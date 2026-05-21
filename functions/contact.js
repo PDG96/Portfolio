@@ -30,6 +30,19 @@ function escapeHtml(str = '') {
     .replace(/'/g, '&#39;');
 }
 
+// Diagnostic: GET /contact returns whether the function is alive and
+// whether the RESEND_API_KEY env var is wired up. Never leaks the key itself.
+export async function onRequestGet({ env }) {
+  return json({
+    ok: true,
+    function: 'contact',
+    runtime: 'cloudflare-pages-function',
+    resend_key_set: Boolean(env.RESEND_API_KEY),
+    resend_key_length: env.RESEND_API_KEY ? env.RESEND_API_KEY.length : 0,
+    timestamp: new Date().toISOString()
+  });
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.RESEND_API_KEY) {
     return json({ ok: false, error: 'missing_api_key' }, 500);
