@@ -1,21 +1,25 @@
 /**
  * POST /contact
  * Receives the landing-page contact form and relays it to Pietra's inbox
- * via the MailChannels HTTP API. Runs on Cloudflare Pages Functions.
+ * through the Resend HTTP API. Runs on Cloudflare Pages Functions.
  *
- * Required (none — MailChannels is callable from inside CF Workers/Pages
- * without an API key). For deliverability you still need three DNS records
- * on pietragottardo.com:
- *   1. SPF       TXT @                  "v=spf1 a mx include:relay.mailchannels.net ~all"
- *   2. Lockdown  TXT _mailchannels      "v=mc1 cfid=pages.dev cfid=pietragottardo.com"
- *   3. DKIM      (optional, recommended — generate a keypair, publish the
- *                 public half as a TXT record, sign with the private half here)
+ * Setup (one-time):
+ *   1. Sign up at https://resend.com (free, 100/day, no credit card)
+ *   2. Create an API key in the dashboard
+ *   3. In Cloudflare Pages → Settings → Environment variables, add:
+ *        RESEND_API_KEY = re_xxxxxxxx
+ *      (Production scope; click Save and redeploy)
+ *   4. For testing immediately, leave FROM_ADDRESS as
+ *      'onboarding@resend.dev' — Resend lets you send from that sender
+ *      to your own verified email without any DNS work.
+ *   5. Later, to send "from" pietragottardo.com:
+ *        - Add the domain in Resend's dashboard
+ *        - Paste the DKIM + SPF records they give you into Cloudflare DNS
+ *        - Change FROM_ADDRESS below to "hello@pietragottardo.com"
  */
 
-const FROM_ADDRESS = 'noreply@pietragottardo.com';
-const FROM_NAME    = 'Portfolio Contact Form';
+const FROM_ADDRESS = 'Portfolio <onboarding@resend.dev>';
 const TO_ADDRESS   = 'pietragottardo@gmail.com';
-const TO_NAME      = 'Pietra Gottardo';
 
 function escapeHtml(str = '') {
   return String(str)
@@ -26,7 +30,11 @@ function escapeHtml(str = '') {
     .replace(/'/g, '&#39;');
 }
 
-export async function onRequestPost({ request }) {
+export async function onRequestPost({ request, env }) {
+  if (!env.RESEND_API_KEY) {
+    return json({ ok: false, error: 'missing_api_key' }, 500);
+  }
+
   let payload;
   try {
     const contentType = request.headers.get('content-type') || '';
@@ -40,13 +48,13 @@ export async function onRequestPost({ request }) {
     return json({ ok: false, error: 'invalid_body' }, 400);
   }
 
-  const name    = (payload.name    || '').toString().trim().slice(0, 120);
-  const email   = (payload.email   || '').toString().trim().slice(0, 200);
-  const message = (payload.message || '').toString().trim().slice(0, 5000);
-  const honeypot = (payload.website || '').toString().trim();
+  const name     = (payload.name     || '').toString().trim().slice(0, 120);
+  const email    = (payload.email    || '').toString().trim().slice(0, 200);
+  const message  = (payload.message  || '').toString().trim().slice(0, 5000);
+  const honeypot = (payload.website  || '').toString().trim();
 
   if (honeypot) {
-    // Silently accept spam, the bot thinks it succeeded
+    // Silently accept spam — the bot thinks it succeeded
     return json({ ok: true });
   }
   if (!name || !email || !message) {
@@ -68,29 +76,26 @@ export async function onRequestPost({ request }) {
     </div>
   `;
 
-  const mcBody = {
-    personalizations: [{
-      to: [{ email: TO_ADDRESS, name: TO_NAME }]
-    }],
-    from: { email: FROM_ADDRESS, name: FROM_NAME },
-    reply_to: { email, name },
-    subject,
-    content: [
-      { type: 'text/plain', value: text },
-      { type: 'text/html',  value: html }
-    ]
-  };
-
-  const mcResp = await fetch('https://api.mailchannels.net/tx/v1/send', {
+  const resp = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(mcBody)
+    headers: {
+      'authorization': `Bearer ${env.RESEND_API_KEY}`,
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify({
+      from: FROM_ADDRESS,
+      to: [TO_ADDRESS],
+      reply_to: email,
+      subject,
+      text,
+      html
+    })
   });
 
-  if (!mcResp.ok) {
-    const detail = await mcResp.text();
-    console.log('mailchannels_failed', mcResp.status, detail);
-    return json({ ok: false, error: 'send_failed', status: mcResp.status }, 502);
+  if (!resp.ok) {
+    const detail = await resp.text();
+    console.log('resend_failed', resp.status, detail);
+    return json({ ok: false, error: 'send_failed', status: resp.status, detail }, 502);
   }
 
   return json({ ok: true });
