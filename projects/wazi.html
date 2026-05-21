@@ -288,7 +288,7 @@
  margin-bottom: var(--section-gap);
  }
  @media (min-width: 720px) {
- .case-meta { grid-template-columns: repeat(4, 1fr); }
+ .case-meta { grid-template-columns: repeat(5, 1fr); }
  }
  .case-meta-item {
  display: flex;
@@ -309,6 +309,18 @@
  color: var(--text);
  line-height: 1.4;
  }
+ a.case-meta-value {
+ display: inline-flex;
+ align-items: center;
+ gap: 0.4rem;
+ text-decoration: none;
+ color: var(--text);
+ transition: color 0.2s var(--ease), gap 0.2s var(--ease);
+ width: fit-content;
+ }
+ a.case-meta-value:hover { color: var(--accent); gap: 0.55rem; }
+ a.case-meta-value svg { opacity: 0.7; transition: opacity 0.2s var(--ease); }
+ a.case-meta-value:hover svg { opacity: 1; }
 
  /* Hero mockup placeholder */
  .case-hero-mockup--image {
@@ -1640,13 +1652,6 @@
 
  <p class="case-lead r" data-i18n="case_lead">A platform that brings trust and transparency to artisanal and small-scale gold mining. Every miner, aggregator, monitor and buyer contributes to a shared evidence base, while keeping sovereignty over their own data.</p>
 
- <a href="https://wazi.datastake.io/" target="_blank" rel="noopener" class="case-live-link r">
-   <span data-i18n="live_link">Visit live site</span>
-   <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-     <path d="M6 2h8v8M14 2L6 10M12 9v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/>
-   </svg>
- </a>
-
  <div class="case-meta r-stagger">
  <div class="case-meta-item r">
  <span class="case-meta-label" data-i18n="meta_role">Role</span>
@@ -1663,6 +1668,15 @@
  <div class="case-meta-item r">
  <span class="case-meta-label" data-i18n="meta_team">Team</span>
  <span class="case-meta-value" data-i18n="meta_team_val">Datastake product team</span>
+ </div>
+ <div class="case-meta-item r">
+ <span class="case-meta-label" data-i18n="meta_live">Live site</span>
+ <a href="https://wazi.datastake.io/" target="_blank" rel="noopener" class="case-meta-value">
+ <span data-i18n="meta_live_val">wazi.datastake.io</span>
+ <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+ <path d="M6 2h8v8M14 2L6 10M12 9v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/>
+ </svg>
+ </a>
  </div>
  </div>
 
@@ -1960,6 +1974,8 @@
  meta_deliverables_val: "Web Platform, Marketing Site",
  meta_team: "Team",
  meta_team_val: "Datastake product team",
+ meta_live: "Live site",
+ meta_live_val: "wazi.datastake.io",
  challenge_label: "The Challenge",
  challenge_title: "Responsible sourcing was a cost, not a collaboration.",
  challenge_p1: "Artisanal and small-scale mining supplies roughly 20% of the world's gold, but the path from a mining site to the market is opaque, fragmented, and often distrusted. Aggregators juggled paper forms and disconnected apps. Downstream buyers couldn't verify what they were buying. Civil society monitors documented abuses without the tools to share evidence at scale.",
@@ -2026,6 +2042,8 @@
  meta_deliverables_val: "Plataforma Web, Site Institucional",
  meta_team: "Time",
  meta_team_val: "Time de produto da Datastake",
+ meta_live: "Site no ar",
+ meta_live_val: "wazi.datastake.io",
  challenge_label: "O Desafio",
  challenge_title: "Sourcing responsável era um custo, não uma colaboração.",
  challenge_p1: "A mineração artesanal e de pequena escala fornece cerca de 20% do ouro mundial, mas o caminho do garimpo até o mercado é opaco, fragmentado e visto com desconfiança. Agregadores faziam malabarismo entre formulários em papel e apps desconectados. Compradores downstream não conseguiam verificar o que estavam comprando. Monitores da sociedade civil documentavam abusos sem ferramentas para compartilhar evidências em escala.",

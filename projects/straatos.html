@@ -289,7 +289,7 @@
  margin-bottom: var(--section-gap);
  }
  @media (min-width: 720px) {
- .case-meta { grid-template-columns: repeat(4, 1fr); }
+ .case-meta { grid-template-columns: repeat(5, 1fr); }
  }
  .case-meta-item {
  display: flex;
@@ -310,6 +310,18 @@
  color: var(--text);
  line-height: 1.4;
  }
+ a.case-meta-value {
+ display: inline-flex;
+ align-items: center;
+ gap: 0.4rem;
+ text-decoration: none;
+ color: var(--text);
+ transition: color 0.2s var(--ease), gap 0.2s var(--ease);
+ width: fit-content;
+ }
+ a.case-meta-value:hover { color: var(--accent); gap: 0.55rem; }
+ a.case-meta-value svg { opacity: 0.7; transition: opacity 0.2s var(--ease); }
+ a.case-meta-value:hover svg { opacity: 1; }
 
  /* Hero mockup placeholder */
  .case-hero-mockup {
@@ -2372,13 +2384,6 @@
 
  <p class="case-lead r" data-i18n="case_lead">Straatos is a digital infrastructure for environmental and outdoor projects. It supports the full lifecycle of climate action: from field data collection to credit issuance, ensuring that every data point is traceable, verifiable, and fair.</p>
 
- <a href="https://www.straatos.io/" target="_blank" rel="noopener" class="case-live-link r">
-   <span data-i18n="live_link">Visit live site</span>
-   <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-     <path d="M6 2h8v8M14 2L6 10M12 9v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/>
-   </svg>
- </a>
-
  <div class="case-meta r-stagger">
  <div class="case-meta-item r">
  <span class="case-meta-label" data-i18n="meta_role">Role</span>
@@ -2395,6 +2400,15 @@
  <div class="case-meta-item r">
  <span class="case-meta-label" data-i18n="meta_team">Team</span>
  <span class="case-meta-value" data-i18n="meta_team_val">Me + 6 Engineers</span>
+ </div>
+ <div class="case-meta-item r">
+ <span class="case-meta-label" data-i18n="meta_live">Live site</span>
+ <a href="https://www.straatos.io/" target="_blank" rel="noopener" class="case-meta-value">
+ <span data-i18n="meta_live_val">straatos.io</span>
+ <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+ <path d="M6 2h8v8M14 2L6 10M12 9v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/>
+ </svg>
+ </a>
  </div>
  </div>
 
@@ -2667,6 +2681,8 @@
  meta_deliverables_val: "Web App, Mobile App",
  meta_team: "Team",
  meta_team_val: "Me + 6 Engineers",
+ meta_live: "Live site",
+ meta_live_val: "straatos.io",
  challenge_label: "The Challenge",
  challenge_title: "Restoration projects ran on spreadsheets, paper, and hope.",
  challenge_p1: "Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.",
@@ -2727,6 +2743,8 @@
  meta_deliverables_val: "Web App, App Mobile",
  meta_team: "Time",
  meta_team_val: "Eu + 6 Engenheiros",
+ meta_live: "Site no ar",
+ meta_live_val: "straatos.io",
  challenge_label: "O Desafio",
  challenge_title: "Projetos de restauração rodavam em planilhas, papel e esperança.",
  challenge_p1: "Times gerenciando projetos de carbono baseados em natureza malabarismo de dados entre planilhas, anotações de campo em papel, imagens de satélite e sistemas legados desconectados. Técnicos em locais remotos não tinham ferramentas que funcionassem offline e acompanhassem o fluxo de trabalho do dia a dia.",
