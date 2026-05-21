@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="WAZI — The digital backbone for ethical gold. A platform bringing trust and transparency to artisanal and small-scale mining.">
   <meta name="theme-color" content="#fcfcfc">
-  <title>WAZI — Digital Gold Ecosystem · Case Study</title>
+  <title>WAZI — Digital Gold Ecosystem · Case Study · Pietra Gottardo</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="apple-touch-icon" href="../favicon.svg">
 
   <link rel="stylesheet" href="../assets/fonts/lausanne.css">
 
@@ -376,6 +378,72 @@
     }
     .case-section--alt { background: var(--bg-alt); }
 
+    /* Research & Process — horizontal scroll-snap carousel of the 3 artefacts.
+       Each card lifts and gains a soft border on hover; siblings dim a touch. */
+    .rp-car {
+      position: relative;
+      margin-top: clamp(2rem, 4vw, 3rem);
+      /* Bleed the carousel slightly past the wrap so cards approach the viewport edge */
+      margin-left: calc(-1 * clamp(1.25rem, 4vw, 3rem));
+      margin-right: calc(-1 * clamp(1.25rem, 4vw, 3rem));
+      padding-block: 0.5rem;
+    }
+    .rp-car-track {
+      display: flex;
+      gap: clamp(1rem, 2vw, 1.5rem);
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding: 1rem clamp(1.25rem, 4vw, 3rem) 1.5rem;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    .rp-card {
+      flex: 0 0 min(86vw, 880px);
+      scroll-snap-align: start;
+      margin: 0;
+      background: #fafafa;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform 0.45s var(--ease),
+                  border-color 0.45s var(--ease),
+                  box-shadow 0.45s var(--ease),
+                  opacity 0.45s var(--ease);
+      cursor: pointer;
+    }
+    .rp-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+    }
+    .rp-card figcaption {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      padding: 1rem 1.25rem 1.25rem;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    /* Hover state — siblings dim, hovered card lifts + accent border */
+    .rp-car-track:hover .rp-card { opacity: 0.5; }
+    .rp-car-track:hover .rp-card:hover {
+      opacity: 1;
+      transform: translateY(-6px);
+      border-color: var(--text);
+      box-shadow: 0 28px 60px -24px rgba(15, 23, 42, 0.22),
+                  0 8px 20px -10px rgba(15, 23, 42, 0.12);
+    }
+    .rp-car-track:hover .rp-card:hover figcaption {
+      color: var(--text);
+    }
+    @media (min-width: 1024px) {
+      .rp-card { flex: 0 0 min(60vw, 1100px); }
+    }
+
     .case-section--dark {
       background: var(--gray-true-900);
       color: var(--gray-true-25);
@@ -414,6 +482,16 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
       color: var(--text-3);
+      margin: 0;
+    }
+    @media (max-width: 640px) {
+      .network-shot { gap: 0.625rem; }
+      .network-shot figcaption,
+      .rp-card figcaption {
+        font-size: 0.5625rem;
+        letter-spacing: 0.1em;
+        line-height: 1.4;
+      }
     }
 
     /* Graph figure — interactive iframe rendered as a card, same grid as siblings */
@@ -428,7 +506,7 @@
     /* Supplier assessment variant — looping mov, container hugs the video tightly. */
     .network-shot--gold .network-embed {
       background: transparent;
-      border-radius: 30px;
+      border-radius: clamp(14px, 3vw, 30px);
       overflow: hidden;
       position: relative;
       aspect-ratio: auto;
@@ -438,7 +516,7 @@
       display: block;
       width: 100%;
       height: auto;
-      border-radius: 30px;
+      border-radius: clamp(14px, 3vw, 30px);
     }
     .network-shot--graph .network-iframe {
       width: 100%;
@@ -473,6 +551,28 @@
       height: 10px;
       border-radius: 50%;
       display: inline-block;
+    }
+
+    /* Mobile — give the graph more height and move the legend out of the canvas
+       so the D3 nodes don't overlap the legend pills. */
+    @media (max-width: 640px) {
+      .network-shot--graph .network-embed {
+        aspect-ratio: 4 / 5;
+      }
+      .network-legend {
+        position: static;
+        margin-top: 0.75rem;
+        padding: 0;
+        background: transparent;
+        color: var(--text-2);
+        gap: 0.875rem 1.25rem;
+        font-size: 0.5625rem;
+        letter-spacing: 0.1em;
+      }
+      .network-legend .dot {
+        width: 8px;
+        height: 8px;
+      }
     }
 
     /* Hero showcase — image contained in the .wrap grid, same as other shots */
@@ -1328,6 +1428,63 @@
     .mock-progress-fill {
       height: 100%; border-radius: 2px; background: #0d2b2e;
     }
+
+    /* ============ LIGHTBOX (click any case-study image to expand) ============ */
+    [data-zoom] { cursor: zoom-in; }
+    .lightbox {
+      position: fixed; inset: 0;
+      background: rgba(15, 18, 22, 0.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(1rem, 3vw, 3rem);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease);
+    }
+    .lightbox.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      /* Light backdrop behind the image so SVGs designed for light cards
+         (ecosystem, sitemap, blueprint) keep their text contrast in the lightbox.
+         Photos with opaque pixels aren't affected. */
+      background: #fafafa;
+      box-shadow: 0 32px 80px -20px rgba(0,0,0,0.6);
+      transform: scale(0.94);
+      transition: transform 0.32s var(--ease);
+    }
+    .lightbox.is-open img { transform: scale(1); }
+    .lightbox-close {
+      position: absolute;
+      top: clamp(0.75rem, 2vw, 1.5rem);
+      right: clamp(0.75rem, 2vw, 1.5rem);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+      color: #fcfcfc;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.25s, transform 0.25s;
+    }
+    .lightbox-close:hover {
+      background: rgba(255,255,255,0.18);
+      transform: scale(1.06);
+    }
+    .lightbox-close svg { width: 18px; height: 18px; }
+    body.lightbox-open { overflow: hidden; }
+    @media (prefers-reduced-motion: reduce) {
+      .lightbox, .lightbox img { transition: none; }
+    }
   </style>
 </head>
 
@@ -1467,44 +1624,29 @@
     </div>
   </section>
 
-  <!-- ====== RESEARCH — Stakeholder ecosystem ====== -->
+  <!-- ====== RESEARCH & PROCESS (single section, 3 image carousel) ====== -->
   <section class="case-section">
     <div class="wrap">
       <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="eco_label">Research · Field of play</p>
-        <h2 data-i18n="eco_title">Whose gold is it, anyway?</h2>
-        <p class="explore-intro" data-i18n="eco_intro">Before sketching anything, I mapped the ecosystem: who holds gold, who holds the paperwork, who holds the receipts. Desk research pulled from OECD, World Bank/Delve and the planetGOLD programme; 14 conversations filled in what the reports don't say.</p>
+        <p class="case-section-label" data-i18n="rp_label">Research &amp; Process</p>
+        <h2 data-i18n="rp_title">From the field, to the architecture, to the screen.</h2>
+        <p class="explore-intro" data-i18n="rp_intro">Three artefacts shaped the work — an ecosystem map of who holds the gold (and the paperwork), the sidebar architecture that survives six different roles, and the service blueprint that turns user intent into auditable evidence. Each one carries its own title, so scroll the carousel below.</p>
       </div>
-      <div class="r" style="margin-top: 2rem; border-radius: 16px; overflow: hidden; background: #fafafa; padding: clamp(1rem, 2vw, 2rem);">
-        <img src="assets/wazi/wazi-ecosystem.svg" alt="Stakeholder ecosystem map for the WAZI use case — upstream (mine operator, cooperative, community), midstream (aggregator, exporter, refiner), and downstream (bullion bank, jewellery brand, consumer), with witnesses (CSO monitors, customs, verifiers, banks, standard-setters, journalists) feeding evidence into the chain. Key stats: ~20% of world gold from ASM, ~45M people, 80+ countries, 5 OECD Annex II categories." style="width:100%; display:block;">
-      </div>
-    </div>
-  </section>
-
-  <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
-  <section class="case-section case-section--alt">
-    <div class="wrap">
-      <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
-        <h2 data-i18n="ia_title">One sidebar, switched by role.</h2>
-        <p class="explore-intro" data-i18n="ia_intro">WAZI doesn't manage projects — it orchestrates a shared evidence base across six roles. Each role (Aggregator, Operator, Monitor, Buyer, Regulator, Partner) sees the same three-section sidebar: <strong>Analysis</strong> for cross-cutting views, <strong>Modules</strong> for the work itself, <strong>Data</strong> for raw access. The grammar doesn't change between roles — only what's actionable does.</p>
-      </div>
-      <div class="r" style="margin-top: 2rem; border-radius: 16px; overflow: hidden; background: #fafafa; padding: clamp(1rem, 2vw, 2rem);">
-        <img src="assets/wazi/wazi-sitemap.svg" alt="WAZI sitemap — Application branch (Network, Due Diligence, Reports) and Project branch (Profile, Operations, Trade), with frameworks band at the bottom listing OECD Annex II, LBMA Responsible Gold, RMI/RMAP, ICGLR, CRAFT, Fairmined, UN Guiding Principles." style="width:100%; display:block;">
-      </div>
-    </div>
-  </section>
-
-  <!-- ====== SERVICE BLUEPRINT ====== -->
-  <section class="case-section">
-    <div class="wrap">
-      <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="bp_label">Process · Service blueprint</p>
-        <h2 data-i18n="bp_title">What the user sees vs. what the platform does.</h2>
-        <p class="explore-intro" data-i18n="bp_intro">Six phases, following the WAZI sidebar order: Onboarding → Self Assessment → Operations → Due Diligence → Analysis → Reporting. Three lanes: the action the user takes, the orchestration the platform runs behind the line of visibility, and the evidence trail that gets written. The blueprint surfaced the design principles WAZI rests on.</p>
-      </div>
-      <div class="r" style="margin-top: 2rem; border-radius: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; background: #fafafa; padding: clamp(1rem, 2vw, 2rem);">
-        <img src="assets/wazi/wazi-blueprint.svg" alt="WAZI service blueprint — Front-stage (user actions), Back-stage (platform orchestration) and Evidence trail (data written), across five phases: Onboard, Self-Assess, Field evidence, Aggregate, Verify, Trade. Footer surfaces design principles: authorship is never lost, offline is the default, verification reads never re-types, frameworks plug in, every action is auditable." style="width:100%; display:block; min-width: 1000px;">
+      <div class="rp-car r">
+        <div class="rp-car-track">
+          <figure class="rp-card">
+            <img src="assets/wazi/wazi-ecosystem.svg" alt="Stakeholder ecosystem map for the WAZI use case — upstream (mine operator, cooperative, community), midstream (aggregator, exporter, refiner), and downstream (bullion bank, jewellery brand, consumer), with witnesses (CSO monitors, customs, verifiers, banks, standard-setters, journalists) feeding evidence into the chain.">
+            <figcaption data-i18n="rp_cap_eco">Stakeholder ecosystem · Research</figcaption>
+          </figure>
+          <figure class="rp-card">
+            <img src="assets/wazi/wazi-sitemap.svg" alt="WAZI sitemap — Dashboard, Analysis, Modules and Data sections of the sidebar shared by every role, plus the frameworks the architecture respects.">
+            <figcaption data-i18n="rp_cap_ia">Information architecture · Sidebar</figcaption>
+          </figure>
+          <figure class="rp-card">
+            <img src="assets/wazi/wazi-blueprint.svg" alt="WAZI service blueprint — Front-stage user actions, back-stage platform orchestration and the evidence trail written along the way, across six phases following the sidebar order.">
+            <figcaption data-i18n="rp_cap_bp">Service blueprint · Process</figcaption>
+          </figure>
+        </div>
       </div>
     </div>
   </section>
@@ -1663,15 +1805,12 @@
         solution_title: "A shared evidence base — with sovereignty by design.",
         solution_p1: "A role-based digital platform where every stakeholder in the gold value chain contributes to a shared, traceable evidence base while retaining control over their own data. Mine operators own their self-assessments. Aggregators consolidate ESG, risk, and shipment data. Monitors upload field observations without losing authorship.",
         solution_p2: "The platform produces audit-ready dossiers aligned to LBMA, RMI and OECD frameworks — and is built on the Datastake Application Framework, so it plugs into tools like KoboToolbox instead of replacing them.",
-        eco_label: "Research · Field of play",
-        eco_title: "Whose gold is it, anyway?",
-        eco_intro: "Before sketching anything, I mapped the ecosystem: who holds gold, who holds the paperwork, who holds the receipts. Desk research pulled from OECD, World Bank/Delve and the planetGOLD programme; 14 conversations filled in what the reports don't say.",
-        ia_label: "Information Architecture",
-        ia_title: "One sidebar, switched by role.",
-        ia_intro: "WAZI doesn't manage projects — it orchestrates a shared evidence base across six roles. Each role (Aggregator, Operator, Monitor, Buyer, Regulator, Partner) sees the same three-section sidebar: <strong>Analysis</strong> for cross-cutting views, <strong>Modules</strong> for the work itself, <strong>Data</strong> for raw access. The grammar doesn't change between roles — only what's actionable does.",
-        bp_label: "Process · Service blueprint",
-        bp_title: "What the user sees vs. what the platform does.",
-        bp_intro: "Six phases, following the WAZI sidebar order: Onboarding → Self Assessment → Operations → Due Diligence → Analysis → Reporting. Three lanes: the action the user takes, the orchestration the platform runs behind the line of visibility, and the evidence trail that gets written. The blueprint surfaced the design principles WAZI rests on.",
+        rp_label: "Research &amp; Process",
+        rp_title: "From the field, to the architecture, to the screen.",
+        rp_intro: "Three artefacts shaped the work — an ecosystem map of who holds the gold (and the paperwork), the sidebar architecture that survives six different roles, and the service blueprint that turns user intent into auditable evidence. Each one carries its own title, so scroll the carousel below.",
+        rp_cap_eco: "Stakeholder ecosystem · Research",
+        rp_cap_ia: "Information architecture · Sidebar",
+        rp_cap_bp: "Service blueprint · Process",
         onb_label: "Onboarding",
         onb_title: "Meets every stakeholder where they are.",
         onb_intro: "From cooperatives to state actors and civil society — the registration flow adapts to the role, asks only what's relevant, and runs on whatever device the user brought to the table.",
@@ -1722,15 +1861,12 @@
         solution_title: "Uma base de evidências compartilhada — com soberania por design.",
         solution_p1: "Uma plataforma digital baseada em papéis onde todo stakeholder da cadeia de valor do ouro contribui para uma base de evidências compartilhada e rastreável, mantendo controle sobre seus próprios dados. Operadores de minas são donos das suas autoavaliações. Agregadores consolidam dados de ESG, risco e shipment. Monitores fazem upload de observações de campo sem perder a autoria.",
         solution_p2: "A plataforma gera dossiês prontos para auditoria alinhados aos frameworks LBMA, RMI e OECD — e é construída sobre o Datastake Application Framework, então se conecta a ferramentas como o KoboToolbox em vez de substituí-las.",
-        eco_label: "Pesquisa · Campo de jogo",
-        eco_title: "De quem é esse ouro, afinal?",
-        eco_intro: "Antes de desenhar qualquer coisa, mapeei o ecossistema: quem tem o ouro, quem tem o papel, quem tem o recibo. Desk research na OECD, Banco Mundial/Delve e no programa planetGOLD; 14 conversas preencheram o que os relatórios não contam.",
-        ia_label: "Arquitetura da Informação",
-        ia_title: "Uma sidebar, trocada por papel.",
-        ia_intro: "A WAZI não gerencia projetos — orquestra uma base de evidências compartilhada entre seis papéis. Cada papel (Aggregator, Operator, Monitor, Buyer, Regulator, Partner) vê a mesma sidebar de três seções: <strong>Analysis</strong> pra visões cruzadas, <strong>Modules</strong> pra o trabalho em si, <strong>Data</strong> pra acesso bruto. A gramática não muda entre papéis — só o que é acionável muda.",
-        bp_label: "Processo · Service blueprint",
-        bp_title: "O que o usuário vê vs. o que a plataforma faz.",
-        bp_intro: "Seis fases, seguindo a ordem da sidebar da WAZI: Onboarding → Self Assessment → Operations → Due Diligence → Analysis → Reporting. Três pistas: a ação que o usuário toma, a orquestração que a plataforma roda atrás da linha de visibilidade, e a trilha de evidência que fica registrada. O blueprint expôs os princípios de design que sustentam o WAZI.",
+        rp_label: "Pesquisa &amp; Processo",
+        rp_title: "Do campo, à arquitetura, à tela.",
+        rp_intro: "Três artefatos moldaram o trabalho — um mapa do ecossistema de quem detém o ouro (e o papel), a arquitetura de sidebar que sobrevive a seis papéis diferentes, e o service blueprint que transforma a intenção do usuário em evidência auditável. Cada um carrega seu próprio título — basta rolar o carrossel abaixo.",
+        rp_cap_eco: "Ecossistema de stakeholders · Pesquisa",
+        rp_cap_ia: "Arquitetura da informação · Sidebar",
+        rp_cap_bp: "Service blueprint · Processo",
         onb_label: "Onboarding",
         onb_title: "Encontra cada stakeholder onde ele está.",
         onb_intro: "De cooperativas a atores estatais e sociedade civil — o fluxo de cadastro se adapta ao papel, pede só o que é relevante e roda em qualquer dispositivo que o usuário levar à mesa.",
@@ -1813,6 +1949,52 @@
         requestAnimationFrame(tick);
       }
       tick();
+    })();
+
+    /* ============ Image lightbox ============ */
+    (() => {
+      const selectors = [
+        '.network-shot img',
+        '.case-hero-mockup img',
+        '.rp-card img',
+        '.showcase-shot img'
+      ];
+      const targets = document.querySelectorAll(selectors.join(','));
+      if (!targets.length) return;
+
+      const lb = document.createElement('div');
+      lb.className = 'lightbox';
+      lb.setAttribute('role', 'dialog');
+      lb.setAttribute('aria-modal', 'true');
+      lb.innerHTML = `
+        <button class="lightbox-close" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <img alt="">
+      `;
+      document.body.appendChild(lb);
+      const lbImg = lb.querySelector('img');
+      const close = () => {
+        lb.classList.remove('is-open');
+        document.body.classList.remove('lightbox-open');
+        setTimeout(() => { lbImg.src = ''; }, 320);
+      };
+      const open = (src, alt) => {
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        document.body.classList.add('lightbox-open');
+        requestAnimationFrame(() => lb.classList.add('is-open'));
+      };
+      targets.forEach(img => {
+        img.setAttribute('data-zoom', '');
+        img.addEventListener('click', () => open(img.currentSrc || img.src, img.alt));
+      });
+      lb.addEventListener('click', (e) => {
+        if (e.target === lb || e.target.closest('.lightbox-close')) close();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lb.classList.contains('is-open')) close();
+      });
     })();
   </script>
 

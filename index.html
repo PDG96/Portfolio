@@ -27,14 +27,14 @@
       --gray-true-800: #292929;
       --gray-true-900: #141414;
 
-      /* Semantic tokens */
-      --bg:       var(--gray-true-25);
-      --bg-alt:   var(--gray-true-100);
-      --surface:  #ffffff;
-      --text:     var(--gray-true-900);
-      --text-2:   var(--gray-true-500);
-      --text-3:   var(--gray-true-400);
-      --border:   var(--gray-true-200);
+      /* Semantic tokens — dark theme. Body wears a fine grain texture via body::after. */
+      --bg:       var(--gray-true-900);
+      --bg-alt:   #1c1c1c;
+      --surface:  rgba(255, 255, 255, 0.04);
+      --text:     var(--gray-true-25);
+      --text-2:   rgba(252, 252, 252, 0.62);
+      --text-3:   rgba(252, 252, 252, 0.40);
+      --border:   rgba(255, 255, 255, 0.10);
 
       /* Primary accent (brand) */
       --accent: #3d5a3e;
@@ -353,16 +353,15 @@
     .ctc {
       background: var(--gray-true-900);
       color: var(--gray-true-25);
-      padding: var(--section-py) 0;
+      padding: clamp(6rem, 11vw, 9rem) 0;
       position: relative;
-      min-height: 100svh;
+      min-height: 70svh;
       display: flex;
       align-items: center;
     }
     .ctc > .wrap { width: 100%; }
-    .ctc .ctc-label { color: rgba(252,252,252,0.45); }
     .ctc h2 { color: var(--gray-true-25); }
-    .ctc p { color: rgba(252,252,252,0.55); }
+    .ctc .ctc-p { color: rgba(252,252,252,0.6); margin: 1rem 0 2rem; max-width: 48ch; }
     .ctc .btn-primary {
       background: var(--gray-true-25);
       color: var(--gray-true-900);
@@ -383,22 +382,7 @@
         gap: 4rem;
       }
     }
-    .ctc-label {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-      margin-bottom: 1.25rem;
-    }
-    .ctc h2 {
-      font-size: clamp(1.875rem, 4vw, 2.75rem);
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 1.5rem;
-    }
+    /* CTC heading is styled by .section-header h2; just keep the em accent. */
     .ctc h2 em {
       font-style: italic;
       font-weight: 300;
@@ -422,15 +406,26 @@
       height: 100%;
     }
 
-    /* ====== SERVICES — light bg ====== */
+    /* ====== SERVICES — dark, with a slow drifting dot field behind the cards ====== */
     .services {
       padding: clamp(7rem, 13vw, 11rem) 0;
-      background: var(--bg);
+      background: transparent;
       color: var(--text);
       display: flex;
       align-items: center;
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
     }
-    .services > .wrap { width: 100%; }
+    .services > .wrap { width: 100%; position: relative; z-index: 1; }
+    .services-dots {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
 
     /* Stage-card entrance — softer rise + scale, distinct from default reveal */
     .stages .stage-card.r {
@@ -497,19 +492,21 @@
       flex-direction: column;
       gap: 1rem;
       padding: 1.75rem 1.5rem;
-      background: var(--surface);
-      border: 1px solid var(--border);
+      background: transparent;
+      border: 1px solid rgba(252, 252, 252, 0.12);
       border-radius: 16px;
+      backdrop-filter: blur(28px) saturate(1.25);
+      -webkit-backdrop-filter: blur(28px) saturate(1.25);
       transition: transform 0.4s var(--ease),
                   border-color 0.4s var(--ease),
                   box-shadow 0.4s var(--ease),
                   background 0.4s var(--ease);
-      isolation: isolate;
     }
     .stage-card:hover {
       transform: translateY(-4px);
-      border-color: var(--text);
-      box-shadow: 0 18px 36px -18px rgba(20, 20, 20, 0.18);
+      border-color: rgba(252, 252, 252, 0.28);
+      background: rgba(252, 252, 252, 0.07);
+      box-shadow: 0 22px 44px -16px rgba(0, 0, 0, 0.5);
     }
 
     /* Top row: number badge + a small connector dot mark */
@@ -669,7 +666,8 @@
     }
     .case-card:hover {
       transform: translateY(-6px);
-      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.06);
+      border-color: rgba(252, 252, 252, 0.25);
+      box-shadow: 0 28px 56px -18px rgba(0,0,0,0.6);
     }
 
     /* Coming-soon variant — not interactive. Sits flat in the carousel with a
@@ -792,8 +790,8 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: var(--accent);
-      background: var(--accent-light);
+      color: rgba(252, 252, 252, 0.78);
+      background: rgba(252, 252, 252, 0.08);
       padding: 4px 10px;
       border-radius: 4px;
     }
@@ -818,7 +816,7 @@
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.12em;
-      color: var(--accent);
+      color: var(--accent-yellow);
       display: inline-flex; align-items: center; gap: 0.5rem;
       transition: gap 0.3s var(--ease);
     }
@@ -844,7 +842,7 @@
       top: 0; left: 0;
       height: 100%;
       width: 33%;
-      background: var(--accent);
+      background: var(--accent-yellow);
       border-radius: 1px;
       transition: left 0.15s ease-out;
     }
@@ -1060,14 +1058,8 @@
       .contact-layout { grid-template-columns: 1fr 1fr; gap: 5rem; }
     }
 
-    .contact-left h2 {
-      font-size: clamp(1.875rem, 4vw, 2.75rem);
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      color: var(--gray-true-25);
-      margin-bottom: 1.5rem;
-    }
+    /* Inherits size/weight from .section-header h2; just sets dark-section colour */
+    .contact-left h2 { color: var(--gray-true-25); }
     .contact-left p {
       font-size: 0.9375rem;
       color: rgba(252,252,252,0.55);
@@ -1227,7 +1219,7 @@
     <div class="wrap hero-content">
       <p class="hero-eyebrow r" data-i18n="hero_eyebrow">Product Architect</p>
       <h1 class="r" data-i18n="hero_h1">SaaS products that people<br><em>actually</em> understand.</h1>
-      <p class="hero-sub r" data-i18n="hero_sub">Helping SaaS companies turn complex products into interfaces that click. Strategy, design, and execution — embedded in your team.</p>
+      <p class="hero-sub r" data-i18n="hero_sub">Helping companies turn complex products into interfaces that click. Strategy, design, and execution, embedded in your team.</p>
       <div class="hero-ctas r">
         <a href="#work" class="btn btn-primary" data-i18n="hero_cta_work">See selected work</a>
         <a href="#contact" class="btn btn-ghost" data-i18n="hero_cta_call">Book a call</a>
@@ -1235,15 +1227,16 @@
     </div>
   </section>
 
-  <!-- SERVICES (position 2 — light bg) -->
+  <!-- SERVICES — dark, with drifting dots behind glass cards -->
   <section class="services" id="services">
+    <canvas class="services-dots" id="servicesCanvas" aria-hidden="true"></canvas>
     <div class="wrap">
       <div class="section-header r">
         <div>
           <p class="section-label" data-i18n="services_label">Services</p>
           <h2 data-i18n="services_heading">What I bring to the table</h2>
         </div>
-        <p class="section-header-num">(05)</p>
+        <p class="section-header-num">(01)</p>
       </div>
       <div class="stages r-stagger">
         <article class="stage-card r">
@@ -1327,9 +1320,14 @@
   <section class="ctc" id="ctc">
     <div class="wrap ctc-inner">
       <div class="ctc-left">
-        <p class="ctc-label r" data-i18n="ctc_label">My design philosophy</p>
-        <h2 class="r" data-i18n="ctc_h2">From chaos to <em>momentum.</em></h2>
-        <p class="r" data-i18n="ctc_p">I take the messy, complex, and overwhelming — and shape it into something people can navigate with confidence.</p>
+        <div class="section-header r">
+          <div>
+            <p class="section-label" data-i18n="ctc_label">My design philosophy</p>
+            <h2 data-i18n="ctc_h2">From chaos to <em>momentum.</em></h2>
+          </div>
+          <p class="section-header-num">(02)</p>
+        </div>
+        <p class="r ctc-p" data-i18n="ctc_p">I take the messy, complex, and overwhelming — and shape it into something people can navigate with confidence.</p>
         <a href="#work" class="btn btn-primary r" data-i18n="ctc_cta">See how I do it</a>
       </div>
       <div class="ctc-right r" aria-hidden="true">
@@ -1344,7 +1342,7 @@
       <div class="section-header r">
         <div>
           <p class="section-label" data-i18n="work_label">Selected work</p>
-          <h2 data-i18n="work_heading">Problems solved,<br>products shipped</h2>
+          <h2 data-i18n="work_heading">Problems solved, products shipped</h2>
         </div>
         <p class="section-header-num">(03)</p>
       </div>
@@ -1414,23 +1412,23 @@
   <section class="about" id="about">
     <div class="wrap">
       <div class="section-header r">
-        <p class="section-label" data-i18n="about_label">About</p>
-        <p class="section-header-num">(06)</p>
+        <div>
+          <p class="section-label" data-i18n="about_label">About</p>
+          <h2 data-i18n="about_heading">A bit about me.</h2>
+        </div>
+        <p class="section-header-num">(04)</p>
       </div>
 
       <div class="about-main">
-        <div class="about-photo r" aria-hidden="true">
-          <span class="ph-caption">
-            <span class="ph-caption-label">Photo</span>
-            <span class="ph-caption-text" data-i18n="about_photo_ph">Replace with portrait</span>
-          </span>
+        <div class="about-photo r">
+          <img src="assets/pietra-portrait.png" alt="Portrait of Pietra Gottardo">
         </div>
         <div class="about-bio-col">
           <div class="about-bio">
             <p class="about-lead r" data-i18n="about_lead">Hey! I'm Pietra, I design solutions that work across borders.</p>
             <p class="r" data-i18n="about_p1">I started in graphic design — branding, editorial, industrial — before moving into digital product design. For the past four years I've been focused on SaaS, working with international teams that need to turn complex, regulated, multi-stakeholder domains into interfaces people can actually use.</p>
             <p class="r" data-i18n="about_p2">My work tends to live at the boundary between research, information architecture and the UI itself. I map ecosystems, draw service blueprints, design role-based sidebars, and ship the screens that come out the other end — often working alongside engineering as a product architect rather than handing files over a wall.</p>
-            <p class="r" data-i18n="about_p3">I work in EN and PT-BR. Available for embedded engagements with startups that take their domain seriously.</p>
+            <p class="r" data-i18n="about_p3">I work in EN and PT-BR. Available for new engagements with startups that take their domain seriously.</p>
           </div>
 
           <div class="about-facts-row">
@@ -1463,8 +1461,13 @@
     <div class="wrap">
       <div class="contact-layout">
         <div class="contact-left">
-          <p class="mono-label r" style="color: rgba(252,252,252,0.45)" data-i18n="contact_label">Get in touch</p>
-          <h2 class="r" data-i18n="contact_heading">Let's build something<br>people understand.</h2>
+          <div class="section-header r">
+            <div>
+              <p class="section-label" data-i18n="contact_label">Get in touch</p>
+              <h2 data-i18n="contact_heading">Let's build something<br>people understand.</h2>
+            </div>
+            <p class="section-header-num">(05)</p>
+          </div>
           <p class="r" data-i18n="contact_p">Have a SaaS product that needs clarity? A complex interface that users struggle with? I'd love to hear about it.</p>
           <div class="r" style="margin-top: 2.5rem;">
             <a href="#" class="btn btn-primary contact-calendly" data-i18n="contact_cal">Book a call ↗</a>
@@ -1506,7 +1509,7 @@
         nav_work:"Work", nav_services:"Services", nav_about:"About", nav_contact:"Contact",
         hero_eyebrow:"Product Architect",
         hero_h1:"SaaS products that people<br><em>actually</em> understand.",
-        hero_sub:"Helping SaaS companies turn complex products into interfaces that click. Strategy, design, and execution — embedded in your team.",
+        hero_sub:"Helping companies turn complex products into interfaces that click. Strategy, design, and execution, embedded in your team.",
         hero_cta_work:"See selected work",
         hero_cta_call:"Book a call",
         m1:"UI/UX Design", m2:"Design Systems", m3:"Product Strategy", m4:"User Research", m5:"SaaS", m6:"B2B Platforms",
@@ -1539,10 +1542,11 @@
         c3_overlay:"Coming soon",
         p1:"Research", p2:"Definition", p3:"Solution", scroll_hint:"Scroll to explore",
         about_label:"About",
+        about_heading:"A bit about me.",
         about_lead:"Hey! I'm Pietra, I design solutions that work across borders.",
         about_p1:"I started in graphic design — branding, editorial, industrial — before moving into digital product design. For the past four years I've been focused on SaaS, working with international teams that need to turn complex, regulated, multi-stakeholder domains into interfaces people can actually use.",
         about_p2:"My work tends to live at the boundary between research, information architecture and the UI itself. I map ecosystems, draw service blueprints, design role-based sidebars, and ship the screens that come out the other end — often working alongside engineering as a product architect rather than handing files over a wall.",
-        about_p3:"I work in EN and PT-BR. Available for embedded engagements with startups that take their domain seriously.",
+        about_p3:"I work in EN and PT-BR. Available for new engagements with startups that take their domain seriously.",
         about_photo_ph:"Replace with portrait",
         fact_based_l:"Based",
         fact_based_v:"Remote · Brazil & EU timezones",
@@ -1572,7 +1576,7 @@
         nav_work:"Projetos", nav_services:"Serviços", nav_about:"Sobre", nav_contact:"Contato",
         hero_eyebrow:"Product Architect",
         hero_h1:"Produtos SaaS que as pessoas<br><em>realmente</em> entendem.",
-        hero_sub:"Ajudo empresas SaaS a transformar produtos complexos em interfaces que funcionam. Estratégia, design e execução — integrado ao seu time.",
+        hero_sub:"Ajudo empresas a transformar produtos complexos em interfaces que funcionam. Estratégia, design e execução, integrado ao seu time.",
         hero_cta_work:"Ver projetos",
         hero_cta_call:"Agendar conversa",
         m1:"UI/UX Design", m2:"Design Systems", m3:"Estratégia de Produto", m4:"Pesquisa com Usuários", m5:"SaaS", m6:"Plataformas B2B",
@@ -1605,10 +1609,11 @@
         c3_overlay:"Em breve",
         p1:"Pesquisa", p2:"Definição", p3:"Solução", scroll_hint:"Deslize para explorar",
         about_label:"Sobre",
+        about_heading:"Um pouco sobre mim.",
         about_lead:"Oi! Eu sou a Pietra, desenho soluções que funcionam sem fronteiras.",
         about_p1:"Comecei em design gráfico — branding, editorial, industrial — antes de migrar pro design de produto digital. Nos últimos quatro anos foquei em SaaS, trabalhando com times internacionais que precisam transformar domínios complexos, regulados e multi-stakeholder em interfaces que as pessoas realmente conseguem usar.",
         about_p2:"Meu trabalho vive na fronteira entre pesquisa, arquitetura da informação e a própria UI. Mapeio ecossistemas, desenho service blueprints, projeto sidebars baseadas em papel, e entrego as telas que saem do outro lado — frequentemente trabalhando lado a lado com engenharia como product architect, em vez de jogar arquivos por cima do muro.",
-        about_p3:"Trabalho em EN e PT-BR. Disponível pra engajamentos embedded com startups que levam o domínio delas a sério.",
+        about_p3:"Trabalho em EN e PT-BR. Disponível pra novos engajamentos com startups que levam o domínio delas a sério.",
         about_photo_ph:"Substituir pelo retrato",
         fact_based_l:"Base",
         fact_based_v:"Remoto · Fusos do Brasil & Europa",
@@ -1662,7 +1667,118 @@
     );
     setLang(lang);
 
-// Contact form — opens the user's mail client with a prefilled message
+    // Services — soft accent-yellow dots flowing along a wavy path with some
+    // diffuse "stragglers" breaking out of the path. No sweep, no triggers —
+    // just a quiet, breathing current behind the glass cards.
+    (() => {
+      const canvas = document.getElementById('servicesCanvas');
+      if (!canvas) return;
+      const section = canvas.parentElement;
+      const ctx = canvas.getContext('2d');
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let W = 0, H = 0, midY = 0, amplitude = 0;
+      let dots = [];
+      let raf = null;
+      let running = false;
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = section.getBoundingClientRect();
+        W = Math.max(1, rect.width); H = Math.max(1, rect.height);
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        midY = H * 0.50;
+        amplitude = Math.min(H * 0.22, 110);
+      }
+
+      // Sinusoidal path — 1.4 wavelengths across, phase animates over time.
+      function pathY(x, t) {
+        const k = (Math.PI * 2 * 1.4) / W;
+        const phase = t * 0.0004;
+        const k2 = (Math.PI * 2 * 0.6) / W;
+        return midY
+          + Math.sin(x * k + phase) * amplitude
+          + Math.sin(x * k2 + phase * 1.3) * amplitude * 0.18;
+      }
+
+      function init() {
+        resize();
+        const density = Math.max(80, Math.floor(W / 11));
+        dots = [];
+        for (let i = 0; i < density; i++) {
+          // ~50% of dots are "stragglers" — they break out of the path with a
+          // big perpendicular offset and a slow vertical drift. The rest hug
+          // the path with subtle jitter.
+          const straggler = Math.random() < 0.50;
+          // ~18% of dots take a green tone (sage-lime), like the CTC animation
+          // accents. Greenish dots are slightly brighter so the colour reads
+          // through the heavy backdrop blur.
+          const greenish = Math.random() < 0.18;
+          const baseAlpha = straggler ? 0.05 : 0.10;
+          dots.push({
+            x: (i / density) * W + (Math.random() - 0.5) * (W / density),
+            yOffset: straggler
+              ? (Math.random() - 0.5) * (H * 0.80)
+              : (Math.random() - 0.5) * 40,
+            vy: straggler ? (Math.random() - 0.5) * 0.10 : 0,
+            r: 0.5 + Math.random() * (straggler ? 1.4 : 1.7),
+            vx: 0.08 + Math.random() * 0.30,
+            // Greenish dots get a small alpha + size bump so they stand out a
+            // little more without breaking the soft overall feel.
+            alpha: (greenish ? baseAlpha + 0.10 : baseAlpha) + Math.random() * 0.16,
+            straggler,
+            greenish,
+            twPhase: Math.random() * Math.PI * 2,
+            twFreq: 0.0008 + Math.random() * 0.0012,
+          });
+        }
+      }
+
+      function draw(time) {
+        if (!running) return;
+        ctx.clearRect(0, 0, W, H);
+        for (const d of dots) {
+          d.x += d.vx;
+          d.yOffset += d.vy;
+          if (d.x - d.r > W) d.x = -d.r;
+          // Stragglers drift vertically a little and wrap softly
+          if (d.straggler) {
+            if (d.yOffset >  H * 0.55) d.vy = -Math.abs(d.vy);
+            if (d.yOffset < -H * 0.55) d.vy =  Math.abs(d.vy);
+          }
+          const baseY = d.straggler ? midY : pathY(d.x, time);
+          const y = baseY + d.yOffset;
+          // breathing twinkle
+          const tw = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(time * d.twFreq + d.twPhase));
+          ctx.beginPath();
+          ctx.arc(d.x, y, d.r, 0, Math.PI * 2);
+          ctx.fillStyle = d.greenish
+            ? `rgba(178, 220, 130, ${d.alpha * tw})`   // sage-lime accent — brighter green
+            : `rgba(247, 253, 185, ${d.alpha * tw})`;  // soft warm yellow
+          ctx.fill();
+        }
+        raf = requestAnimationFrame(draw);
+      }
+
+      function start() { if (!running) { running = true; raf = requestAnimationFrame(draw); } }
+      function stop()  { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
+
+      window.addEventListener('resize', init, { passive: true });
+      init();
+
+      if (reduce) {
+        running = true; draw(performance.now()); running = false;
+        return;
+      }
+      const io = new IntersectionObserver(entries => {
+        for (const e of entries) e.isIntersecting ? start() : stop();
+      }, { threshold: 0 });
+      io.observe(section);
+    })();
+
+    // Contact form — opens the user's mail client with a prefilled message
     // addressed to Pietra. No backend needed.
     const contactForm = document.getElementById('contactForm');
     if (contactForm) {
@@ -1678,21 +1794,11 @@
       });
     }
 
-    // Nav scroll + adapt over dark sections
+    // Nav scroll — page is entirely dark, so always run in over-dark mode.
     const nav = document.querySelector('.nav');
-    function isOverDark() {
-      const navH = 64;
-      const probeY = navH / 2;
-      const els = document.elementsFromPoint(window.innerWidth / 2, probeY);
-      for (const el of els) {
-        const section = el.closest('.hero, .ctc, .contact');
-        if (section) return true;
-      }
-      return false;
-    }
     function updateNav() {
       nav.classList.toggle('scrolled', scrollY > 10);
-      nav.classList.toggle('over-dark', isOverDark());
+      nav.classList.add('over-dark');
     }
     window.addEventListener('scroll', updateNav, { passive: true });
     window.addEventListener('resize', updateNav, { passive: true });
@@ -1729,7 +1835,8 @@
       }, { passive: true });
     }
 
-    // Reveal
+    // Reveal — global observer; the services stage-cards are excluded because
+    // they have their own wave-driven reveal (handled in the services block).
     const obs = new IntersectionObserver(es =>
       es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
     , { threshold: 0.12 });

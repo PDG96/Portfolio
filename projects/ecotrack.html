@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Straatos Application — Digital infrastructure for environmental and outdoor projects, from field data collection to credit issuance.">
   <meta name="theme-color" content="#fcfcfc">
-  <title>Straatos Application — Case Study</title>
+  <title>Straatos Application — Case Study · Pietra Gottardo</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="apple-touch-icon" href="../favicon.svg">
 
   <link rel="stylesheet" href="../assets/fonts/lausanne.css">
 
@@ -731,7 +733,7 @@
       margin: 0;
       display: flex;
       flex-direction: column;
-      gap: .875rem;
+      gap: 0.875rem;
     }
     .app-shot img {
       width: 100%;
@@ -746,6 +748,15 @@
       letter-spacing: 0.14em;
       text-transform: uppercase;
       color: var(--text-3);
+      margin: 0;
+    }
+    @media (max-width: 640px) {
+      .app-shot { gap: 0.625rem; }
+      .app-shot figcaption {
+        font-size: 0.5625rem;
+        letter-spacing: 0.1em;
+        line-height: 1.4;
+      }
     }
     /* Embedded composition (iframe) — same outer treatment as .app-shot img */
     .app-shot--embed .embed-frame {
@@ -795,7 +806,7 @@
     }
     .app-shot--bg-full figcaption {
       max-width: calc(clamp(72rem, 90vw, 110rem) - 2 * clamp(1.25rem, 4vw, 3rem));
-      margin: 0.25rem auto 0;
+      margin: 0 auto;
     }
     /* Left-bleed variant — escapes the .wrap left padding so the asset
        visually touches the left edge of the viewport. Right padding stays. */
@@ -2078,6 +2089,61 @@
       font-size: 0.3125rem; font-weight: 700;
       position: absolute;
     }
+
+    /* ============ LIGHTBOX (click any case-study image to expand) ============ */
+    [data-zoom] { cursor: zoom-in; }
+    .lightbox {
+      position: fixed; inset: 0;
+      background: rgba(15, 18, 22, 0.92);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(1rem, 3vw, 3rem);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s var(--ease);
+    }
+    .lightbox.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .lightbox img {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      border-radius: 12px;
+      /* Light backdrop so SVG diagrams keep their text contrast when expanded. */
+      background: #fafafa;
+      box-shadow: 0 32px 80px -20px rgba(0,0,0,0.6);
+      transform: scale(0.94);
+      transition: transform 0.32s var(--ease);
+    }
+    .lightbox.is-open img { transform: scale(1); }
+    .lightbox-close {
+      position: absolute;
+      top: clamp(0.75rem, 2vw, 1.5rem);
+      right: clamp(0.75rem, 2vw, 1.5rem);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.08);
+      color: #fcfcfc;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.25s, transform 0.25s;
+    }
+    .lightbox-close:hover {
+      background: rgba(255,255,255,0.18);
+      transform: scale(1.06);
+    }
+    .lightbox-close svg { width: 18px; height: 18px; }
+    body.lightbox-open { overflow: hidden; }
+    @media (prefers-reduced-motion: reduce) {
+      .lightbox, .lightbox img { transition: none; }
+    }
   </style>
 </head>
 
@@ -2615,6 +2681,51 @@
         requestAnimationFrame(tick);
       }
       tick();
+    })();
+
+    /* ============ Image lightbox ============ */
+    (() => {
+      const selectors = [
+        '.app-shot img',
+        '.case-hero-mockup img',
+        '.id-car-slide img'
+      ];
+      const targets = document.querySelectorAll(selectors.join(','));
+      if (!targets.length) return;
+
+      const lb = document.createElement('div');
+      lb.className = 'lightbox';
+      lb.setAttribute('role', 'dialog');
+      lb.setAttribute('aria-modal', 'true');
+      lb.innerHTML = `
+        <button class="lightbox-close" type="button" aria-label="Close">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+        <img alt="">
+      `;
+      document.body.appendChild(lb);
+      const lbImg = lb.querySelector('img');
+      const close = () => {
+        lb.classList.remove('is-open');
+        document.body.classList.remove('lightbox-open');
+        setTimeout(() => { lbImg.src = ''; }, 320);
+      };
+      const open = (src, alt) => {
+        lbImg.src = src;
+        lbImg.alt = alt || '';
+        document.body.classList.add('lightbox-open');
+        requestAnimationFrame(() => lb.classList.add('is-open'));
+      };
+      targets.forEach(img => {
+        img.setAttribute('data-zoom', '');
+        img.addEventListener('click', () => open(img.currentSrc || img.src, img.alt));
+      });
+      lb.addEventListener('click', (e) => {
+        if (e.target === lb || e.target.closest('.lightbox-close')) close();
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lb.classList.contains('is-open')) close();
+      });
     })();
   </script>
 

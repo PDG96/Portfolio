@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <!-- Pietra Gottardo · "P" monogram on a deep neutral, with a small accent dot
-       echoing the period in the wordmark. -->
-  <rect width="32" height="32" rx="7" fill="#141414"/>
+       echoing the period in the wordmark. Circular badge. -->
+  <circle cx="16" cy="16" r="16" fill="#141414"/>
   <!-- P letterform -->
   <path d="M 9 7
            L 9 25
