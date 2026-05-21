@@ -1134,6 +1134,37 @@
  }
  .form-group textarea { min-height: 120px; }
 
+ /* Honeypot, kept in the DOM for bots but invisible to humans */
+ .form-honeypot {
+ position: absolute;
+ left: -10000px;
+ width: 1px;
+ height: 1px;
+ overflow: hidden;
+ opacity: 0;
+ pointer-events: none;
+ }
+
+ /* Inline status message under the submit button */
+ .form-status {
+ font-family: var(--mono);
+ font-size: 0.75rem;
+ letter-spacing: 0.04em;
+ margin-top: 0.25rem;
+ min-height: 1.1em;
+ color: var(--text-2);
+ opacity: 0;
+ transition: opacity 0.25s var(--ease);
+ }
+ .form-status.is-visible { opacity: 1; }
+ .form-status.is-success { color: var(--accent-yellow); }
+ .form-status.is-error   { color: #f08a8a; }
+
+ .contact-form .btn-primary[disabled] {
+ opacity: 0.55;
+ cursor: progress;
+ }
+
  .contact .btn-primary {
  background: var(--gray-true-25);
  color: var(--gray-true-900);
@@ -1360,7 +1391,7 @@
  </div>
  <div class="case-body">
  <div class="case-meta"><span class="case-tag" data-i18n="c1_tag">Carbon Tech</span></div>
- <h3 data-i18n="c1_t">Straatos</h3>
+ <h3 style="color:#1B989B" data-i18n="c1_t">Straatos</h3>
  <p data-i18n="c1_d">A plataforma única para project developers de carbono, do cadastro de plots à submissão Verra, adaptada ao estágio do projeto.</p>
  <span class="case-link"><span data-i18n="c1_l">Read case study</span> →</span>
  </div>
@@ -1476,7 +1507,7 @@
  <a href="#" class="btn btn-primary contact-calendly" data-i18n="contact_cal">Book a call ↗</a>
  </div>
  </div>
- <form class="contact-form r" id="contactForm">
+ <form class="contact-form r" id="contactForm" novalidate>
  <div class="form-group">
  <label for="name" data-i18n="form_name">Name</label>
  <input type="text" id="name" name="name" placeholder="Your name" data-i18n-placeholder="form_name_ph" required>
@@ -1489,7 +1520,13 @@
  <label for="message" data-i18n="form_message">Message</label>
  <textarea id="message" name="message" placeholder="Tell me about your project..." data-i18n-placeholder="form_msg_ph" required></textarea>
  </div>
- <button type="submit" class="btn btn-primary" data-i18n="form_send">Send message</button>
+ <!-- Honeypot, invisible to humans, irresistible to bots -->
+ <div class="form-honeypot" aria-hidden="true">
+ <label for="website">Website</label>
+ <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+ </div>
+ <button type="submit" class="btn btn-primary" id="contactSubmit" data-i18n="form_send">Send message</button>
+ <p class="form-status" id="contactStatus" role="status" aria-live="polite"></p>
  </form>
  </div>
  </div>
@@ -1568,6 +1605,10 @@
  form_email:"Email",
  form_message:"Message",
  form_send:"Send message",
+ form_sending:"Sending…",
+ form_success:"Thanks, your message just landed in my inbox.",
+ form_error:"Something went sideways. Try again, or email pietragottardo@gmail.com.",
+ form_missing:"Please fill in name, email, and message.",
  footer_copy:"© 2026 · Pietra Gottardo",
  footer_top:"Back to top",
  ctc_label:"My design philosophy",
@@ -1635,6 +1676,10 @@
  form_email:"Email",
  form_message:"Mensagem",
  form_send:"Enviar mensagem",
+ form_sending:"Enviando…",
+ form_success:"Valeu, sua mensagem chegou na minha caixa.",
+ form_error:"Algo deu errado. Tenta de novo, ou manda direto pra pietragottardo@gmail.com.",
+ form_missing:"Preencha nome, email e mensagem.",
  footer_copy:"© 2026 · Pietra Gottardo",
  footer_top:"Voltar ao topo",
  ctc_label:"Minha filosofia de design",
@@ -1781,19 +1826,54 @@
  io.observe(section);
  })();
 
- // Contact form, opens the user's mail client with a prefilled message
- // addressed to Pietra. No backend needed.
+ // Contact form, POSTs to the Cloudflare Pages Function at /contact,
+ // which relays via MailChannels. No mail client opens.
  const contactForm = document.getElementById('contactForm');
  if (contactForm) {
- contactForm.addEventListener('submit', (e) => {
+ const submitBtn = document.getElementById('contactSubmit');
+ const statusEl = document.getElementById('contactStatus');
+ const labelDefault = () => T[lang].form_send;
+ const setStatus = (text, kind) => {
+ statusEl.textContent = text;
+ statusEl.classList.remove('is-success', 'is-error');
+ if (kind) statusEl.classList.add(kind === 'ok' ? 'is-success' : 'is-error');
+ statusEl.classList.add('is-visible');
+ };
+ const clearStatus = () => {
+ statusEl.classList.remove('is-visible', 'is-success', 'is-error');
+ };
+ contactForm.addEventListener('submit', async (e) => {
  e.preventDefault();
- const name = (document.getElementById('name').value || '').trim();
- const email = (document.getElementById('email').value || '').trim();
+ const name    = (document.getElementById('name').value || '').trim();
+ const email   = (document.getElementById('email').value || '').trim();
  const message = (document.getElementById('message').value || '').trim();
- const subject = `Portfolio inquiry, ${name || 'no name'}`;
- const body = `${message}\n\n, ${name}\n${email}`;
- const href = `mailto:pietragottardo@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
- window.location.href = href;
+ const website = (document.getElementById('website').value || '').trim();
+ if (!name || !email || !message) {
+ setStatus(T[lang].form_missing, 'err');
+ return;
+ }
+ submitBtn.disabled = true;
+ submitBtn.textContent = T[lang].form_sending;
+ clearStatus();
+ try {
+ const resp = await fetch('/contact', {
+ method: 'POST',
+ headers: { 'content-type': 'application/json' },
+ body: JSON.stringify({ name, email, message, website })
+ });
+ const data = await resp.json().catch(() => ({}));
+ if (resp.ok && data.ok) {
+ contactForm.reset();
+ setStatus(T[lang].form_success, 'ok');
+ } else {
+ setStatus(T[lang].form_error, 'err');
+ }
+ } catch (err) {
+ setStatus(T[lang].form_error, 'err');
+ } finally {
+ submitBtn.disabled = false;
+ submitBtn.textContent = labelDefault();
+ }
  });
  }
 
