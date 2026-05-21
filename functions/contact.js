@@ -44,74 +44,91 @@ export async function onRequestGet({ env }) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.RESEND_API_KEY) {
-    return json({ ok: false, error: 'missing_api_key' }, 500);
-  }
-
-  let payload;
   try {
-    const contentType = request.headers.get('content-type') || '';
-    if (contentType.includes('application/json')) {
-      payload = await request.json();
-    } else {
-      const form = await request.formData();
-      payload = Object.fromEntries(form.entries());
+    if (!env.RESEND_API_KEY) {
+      return json({ ok: false, error: 'missing_api_key' }, 500);
     }
-  } catch {
-    return json({ ok: false, error: 'invalid_body' }, 400);
-  }
 
-  const name     = (payload.name     || '').toString().trim().slice(0, 120);
-  const email    = (payload.email    || '').toString().trim().slice(0, 200);
-  const message  = (payload.message  || '').toString().trim().slice(0, 5000);
-  const honeypot = (payload.website  || '').toString().trim();
+    let payload;
+    try {
+      const contentType = request.headers.get('content-type') || '';
+      if (contentType.includes('application/json')) {
+        payload = await request.json();
+      } else {
+        const form = await request.formData();
+        payload = Object.fromEntries(form.entries());
+      }
+    } catch {
+      return json({ ok: false, error: 'invalid_body' }, 400);
+    }
 
-  if (honeypot) {
-    // Silently accept spam — the bot thinks it succeeded
-    return json({ ok: true });
-  }
-  if (!name || !email || !message) {
-    return json({ ok: false, error: 'missing_fields' }, 400);
-  }
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return json({ ok: false, error: 'invalid_email' }, 400);
-  }
+    const name     = (payload.name     || '').toString().trim().slice(0, 120);
+    const email    = (payload.email    || '').toString().trim().slice(0, 200);
+    const message  = (payload.message  || '').toString().trim().slice(0, 5000);
+    const honeypot = (payload.website  || '').toString().trim();
 
-  const subject = `Portfolio inquiry, ${name}`;
-  const text = `${message}\n\n---\nFrom: ${name} <${email}>`;
-  const html = `
-    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:#141414;">
-      <p style="white-space:pre-wrap;">${escapeHtml(message)}</p>
-      <hr style="border:0;border-top:1px solid #e5e5e5;margin:24px 0;">
-      <p style="color:#737373;font-size:13px;">
-        From <strong style="color:#141414;">${escapeHtml(name)}</strong> &lt;${escapeHtml(email)}&gt;
-      </p>
-    </div>
-  `;
+    if (honeypot) {
+      // Silently accept spam — the bot thinks it succeeded
+      return json({ ok: true });
+    }
+    if (!name || !email || !message) {
+      return json({ ok: false, error: 'missing_fields' }, 400);
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return json({ ok: false, error: 'invalid_email' }, 400);
+    }
 
-  const resp = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'authorization': `Bearer ${env.RESEND_API_KEY}`,
-      'content-type': 'application/json'
-    },
-    body: JSON.stringify({
-      from: FROM_ADDRESS,
-      to: [TO_ADDRESS],
-      reply_to: email,
-      subject,
-      text,
-      html
-    })
-  });
+    const subject = `Portfolio inquiry, ${name}`;
+    const text = `${message}\n\n---\nFrom: ${name} <${email}>`;
+    const html = `
+      <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:#141414;">
+        <p style="white-space:pre-wrap;">${escapeHtml(message)}</p>
+        <hr style="border:0;border-top:1px solid #e5e5e5;margin:24px 0;">
+        <p style="color:#737373;font-size:13px;">
+          From <strong style="color:#141414;">${escapeHtml(name)}</strong> &lt;${escapeHtml(email)}&gt;
+        </p>
+      </div>
+    `;
 
-  if (!resp.ok) {
+    let resp;
+    try {
+      resp = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'authorization': `Bearer ${env.RESEND_API_KEY}`,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: FROM_ADDRESS,
+          to: [TO_ADDRESS],
+          reply_to: email,
+          subject,
+          text,
+          html
+        })
+      });
+    } catch (fetchErr) {
+      return json({
+        ok: false,
+        error: 'fetch_threw',
+        detail: String(fetchErr && fetchErr.message || fetchErr)
+      }, 502);
+    }
+
     const detail = await resp.text();
-    console.log('resend_failed', resp.status, detail);
-    return json({ ok: false, error: 'send_failed', status: resp.status, detail }, 502);
-  }
+    if (!resp.ok) {
+      return json({ ok: false, error: 'send_failed', status: resp.status, detail }, 502);
+    }
 
-  return json({ ok: true });
+    return json({ ok: true, resend: detail });
+  } catch (err) {
+    return json({
+      ok: false,
+      error: 'handler_threw',
+      detail: String(err && err.message || err),
+      stack: String(err && err.stack || '').slice(0, 800)
+    }, 500);
+  }
 }
 
 function json(body, status = 200) {
