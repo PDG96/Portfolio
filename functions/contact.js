@@ -30,17 +30,58 @@ function escapeHtml(str = '') {
     .replace(/'/g, '&#39;');
 }
 
-// Diagnostic: GET /contact returns whether the function is alive and
-// whether the RESEND_API_KEY env var is wired up. Never leaks the key itself.
-export async function onRequestGet({ env }) {
-  return json({
+// Diagnostic: GET /contact returns whether the function is alive and whether
+// the RESEND_API_KEY env var is wired up. Never leaks the key itself.
+// GET /contact?test=1 also fires a real send through Resend and returns the
+// full response from their API so we can see what's actually going wrong.
+export async function onRequestGet({ env, request }) {
+  const url = new URL(request.url);
+  const wantTest = url.searchParams.get('test') === '1';
+
+  const base = {
     ok: true,
     function: 'contact',
     runtime: 'cloudflare-pages-function',
     resend_key_set: Boolean(env.RESEND_API_KEY),
     resend_key_length: env.RESEND_API_KEY ? env.RESEND_API_KEY.length : 0,
+    resend_key_prefix: env.RESEND_API_KEY ? env.RESEND_API_KEY.slice(0, 4) : null,
     timestamp: new Date().toISOString()
-  });
+  };
+
+  if (!wantTest) return json(base);
+  if (!env.RESEND_API_KEY) return json({ ...base, test: 'skipped, no key' });
+
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: FROM_ADDRESS,
+        to: [TO_ADDRESS],
+        subject: 'Diagnostic test from /contact?test=1',
+        text: 'If you got this, Resend is wired up correctly.'
+      })
+    });
+    const body = await resp.text();
+    return json({
+      ...base,
+      test: {
+        status: resp.status,
+        ok: resp.ok,
+        body
+      }
+    });
+  } catch (err) {
+    return json({
+      ...base,
+      test: {
+        threw: String(err && err.message || err)
+      }
+    });
+  }
 }
 
 export async function onRequestPost({ request, env }) {
