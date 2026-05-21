@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WAZI — Stakeholder network</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #0C0D11;
+    font-family: 'TWKLausanne', -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  .graph {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+  }
+  .graph:active { cursor: grabbing; }
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .link {
+    stroke: #ffffff;
+    stroke-opacity: 0.18;
+    stroke-width: 0.7;
+  }
+  .node {
+    cursor: pointer;
+    stroke: rgba(0, 0, 0, 0.25);
+    stroke-width: 1;
+    transition: stroke-width 0.2s ease;
+  }
+  .node:hover {
+    stroke: rgba(255, 255, 255, 0.6);
+    stroke-width: 2;
+  }
+
+  .tooltip {
+    position: absolute;
+    pointer-events: none;
+    background: #E8C5D0;
+    color: #1B2230;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    transform: translate(-50%, -130%);
+    transition: opacity 0.18s ease;
+    white-space: nowrap;
+    box-shadow: 0 6px 18px -6px rgba(0, 0, 0, 0.45);
+  }
+  .tooltip.is-on { opacity: 1; }
+
+  /* Incident card — appears on click for event (orange) nodes */
+  .incident {
+    position: absolute;
+    background: #ffffff;
+    color: #1B2230;
+    border-radius: 8px;
+    padding: 12px 14px 14px;
+    min-width: 220px;
+    max-width: 280px;
+    transform: translate(-50%, -110%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    box-shadow: 0 18px 36px -10px rgba(0, 0, 0, 0.55),
+                0 4px 8px -2px rgba(0, 0, 0, 0.25);
+    font-size: 12px;
+    line-height: 1.45;
+  }
+  .incident.is-on {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -120%);
+  }
+  .incident-flag {
+    font-size: 22px;
+    line-height: 1;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .incident-name {
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: -0.005em;
+    margin-bottom: 3px;
+    color: #1B2230;
+  }
+  .incident-country {
+    font-size: 11px;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .incident-meta {
+    font-size: 11px;
+    color: #4B5563;
+    line-height: 1.5;
+  }
+  .incident-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 22px;
+    height: 22px;
+    border: 0;
+    background: transparent;
+    color: #9CA3AF;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 16px;
+    line-height: 1;
+  }
+  .incident-close:hover { background: #F3F4F6; color: #1B2230; }
+  /* Pulse ring on the active event node */
+  .pulse {
+    fill: none;
+    stroke: #D8A472;
+    stroke-width: 1.5;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .pulse.is-on {
+    animation: pulse 1.6s ease-out infinite;
+  }
+  @keyframes pulse {
+    0%   { opacity: 0.6; r: 7; }
+    100% { opacity: 0;   r: 22; }
+  }
+</style>
+</head>
+<body>
+
+<div class="graph" id="graph">
+  <svg id="svg" aria-label="Force-directed graph of WAZI stakeholders"></svg>
+  <div class="tooltip" id="tooltip"></div>
+  <div class="incident" id="incident" role="dialog" aria-modal="false">
+    <button class="incident-close" id="incidentClose" aria-label="Close">×</button>
+    <span class="incident-flag" id="incidentFlag">🇨🇩</span>
+    <div class="incident-name" id="incidentName">Incident</div>
+    <div class="incident-country" id="incidentCountry">Country</div>
+    <div class="incident-meta" id="incidentMeta">Reported on the WAZI evidence base.</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script>
+  // ---- node roles + palette ----
+  const roles = {
+    event:       { label: 'Incident / event', fill: '#D8A472' }, // warm orange
+    location:    { label: 'Location',         fill: '#B796C9' }, // muted purple
+    stakeholder: { label: 'Stakeholder',      fill: '#A6B8CB' }, // muted blue
+  };
+
+  // Incident catalogue — orange nodes.
+  const incidents = [
+    { name: 'Mercury contamination report',  country: 'Democratic Republic of the Congo', iso: 'CD', meta: 'Flagged by community monitor · evidence shared with auditor' },
+    { name: 'Unverified shipment intercepted', country: 'Tanzania',                       iso: 'TZ', meta: 'Aggregator paperwork mismatched LBMA chain-of-custody' },
+    { name: 'Child labour allegation',       country: 'Ghana',                            iso: 'GH', meta: 'Field observation — third-party verification opened' },
+    { name: 'Tailings dam failure',          country: 'Peru',                             iso: 'PE', meta: 'Geo-located satellite evidence cross-referenced with site visit' },
+    { name: 'Conflict-zone trade attempt',   country: 'Burkina Faso',                     iso: 'BF', meta: 'OECD Annex II trigger — buyer notified, transaction held' },
+    { name: 'Forged provenance certificate', country: 'Mali',                             iso: 'ML', meta: 'Counter-party screening flagged duplicate batch IDs' },
+    { name: 'Unsafe excavation site',        country: 'Ecuador',                          iso: 'EC', meta: 'CSO monitor uploaded photos · OSH score dropped to 38%' },
+    { name: 'Smuggling route identified',    country: 'Sudan',                            iso: 'SD', meta: 'Cross-border anomaly detected from declared volumes' },
+    { name: 'Worker fatality',               country: 'Sierra Leone',                     iso: 'SL', meta: 'Reported within 24h · incident review escalated' },
+    { name: 'Royalty evasion suspected',     country: 'Venezuela',                        iso: 'VE', meta: 'Mismatch between declared output and refinery receipts' },
+    { name: 'Water source pollution',        country: 'Colombia',                         iso: 'CO', meta: 'Independent lab results uploaded to evidence base' },
+    { name: 'Illegal armed group payment',   country: 'Democratic Republic of the Congo', iso: 'CD', meta: 'Annex II trigger · supply chain quarantined' },
+    { name: 'Underage operator on site',     country: 'Myanmar',                          iso: 'MM', meta: 'Confidential whistleblower upload — investigation pending' },
+    { name: 'Land rights dispute',           country: 'Indonesia',                        iso: 'ID', meta: 'Community claim filed via local NGO partner' },
+    { name: 'Unsafe storage of cyanide',     country: 'Bolivia',                          iso: 'BO', meta: 'Inspection report attached · remediation plan due' },
+  ];
+
+  // Stakeholders — blue nodes.
+  const stakeholders = [
+    { name: 'Bukavu Gold Coop',           role: 'Mine operator · 240 miners',     iso: 'CD', meta: 'Active since 2021 · ESG score 78%' },
+    { name: 'Kivu Minerals Ltd',          role: 'Aggregator',                     iso: 'CD', meta: 'Handles 12 mine sites · verified provenance' },
+    { name: 'Great Lakes Monitor',        role: 'CSO observer',                   iso: 'KE', meta: 'Field network across the African Great Lakes region' },
+    { name: 'Lubero Artisans',            role: 'Mine cooperative',               iso: 'CD', meta: 'Self-assessment in progress · OSH score 54%' },
+    { name: 'Pan-African Refinery',       role: 'Refiner',                        iso: 'ZA', meta: 'LBMA-listed · 100% chain-of-custody requirement' },
+    { name: 'Northern Tanzania Coop',     role: 'Mine operator',                  iso: 'TZ', meta: 'ESG score 71% · mercury-free since 2024' },
+    { name: 'Andes Verified',             role: 'Independent auditor',            iso: 'PE', meta: 'Annex II framework specialist' },
+    { name: 'Ghana Aggregators Union',    role: 'Trade group · 18 buyers',        iso: 'GH', meta: 'Member of WAZI peer-review board' },
+    { name: 'OECD Liaison',               role: 'Framework coordinator',          iso: 'FR', meta: 'Cross-border compliance contact' },
+    { name: 'CIDA Field Office',          role: 'Donor / program implementer',    iso: 'CA', meta: 'Funds capacity building for 14 mine sites' },
+    { name: 'WAZI Compliance Desk',       role: 'Platform team',                  iso: 'CD', meta: 'Reviews escalations and trigger flags daily' },
+    { name: 'Sahel Watch',                role: 'Regional CSO network',           iso: 'BF', meta: 'Tracks conflict-affected zones across 6 countries' },
+  ];
+
+  // Locations — purple nodes.
+  const locations = [
+    { name: 'Saloum Delta',           country: 'Senegal',                            iso: 'SN', meta: 'Coastal mining cluster · 8 active sites' },
+    { name: 'South Kivu',             country: 'Democratic Republic of the Congo',   iso: 'CD', meta: '142 registered mine operators in WAZI' },
+    { name: 'Geita Region',           country: 'Tanzania',                           iso: 'TZ', meta: 'Aggregation hub · 26 verified sites' },
+    { name: 'Ashanti Belt',           country: 'Ghana',                              iso: 'GH', meta: 'Historic gold belt · 31 cooperatives' },
+    { name: 'Madre de Dios',          country: 'Peru',                               iso: 'PE', meta: 'Amazon basin · environmental triggers monitored' },
+    { name: 'Sahel Corridor',         country: 'Burkina Faso',                       iso: 'BF', meta: 'Cross-border zone · OECD Annex II coverage' },
+    { name: 'Kayes Plateau',          country: 'Mali',                               iso: 'ML', meta: 'Artisanal production cluster' },
+    { name: 'Bolívar State',          country: 'Venezuela',                          iso: 'VE', meta: 'Restricted-access mining zone' },
+    { name: 'Antioquia',              country: 'Colombia',                           iso: 'CO', meta: 'Andes gold corridor · 19 verified sites' },
+    { name: 'Lower Shire Valley',     country: 'Malawi',                             iso: 'MW', meta: 'Emerging WAZI region · capacity-building active' },
+    { name: 'Kachin State',           country: 'Myanmar',                            iso: 'MM', meta: 'Conflict-affected · enhanced due diligence required' },
+    { name: 'Kalimantan East',        country: 'Indonesia',                          iso: 'ID', meta: 'Tropical forest interface · land rights monitored' },
+  ];
+
+  function isoToFlag(iso) {
+    // Convert two-letter ISO into the regional indicator emoji
+    return iso.toUpperCase().replace(/./g, c =>
+      String.fromCodePoint(127397 + c.charCodeAt(0)));
+  }
+
+  // Build a synthetic network: roles distributed so the graph reads as a
+  // stakeholder web — events (orange) sprinkled across, locations (purple)
+  // anchor regions, stakeholders (blue) thread through, buyers + auditors at hubs.
+  const N = 52;
+  const cursors = { event: 0, location: 0, stakeholder: 0 };
+  const data = { event: incidents, location: locations, stakeholder: stakeholders };
+  const nodes = d3.range(N).map(i => {
+    const roleKeys = Object.keys(roles);
+    // weighted distribution — every node has data now
+    const weights = [0.38, 0.30, 0.32];   // event · location · stakeholder
+    let r = Math.random(), acc = 0, idx = 0;
+    for (let k = 0; k < weights.length; k++) {
+      acc += weights[k];
+      if (r <= acc) { idx = k; break; }
+    }
+    const role = roleKeys[idx];
+    const node = { id: i, role };
+    const arr = data[role];
+    const entry = arr[cursors[role] % arr.length];
+    cursors[role]++;
+    node.info = entry;
+    node.label = entry.name;
+    return node;
+  });
+
+  // Build edges: ~2.5x more edges than nodes for a moderately dense graph
+  const links = [];
+  const seen = new Set();
+  const targetEdges = Math.round(N * 2.3);
+  while (links.length < targetEdges) {
+    const a = Math.floor(Math.random() * N);
+    const b = Math.floor(Math.random() * N);
+    if (a === b) continue;
+    const key = a < b ? `${a}-${b}` : `${b}-${a}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    links.push({ source: a, target: b });
+  }
+  // Ensure no orphans — each node gets at least one link to a random other
+  nodes.forEach((n, i) => {
+    const hasLink = links.some(l => l.source === i || l.target === i);
+    if (!hasLink) {
+      let j;
+      do { j = Math.floor(Math.random() * N); } while (j === i);
+      const key = i < j ? `${i}-${j}` : `${j}-${i}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        links.push({ source: i, target: j });
+      }
+    }
+  });
+
+  // ---- D3 setup ----
+  const graphEl = document.getElementById('graph');
+  const svg = d3.select('#svg');
+  const tooltip = d3.select('#tooltip');
+
+  let width = graphEl.clientWidth;
+  let height = graphEl.clientHeight;
+
+  // Reusable groups
+  const linkG = svg.append('g').attr('class', 'links');
+  const nodeG = svg.append('g').attr('class', 'nodes');
+
+  const linkSel = linkG.selectAll('line')
+    .data(links)
+    .join('line')
+    .attr('class', 'link');
+
+  // pulse ring that highlights the active node
+  const pulse = svg.append('circle').attr('class', 'pulse').attr('r', 7);
+  let activeId = null;
+
+  const incidentEl  = document.getElementById('incident');
+  const incidentName = document.getElementById('incidentName');
+  const incidentFlag = document.getElementById('incidentFlag');
+  const incidentCountry = document.getElementById('incidentCountry');
+  const incidentMeta = document.getElementById('incidentMeta');
+  document.getElementById('incidentClose').addEventListener('click', closeIncident);
+
+  function showIncident(d) {
+    if (!d.info) return;
+    activeId = d.id;
+    const i = d.info;
+    incidentName.textContent = i.name;
+    incidentFlag.textContent = i.iso ? isoToFlag(i.iso) : '';
+    // For locations show country, for stakeholders show role, for events show country
+    incidentCountry.textContent = i.country || i.role || '';
+    incidentMeta.textContent = i.meta || '';
+    // Pulse color matches the node role
+    pulse.attr('stroke', roles[d.role].fill);
+    positionIncident(d);
+    incidentEl.classList.add('is-on');
+    pulse.classed('is-on', true);
+  }
+  function closeIncident() {
+    activeId = null;
+    incidentEl.classList.remove('is-on');
+    pulse.classed('is-on', false);
+  }
+  function positionIncident(d) {
+    if (d.x == null) return;
+    incidentEl.style.left = d.x + 'px';
+    incidentEl.style.top  = d.y + 'px';
+    pulse.attr('cx', d.x).attr('cy', d.y);
+  }
+
+  const nodeSel = nodeG.selectAll('circle')
+    .data(nodes)
+    .join('circle')
+    .attr('class', 'node')
+    .attr('r', d => d.info ? 7 : 6)
+    .attr('fill', d => roles[d.role].fill)
+    .on('mousemove', (event, d) => {
+      if (activeId === d.id) return;     // active node uses the info card
+      const rect = graphEl.getBoundingClientRect();
+      tooltip
+        .style('left', (event.clientX - rect.left) + 'px')
+        .style('top',  (event.clientY - rect.top)  + 'px')
+        .classed('is-on', true)
+        .text(d.label);
+    })
+    .on('mouseleave', () => tooltip.classed('is-on', false))
+    .on('click', (event, d) => {
+      event.stopPropagation();
+      tooltip.classed('is-on', false);
+      if (d.info) showIncident(d);
+      else closeIncident();
+    })
+    .call(d3.drag()
+      .on('start', dragstarted)
+      .on('drag', dragged)
+      .on('end', dragended));
+
+  // click anywhere else dismisses the incident card
+  graphEl.addEventListener('click', closeIncident);
+
+  function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.3).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+  function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+  }
+  function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+
+  const simulation = d3.forceSimulation(nodes)
+    .force('link',
+      d3.forceLink(links).id(d => d.id).distance(60).strength(0.6)
+    )
+    .force('charge', d3.forceManyBody().strength(-110))
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('collide', d3.forceCollide(10))
+    .on('tick', tick);
+
+  function tick() {
+    linkSel
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
+    nodeSel
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y);
+    if (activeId !== null) {
+      const active = nodes.find(n => n.id === activeId);
+      if (active) positionIncident(active);
+    }
+  }
+
+  function fit() {
+    width = graphEl.clientWidth;
+    height = graphEl.clientHeight;
+    svg.attr('viewBox', `0 0 ${width} ${height}`);
+    simulation
+      .force('center', d3.forceCenter(width / 2, height / 2))
+      .alpha(0.4)
+      .restart();
+  }
+  fit();
+  window.addEventListener('resize', fit);
+</script>
+
+</body>
+</html>

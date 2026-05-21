@@ -1,0 +1,22 @@
+# System
+.DS_Store
+Thumbs.db
+*.swp
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Private agent / instruction files
+CLAUDE.md
+.claude/
+
+# Reference material — local-only, not part of the deployed site
+_case-studies/
+datastake/
+portfolio/
+
+# Build / cache (none right now, but future-proof)
+node_modules/
+dist/
+.cache/

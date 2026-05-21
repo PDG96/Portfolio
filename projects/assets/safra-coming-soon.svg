@@ -1,0 +1,149 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" font-family="-apple-system, BlinkMacSystemFont, 'SF UI Display', 'Inter', 'Helvetica Neue', Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e8efd6"/>
+      <stop offset="0.5" stop-color="#dde4c8"/>
+      <stop offset="1" stop-color="#c9d3a8"/>
+    </linearGradient>
+    <linearGradient id="device" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f2a1c"/>
+      <stop offset="1" stop-color="#2a3624"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfaf4"/>
+      <stop offset="1" stop-color="#f3f1e6"/>
+    </linearGradient>
+    <linearGradient id="hero-card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3d5a3e"/>
+      <stop offset="1" stop-color="#2a4530"/>
+    </linearGradient>
+    <linearGradient id="chip-cs" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#d4a03a"/>
+      <stop offset="1" stop-color="#b8842a"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="0.5" cy="0.4" r="0.6">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="560" fill="url(#bg)"/>
+  <rect width="800" height="560" fill="url(#halo)"/>
+
+  <!-- Faint contour-line texture suggesting farm plots -->
+  <g opacity="0.18" stroke="#3d5a3e" fill="none" stroke-width="1">
+    <path d="M-40 120 C 160 90, 360 160, 520 140 S 880 110, 880 110"/>
+    <path d="M-40 180 C 160 150, 360 220, 520 200 S 880 170, 880 170"/>
+    <path d="M-40 240 C 160 210, 360 280, 520 260 S 880 230, 880 230"/>
+    <path d="M-40 300 C 160 270, 360 340, 520 320 S 880 290, 880 290"/>
+    <path d="M-40 360 C 160 330, 360 400, 520 380 S 880 350, 880 350"/>
+    <path d="M-40 420 C 160 390, 360 460, 520 440 S 880 410, 880 410"/>
+    <path d="M-40 480 C 160 450, 360 520, 520 500 S 880 470, 880 470"/>
+  </g>
+
+  <!-- ===== Tablet device, centred, slight tilt ===== -->
+  <g transform="translate(120, 80) rotate(-2 280 200)">
+    <!-- Outer body -->
+    <rect x="0" y="0" width="560" height="400" rx="22" fill="url(#device)"/>
+    <!-- Screen bezel -->
+    <rect x="16" y="16" width="528" height="368" rx="12" fill="url(#screen)"/>
+
+    <!-- ===== App content inside screen ===== -->
+    <!-- Top bar: brand + nav -->
+    <g transform="translate(36, 36)">
+      <!-- Safra wordmark -->
+      <g>
+        <circle cx="14" cy="14" r="13" fill="#3d5a3e"/>
+        <path d="M8 14 q3 -7 8 -4 q3 2 -2 6 q-3 2 -6 -2 z" fill="#d4a03a"/>
+        <text x="38" y="20" font-size="20" font-weight="600" fill="#1a2a1a" letter-spacing="-0.01em">safra</text>
+      </g>
+
+      <!-- Right side: small avatar + dot -->
+      <g transform="translate(420, 0)">
+        <rect x="0" y="2" width="48" height="24" rx="12" fill="#e7ead7"/>
+        <circle cx="12" cy="14" r="6" fill="#3d5a3e"/>
+        <rect x="22" y="11" width="20" height="3" rx="1.5" fill="#3d5a3e" opacity="0.5"/>
+        <rect x="22" y="17" width="14" height="3" rx="1.5" fill="#3d5a3e" opacity="0.35"/>
+      </g>
+    </g>
+
+    <!-- Row 1: Hero "current safra" card -->
+    <g transform="translate(36, 80)">
+      <rect width="290" height="120" rx="12" fill="url(#hero-card)"/>
+      <!-- Decorative grid lines suggesting plots -->
+      <g opacity="0.18" stroke="#fcfcfc" fill="none" stroke-width="0.8">
+        <line x1="0" y1="40" x2="290" y2="40"/>
+        <line x1="0" y1="70" x2="290" y2="70"/>
+        <line x1="0" y1="100" x2="290" y2="100"/>
+        <line x1="70" y1="0" x2="70" y2="120"/>
+        <line x1="140" y1="0" x2="140" y2="120"/>
+        <line x1="210" y1="0" x2="210" y2="120"/>
+      </g>
+      <text x="16" y="28" font-size="10" font-weight="600" letter-spacing="0.16em" fill="#d4a03a">SAFRA 24/25 · SOJA</text>
+      <text x="16" y="62" font-size="34" font-weight="300" fill="#fcfcfc" letter-spacing="-0.02em">62.4 <tspan font-size="16" fill="#d4a03a">sc/ha</tspan></text>
+      <text x="16" y="84" font-size="11" fill="#e7ead7" opacity="0.85">Produtividade média · 1.240 ha</text>
+      <!-- mini trend -->
+      <polyline points="170,98 188,90 206,93 224,84 242,86 260,76 278,72" fill="none" stroke="#d4a03a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="278" cy="72" r="2.6" fill="#d4a03a"/>
+    </g>
+
+    <!-- Right column: two stacked KPI cards -->
+    <g transform="translate(338, 80)">
+      <rect width="190" height="56" rx="10" fill="#fbfaf4" stroke="#d6d6cf" stroke-width="0.8"/>
+      <text x="14" y="22" font-size="9" font-weight="600" letter-spacing="0.16em" fill="#737373">CHUVA · 7D</text>
+      <text x="14" y="44" font-size="20" font-weight="500" fill="#1a2a1a">68 mm</text>
+      <text x="100" y="44" font-size="10" fill="#3d5a3e">↑ 12%</text>
+    </g>
+    <g transform="translate(338, 144)">
+      <rect width="190" height="56" rx="10" fill="#fbfaf4" stroke="#d6d6cf" stroke-width="0.8"/>
+      <text x="14" y="22" font-size="9" font-weight="600" letter-spacing="0.16em" fill="#737373">CBOT · SOJA</text>
+      <text x="14" y="44" font-size="20" font-weight="500" fill="#1a2a1a">US$ 11.42</text>
+      <text x="118" y="44" font-size="10" fill="#b8842a">↓ 0.18</text>
+    </g>
+
+    <!-- Row 2: plots table -->
+    <g transform="translate(36, 220)">
+      <rect width="492" height="142" rx="12" fill="#fbfaf4" stroke="#d6d6cf" stroke-width="0.8"/>
+      <text x="16" y="24" font-size="11" font-weight="600" fill="#1a2a1a" letter-spacing="-0.005em">Talhões</text>
+      <text x="16" y="38" font-size="9" fill="#737373">14 ativos · 1.240 ha · 3 culturas</text>
+      <!-- Table rows -->
+      <g font-size="10" fill="#404040">
+        <g transform="translate(16, 56)">
+          <rect width="12" height="12" rx="2" fill="#3d5a3e"/>
+          <text x="22" y="10" font-weight="500" fill="#1a2a1a">T-07 · Soja</text>
+          <text x="180" y="10">142 ha</text>
+          <text x="260" y="10">R3 · enchimento</text>
+          <text x="400" y="10" fill="#3d5a3e">+8.4 sc</text>
+        </g>
+        <line x1="16" y1="74" x2="476" y2="74" stroke="#eee" stroke-width="0.6"/>
+        <g transform="translate(16, 84)">
+          <rect width="12" height="12" rx="2" fill="#d4a03a"/>
+          <text x="22" y="10" font-weight="500" fill="#1a2a1a">T-12 · Milho 2ª</text>
+          <text x="180" y="10">98 ha</text>
+          <text x="260" y="10">V8 · vegetativo</text>
+          <text x="400" y="10" fill="#b8842a">-1.2 sc</text>
+        </g>
+        <line x1="16" y1="102" x2="476" y2="102" stroke="#eee" stroke-width="0.6"/>
+        <g transform="translate(16, 112)">
+          <rect width="12" height="12" rx="2" fill="#7a9a4a"/>
+          <text x="22" y="10" font-weight="500" fill="#1a2a1a">T-21 · Algodão</text>
+          <text x="180" y="10">86 ha</text>
+          <text x="260" y="10">B2 · botão floral</text>
+          <text x="400" y="10" fill="#3d5a3e">+2.6 fardos</text>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <!-- ===== Coming Soon chip (top-right of card area) ===== -->
+  <g transform="translate(560, 30)">
+    <rect width="210" height="44" rx="22" fill="url(#chip-cs)"/>
+    <circle cx="24" cy="22" r="5" fill="#fcfcfc"/>
+    <circle cx="24" cy="22" r="5" fill="#fcfcfc" opacity="0.5">
+      <animate attributeName="r" values="5;9;5" dur="2.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0;0.5" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+    <text x="42" y="28" font-size="13" font-weight="600" fill="#fcfcfc" letter-spacing="0.14em" text-transform="uppercase">COMING SOON</text>
+  </g>
+</svg>

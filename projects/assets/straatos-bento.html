@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Straatos — Analysis bento</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+
+  /* Stage fills the iframe completely; aspect-ratio of the iframe matches 5171/2840
+     so the stage retains the original composition shape with no letterboxing. */
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Every tile is positioned as a % of the stage — fully responsive,
+     identical proportions to analysis 03 reference (5171 × 2840). */
+  .tile {
+    position: absolute;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.45s ease;
+    will-change: transform, filter;
+  }
+  .tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+  /* Hover — gentle lift + shadow boost (same as bento2) */
+  .tile:hover {
+    transform: translateY(-8px) scale(1.02);
+    filter: drop-shadow(0 24px 48px rgba(15, 23, 42, 0.16));
+    z-index: 5;
+  }
+  /* Species has overflow:hidden + inner card, so target its inner card instead */
+  .tile.species {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                filter 0.45s ease;
+  }
+  .tile.species:hover {
+    transform: translateY(-8px) scale(1.02);
+    filter: drop-shadow(0 24px 48px rgba(15, 23, 42, 0.16));
+    z-index: 5;
+  }
+
+  /* salinity     2022×1400 at 0,0       */ .salinity    { left: 0;      top: 0;       width: 39.105%; height: 49.296%; }
+  /* indicators   1311×1394 at 2062,0    */ .indicators  { left: 39.876%; top: 0;       width: 25.353%; height: 49.085%; }
+  /* awareness    1756×2840 at 3415,0    */ .awareness   { left: 66.041%; top: 0;       width: 33.958%; height: 100%; }
+  /* species      1306×1400 at 0,1440    */ .species     { left: 0;       top: 50.704%; width: 25.256%; height: 49.296%; overflow: hidden; }
+  /* stakeholder  2029×1400 at 1346,1440 */ .stakeholder { left: 26.029%; top: 50.704%; width: 39.238%; height: 49.296%; }
+
+  /* Species composed card — video bg + donut overlay */
+  .species-inner {
+    position: absolute;
+    /* 20px outer padding ≈ 1.5% of card width (1306) — keeps the visible card edge
+       aligned with the shadow-padding baked into the PNG cards */
+    inset: 1.5%;
+    border-radius: clamp(8px, 1.6%, 22px);
+    overflow: hidden;
+    box-shadow: 0 6px 22px -6px rgba(15, 23, 42, 0.18);
+  }
+  .species-inner .bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .species-inner .vignette {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(0,0,0,0.40) 100%);
+    pointer-events: none;
+  }
+  .species-inner .donut {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    /* donut Species.png native 1109×767, kept proportional to the inner area */
+    width: 87.6%;       /* 1109 / 1266 (inner width) */
+    aspect-ratio: 1109 / 767;
+  }
+  .species-inner .donut img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 1.2% 3% rgba(0, 0, 0, 0.32));
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="tile salinity">
+    <img src="straatos-bento/Salinity levels.png" alt="Salinity levels chart">
+  </div>
+  <div class="tile indicators">
+    <img src="straatos-bento/indicators.png" alt="Key indicators">
+  </div>
+  <div class="tile awareness">
+    <img src="straatos-bento/Awareness Raising.png" alt="Awareness Raising">
+  </div>
+  <div class="tile species">
+    <div class="species-inner">
+      <video class="bg-video" autoplay muted loop playsinline preload="auto"
+             src="straatos-bento/Species background.mp4"></video>
+      <div class="vignette"></div>
+      <div class="donut">
+        <img src="straatos-bento/Species.png" alt="Species composition donut chart">
+      </div>
+    </div>
+  </div>
+  <div class="tile stakeholder">
+    <img src="straatos-bento/Stakeholder Engagement.png" alt="Stakeholder Engagement">
+  </div>
+</div>
+
+</body>
+</html>

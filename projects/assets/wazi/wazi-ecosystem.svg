@@ -1,0 +1,215 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1380" font-family="-apple-system, BlinkMacSystemFont, 'SF UI Display', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <style>
+    .lbl-mono   { font-family: 'SF Mono', ui-monospace, 'JetBrains Mono', monospace; font-size: 16px; letter-spacing: 0.16em; text-transform: uppercase; fill: #6B6B6B; }
+    .root-t     { font-size: 36px; font-weight: 500; fill: #1a1a1a; }
+    .h1         { font-size: 20px; font-weight: 500; fill: #1a1a1a; }
+    .h2         { font-size: 15px; font-weight: 500; fill: #1a1a1a; }
+    .body       { font-size: 14px; font-weight: 400; fill: #525252; }
+    .stat-num   { font-size: 56px; font-weight: 300; fill: #9C7C40; letter-spacing: -0.02em; }
+    .stat-unit  { font-size: 22px; font-weight: 400; fill: #1a1a1a; }
+    .stat-lbl   { font-size: 13px; font-weight: 400; fill: #6B6B6B; }
+    .src        { font-size: 11px; font-weight: 400; fill: #9a9a9a; font-style: italic; }
+    .note       { font-size: 13px; font-weight: 400; fill: #8a8a8a; }
+    .card       { fill: #fff; stroke: #e5e5e5; stroke-width: 1; }
+    .card-acc   { fill: #fcf9f3; stroke: #ddd1b5; stroke-width: 1; }
+    .actor-up   { fill: #fdf6e3; stroke: #d4a03a; stroke-width: 1.3; }
+    .actor-mid  { fill: #f1ece2; stroke: #b8a06a; stroke-width: 1.3; }
+    .actor-dn   { fill: #efe9d5; stroke: #9C7C40; stroke-width: 1.3; }
+    .actor-side { fill: #f5f5f5; stroke: #c4c4c4; stroke-width: 1.3; }
+    .flow       { stroke: #9C7C40; stroke-width: 1.5; fill: none; }
+    .flow-mono  { stroke: #b4b4b4; stroke-width: 1.2; fill: none; stroke-dasharray: 4 4; }
+    .pin        { fill: #9C7C40; }
+    .pin-soft   { fill: #cdb88c; }
+  </style>
+
+  <!-- Title -->
+  <text x="80" y="70" class="lbl-mono">Stakeholder ecosystem · Research</text>
+  <text x="80" y="120" class="root-t">Whose gold is it, anyway?</text>
+  <text x="80" y="155" class="note">Mapping the actors, the data they hold, and the trust gaps between them. Desk research + 14 interviews across DRC, Ghana, and Peru.</text>
+
+  <!-- Stats row -->
+  <g transform="translate(80, 220)">
+    <rect class="card" width="540" height="160" rx="12"/>
+    <text x="32" y="58" class="stat-num">~20<tspan class="stat-unit">%</tspan></text>
+    <text x="32" y="100" class="stat-lbl">of the world's gold supply is sourced from</text>
+    <text x="32" y="120" class="stat-lbl">artisanal &amp; small-scale mining (ASM).</text>
+    <text x="32" y="145" class="src">Source: OECD &amp; World Bank, Delve 2023.</text>
+  </g>
+  <g transform="translate(640, 220)">
+    <rect class="card" width="540" height="160" rx="12"/>
+    <text x="32" y="58" class="stat-num">~45M</text>
+    <text x="32" y="100" class="stat-lbl">people working directly in ASM globally,</text>
+    <text x="32" y="120" class="stat-lbl">supporting an estimated 270M dependents.</text>
+    <text x="32" y="145" class="src">Source: IGF / Delve State of the Sector 2023.</text>
+  </g>
+  <g transform="translate(1200, 220)">
+    <rect class="card" width="540" height="160" rx="12"/>
+    <text x="32" y="58" class="stat-num">80+</text>
+    <text x="32" y="100" class="stat-lbl">countries with documented ASM gold</text>
+    <text x="32" y="120" class="stat-lbl">activity — DRC, Peru, Ghana, Tanzania lead.</text>
+    <text x="32" y="145" class="src">Source: planetGOLD GEF programme, 2024.</text>
+  </g>
+  <g transform="translate(1760, 220)">
+    <rect class="card-acc" width="560" height="160" rx="12"/>
+    <text x="32" y="58" class="stat-num">5</text>
+    <text x="32" y="100" class="stat-lbl">OECD Annex II risk categories every</text>
+    <text x="32" y="120" class="stat-lbl">dossier must cover — and they conflict.</text>
+    <text x="32" y="145" class="src">Source: OECD Due Diligence Guidance, 2016.</text>
+  </g>
+
+  <!-- ===== Ecosystem map ===== -->
+  <!-- Vertical lane structure: Upstream → Midstream → Downstream + side actors (oversight + finance) -->
+  <text x="80" y="450" class="lbl-mono">The chain — and the witnesses to it</text>
+
+  <!-- Lane headers -->
+  <g transform="translate(120, 490)">
+    <text x="0" y="0" class="h1">Upstream</text>
+    <text x="0" y="22" class="body">Where the gold leaves the ground.</text>
+  </g>
+  <g transform="translate(900, 490)">
+    <text x="0" y="0" class="h1">Midstream</text>
+    <text x="0" y="22" class="body">Where evidence consolidates.</text>
+  </g>
+  <g transform="translate(1700, 490)">
+    <text x="0" y="0" class="h1">Downstream</text>
+    <text x="0" y="22" class="body">Where the market accepts (or rejects) it.</text>
+  </g>
+
+  <!-- ===== UPSTREAM cards ===== -->
+  <g transform="translate(120, 560)">
+    <rect class="actor-up" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Mine operator</text>
+    <text x="22" y="68" class="body">Cooperative or individual digger. Holds</text>
+    <text x="22" y="86" class="body">the field truth, but not the paperwork.</text>
+  </g>
+  <g transform="translate(120, 690)">
+    <rect class="actor-up" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Local cooperative</text>
+    <text x="22" y="68" class="body">Negotiates on behalf of dozens of</text>
+    <text x="22" y="86" class="body">miners. Often the first paper trail.</text>
+  </g>
+  <g transform="translate(120, 820)">
+    <rect class="actor-up" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Community / land owner</text>
+    <text x="22" y="68" class="body">Bears the environmental and social</text>
+    <text x="22" y="86" class="body">cost — rarely sees the data.</text>
+  </g>
+
+  <!-- ===== MIDSTREAM cards ===== -->
+  <g transform="translate(900, 560)">
+    <rect class="actor-mid" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Aggregator / trader</text>
+    <text x="22" y="68" class="body">Consolidates lots from many sites.</text>
+    <text x="22" y="86" class="body">Where most traceability breaks down.</text>
+  </g>
+  <g transform="translate(900, 690)">
+    <rect class="actor-mid" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Logistics / exporter</text>
+    <text x="22" y="68" class="body">Moves physical metal across borders.</text>
+    <text x="22" y="86" class="body">Customs records vs reality often differ.</text>
+  </g>
+  <g transform="translate(900, 820)">
+    <rect class="actor-mid" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Refiner</text>
+    <text x="22" y="68" class="body">LBMA-listed in the formal market.</text>
+    <text x="22" y="86" class="body">The hand-off into &quot;good delivery.&quot;</text>
+  </g>
+
+  <!-- ===== DOWNSTREAM cards ===== -->
+  <g transform="translate(1700, 560)">
+    <rect class="actor-dn" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Bullion bank / buyer</text>
+    <text x="22" y="68" class="body">Wants compliant gold, low overhead.</text>
+    <text x="22" y="86" class="body">Reads dossiers, not data.</text>
+  </g>
+  <g transform="translate(1700, 690)">
+    <rect class="actor-dn" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">Jewellery / tech brand</text>
+    <text x="22" y="68" class="body">Public-facing claims. ESG reports.</text>
+    <text x="22" y="86" class="body">The pressure flows from here.</text>
+  </g>
+  <g transform="translate(1700, 820)">
+    <rect class="actor-dn" width="320" height="100" rx="12"/>
+    <text x="22" y="40" class="h2">End consumer</text>
+    <text x="22" y="68" class="body">Willing to pay 6–12% premium for</text>
+    <text x="22" y="86" class="body">verified origin (Fairmined surveys).</text>
+  </g>
+
+  <!-- ===== Side / oversight ===== -->
+  <text x="80" y="1000" class="lbl-mono">Witnesses</text>
+
+  <g transform="translate(120, 1030)">
+    <rect class="actor-side" width="280" height="92" rx="12"/>
+    <text x="22" y="40" class="h2">CSO monitor</text>
+    <text x="22" y="68" class="body">Documents abuses + ESG breaches.</text>
+  </g>
+  <g transform="translate(440, 1030)">
+    <rect class="actor-side" width="280" height="92" rx="12"/>
+    <text x="22" y="40" class="h2">Government / customs</text>
+    <text x="22" y="68" class="body">Issues export permits, audits flows.</text>
+  </g>
+  <g transform="translate(760, 1030)">
+    <rect class="actor-side" width="280" height="92" rx="12"/>
+    <text x="22" y="40" class="h2">3rd-party verifier</text>
+    <text x="22" y="68" class="body">Signs off OECD/LBMA dossiers.</text>
+  </g>
+  <g transform="translate(1080, 1030)">
+    <rect class="actor-side" width="280" height="92" rx="12"/>
+    <text x="22" y="40" class="h2">Bank / financier</text>
+    <text x="22" y="68" class="body">Prefinances aggregators, demands KYC.</text>
+  </g>
+  <g transform="translate(1400, 1030)">
+    <rect class="actor-side" width="280" height="92" rx="12"/>
+    <text x="22" y="40" class="h2">Standard-setter</text>
+    <text x="22" y="68" class="body">OECD, LBMA, RMI, CRAFT, ICGLR.</text>
+  </g>
+  <g transform="translate(1720, 1030)">
+    <rect class="actor-side" width="280" height="92" rx="12"/>
+    <text x="22" y="40" class="h2">Journalist / public</text>
+    <text x="22" y="68" class="body">Exposes when the chain breaks.</text>
+  </g>
+
+  <!-- Flow arrows (upstream → midstream → downstream) -->
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9C7C40"/>
+    </marker>
+    <marker id="arrow-soft" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#b4b4b4"/>
+    </marker>
+  </defs>
+  <!-- Material flow -->
+  <path class="flow" marker-end="url(#arrow)" d="M440 610 C 600 610, 740 610, 900 610"/>
+  <path class="flow" marker-end="url(#arrow)" d="M440 740 C 600 740, 740 740, 900 740"/>
+  <path class="flow" marker-end="url(#arrow)" d="M440 870 C 600 870, 740 870, 900 870"/>
+  <path class="flow" marker-end="url(#arrow)" d="M1220 610 C 1380 610, 1540 610, 1700 610"/>
+  <path class="flow" marker-end="url(#arrow)" d="M1220 740 C 1380 740, 1540 740, 1700 740"/>
+  <path class="flow" marker-end="url(#arrow)" d="M1220 870 C 1380 870, 1540 870, 1700 870"/>
+
+  <!-- Evidence flow — one shared "evidence rail" rising from the witnesses row.
+       The rail spans the full witnesses band; each witness card has a small riser
+       into it. No single arrow points at any one chain actor — the rail itself
+       represents the shared evidence base every witness contributes to. -->
+  <g>
+    <!-- Horizontal rail just above the witnesses cards -->
+    <path class="flow-mono" d="M120 990 L2000 990"/>
+    <!-- Vertical risers from each witness card top, into the rail -->
+    <path class="flow-mono" d="M260 1030 L260 990"/>
+    <path class="flow-mono" d="M580 1030 L580 990"/>
+    <path class="flow-mono" d="M900 1030 L900 990"/>
+    <path class="flow-mono" d="M1220 1030 L1220 990"/>
+    <path class="flow-mono" d="M1540 1030 L1540 990"/>
+    <path class="flow-mono" d="M1860 1030 L1860 990"/>
+    <!-- Label sitting on the rail, anchored visually away from any single chain card -->
+    <rect x="970" y="975" width="180" height="30" rx="15" fill="#fafafa" stroke="#d4d4d4" stroke-width="1"/>
+    <text x="1060" y="995" text-anchor="middle" font-size="12" font-family="'SF Mono', ui-monospace, monospace" letter-spacing="0.14em" text-transform="uppercase" fill="#6B6B6B">Evidence rail</text>
+  </g>
+
+  <!-- Footer -->
+  <g transform="translate(80, 1200)">
+    <rect class="card-acc" width="2240" height="120" rx="14"/>
+    <text x="32" y="42" class="lbl-mono">What the map exposed</text>
+    <text x="32" y="78" class="body">— The midstream is the trust gap: aggregators hold the data but no incentive to share it.</text>
+    <text x="32" y="100" class="body">— Witnesses (CSOs, customs, verifiers) sit on parallel records. WAZI's job is to let them all write to the same evidence base — without losing authorship.</text>
+  </g>
+</svg>

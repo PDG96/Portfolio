@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="WAZI — The digital backbone for ethical gold. A platform bringing trust and transparency to artisanal and small-scale mining.">
+  <meta name="theme-color" content="#fcfcfc">
+  <title>WAZI — Digital Gold Ecosystem · Case Study</title>
+
+  <link rel="stylesheet" href="../assets/fonts/lausanne.css">
+
+  <style>
+    :root {
+      /* Gray True palette */
+      --gray-true-25:  #fcfcfc;
+      --gray-true-50:  #fafafa;
+      --gray-true-100: #f5f5f5;
+      --gray-true-200: #e5e5e5;
+      --gray-true-300: #d6d6d6;
+      --gray-true-400: #a3a3a3;
+      --gray-true-500: #737373;
+      --gray-true-600: #525252;
+      --gray-true-700: #424242;
+      --gray-true-800: #292929;
+      --gray-true-900: #141414;
+
+      /* Semantic */
+      --bg:       var(--gray-true-25);
+      --bg-alt:   var(--gray-true-100);
+      --surface:  #ffffff;
+      --text:     var(--gray-true-900);
+      --text-2:   var(--gray-true-500);
+      --text-3:   var(--gray-true-400);
+      --border:   var(--gray-true-200);
+
+      --accent: #3d5a3e;
+      --accent-light: #e8ede8;
+      --accent-yellow: #f7fdb9;
+      --accent-blue:   #c5e9ff;
+      --accent-pink:   #eee1ea;
+
+      --font: 'TWKLausanne', system-ui, sans-serif;
+      --mono: 'TWKLausanne', system-ui, sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+      --section-py: clamp(4.5rem, 9vw, 7rem);
+      --section-gap: clamp(2.5rem, 5vw, 3.5rem);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #fff;
+      mix-blend-mode: difference;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate3d(-100px, -100px, 0);
+      will-change: transform;
+      transition: width 0.35s var(--ease), height 0.35s var(--ease);
+    }
+    .cursor.active {
+      width: 64px; height: 64px;
+      mix-blend-mode: normal;
+      background: transparent;
+      backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+      -webkit-backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+      border: 1.5px solid rgba(255,255,255,0.6);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.06),
+        0 6px 20px rgba(0,0,0,0.12),
+        inset 0 2px 3px rgba(255,255,255,0.35),
+        inset 0 -2px 3px rgba(0,0,0,0.06);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .cursor { display: block; }
+      html, body { cursor: none; }
+      a, button, input, textarea { cursor: none; }
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: var(--font);
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    h1 { font-size: clamp(2.25rem, 5.5vw, 4rem); line-height: 1.1; letter-spacing: -0.025em; }
+    h2 { font-size: clamp(1.875rem, 4vw, 2.75rem); }
+    h3 { font-size: 1.25rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; }
+
+    p { max-width: none; }
+
+    .wrap {
+      width: 100%;
+      max-width: clamp(72rem, 90vw, 110rem);
+      margin: 0 auto;
+      padding: 0 clamp(1.25rem, 4vw, 3rem);
+    }
+
+    .mono-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
+
+    /* Reveal */
+    .r {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+    .r.v { opacity: 1; transform: none; }
+    .r-stagger > .r:nth-child(2) { transition-delay: 0.06s; }
+    .r-stagger > .r:nth-child(3) { transition-delay: 0.12s; }
+    .r-stagger > .r:nth-child(4) { transition-delay: 0.18s; }
+    .r-stagger > .r:nth-child(5) { transition-delay: 0.24s; }
+    .r-stagger > .r:nth-child(6) { transition-delay: 0.30s; }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.875rem 1.5rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.35s var(--ease);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      line-height: 1;
+    }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+      border-color: var(--accent-yellow);
+    }
+
+    /* ====== NAV ====== */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(252,252,252,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: box-shadow 0.4s var(--ease);
+    }
+    .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .nav-right { display: flex; align-items: center; gap: 2rem; }
+    .nav-links {
+      display: none; list-style: none;
+      gap: 1.75rem; align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.8125rem; font-weight: 500;
+      color: var(--text-2);
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .lang-toggle {
+      display: flex; gap: 0;
+      border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden;
+    }
+    .lang-btn {
+      font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+      padding: 5px 10px; border: none; cursor: pointer;
+      background: transparent; color: var(--text-3);
+      transition: all 0.3s;
+    }
+    .lang-btn.active { background: var(--text); color: var(--bg); }
+
+    @media (min-width: 768px) {
+      .nav-links { display: flex; }
+    }
+
+    /* ====== CASE HERO ====== */
+    .case-hero {
+      padding: calc(60px + var(--section-py)) 0 var(--section-py);
+      position: relative;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-2);
+      margin-bottom: 2rem;
+      transition: color 0.3s, gap 0.3s var(--ease);
+    }
+    .back-link:hover {
+      color: var(--text);
+      gap: 0.85rem;
+    }
+    .back-arrow {
+      display: inline-block;
+      font-family: var(--font);
+    }
+
+    .case-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 5px 11px;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .case-hero h1 {
+      margin-bottom: 1.5rem;
+      max-width: none;
+    }
+
+    .case-lead {
+      font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--text-2);
+      max-width: none;
+      margin-bottom: 3.5rem;
+    }
+
+    /* Meta grid */
+    .case-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 2.5rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--section-gap);
+    }
+    @media (min-width: 720px) {
+      .case-meta { grid-template-columns: repeat(4, 1fr); }
+    }
+    .case-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .case-meta-label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
+    .case-meta-value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    /* Hero mockup placeholder */
+    .case-hero-mockup--image {
+      margin-top: clamp(1.5rem, 3vw, 2.5rem);
+    }
+    .case-hero-mockup--image img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 14px;
+    }
+    .case-hero-mockup {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--bg-alt);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .case-hero-mockup::before {
+      content: '';
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      background: var(--accent);
+      opacity: 0.08;
+      border-radius: 40% 60% 65% 35% / 40% 45% 55% 60%;
+      top: 15%;
+      left: 20%;
+      filter: blur(20px);
+    }
+    .case-hero-mockup::after {
+      content: '';
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: var(--accent-yellow);
+      opacity: 0.3;
+      border-radius: 50%;
+      bottom: 15%;
+      right: 20%;
+      filter: blur(30px);
+    }
+    .mockup-caption {
+      position: relative;
+      z-index: 1;
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+      background: var(--surface);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    /* ====== CASE SECTIONS (shared) ====== */
+    .case-section {
+      padding: var(--section-py) 0;
+      position: relative;
+    }
+    .case-section--alt { background: var(--bg-alt); }
+
+    .case-section--dark {
+      background: var(--gray-true-900);
+      color: var(--gray-true-25);
+    }
+    .case-section--dark h2,
+    .case-section--dark h3 { color: var(--gray-true-25); }
+    .case-section--dark p { color: rgba(252,252,252,0.6); }
+    .case-section--dark .case-section-label { color: rgba(252,252,252,0.45); }
+
+    /* Stakeholder Network — default (light) section; the iframe keeps its own dark canvas */
+    .case-section--network {
+      background: var(--bg);
+    }
+
+    .network-stack {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(2rem, 4vw, 3rem);
+      margin-top: clamp(1.5rem, 3vw, 2.5rem);
+    }
+    .network-shot {
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+    .network-shot img {
+      width: 100%;
+      display: block;
+      border-radius: 14px;
+    }
+    .network-shot figcaption {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+
+    /* Graph figure — interactive iframe rendered as a card, same grid as siblings */
+    .network-shot--graph .network-embed {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      border-radius: 14px;
+      overflow: hidden;
+      background: #0C0D11;
+    }
+    /* Supplier assessment variant — looping mov, container hugs the video tightly. */
+    .network-shot--gold .network-embed {
+      background: transparent;
+      border-radius: 30px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: auto;
+      height: auto;
+    }
+    .network-shot--gold .network-video {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 30px;
+    }
+    .network-shot--graph .network-iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: transparent;
+    }
+    /* Legend floats over the dark canvas, bottom-left of the card */
+    .network-legend {
+      position: absolute;
+      left: clamp(1rem, 2vw, 1.75rem);
+      bottom: clamp(1rem, 2vw, 1.75rem);
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(0.875rem, 1.75vw, 1.5rem);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      pointer-events: none;
+    }
+    .network-legend__item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .network-legend .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* Hero showcase — image contained in the .wrap grid, same as other shots */
+    .case-section--showcase {
+      background: var(--bg-alt);
+    }
+    .showcase-shot {
+      margin: 0;
+      width: 100%;
+    }
+    .showcase-shot img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 14px;
+    }
+
+    .case-section-header {
+      margin-bottom: var(--section-gap);
+    }
+    .case-section-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 0.75rem;
+    }
+    .case-section h2 {
+      max-width: none;
+    }
+
+    /* ====== CHALLENGE / SOLUTION (2-col) ====== */
+    .cs-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+    @media (min-width: 820px) {
+      .cs-grid { grid-template-columns: 1fr 1fr; gap: 4rem; }
+    }
+    .cs-block h3 {
+      font-size: clamp(1.875rem, 4vw, 2.75rem);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: -0.015em;
+      margin-bottom: 1rem;
+    }
+    .cs-block p {
+      color: var(--text-2);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .cs-block p:last-child { margin-bottom: 0; }
+    .cs-block-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .cs-block--challenge .cs-block-label { color: #b85c3f; }
+    .cs-block--solution .cs-block-label { color: var(--accent); }
+
+    /* ====== RESEARCH ====== */
+    .research-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (min-width: 900px) {
+      .research-layout { grid-template-columns: 1.1fr 0.9fr; gap: 4rem; }
+    }
+    .research-text p {
+      color: var(--text-2);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+    .research-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 1.5rem;
+    }
+    .research-list li {
+      padding: 0.75rem 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.9375rem;
+      color: var(--text);
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+    }
+    .research-list li:last-child { border-bottom: 1px solid var(--border); }
+    .research-list li::before {
+      content: '';
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+      transform: translateY(-2px);
+    }
+    .research-visual {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      aspect-ratio: 4 / 5;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+    }
+    .research-visual::before {
+      content: '';
+      position: absolute;
+      width: 70%; height: 70%;
+      top: 10%; left: 15%;
+      background: var(--accent);
+      opacity: 0.1;
+      border-radius: 45% 55% 60% 40% / 50% 40% 60% 50%;
+      filter: blur(30px);
+    }
+    .placeholder-caption {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.875rem 1rem;
+      max-width: 100%;
+    }
+    .placeholder-caption-label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .placeholder-caption-text {
+      font-size: 0.8125rem;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    /* ====== INSIGHTS ====== */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    @media (min-width: 720px) {
+      .insights-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: clamp(1.25rem, 2vw, 1.75rem);
+        align-items: stretch;
+      }
+    }
+    @media (min-width: 1100px) {
+      .insights-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .insight-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: clamp(1.75rem, 2.75vw, 2.5rem);
+      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+      transition: transform .35s var(--ease, cubic-bezier(0.16, 1, 0.3, 1)),
+                  border-color .35s ease,
+                  box-shadow .35s ease;
+    }
+    .insight-item::before {
+      content: "";
+      position: absolute;
+      top: 0; left: clamp(1.75rem, 2.75vw, 2.5rem);
+      width: 28px; height: 2px;
+      background: var(--accent);
+      border-radius: 0 0 2px 2px;
+      opacity: 0.85;
+    }
+    .insight-item:hover {
+      transform: translateY(-4px);
+      border-color: var(--gray-true-300, #d6d6d6);
+      box-shadow: 0 16px 36px -18px rgba(15, 23, 42, 0.18),
+                  0 2px 6px -2px rgba(15, 23, 42, 0.06);
+    }
+    .insight-num { display: none; }
+    .insight-content h3 {
+      font-size: clamp(1.125rem, 1.5vw, 1.375rem);
+      font-weight: 500;
+      line-height: 1.3;
+      letter-spacing: -0.012em;
+      margin-bottom: 0.9rem;
+      color: var(--text);
+    }
+    .insight-content p {
+      color: var(--text-2);
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      max-width: none;
+      flex: 1;
+    }
+
+    /* ====== PRINCIPLES ====== */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    @media (min-width: 700px) {
+      .principles-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1000px) {
+      .principles-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .principle-card {
+      padding: 2rem 1.75rem;
+      border-radius: 12px;
+      background: rgba(252,252,252,0.03);
+      border: 1px solid rgba(252,252,252,0.12);
+    }
+    .principle-num {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: rgba(252,252,252,0.5);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .principle-card h3 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.75rem;
+    }
+    .principle-card p {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: rgba(252,252,252,0.55);
+    }
+
+    /* ====== REUSABLE PLACEHOLDER SYSTEM ====== */
+    .ph {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.25rem;
+    }
+    .ph--16x9 { aspect-ratio: 16 / 9; }
+    .ph--4x3  { aspect-ratio: 4 / 3; }
+    .ph--3x4  { aspect-ratio: 3 / 4; }
+    .ph--1x1  { aspect-ratio: 1 / 1; }
+    .ph--3x2  { aspect-ratio: 3 / 2; }
+
+    .ph::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.12;
+      filter: blur(30px);
+      pointer-events: none;
+    }
+    .ph--green::before {
+      background: radial-gradient(circle at 30% 40%, var(--accent), transparent 60%);
+    }
+    .ph--yellow::before {
+      background: radial-gradient(circle at 70% 60%, var(--accent-yellow), transparent 60%);
+      opacity: 0.4;
+    }
+    .ph--blue::before {
+      background: radial-gradient(circle at 40% 30%, var(--accent-blue), transparent 60%);
+      opacity: 0.5;
+    }
+    .ph--pink::before {
+      background: radial-gradient(circle at 60% 50%, var(--accent-pink), transparent 60%);
+      opacity: 0.5;
+    }
+    .ph--warn::before {
+      background: radial-gradient(circle at 50% 50%, #d4a37a, transparent 60%);
+      opacity: 0.25;
+    }
+
+    /* Grid lines decoration */
+    .ph--grid::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(20,20,20,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20,20,20,0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    .ph-caption {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      max-width: 340px;
+      box-shadow: 0 4px 12px rgba(20,20,20,0.04);
+    }
+    .ph-caption-label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .ph-caption-text {
+      font-size: 0.8125rem;
+      color: var(--text-2);
+      line-height: 1.45;
+    }
+
+    /* ====== BEFORE / AFTER ====== */
+    .ba-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 820px) {
+      .ba-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    }
+    .ba-block {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .ba-tag {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+    .ba-tag--before {
+      color: #a04e2f;
+      background: #f5e4db;
+    }
+    .ba-tag--after {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+    .ba-block h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .ba-block p {
+      font-size: 0.9375rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* ====== UX PROCESS GALLERY ====== */
+    .process-gallery {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    @media (min-width: 700px) {
+      .process-gallery {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 1000px) {
+      .process-gallery {
+        grid-template-columns: repeat(6, 1fr);
+        grid-auto-rows: minmax(180px, auto);
+      }
+      /* Asymmetric spans for visual rhythm */
+      .process-gallery > .process-item:nth-child(1) { grid-column: span 4; }
+      .process-gallery > .process-item:nth-child(2) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(3) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(4) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(5) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(6) { grid-column: span 3; }
+      .process-gallery > .process-item:nth-child(7) { grid-column: span 3; }
+    }
+    .process-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+    .process-item .ph {
+      flex: 1;
+      min-height: 180px;
+    }
+    .process-item-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
+    .process-item-title {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -0.005em;
+    }
+
+    /* ====== DESIGN EXPLORATIONS ====== */
+    .explore-intro {
+      font-size: 1rem;
+      color: var(--text-2);
+      line-height: 1.7;
+      max-width: none;
+      margin-top: 0.75rem;
+    }
+    .explore-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 700px) {
+      .explore-grid { grid-template-columns: repeat(3, 1fr); gap: 1.75rem; }
+    }
+    .explore-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .explore-num {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+    }
+    .explore-item h3 {
+      font-size: 1.0625rem;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+    }
+    .explore-item p {
+      font-size: 0.875rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* ====== FINAL PRODUCT GALLERY ====== */
+    .gallery-hero { margin-bottom: 1.5rem; }
+    .gallery-detail {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 700px) {
+      .gallery-detail { grid-template-columns: 1fr 1fr; }
+    }
+    .gallery-mobile {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+    @media (min-width: 700px) {
+      .gallery-mobile { grid-template-columns: repeat(4, 1fr); }
+    }
+    .gallery-caption {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-top: 0.625rem;
+      display: block;
+    }
+
+    /* ====== MOCKUP UI SYSTEM ====== */
+    .mock-browser {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      font-family: var(--font);
+    }
+    .mock-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 12px;
+      background: var(--gray-true-100);
+      border-bottom: 1px solid var(--border);
+    }
+    .mock-dots { display: flex; gap: 5px; }
+    .mock-dots i { width: 7px; height: 7px; border-radius: 50%; display: block; font-style: normal; }
+    .mock-dots i:nth-child(1) { background: #ff5f57; }
+    .mock-dots i:nth-child(2) { background: #ffbd2e; }
+    .mock-dots i:nth-child(3) { background: #28c840; }
+    .mock-url {
+      flex: 1; margin-left: 8px;
+      background: #fff; border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.5rem; color: var(--text-3);
+      font-family: var(--mono); letter-spacing: 0.02em;
+    }
+
+    .mock-app {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      min-height: 340px;
+    }
+    @media (max-width: 600px) {
+      .mock-app { grid-template-columns: 1fr; }
+      .mock-side { display: none; }
+    }
+
+    /* Sidebar */
+    .mock-side {
+      background: #0d2b2e; color: rgba(255,255,255,0.65);
+      padding: 12px 0; font-size: 0.5625rem;
+      display: flex; flex-direction: column;
+    }
+    .mock-side-logo {
+      padding: 2px 14px 10px;
+      font-weight: 700; font-size: 0.6875rem;
+      color: #fff; letter-spacing: -0.02em;
+      font-style: italic;
+    }
+    .mock-side-sec {
+      padding: 10px 14px 3px;
+      font-size: 0.4375rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: rgba(255,255,255,0.3);
+    }
+    .mock-side-item {
+      padding: 5px 14px; font-size: 0.5625rem;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mock-side-item--on {
+      background: rgba(255,255,255,0.12); color: #fff;
+      border-radius: 0 4px 4px 0; margin-right: 6px;
+    }
+    .mock-side-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: currentColor; opacity: 0.5;
+    }
+
+    /* Content area */
+    .mock-body {
+      padding: 14px 16px; background: #f8f9fa;
+      overflow: hidden; font-size: 0.5625rem; color: var(--text);
+    }
+    .mock-breadcrumb {
+      font-size: 0.4375rem; color: var(--text-3);
+      margin-bottom: 4px; font-family: var(--mono);
+      letter-spacing: 0.04em;
+    }
+    .mock-title {
+      font-size: 0.75rem; font-weight: 600;
+      margin-bottom: 10px; letter-spacing: -0.01em;
+    }
+
+    /* Metric cards */
+    .mock-metrics { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .mock-m {
+      flex: 1; min-width: 60px;
+      background: #fff; border-radius: 5px;
+      padding: 8px 10px; border: 1px solid #eee;
+    }
+    .mock-m-label {
+      font-size: 0.375rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 3px;
+    }
+    .mock-m-val { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
+    .mock-m-delta {
+      font-size: 0.375rem; margin-top: 2px;
+    }
+    .mock-m-delta--up { color: #28a745; }
+    .mock-m-delta--down { color: #dc3545; }
+
+    /* Map */
+    .mock-map {
+      background: linear-gradient(145deg, #d4e8df, #a8d5c2 40%, #7ec4a5 70%, #5aad8a);
+      border-radius: 5px; height: 110px;
+      position: relative; margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .mock-map-pin {
+      position: absolute; width: 8px; height: 8px;
+      background: #e74c3c; border-radius: 50%;
+      border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .mock-map-overlay {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(255,255,255,0.92); border-radius: 4px;
+      padding: 5px 8px; font-size: 0.4375rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .mock-map-overlay b { display: block; font-size: 0.5rem; }
+
+    /* Table */
+    .mock-tbl {
+      width: 100%; border-collapse: collapse;
+      background: #fff; border-radius: 5px;
+      overflow: hidden; border: 1px solid #eee;
+    }
+    .mock-tbl th {
+      text-align: left; padding: 6px 8px;
+      background: #f8f9fa; font-weight: 600;
+      font-size: 0.375rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-3);
+      border-bottom: 1px solid #eee;
+    }
+    .mock-tbl td {
+      padding: 5px 8px; border-bottom: 1px solid #f5f5f5;
+      font-size: 0.5rem; color: var(--text);
+    }
+    .mock-badge {
+      display: inline-block; padding: 1px 5px;
+      border-radius: 3px; font-size: 0.375rem;
+      font-weight: 600;
+    }
+    .mock-badge--green { background: #e6f7ee; color: #1a7f43; }
+    .mock-badge--yellow { background: #fef7e0; color: #9a7b1a; }
+    .mock-badge--blue { background: #e8f0fe; color: #1a5fb4; }
+    .mock-badge--red { background: #fde8e8; color: #c0392b; }
+
+    /* Charts */
+    .mock-chart {
+      background: #fff; border-radius: 5px;
+      border: 1px solid #eee; padding: 10px;
+      margin-bottom: 10px;
+    }
+    .mock-chart-title {
+      font-size: 0.4375rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-3); margin-bottom: 8px;
+    }
+    .mock-chart-bars { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
+    .mock-chart-bar {
+      flex: 1; background: #0d2b2e; border-radius: 2px 2px 0 0;
+      min-width: 6px; transition: height 0.3s;
+    }
+    .mock-chart-bar--accent { background: var(--accent-yellow); }
+
+    /* Tabs */
+    .mock-tabs { display: flex; gap: 0; margin-bottom: 10px; }
+    .mock-tab {
+      padding: 5px 12px; font-size: 0.4375rem; font-weight: 500;
+      color: var(--text-3); border-bottom: 2px solid transparent;
+    }
+    .mock-tab--on { color: #0d2b2e; border-bottom-color: #0d2b2e; }
+
+    /* Form elements */
+    .mock-input {
+      background: #fff; border: 1px solid #ddd; border-radius: 4px;
+      padding: 5px 8px; font-size: 0.5rem; color: var(--text);
+      width: 100%; margin-bottom: 6px;
+    }
+    .mock-checkbox {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.5rem; color: var(--text); margin-bottom: 4px;
+    }
+    .mock-checkbox i {
+      width: 10px; height: 10px; border-radius: 2px;
+      border: 1.5px solid #0d2b2e; display: block; font-style: normal;
+      position: relative;
+    }
+    .mock-checkbox i.on { background: #0d2b2e; }
+    .mock-checkbox i.on::after {
+      content: ''; position: absolute;
+      left: 2px; top: 0; width: 3px; height: 6px;
+      border: solid #fff; border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+    }
+    .mock-btn-sm {
+      display: inline-block; padding: 4px 10px;
+      background: #0d2b2e; color: #fff;
+      border-radius: 4px; font-size: 0.4375rem; font-weight: 600;
+    }
+
+    /* Phone frame */
+    .mock-phone {
+      background: #1a1a1a; border-radius: 24px;
+      padding: 8px; max-width: 180px; margin: 0 auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    .mock-phone-screen {
+      background: #fff; border-radius: 18px;
+      overflow: hidden; min-height: 320px;
+      font-family: var(--font); font-size: 0.5rem;
+      color: var(--text);
+    }
+    .mock-phone-status {
+      display: flex; justify-content: space-between;
+      padding: 6px 12px 2px;
+      font-size: 0.375rem; color: var(--text-3);
+    }
+    .mock-phone-header {
+      padding: 4px 12px 8px;
+      font-size: 0.6875rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.01em;
+    }
+    .mock-phone-body { padding: 0 12px 12px; }
+    .mock-phone-nav {
+      display: flex; justify-content: space-around;
+      padding: 8px 0; border-top: 1px solid #eee;
+      font-size: 0.3125rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-3);
+    }
+    .mock-phone-nav span { text-align: center; }
+    .mock-phone-nav span.on { color: #0d2b2e; font-weight: 700; }
+
+    .mock-phone-card {
+      background: #f8f9fa; border-radius: 6px;
+      padding: 8px; margin-bottom: 6px;
+    }
+    .mock-phone-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 4px 0;
+      font-size: 0.4375rem; border-bottom: 1px solid #f0f0f0;
+    }
+    .mock-phone-row:last-child { border-bottom: none; }
+
+    /* Wireframe style (mid-fi process artifacts) */
+    .mock-wire {
+      background: #f5f5f5; border-radius: 8px;
+      border: 1px solid #e0e0e0; padding: 16px;
+      font-family: var(--font); font-size: 0.5rem;
+      color: #666; overflow: hidden;
+      height: 100%; min-height: 200px;
+      display: flex; flex-direction: column;
+    }
+    .mock-wire-title {
+      font-size: 0.5625rem; font-weight: 700; color: #444;
+      margin-bottom: 10px; padding-bottom: 6px;
+      border-bottom: 1px dashed #ddd;
+    }
+    /* Sticky notes */
+    .mock-stickies { display: flex; flex-wrap: wrap; gap: 4px; }
+    .mock-sticky {
+      padding: 5px 7px; border-radius: 2px;
+      font-size: 0.375rem; line-height: 1.3;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.06);
+      width: calc(33% - 3px); min-width: 48px;
+    }
+    .mock-sticky--y { background: #fff9c4; color: #6d5e00; }
+    .mock-sticky--b { background: #e3f2fd; color: #1565c0; }
+    .mock-sticky--p { background: #fce4ec; color: #ad1457; }
+    .mock-sticky--g { background: #e8f5e9; color: #2e7d32; }
+    /* Flow arrows */
+    .mock-flow { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .mock-flow-step {
+      background: #fff; border: 1px solid #ddd; border-radius: 4px;
+      padding: 6px 8px; font-size: 0.4375rem; font-weight: 500;
+      color: #444; text-align: center; flex: 1; min-width: 50px;
+    }
+    .mock-flow-step--on { background: #0d2b2e; color: #fff; border-color: #0d2b2e; }
+    .mock-flow-step--warn { border-color: #e74c3c; color: #e74c3c; }
+    .mock-flow-arrow { color: #ccc; font-size: 0.625rem; flex-shrink: 0; }
+    /* Tree diagram */
+    .mock-tree { padding-left: 12px; }
+    .mock-tree-node {
+      position: relative; padding: 3px 0 3px 14px;
+      font-size: 0.4375rem; color: #555;
+    }
+    .mock-tree-node::before {
+      content: ''; position: absolute; left: 0; top: 0;
+      width: 8px; height: 100%;
+      border-left: 1px solid #ccc; border-bottom: 1px solid #ccc;
+    }
+    .mock-tree-node:last-child::before { height: 50%; }
+    .mock-tree-node b { color: #333; font-weight: 600; }
+    /* Gray wireframe boxes */
+    .mock-wire-box {
+      background: #e8e8e8; border-radius: 3px;
+      padding: 6px 8px; margin-bottom: 4px;
+      font-size: 0.375rem; color: #888;
+    }
+    .mock-wire-box--dark { background: #d0d0d0; color: #666; }
+    .mock-wire-row { display: flex; gap: 4px; margin-bottom: 4px; }
+    .mock-wire-sidebar {
+      width: 40px; background: #ddd; border-radius: 3px;
+      padding: 4px; flex-shrink: 0;
+    }
+    .mock-wire-main { flex: 1; }
+    /* Annotation dots */
+    .mock-annot {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #e74c3c; color: #fff;
+      font-size: 0.3125rem; font-weight: 700;
+      position: absolute;
+    }
+
+    /* Network graph node */
+    .mock-node {
+      display: flex; align-items: center; gap: 4px;
+      background: #fff; border: 1px solid #eee;
+      border-radius: 12px; padding: 3px 8px 3px 3px;
+      font-size: 0.375rem; font-weight: 500; color: var(--text);
+      white-space: nowrap;
+    }
+    .mock-node-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .mock-node--miner .mock-node-dot { background: #d4a03a; }
+    .mock-node--agg .mock-node-dot { background: #4a90c2; }
+    .mock-node--monitor .mock-node-dot { background: #8e44ad; }
+    .mock-node--buyer .mock-node-dot { background: #28a745; }
+    .mock-node--refiner .mock-node-dot { background: #e74c3c; }
+
+    /* ESG score circle */
+    .mock-esg {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mock-esg-ring {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 3px solid; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 0.375rem; font-weight: 700;
+    }
+    .mock-esg-ring--high { border-color: #28a745; color: #28a745; }
+    .mock-esg-ring--mid { border-color: #f0ad4e; color: #9a7b1a; }
+    .mock-esg-ring--low { border-color: #dc3545; color: #dc3545; }
+    .mock-esg-label { font-size: 0.375rem; color: var(--text-3); }
+
+    /* Progress bar */
+    .mock-progress {
+      height: 4px; background: #eee; border-radius: 2px;
+      overflow: hidden; margin-top: 4px;
+    }
+    .mock-progress-fill {
+      height: 100%; border-radius: 2px; background: #0d2b2e;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Custom cursor -->
+  <div class="cursor" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a href="../index.html" class="nav-logo">Pietra Gottardo.</a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
+          <li><a href="../index.html#services" data-i18n="nav_services">Services</a></li>
+          <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
+        </ul>
+        <div class="lang-toggle" role="group" aria-label="Language selector">
+          <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+          <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CASE HERO -->
+  <section class="case-hero">
+    <div class="wrap">
+      <a href="../index.html#work" class="back-link r">
+        <span class="back-arrow">←</span>
+        <span data-i18n="back_to_projects">Back to projects</span>
+      </a>
+
+      <span class="case-tag r" data-i18n="case_tag">Responsible Sourcing · Digital Gold</span>
+
+      <h1 class="r" data-i18n="case_title">WAZI — The Digital Backbone for Ethical Gold</h1>
+
+      <p class="case-lead r" data-i18n="case_lead">A platform that brings trust and transparency to artisanal and small-scale gold mining. Every miner, aggregator, monitor and buyer contributes to a shared evidence base — while keeping sovereignty over their own data.</p>
+
+      <div class="case-meta r-stagger">
+        <div class="case-meta-item r">
+          <span class="case-meta-label" data-i18n="meta_role">Role</span>
+          <span class="case-meta-value" data-i18n="meta_role_val">Senior Product Designer</span>
+        </div>
+        <div class="case-meta-item r">
+          <span class="case-meta-label" data-i18n="meta_timeline">Timeline</span>
+          <span class="case-meta-value" data-i18n="meta_timeline_val">8 months · 2024–2025</span>
+        </div>
+        <div class="case-meta-item r">
+          <span class="case-meta-label" data-i18n="meta_deliverables">Deliverables</span>
+          <span class="case-meta-value" data-i18n="meta_deliverables_val">Web Platform, Marketing Site</span>
+        </div>
+        <div class="case-meta-item r">
+          <span class="case-meta-label" data-i18n="meta_team">Team</span>
+          <span class="case-meta-value" data-i18n="meta_team_val">Datastake product team</span>
+        </div>
+      </div>
+
+      <div class="case-hero-mockup case-hero-mockup--image r" style="aspect-ratio:auto;padding:0;background:transparent;border:none;">
+        <img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI Shipments view on a tablet held in two hands — sidebar with Aggregator modules, Timeline + Origin Distribution + Counterparties donuts in gold, and an Inbound shipments table with EVT000000123 marked Completed">
+      </div>
+      <!-- legacy HTML mockup hidden — keep markup for reference -->
+      <div class="case-hero-mockup r" style="display:none;">
+        <div class="mock-browser" style="width:100%;">
+          <div class="mock-bar"><div class="mock-dots"><i></i><i></i><i></i></div><span class="mock-url">app.wazi.io/dashboard/network</span></div>
+          <div class="mock-app">
+            <div class="mock-side">
+              <div class="mock-side-logo">wazi</div>
+              <div class="mock-side-sec">Network</div>
+              <div class="mock-side-item mock-side-item--on"><span class="mock-side-dot"></span> Dashboard</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> Stakeholders</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> Supply Chain</div>
+              <div class="mock-side-sec">Due Diligence</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> ESG Scores</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> Assessments</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> Framework Map</div>
+              <div class="mock-side-sec">Reports</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> Dossiers</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> Documents</div>
+              <div class="mock-side-item"><span class="mock-side-dot"></span> Activity Log</div>
+            </div>
+            <div class="mock-body">
+              <div class="mock-breadcrumb">WAZI › Network › Dashboard</div>
+              <div class="mock-title">Stakeholder Network Overview</div>
+              <div class="mock-metrics">
+                <div class="mock-m"><div class="mock-m-label">Active Sites</div><div class="mock-m-val">34</div><div class="mock-m-delta mock-m-delta--up">+6 this quarter</div></div>
+                <div class="mock-m"><div class="mock-m-label">Avg ESG Score</div><div class="mock-m-val">72%</div><div class="mock-m-delta mock-m-delta--up">+8%</div></div>
+                <div class="mock-m"><div class="mock-m-label">Stakeholders</div><div class="mock-m-val">128</div></div>
+                <div class="mock-m"><div class="mock-m-label">Shipments (Q4)</div><div class="mock-m-val">89</div><div class="mock-m-delta mock-m-delta--up">+12</div></div>
+              </div>
+              <div class="mock-map" style="height:90px;background:linear-gradient(145deg,#1a3a2a,#0d2b2e 40%,#1a4a3a 70%,#2a5a4a);">
+                <div class="mock-map-pin" style="top:25%;left:30%;background:#d4a03a;"></div>
+                <div class="mock-map-pin" style="top:45%;left:50%;background:#d4a03a;"></div>
+                <div class="mock-map-pin" style="top:55%;left:65%;background:#4a90c2;"></div>
+                <div class="mock-map-pin" style="top:35%;left:75%;background:#28a745;"></div>
+                <div class="mock-map-overlay"><b>Ituri Province</b>12 sites · 4 aggregators</div>
+              </div>
+              <div class="mock-tabs">
+                <div class="mock-tab mock-tab--on">Network</div>
+                <div class="mock-tab">ESG Scores</div>
+                <div class="mock-tab">Recent Activity</div>
+              </div>
+              <table class="mock-tbl">
+                <thead><tr><th>Stakeholder</th><th>Role</th><th>ESG</th><th>Status</th><th>Last Update</th></tr></thead>
+                <tbody>
+                  <tr><td>Bukavu Gold Coop</td><td>Mine Operator</td><td><span style="color:#28a745;font-weight:600;">78%</span></td><td><span class="mock-badge mock-badge--green">Verified</span></td><td>02 Mar 25</td></tr>
+                  <tr><td>Kivu Minerals Ltd</td><td>Aggregator</td><td><span style="color:#28a745;font-weight:600;">81%</span></td><td><span class="mock-badge mock-badge--green">Verified</span></td><td>28 Feb 25</td></tr>
+                  <tr><td>Lubero Artisans</td><td>Mine Operator</td><td><span style="color:#f0ad4e;font-weight:600;">54%</span></td><td><span class="mock-badge mock-badge--yellow">In Progress</span></td><td>15 Feb 25</td></tr>
+                  <tr><td>Great Lakes Monitor</td><td>CSO Monitor</td><td>--</td><td><span class="mock-badge mock-badge--blue">Observer</span></td><td>01 Mar 25</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== CHALLENGE / SOLUTION ====== -->
+  <section class="case-section case-section--alt">
+    <div class="wrap">
+      <div class="cs-grid">
+        <div class="cs-block cs-block--challenge r">
+          <span class="cs-block-label" data-i18n="challenge_label">The Challenge</span>
+          <h3 data-i18n="challenge_title">Responsible sourcing was a cost, not a collaboration.</h3>
+          <p data-i18n="challenge_p1">Artisanal and small-scale mining supplies roughly 20% of the world's gold, but the path from a mining site to the market is opaque, fragmented, and often distrusted. Aggregators juggled paper forms and disconnected apps. Downstream buyers couldn't verify what they were buying. Civil society monitors documented abuses without the tools to share evidence at scale.</p>
+          <p data-i18n="challenge_p2">Existing due diligence tools treated every participant as a suspect and asked miners to hand over their data in exchange for access. The honest producers ended up invisible, and compliance became a heavy cost rather than a collaborative process.</p>
+        </div>
+        <div class="cs-block cs-block--solution r">
+          <span class="cs-block-label" data-i18n="solution_label">The Solution</span>
+          <h3 data-i18n="solution_title">A shared evidence base — with sovereignty by design.</h3>
+          <p data-i18n="solution_p1">A role-based digital platform where every stakeholder in the gold value chain contributes to a shared, traceable evidence base while retaining control over their own data. Mine operators own their self-assessments. Aggregators consolidate ESG, risk, and shipment data. Monitors upload field observations without losing authorship.</p>
+          <p data-i18n="solution_p2">The platform produces audit-ready dossiers aligned to LBMA, RMI and OECD frameworks — and is built on the Datastake Application Framework, so it plugs into tools like KoboToolbox instead of replacing them.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== RESEARCH — Stakeholder ecosystem ====== -->
+  <section class="case-section">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="eco_label">Research · Field of play</p>
+        <h2 data-i18n="eco_title">Whose gold is it, anyway?</h2>
+        <p class="explore-intro" data-i18n="eco_intro">Before sketching anything, I mapped the ecosystem: who holds gold, who holds the paperwork, who holds the receipts. Desk research pulled from OECD, World Bank/Delve and the planetGOLD programme; 14 conversations filled in what the reports don't say.</p>
+      </div>
+      <div class="r" style="margin-top: 2rem; border-radius: 16px; overflow: hidden; background: #fafafa; padding: clamp(1rem, 2vw, 2rem);">
+        <img src="assets/wazi/wazi-ecosystem.svg" alt="Stakeholder ecosystem map for the WAZI use case — upstream (mine operator, cooperative, community), midstream (aggregator, exporter, refiner), and downstream (bullion bank, jewellery brand, consumer), with witnesses (CSO monitors, customs, verifiers, banks, standard-setters, journalists) feeding evidence into the chain. Key stats: ~20% of world gold from ASM, ~45M people, 80+ countries, 5 OECD Annex II categories." style="width:100%; display:block;">
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
+  <section class="case-section case-section--alt">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
+        <h2 data-i18n="ia_title">One sidebar, switched by role.</h2>
+        <p class="explore-intro" data-i18n="ia_intro">WAZI doesn't manage projects — it orchestrates a shared evidence base across six roles. Each role (Aggregator, Operator, Monitor, Buyer, Regulator, Partner) sees the same three-section sidebar: <strong>Analysis</strong> for cross-cutting views, <strong>Modules</strong> for the work itself, <strong>Data</strong> for raw access. The grammar doesn't change between roles — only what's actionable does.</p>
+      </div>
+      <div class="r" style="margin-top: 2rem; border-radius: 16px; overflow: hidden; background: #fafafa; padding: clamp(1rem, 2vw, 2rem);">
+        <img src="assets/wazi/wazi-sitemap.svg" alt="WAZI sitemap — Application branch (Network, Due Diligence, Reports) and Project branch (Profile, Operations, Trade), with frameworks band at the bottom listing OECD Annex II, LBMA Responsible Gold, RMI/RMAP, ICGLR, CRAFT, Fairmined, UN Guiding Principles." style="width:100%; display:block;">
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SERVICE BLUEPRINT ====== -->
+  <section class="case-section">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="bp_label">Process · Service blueprint</p>
+        <h2 data-i18n="bp_title">What the user sees vs. what the platform does.</h2>
+        <p class="explore-intro" data-i18n="bp_intro">Six phases, following the WAZI sidebar order: Onboarding → Self Assessment → Operations → Due Diligence → Analysis → Reporting. Three lanes: the action the user takes, the orchestration the platform runs behind the line of visibility, and the evidence trail that gets written. The blueprint surfaced the design principles WAZI rests on.</p>
+      </div>
+      <div class="r" style="margin-top: 2rem; border-radius: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; background: #fafafa; padding: clamp(1rem, 2vw, 2rem);">
+        <img src="assets/wazi/wazi-blueprint.svg" alt="WAZI service blueprint — Front-stage (user actions), Back-stage (platform orchestration) and Evidence trail (data written), across five phases: Onboard, Self-Assess, Field evidence, Aggregate, Verify, Trade. Footer surfaces design principles: authorship is never lost, offline is the default, verification reads never re-types, frameworks plug in, every action is auditable." style="width:100%; display:block; min-width: 1000px;">
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ONBOARDING ====== -->
+  <section class="case-section case-section--alt">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="onb_label">Onboarding</p>
+        <h2 data-i18n="onb_title">Meets every stakeholder where they are.</h2>
+        <p class="explore-intro" data-i18n="onb_intro">From cooperatives to state actors and civil society — the registration flow adapts to the role, asks only what's relevant, and runs on whatever device the user brought to the table.</p>
+      </div>
+      <div class="network-stack r-stagger">
+        <figure class="network-shot r">
+          <img src="assets/wazi/registration.png" alt="A tablet held in two hands showing the WAZI Welcome registration form — organisation category dropdown open with Government, State security forces, Non-state armed group, Business entity, Civil society, Other organisation and Individual options">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== STAKEHOLDER NETWORK (D3 force graph) ====== -->
+  <section class="case-section case-section--network">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="net_label">Stakeholder Network</p>
+        <h2 data-i18n="net_title">From form to graph.</h2>
+        <p class="explore-intro" data-i18n="net_intro">Click any node. Mine operators, monitors, refiners, incidents that triggered Annex II reviews, locations across the gold corridors. Every line is a relationship the platform can audit, route a question to, or attach evidence to.</p>
+      </div>
+
+      <div class="network-stack r-stagger">
+        <figure class="network-shot network-shot--graph r">
+          <div class="network-embed">
+            <iframe class="network-iframe" src="assets/wazi-network.html"
+                    title="Interactive stakeholder network — events, locations and stakeholders connected by relationships in the WAZI evidence base"
+                    loading="lazy" scrolling="no"></iframe>
+            <div class="network-legend" aria-hidden="true">
+              <span class="network-legend__item"><span class="dot" style="background:#D8A472"></span><span data-i18n="legend_event">Incident / event</span></span>
+              <span class="network-legend__item"><span class="dot" style="background:#B796C9"></span><span data-i18n="legend_location">Location</span></span>
+              <span class="network-legend__item"><span class="dot" style="background:#A6B8CB"></span><span data-i18n="legend_stakeholder">Stakeholder</span></span>
+            </div>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== DAILY OPERATIONS ====== -->
+  <section class="case-section">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="ops_label">Daily Operations</p>
+        <h2 data-i18n="ops_title">The evidence, flattened into work.</h2>
+        <p class="explore-intro" data-i18n="ops_intro">The dashboard surfaces the same data the graph maps — but in the shape verifiers, miners and monitors actually use day to day: trends, distributions, ratings, faces.</p>
+      </div>
+      <div class="network-stack r-stagger">
+        <figure class="network-shot r">
+          <img src="assets/wazi/dashboard-bento.png?v=2" alt="WAZI verifier dashboard — Supplier Onboarding trend (25 onboarded), photo of a miner panning a riverbed, an annotated gold bar with Due Diligence score and 5 supply chain actors, Information Provided donut (52% single source, 73% combined), Due Diligence Profile radar (Transparency Current 60% vs Baseline 48%), Supply Risk Distribution treemap from E to A+, and Information Availability 76%">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SUPPLIER ASSESSMENT (animated) ====== -->
+  <section class="case-section">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="sup_label">Supplier Assessment</p>
+        <h2 data-i18n="sup_title">Inputs roll up to a score.</h2>
+        <p class="explore-intro" data-i18n="sup_intro">A short walk-through of the supplier review: every input — onboarding evidence, sourcing history, declared sites — is rolled up into a single risk and readiness score the verifier can act on.</p>
+      </div>
+      <div class="network-stack r-stagger">
+        <figure class="network-shot network-shot--graph network-shot--gold r">
+          <div class="network-embed">
+            <video class="network-video" autoplay muted loop playsinline preload="auto"
+                   src="assets/wazi/supplier-assessment.mov?v=2"
+                   aria-label="WAZI Supplier Assessment — animated evaluation flow"></video>
+          </div>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== INCIDENTS & TESTIMONIALS ====== -->
+  <section class="case-section case-section--alt">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="inc_label">Incidents &amp; Testimonials</p>
+        <h2 data-i18n="inc_title">The human side of compliance.</h2>
+        <p class="explore-intro" data-i18n="inc_intro">Numbers don't audit themselves. Each incident has a story, each corrective action has a person closing it, each testimonial is someone who chose to be on the record.</p>
+      </div>
+      <div class="network-stack r-stagger">
+        <figure class="network-shot r">
+          <img src="assets/wazi/workers.png" alt="Incidents Timeline stacked-bar chart, Corrective Actions pie with Investigation & research highlight, and a Testimonials area chart climbing from 13% to 60% — next to a photograph of a young miner balancing rocks on his head">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== SELF ASSESSMENT ====== -->
+  <section class="case-section">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="self_label">Self Assessment</p>
+        <h2 data-i18n="self_title">Operators see where they stand.</h2>
+        <p class="explore-intro" data-i18n="self_intro">Self Assessment puts the framework in the operator's hands. Ratings, gaps and readiness — readable before any verifier opens a dossier — so improvement is a choice, not a surprise.</p>
+      </div>
+      <div class="network-stack r-stagger">
+        <figure class="network-shot r">
+          <img src="assets/wazi/self-assessment.png" alt="WAZI Self Assessment view on a laptop — Rating 70%, Information Availability 40%, Operated Sites 21, Profile Completion bar chart, Risk Readiness radar with Integrity tooltip, and Suppliers Distribution pie">
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== IN THE FIELD (laptop on rock outcrop) ====== -->
+  <section class="case-section case-section--alt case-section--showcase">
+    <div class="wrap">
+      <div class="case-section-header r">
+        <p class="case-section-label" data-i18n="field_label">In the field</p>
+        <h2 data-i18n="field_title">The same evidence base, anywhere.</h2>
+        <p class="explore-intro" data-i18n="field_intro">Stationed at a refinery desk or perched on a mining outcrop, WAZI carries the same chain of custody — same data model, same identities, same auditable trail.</p>
+      </div>
+      <figure class="showcase-shot r">
+        <img src="assets/wazi/dashboard-globe.png" alt="A laptop perched on a rocky outcrop displaying the WAZI dashboard — sidebar with Aggregator modules, a 3D globe with stakeholder pins across Africa, the Middle East and Asia, and a warm gold backdrop">
+      </figure>
+    </div>
+  </section>
+
+
+  <!-- ====== STAGE 3 sections go here ======-->
+
+  <script>
+    /* ------- i18n (EN / PT-BR) ------- */
+    const T = {
+      en: {
+        nav_work: "Work",
+        nav_services: "Services",
+        nav_contact: "Contact",
+        back_to_projects: "Back to projects",
+        case_tag: "Responsible Sourcing · Digital Gold",
+        case_title: "WAZI — The Digital Backbone for Ethical Gold",
+        case_lead: "A platform that brings trust and transparency to artisanal and small-scale gold mining. Every miner, aggregator, monitor and buyer contributes to a shared evidence base — while keeping sovereignty over their own data.",
+        meta_role: "Role",
+        meta_role_val: "Senior Product Designer",
+        meta_timeline: "Timeline",
+        meta_timeline_val: "8 months · 2024–2025",
+        meta_deliverables: "Deliverables",
+        meta_deliverables_val: "Web Platform, Marketing Site",
+        meta_team: "Team",
+        meta_team_val: "Datastake product team",
+        challenge_label: "The Challenge",
+        challenge_title: "Responsible sourcing was a cost, not a collaboration.",
+        challenge_p1: "Artisanal and small-scale mining supplies roughly 20% of the world's gold, but the path from a mining site to the market is opaque, fragmented, and often distrusted. Aggregators juggled paper forms and disconnected apps. Downstream buyers couldn't verify what they were buying. Civil society monitors documented abuses without the tools to share evidence at scale.",
+        challenge_p2: "Existing due diligence tools treated every participant as a suspect and asked miners to hand over their data in exchange for access. The honest producers ended up invisible, and compliance became a heavy cost rather than a collaborative process.",
+        solution_label: "The Solution",
+        solution_title: "A shared evidence base — with sovereignty by design.",
+        solution_p1: "A role-based digital platform where every stakeholder in the gold value chain contributes to a shared, traceable evidence base while retaining control over their own data. Mine operators own their self-assessments. Aggregators consolidate ESG, risk, and shipment data. Monitors upload field observations without losing authorship.",
+        solution_p2: "The platform produces audit-ready dossiers aligned to LBMA, RMI and OECD frameworks — and is built on the Datastake Application Framework, so it plugs into tools like KoboToolbox instead of replacing them.",
+        eco_label: "Research · Field of play",
+        eco_title: "Whose gold is it, anyway?",
+        eco_intro: "Before sketching anything, I mapped the ecosystem: who holds gold, who holds the paperwork, who holds the receipts. Desk research pulled from OECD, World Bank/Delve and the planetGOLD programme; 14 conversations filled in what the reports don't say.",
+        ia_label: "Information Architecture",
+        ia_title: "One sidebar, switched by role.",
+        ia_intro: "WAZI doesn't manage projects — it orchestrates a shared evidence base across six roles. Each role (Aggregator, Operator, Monitor, Buyer, Regulator, Partner) sees the same three-section sidebar: <strong>Analysis</strong> for cross-cutting views, <strong>Modules</strong> for the work itself, <strong>Data</strong> for raw access. The grammar doesn't change between roles — only what's actionable does.",
+        bp_label: "Process · Service blueprint",
+        bp_title: "What the user sees vs. what the platform does.",
+        bp_intro: "Six phases, following the WAZI sidebar order: Onboarding → Self Assessment → Operations → Due Diligence → Analysis → Reporting. Three lanes: the action the user takes, the orchestration the platform runs behind the line of visibility, and the evidence trail that gets written. The blueprint surfaced the design principles WAZI rests on.",
+        onb_label: "Onboarding",
+        onb_title: "Meets every stakeholder where they are.",
+        onb_intro: "From cooperatives to state actors and civil society — the registration flow adapts to the role, asks only what's relevant, and runs on whatever device the user brought to the table.",
+        net_label: "Stakeholder Network",
+        net_title: "From form to graph.",
+        net_intro: "Click any node. Mine operators, monitors, refiners, incidents that triggered Annex II reviews, locations across the gold corridors. Every line is a relationship the platform can audit, route a question to, or attach evidence to.",
+        legend_event: "Incident / event",
+        legend_location: "Location",
+        legend_stakeholder: "Stakeholder",
+        ops_label: "Daily Operations",
+        ops_title: "The evidence, flattened into work.",
+        ops_intro: "The dashboard surfaces the same data the graph maps — but in the shape verifiers, miners and monitors actually use day to day: trends, distributions, ratings, faces.",
+        sup_label: "Supplier Assessment",
+        sup_title: "Inputs roll up to a score.",
+        sup_intro: "A short walk-through of the supplier review: every input — onboarding evidence, sourcing history, declared sites — is rolled up into a single risk and readiness score the verifier can act on.",
+        inc_label: "Incidents &amp; Testimonials",
+        inc_title: "The human side of compliance.",
+        inc_intro: "Numbers don't audit themselves. Each incident has a story, each corrective action has a person closing it, each testimonial is someone who chose to be on the record.",
+        self_label: "Self Assessment",
+        self_title: "Operators see where they stand.",
+        self_intro: "Self Assessment puts the framework in the operator's hands. Ratings, gaps and readiness — readable before any verifier opens a dossier — so improvement is a choice, not a surprise.",
+        self_cap: "Supplier assessment — animated evaluation flow showing how operator inputs roll up to risk and readiness scores.",
+        field_label: "In the field",
+        field_title: "The same evidence base, anywhere.",
+        field_intro: "Stationed at a refinery desk or perched on a mining outcrop, WAZI carries the same chain of custody — same data model, same identities, same auditable trail."
+      },
+      pt: {
+        nav_work: "Projetos",
+        nav_services: "Serviços",
+        nav_contact: "Contato",
+        back_to_projects: "Voltar para projetos",
+        case_tag: "Sourcing Responsável · Ouro Digital",
+        case_title: "WAZI — A Espinha Dorsal Digital do Ouro Ético",
+        case_lead: "Uma plataforma que traz confiança e transparência para a mineração artesanal e de pequena escala de ouro. Cada minerador, agregador, monitor e comprador contribui para uma base de evidências compartilhada — mantendo soberania sobre seus próprios dados.",
+        meta_role: "Função",
+        meta_role_val: "Senior Product Designer",
+        meta_timeline: "Período",
+        meta_timeline_val: "8 meses · 2024–2025",
+        meta_deliverables: "Entregas",
+        meta_deliverables_val: "Plataforma Web, Site Institucional",
+        meta_team: "Time",
+        meta_team_val: "Time de produto da Datastake",
+        challenge_label: "O Desafio",
+        challenge_title: "Sourcing responsável era um custo, não uma colaboração.",
+        challenge_p1: "A mineração artesanal e de pequena escala fornece cerca de 20% do ouro mundial, mas o caminho do garimpo até o mercado é opaco, fragmentado e visto com desconfiança. Agregadores faziam malabarismo entre formulários em papel e apps desconectados. Compradores downstream não conseguiam verificar o que estavam comprando. Monitores da sociedade civil documentavam abusos sem ferramentas para compartilhar evidências em escala.",
+        challenge_p2: "As ferramentas de due diligence existentes tratavam todo participante como suspeito e pediam que os mineradores entregassem seus dados em troca de acesso. Os produtores honestos ficavam invisíveis, e a conformidade virou um custo pesado em vez de um processo colaborativo.",
+        solution_label: "A Solução",
+        solution_title: "Uma base de evidências compartilhada — com soberania por design.",
+        solution_p1: "Uma plataforma digital baseada em papéis onde todo stakeholder da cadeia de valor do ouro contribui para uma base de evidências compartilhada e rastreável, mantendo controle sobre seus próprios dados. Operadores de minas são donos das suas autoavaliações. Agregadores consolidam dados de ESG, risco e shipment. Monitores fazem upload de observações de campo sem perder a autoria.",
+        solution_p2: "A plataforma gera dossiês prontos para auditoria alinhados aos frameworks LBMA, RMI e OECD — e é construída sobre o Datastake Application Framework, então se conecta a ferramentas como o KoboToolbox em vez de substituí-las.",
+        eco_label: "Pesquisa · Campo de jogo",
+        eco_title: "De quem é esse ouro, afinal?",
+        eco_intro: "Antes de desenhar qualquer coisa, mapeei o ecossistema: quem tem o ouro, quem tem o papel, quem tem o recibo. Desk research na OECD, Banco Mundial/Delve e no programa planetGOLD; 14 conversas preencheram o que os relatórios não contam.",
+        ia_label: "Arquitetura da Informação",
+        ia_title: "Uma sidebar, trocada por papel.",
+        ia_intro: "A WAZI não gerencia projetos — orquestra uma base de evidências compartilhada entre seis papéis. Cada papel (Aggregator, Operator, Monitor, Buyer, Regulator, Partner) vê a mesma sidebar de três seções: <strong>Analysis</strong> pra visões cruzadas, <strong>Modules</strong> pra o trabalho em si, <strong>Data</strong> pra acesso bruto. A gramática não muda entre papéis — só o que é acionável muda.",
+        bp_label: "Processo · Service blueprint",
+        bp_title: "O que o usuário vê vs. o que a plataforma faz.",
+        bp_intro: "Seis fases, seguindo a ordem da sidebar da WAZI: Onboarding → Self Assessment → Operations → Due Diligence → Analysis → Reporting. Três pistas: a ação que o usuário toma, a orquestração que a plataforma roda atrás da linha de visibilidade, e a trilha de evidência que fica registrada. O blueprint expôs os princípios de design que sustentam o WAZI.",
+        onb_label: "Onboarding",
+        onb_title: "Encontra cada stakeholder onde ele está.",
+        onb_intro: "De cooperativas a atores estatais e sociedade civil — o fluxo de cadastro se adapta ao papel, pede só o que é relevante e roda em qualquer dispositivo que o usuário levar à mesa.",
+        net_label: "Rede de Stakeholders",
+        net_title: "Do formulário ao grafo.",
+        net_intro: "Clique em qualquer nó. Operadores de mina, monitores, refinarias, incidentes que dispararam revisões do Annex II, locais nos corredores do ouro. Cada linha é uma relação que a plataforma consegue auditar, rotear uma pergunta ou anexar uma evidência.",
+        legend_event: "Incidente / evento",
+        legend_location: "Local",
+        legend_stakeholder: "Stakeholder",
+        ops_label: "Operações Diárias",
+        ops_title: "A evidência, traduzida em rotina.",
+        ops_intro: "O dashboard expõe os mesmos dados que o grafo mapeia — mas no formato que verificadores, mineradores e monitores realmente usam no dia a dia: tendências, distribuições, ratings, rostos.",
+        sup_label: "Avaliação de Fornecedor",
+        sup_title: "Os inputs sobem para um score.",
+        sup_intro: "Um walk-through da revisão de fornecedor: cada input — evidência de onboarding, histórico de sourcing, sites declarados — é consolidado em um único score de risco e prontidão que o verificador pode acionar.",
+        inc_label: "Incidentes &amp; Depoimentos",
+        inc_title: "O lado humano da conformidade.",
+        inc_intro: "Números não se auditam sozinhos. Cada incidente tem uma história, cada ação corretiva tem uma pessoa fechando-a, cada depoimento é alguém que escolheu estar no registro.",
+        self_label: "Autoavaliação",
+        self_title: "Operadores veem onde estão.",
+        self_intro: "A Autoavaliação coloca o framework nas mãos do operador. Ratings, gaps e prontidão — legíveis antes de qualquer verificador abrir um dossiê — para que melhorar seja uma escolha, não uma surpresa.",
+        self_cap: "Avaliação de fornecedor — fluxo animado que mostra como os inputs do operador agregam em scores de risco e prontidão.",
+        field_label: "Em campo",
+        field_title: "A mesma base de evidências, em qualquer lugar.",
+        field_intro: "Numa mesa de refinaria ou empoleirado num afloramento mineral, o WAZI carrega a mesma cadeia de custódia — mesmo modelo de dados, mesmas identidades, mesma trilha auditável."
+      }
+    };
+
+    let lang = localStorage.getItem('lang') || 'en';
+    function setLang(l) {
+      lang = l;
+      localStorage.setItem('lang', l);
+      document.documentElement.lang = l === 'pt' ? 'pt-BR' : 'en';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (T[l]?.[k]) {
+          const v = T[l][k];
+          if (/<[a-z]/i.test(v)) el.innerHTML = v;
+          else el.textContent = v;
+        }
+      });
+      document.querySelectorAll('.lang-btn').forEach(b => {
+        const on = b.dataset.lang === l;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on);
+      });
+    }
+    document.querySelectorAll('.lang-btn').forEach(b =>
+      b.addEventListener('click', () => setLang(b.dataset.lang))
+    );
+    setLang(lang);
+
+    // Minimal JS for Stage 1 — full version comes in Stage 3
+    const nav = document.querySelector('.nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', scrollY > 10);
+    }, { passive: true });
+
+    // Reveal
+    const obs = new IntersectionObserver(es =>
+      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
+    , { threshold: 0.12 });
+    document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+    // Custom cursor
+    (() => {
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const cursor = document.querySelector('.cursor');
+      if (!cursor) return;
+      let mx = -100, my = -100, cx = -100, cy = -100;
+      document.addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; });
+      document.querySelectorAll('a, button, .btn, .lang-btn').forEach(el => {
+        el.addEventListener('pointerenter', () => cursor.classList.add('active'));
+        el.addEventListener('pointerleave', () => cursor.classList.remove('active'));
+      });
+      function tick() {
+        cx += (mx - cx) * 0.22;
+        cy += (my - cy) * 0.22;
+        cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1340" font-family="-apple-system, BlinkMacSystemFont, 'SF UI Display', 'Inter', 'Helvetica Neue', Arial, sans-serif">
+  <style>
+    .lbl-mono { font-family: 'SF Mono', ui-monospace, 'JetBrains Mono', monospace; font-size: 16px; letter-spacing: 0.16em; text-transform: uppercase; fill: #6B6B6B; }
+    .root-t   { font-size: 36px; font-weight: 500; fill: #1a1a1a; }
+    .h1       { font-size: 22px; font-weight: 500; fill: #1a1a1a; }
+    .h2       { font-size: 17px; font-weight: 500; fill: #1a1a1a; }
+    .item     { font-size: 15px; font-weight: 400; fill: #2a2a2a; }
+    .item-mut { font-size: 14px; font-weight: 400; fill: #6B6B6B; }
+    .body     { font-size: 13px; font-weight: 400; fill: #6B6B6B; }
+    .note     { font-size: 13px; font-weight: 400; fill: #8a8a8a; }
+    .stroke   { stroke: #d4d4d4; stroke-width: 1.2; fill: none; }
+    .outer    { fill: #fafafa; stroke: #e5e5e5; stroke-width: 1; }
+    .card     { fill: #fff; stroke: #e5e5e5; stroke-width: 1; }
+    .card-acc { fill: #fcf9f3; stroke: #ddd1b5; stroke-width: 1; }
+    .section-hdr { fill: #f5f3ed; }
+    .pill-sm  { fill: #fbf5e6; stroke: #d4a03a; stroke-width: 1; }
+    .dot      { fill: #9C7C40; }
+    .chev     { stroke: #9C7C40; stroke-width: 1.5; fill: none; }
+    .row-line { stroke: #efefef; stroke-width: 1; fill: none; }
+  </style>
+
+  <!-- Title -->
+  <text x="80" y="70" class="lbl-mono">Information architecture · WAZI</text>
+  <text x="80" y="120" class="root-t">One sidebar, switched by role.</text>
+  <text x="80" y="155" class="note">Same three-section sidebar for every role (Aggregator, Operator, Monitor, Buyer, Regulator, Partner). The grammar doesn't change between roles — only what's actionable does.</text>
+
+  <!-- ===================================================================
+       BIG OUTER CARD — wraps everything that is part of the sidebar IA
+       (Dashboard + Analysis + Modules + Data). Frameworks lives outside.
+       =================================================================== -->
+  <g transform="translate(60, 200)">
+    <rect class="outer" width="2280" height="940" rx="16"/>
+    <text x="28" y="36" class="lbl-mono">Sidebar — what every role sees</text>
+  </g>
+
+  <!-- Dashboard standalone -->
+  <g transform="translate(80, 270)">
+    <rect class="card-acc" width="2240" height="64" rx="10"/>
+    <text x="22" y="40" class="h2">Dashboard</text>
+    <text x="174" y="40" class="body">Single overview page, scoped to the active role.</text>
+  </g>
+
+  <!-- ===== ANALYSIS section (full width) ===== -->
+  <g transform="translate(80, 360)">
+    <rect class="section-hdr" width="2240" height="40" rx="8"/>
+    <text x="22" y="27" class="lbl-mono">Analysis</text>
+    <text x="220" y="27" class="body">Cross-cutting views over the network.</text>
+  </g>
+  <g transform="translate(80, 410)">
+    <rect class="card" width="2240" height="100" rx="10"/>
+    <g transform="translate(28, 30)">
+      <text x="0" y="6" class="h2">Supply Chain</text>
+      <text x="0" y="34" class="body">Material flow + trade relationships.</text>
+    </g>
+    <line class="row-line" x1="560" y1="20" x2="560" y2="80"/>
+    <g transform="translate(588, 30)">
+      <text x="0" y="6" class="h2">Operator Review</text>
+      <text x="0" y="34" class="body">Per-operator status + history.</text>
+    </g>
+    <line class="row-line" x1="1120" y1="20" x2="1120" y2="80"/>
+    <g transform="translate(1148, 30)">
+      <text x="0" y="6" class="h2">Mine Review</text>
+      <text x="0" y="34" class="body">Site-level evidence + ESG signal.</text>
+    </g>
+    <line class="row-line" x1="1680" y1="20" x2="1680" y2="80"/>
+    <g transform="translate(1708, 30)">
+      <text x="0" y="6" class="h2">Partners Updates</text>
+      <text x="0" y="34" class="body">Activity from connected partners.</text>
+    </g>
+  </g>
+
+  <!-- ===== MODULES section (5 cols) ===== -->
+  <g transform="translate(80, 540)">
+    <rect class="section-hdr" width="2240" height="40" rx="8"/>
+    <text x="22" y="27" class="lbl-mono">Modules</text>
+    <text x="170" y="27" class="body">Where the work happens. Two sit flat, three expand into child pages.</text>
+  </g>
+
+  <!-- 5 cards row, each 432 wide, 20 gap -->
+  <g transform="translate(80, 590)">
+    <rect class="card" width="432" height="100" rx="10"/>
+    <text x="22" y="34" class="h2">Self Assessment</text>
+    <text x="22" y="60" class="body">Rating, information availability,</text>
+    <text x="22" y="78" class="body">profile completion, risk readiness.</text>
+  </g>
+  <g transform="translate(532, 590)">
+    <rect class="card" width="432" height="100" rx="10"/>
+    <text x="22" y="34" class="h2">Onboarding</text>
+    <text x="22" y="60" class="body">Role-based registration, role-aware</text>
+    <text x="22" y="78" class="body">forms (Operator / Aggregator / …).</text>
+  </g>
+  <g transform="translate(984, 590)">
+    <rect class="card" width="432" height="100" rx="10"/>
+    <text x="22" y="34" class="h2">Operations</text>
+    <path class="chev" d="M396 32 L406 42 L396 52"/>
+    <text x="22" y="60" class="body">Daily activity — where the</text>
+    <text x="22" y="78" class="body">field data accumulates.</text>
+  </g>
+  <g transform="translate(1436, 590)">
+    <rect class="card" width="432" height="100" rx="10"/>
+    <text x="22" y="34" class="h2">Due Diligence</text>
+    <path class="chev" d="M396 32 L406 42 L396 52"/>
+    <text x="22" y="60" class="body">Risk surface — corrective actions,</text>
+    <text x="22" y="78" class="body">incidents, third-party flags.</text>
+  </g>
+  <g transform="translate(1888, 590)">
+    <rect class="card" width="432" height="100" rx="10"/>
+    <text x="22" y="34" class="h2">Reporting</text>
+    <path class="chev" d="M396 32 L406 42 L396 52"/>
+    <text x="22" y="60" class="body">Audit-ready exports —</text>
+    <text x="22" y="78" class="body">sovereignty by default.</text>
+  </g>
+
+  <!-- Children for expanded modules -->
+  <g transform="translate(984, 710)">
+    <path class="stroke" d="M40 0 L40 16 M40 16 L80 16"/>
+    <g transform="translate(85, 11)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Production Sites</text></g>
+    <path class="stroke" d="M40 16 L40 46 M40 46 L80 46"/>
+    <g transform="translate(85, 41)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Operators</text></g>
+    <path class="stroke" d="M40 46 L40 76 M40 76 L80 76"/>
+    <g transform="translate(85, 71)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Workers</text></g>
+    <path class="stroke" d="M40 76 L40 106 M40 106 L80 106"/>
+    <g transform="translate(85, 101)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Shipments</text></g>
+  </g>
+  <g transform="translate(1436, 710)">
+    <path class="stroke" d="M40 0 L40 16 M40 16 L80 16"/>
+    <g transform="translate(85, 11)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Activities</text></g>
+    <path class="stroke" d="M40 16 L40 46 M40 46 L80 46"/>
+    <g transform="translate(85, 41)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Incidents</text></g>
+    <path class="stroke" d="M40 46 L40 76 M40 76 L80 76"/>
+    <g transform="translate(85, 71)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Corrective actions</text></g>
+    <path class="stroke" d="M40 76 L40 106 M40 106 L80 106"/>
+    <g transform="translate(85, 101)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Testimonials</text></g>
+  </g>
+  <g transform="translate(1888, 710)">
+    <path class="stroke" d="M40 0 L40 16 M40 16 L80 16"/>
+    <g transform="translate(85, 11)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Performance</text></g>
+    <path class="stroke" d="M40 16 L40 46 M40 46 L80 46"/>
+    <g transform="translate(85, 41)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Dossiers (LBMA / RMI / OECD)</text></g>
+    <path class="stroke" d="M40 46 L40 76 M40 76 L80 76"/>
+    <g transform="translate(85, 71)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Activity log</text></g>
+    <path class="stroke" d="M40 76 L40 106 M40 106 L80 106"/>
+    <g transform="translate(85, 101)"><circle class="dot" cx="0" cy="6" r="3"/><text x="14" y="11" class="item-mut">Share-with permissions</text></g>
+  </g>
+
+  <!-- ===== DATA section (full width) — sits right after Modules in the same outer card ===== -->
+  <g transform="translate(80, 880)">
+    <rect class="section-hdr" width="2240" height="40" rx="8"/>
+    <text x="22" y="27" class="lbl-mono">Data</text>
+    <text x="120" y="27" class="body">Raw data access — for power users and integrations.</text>
+  </g>
+  <g transform="translate(80, 930)">
+    <rect class="card" width="1110" height="84" rx="10"/>
+    <text x="28" y="36" class="h2">Query</text>
+    <text x="28" y="62" class="body">Ad-hoc questions over the evidence base.</text>
+  </g>
+  <g transform="translate(1210, 930)">
+    <rect class="card" width="1110" height="84" rx="10"/>
+    <text x="28" y="36" class="h2">Channels</text>
+    <text x="28" y="62" class="body">Integrations — KoboToolbox, ODK, webhooks, REST.</text>
+  </g>
+
+  <!-- ===================================================================
+       FRAMEWORKS — sits OUTSIDE the outer card. Context / extra layer.
+       =================================================================== -->
+  <g transform="translate(60, 1190)">
+    <text x="20" y="0" class="lbl-mono">Context · Frameworks the architecture respects</text>
+    <g transform="translate(20, 18)">
+      <rect class="pill-sm" width="170" height="32" rx="16"/>
+      <text x="85" y="22" text-anchor="middle" class="item-mut">OECD Annex II</text>
+    </g>
+    <g transform="translate(210, 18)">
+      <rect class="pill-sm" width="210" height="32" rx="16"/>
+      <text x="105" y="22" text-anchor="middle" class="item-mut">LBMA Responsible Gold</text>
+    </g>
+    <g transform="translate(440, 18)">
+      <rect class="pill-sm" width="150" height="32" rx="16"/>
+      <text x="75" y="22" text-anchor="middle" class="item-mut">RMI / RMAP</text>
+    </g>
+    <g transform="translate(610, 18)">
+      <rect class="pill-sm" width="110" height="32" rx="16"/>
+      <text x="55" y="22" text-anchor="middle" class="item-mut">CRAFT</text>
+    </g>
+    <g transform="translate(740, 18)">
+      <rect class="pill-sm" width="110" height="32" rx="16"/>
+      <text x="55" y="22" text-anchor="middle" class="item-mut">ICGLR</text>
+    </g>
+    <g transform="translate(870, 18)">
+      <rect class="pill-sm" width="190" height="32" rx="16"/>
+      <text x="95" y="22" text-anchor="middle" class="item-mut">UN Guiding Principles</text>
+    </g>
+    <g transform="translate(1080, 18)">
+      <rect class="pill-sm" width="130" height="32" rx="16"/>
+      <text x="65" y="22" text-anchor="middle" class="item-mut">Fairmined</text>
+    </g>
+  </g>
+</svg>

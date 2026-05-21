@@ -1,0 +1,254 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2400 1380" font-family="-apple-system, BlinkMacSystemFont, 'SF UI Display', 'Inter', 'Helvetica Neue', Arial, sans-serif">
+  <style>
+    .lbl-mono   { font-family: 'SF Mono', ui-monospace, 'JetBrains Mono', monospace; font-size: 16px; letter-spacing: 0.16em; text-transform: uppercase; fill: #6B6B6B; }
+    .root-t     { font-size: 36px; font-weight: 500; fill: #1a1a1a; }
+    .h1         { font-size: 18px; font-weight: 500; fill: #1a1a1a; }
+    .h2         { font-size: 15px; font-weight: 500; fill: #1a1a1a; }
+    .body       { font-size: 14px; font-weight: 400; fill: #525252; }
+    .body-soft  { font-size: 13px; font-weight: 400; fill: #737373; }
+    .phase      { font-size: 14px; font-weight: 500; fill: #1a1a1a; letter-spacing: 0.02em; text-transform: uppercase; }
+    .lane-lbl   { font-size: 13px; font-weight: 500; fill: #6B6B6B; letter-spacing: 0.14em; text-transform: uppercase; }
+    .note       { font-size: 13px; font-weight: 400; fill: #8a8a8a; }
+    .lane-row     { fill: #fafafa; stroke: #e5e5e5; stroke-width: 1; }
+    .lane-row-acc { fill: #fcf9f3; stroke: #ddd1b5; stroke-width: 1; }
+    .cell       { fill: #fff; stroke: #e5e5e5; stroke-width: 1; }
+    .cell-evt   { fill: #fbf5e6; stroke: #d4a03a; stroke-width: 1.2; }
+    .divider    { stroke: #d4a03a; stroke-width: 2; fill: none; stroke-dasharray: 8 6; }
+    .arrow      { stroke: #9C7C40; stroke-width: 1.5; fill: none; }
+    .pin-gold   { fill: #9C7C40; }
+    .pin-soft   { fill: #c4c4c4; }
+  </style>
+
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#9C7C40"/>
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="80" y="70" class="lbl-mono">Service blueprint · Creation</text>
+  <text x="80" y="120" class="root-t">What the user sees vs. what the platform does.</text>
+  <text x="80" y="155" class="note">Six phases following the WAZI sidebar order. Three lanes: what the user touches, what the platform orchestrates, and the evidence trail it writes.</text>
+
+  <!-- Phase column headers -->
+  <g transform="translate(280, 220)">
+    <text x="0"    y="0" class="phase">Onboarding</text>
+    <text x="360"  y="0" class="phase">Self Assessment</text>
+    <text x="720"  y="0" class="phase">Operations</text>
+    <text x="1080" y="0" class="phase">Due Diligence</text>
+    <text x="1440" y="0" class="phase">Analysis</text>
+    <text x="1800" y="0" class="phase">Reporting</text>
+  </g>
+  <g transform="translate(280, 232)">
+    <text x="0"    y="0" class="note">Identity + role</text>
+    <text x="360"  y="0" class="note">Operator-owned</text>
+    <text x="720"  y="0" class="note">Sites, workers, daily logs</text>
+    <text x="1080" y="0" class="note">Activities + incidents</text>
+    <text x="1440" y="0" class="note">Supply chain rolled up</text>
+    <text x="1800" y="0" class="note">Dossiers + permissions</text>
+  </g>
+
+  <!-- ====== LANE 1 — Front-stage ====== -->
+  <g transform="translate(80, 280)">
+    <rect class="lane-row-acc" width="2240" height="180" rx="10"/>
+    <text x="20" y="32" class="lane-lbl">Front-stage — what the user does</text>
+  </g>
+  <g transform="translate(280, 340)">
+    <rect class="cell" width="320" height="110" rx="8"/>
+    <text x="20" y="32" class="h2">Pick a role</text>
+    <text x="20" y="58" class="body">Aggregator, Operator, Monitor,</text>
+    <text x="20" y="76" class="body">Buyer, Regulator, Partner.</text>
+    <text x="20" y="100" class="body-soft">Form adapts per role.</text>
+  </g>
+  <g transform="translate(640, 340)">
+    <rect class="cell" width="320" height="110" rx="8"/>
+    <text x="20" y="32" class="h2">Score yourself</text>
+    <text x="20" y="58" class="body">Rating, information availability,</text>
+    <text x="20" y="76" class="body">profile completion. Save or submit.</text>
+    <text x="20" y="100" class="body-soft">Re-runnable; gaps visible up front.</text>
+  </g>
+  <g transform="translate(1000, 340)">
+    <rect class="cell" width="320" height="110" rx="8"/>
+    <text x="20" y="32" class="h2">Log the work</text>
+    <text x="20" y="58" class="body">Sites, operators, workers,</text>
+    <text x="20" y="76" class="body">shipments. Mobile-first, offline.</text>
+    <text x="20" y="100" class="body-soft">Syncs when reconnected.</text>
+  </g>
+  <g transform="translate(1360, 340)">
+    <rect class="cell" width="320" height="110" rx="8"/>
+    <text x="20" y="32" class="h2">Surface a risk</text>
+    <text x="20" y="58" class="body">Log an activity or incident,</text>
+    <text x="20" y="76" class="body">attach evidence, open an action.</text>
+    <text x="20" y="100" class="body-soft">Monitor or operator records.</text>
+  </g>
+  <g transform="translate(1720, 340)">
+    <rect class="cell" width="320" height="110" rx="8"/>
+    <text x="20" y="32" class="h2">Read the chain</text>
+    <text x="20" y="58" class="body">Supply Chain · Operator Review ·</text>
+    <text x="20" y="76" class="body">Mine Review · Partners Updates.</text>
+    <text x="20" y="100" class="body-soft">Cross-cutting analysis views.</text>
+  </g>
+  <g transform="translate(2080, 340)">
+    <rect class="cell" width="220" height="110" rx="8"/>
+    <text x="20" y="32" class="h2">Share a dossier</text>
+    <text x="20" y="58" class="body">Choose what to share,</text>
+    <text x="20" y="76" class="body">and with whom.</text>
+    <text x="20" y="100" class="body-soft">Aligned to LBMA / RMI / OECD.</text>
+  </g>
+
+  <!-- Divider -->
+  <path class="divider" d="M80 510 L2320 510"/>
+  <text x="80" y="540" class="lbl-mono">Line of visibility</text>
+
+  <!-- ====== LANE 2 — Back-stage ====== -->
+  <g transform="translate(80, 570)">
+    <rect class="lane-row" width="2240" height="200" rx="10"/>
+    <text x="20" y="32" class="lane-lbl">Back-stage — what WAZI orchestrates</text>
+  </g>
+  <g transform="translate(280, 630)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Match role → schema</text>
+    <text x="20" y="58" class="body">Route the user to the right form</text>
+    <text x="20" y="76" class="body">variant. Stamp identity, set scope.</text>
+    <text x="20" y="94" class="body">Bind KoboToolbox token.</text>
+    <text x="20" y="118" class="body-soft">No re-typing across modules.</text>
+  </g>
+  <g transform="translate(640, 630)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Score against Annex II</text>
+    <text x="20" y="58" class="body">Answers mapped to OECD risk</text>
+    <text x="20" y="76" class="body">categories. Gaps drive a phased</text>
+    <text x="20" y="94" class="body">improvement plan, not a fail.</text>
+    <text x="20" y="118" class="body-soft">Re-runs on every edit.</text>
+  </g>
+  <g transform="translate(1000, 630)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Queue + reconcile</text>
+    <text x="20" y="58" class="body">Field captures wait locally;</text>
+    <text x="20" y="76" class="body">sync resolves conflicts on reconnect.</text>
+    <text x="20" y="94" class="body">EXIF + geotag preserved.</text>
+    <text x="20" y="118" class="body-soft">Last-writer-wins per field.</text>
+  </g>
+  <g transform="translate(1360, 630)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Link risk → record</text>
+    <text x="20" y="58" class="body">Activity / incident attached to</text>
+    <text x="20" y="76" class="body">operator + site by reference.</text>
+    <text x="20" y="94" class="body">Corrective action opens a clock.</text>
+    <text x="20" y="118" class="body-soft">Witness keeps authorship.</text>
+  </g>
+  <g transform="translate(1720, 630)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Roll up the network</text>
+    <text x="20" y="58" class="body">Cross-records into Supply Chain,</text>
+    <text x="20" y="76" class="body">Operator + Mine + Partners views.</text>
+    <text x="20" y="94" class="body">No re-entry; reference-only.</text>
+    <text x="20" y="118" class="body-soft">Re-renders on data change.</text>
+  </g>
+  <g transform="translate(2080, 630)">
+    <rect class="cell" width="220" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Compose + sign</text>
+    <text x="20" y="58" class="body">Dossier snapshot,</text>
+    <text x="20" y="76" class="body">scoped share permissions.</text>
+    <text x="20" y="94" class="body">Hash + audit log.</text>
+    <text x="20" y="118" class="body-soft">Operator owns the share key.</text>
+  </g>
+
+  <!-- ====== LANE 3 — Evidence trail ====== -->
+  <g transform="translate(80, 800)">
+    <rect class="lane-row" width="2240" height="200" rx="10"/>
+    <text x="20" y="32" class="lane-lbl">Evidence trail — what gets written</text>
+  </g>
+  <g transform="translate(280, 860)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Identity record</text>
+    <text x="20" y="58" class="body">Role, declared sites,</text>
+    <text x="20" y="76" class="body">consent flags, contact channels.</text>
+    <text x="20" y="100" class="body-soft">Immutable post-onboard.</text>
+  </g>
+  <g transform="translate(640, 860)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Self-assessment v.n</text>
+    <text x="20" y="58" class="body">Versioned scorecard;</text>
+    <text x="20" y="76" class="body">past versions stay queryable.</text>
+    <text x="20" y="100" class="body-soft">Diff between versions visible.</text>
+  </g>
+  <g transform="translate(1000, 860)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Operations log + media</text>
+    <text x="20" y="58" class="body">Sites, operators, workers,</text>
+    <text x="20" y="76" class="body">shipments, geotagged photos.</text>
+    <text x="20" y="100" class="body-soft">EXIF + hash on entry.</text>
+  </g>
+  <g transform="translate(1360, 860)">
+    <rect class="cell" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Risk record</text>
+    <text x="20" y="58" class="body">Activity / incident +</text>
+    <text x="20" y="76" class="body">corrective action timeline.</text>
+    <text x="20" y="100" class="body-soft">Multi-author preserved.</text>
+  </g>
+  <g transform="translate(1720, 860)">
+    <rect class="cell cell-evt" width="320" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Supply chain graph</text>
+    <text x="20" y="58" class="body">Live reference graph of</text>
+    <text x="20" y="76" class="body">counterparties + flows.</text>
+    <text x="20" y="100" class="body-soft">Queryable via Query module.</text>
+  </g>
+  <g transform="translate(2080, 860)">
+    <rect class="cell cell-evt" width="220" height="130" rx="8"/>
+    <text x="20" y="32" class="h2">Dossier object</text>
+    <text x="20" y="58" class="body">Frozen snapshot,</text>
+    <text x="20" y="76" class="body">share key, signature.</text>
+    <text x="20" y="100" class="body-soft">Verifiable by SHA-256.</text>
+  </g>
+
+  <!-- Flow arrows -->
+  <path class="arrow" marker-end="url(#arr)" d="M600 395 L640 395"/>
+  <path class="arrow" marker-end="url(#arr)" d="M960 395 L1000 395"/>
+  <path class="arrow" marker-end="url(#arr)" d="M1320 395 L1360 395"/>
+  <path class="arrow" marker-end="url(#arr)" d="M1680 395 L1720 395"/>
+  <path class="arrow" marker-end="url(#arr)" d="M2040 395 L2080 395"/>
+
+  <path class="arrow" marker-end="url(#arr)" d="M600 695 L640 695"/>
+  <path class="arrow" marker-end="url(#arr)" d="M960 695 L1000 695"/>
+  <path class="arrow" marker-end="url(#arr)" d="M1320 695 L1360 695"/>
+  <path class="arrow" marker-end="url(#arr)" d="M1680 695 L1720 695"/>
+  <path class="arrow" marker-end="url(#arr)" d="M2040 695 L2080 695"/>
+
+  <!-- Vertical hint arrows -->
+  <path class="arrow" marker-end="url(#arr)" d="M440 450 L440 630" stroke-dasharray="3 4"/>
+  <path class="arrow" marker-end="url(#arr)" d="M440 760 L440 860" stroke-dasharray="3 4"/>
+  <path class="arrow" marker-end="url(#arr)" d="M2190 450 L2190 630" stroke-dasharray="3 4"/>
+  <path class="arrow" marker-end="url(#arr)" d="M2190 760 L2190 860" stroke-dasharray="3 4"/>
+
+  <!-- Footer takeaways -->
+  <g transform="translate(80, 1100)">
+    <rect class="lane-row-acc" width="2240" height="220" rx="14"/>
+    <text x="32" y="44" class="lbl-mono">Design principles the blueprint surfaced</text>
+    <g transform="translate(32, 80)">
+      <circle class="pin-gold" cx="6" cy="6" r="6"/>
+      <text x="24" y="11" class="h2">Authorship is never lost.</text>
+      <text x="24" y="36" class="body">Every record carries the writer's identity. Aggregating into Analysis doesn't overwrite.</text>
+    </g>
+    <g transform="translate(780, 80)">
+      <circle class="pin-gold" cx="6" cy="6" r="6"/>
+      <text x="24" y="11" class="h2">Phased compliance over fail/pass.</text>
+      <text x="24" y="36" class="body">Self-assessment leads to an improvement plan, not a binary rejection.</text>
+    </g>
+    <g transform="translate(1520, 80)">
+      <circle class="pin-gold" cx="6" cy="6" r="6"/>
+      <text x="24" y="11" class="h2">The operator owns the share.</text>
+      <text x="24" y="36" class="body">Dossier outputs go where the operator says, not by default.</text>
+    </g>
+    <g transform="translate(32, 150)">
+      <circle class="pin-soft" cx="6" cy="6" r="6"/>
+      <text x="24" y="11" class="h2">Offline-first by design.</text>
+      <text x="24" y="36" class="body">Field captures queue locally; sync resolves conflicts deterministically.</text>
+    </g>
+    <g transform="translate(1520, 150)">
+      <circle class="pin-soft" cx="6" cy="6" r="6"/>
+      <text x="24" y="11" class="h2">Frameworks plug in, not own.</text>
+      <text x="24" y="36" class="body">OECD / LBMA / RMI mappings live in config; schemas swap without rewiring the UI.</text>
+    </g>
+  </g>
+</svg>

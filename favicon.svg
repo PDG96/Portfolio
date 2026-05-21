@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Pietra Gottardo · "P" monogram on a deep neutral, with a small accent dot
+       echoing the period in the wordmark. -->
+  <rect width="32" height="32" rx="7" fill="#141414"/>
+  <!-- P letterform -->
+  <path d="M 9 7
+           L 9 25
+           L 12.6 25
+           L 12.6 18.4
+           L 17.4 18.4
+           A 5.7 5.7 0 0 0 17.4 7
+           Z
+           M 12.6 10.2
+           L 17.4 10.2
+           A 2.5 2.5 0 0 1 17.4 15.2
+           L 12.6 15.2
+           Z"
+        fill="#fcfcfc"/>
+  <!-- Tiny accent dot — the period from "Pietra Gottardo." -->
+  <circle cx="22.5" cy="24" r="1.4" fill="#f7fdb9"/>
+</svg>

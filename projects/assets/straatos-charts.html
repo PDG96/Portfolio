@@ -1,0 +1,523 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Straatos — Carbon project charts</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --card: #ffffff;
+    --border: #E5E7EB;
+    --text: #111827;
+    --text-2: #6B7280;
+    --text-3: #9CA3AF;
+    --grid: #eef0f2;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* Teal palette for the pie */
+    --t1: #0F4F4A;
+    --t2: #176B63;
+    --t3: #1F857B;
+    --t4: #2E9E92;
+    --t5: #48B2A5;
+    --t6: #6CC2B7;
+    --t7: #94D3CB;
+    --t8: #BFE3DE;
+    --t9: #DCEFEC;
+
+    /* Tree/SOC palette */
+    --tree:  #4FAE85;
+    --treeF: #A8E0C8;
+    --soc:   #E07B4A;
+    --socF:  #F4B89A;
+  }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'TWKLausanne', -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: clamp(1rem, 2.5vw, 2rem);
+  }
+
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(1rem, 2vw, 1.5rem);
+    gap: 1rem;
+  }
+  .head h2 {
+    font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+  .head button {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 12px;
+    padding: 0.55rem 0.95rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.25s ease, border-color 0.25s ease;
+  }
+  .head button:hover {
+    background: var(--grid);
+    border-color: var(--text-3);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(0.875rem, 1.5vw, 1rem);
+  }
+  @media (min-width: 780px) {
+    .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: clamp(0.875rem, 1.5vw, 1rem);
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(16px);
+    animation: cardIn 0.55s var(--ease) forwards;
+  }
+  .card:nth-child(1) { animation-delay: 0s; }
+  .card:nth-child(2) { animation-delay: 0.15s; }
+  .card:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes cardIn {
+    to { opacity: 1; transform: none; }
+  }
+
+  .card-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .card-body {
+    flex: 1;
+    position: relative;
+    min-height: 240px;
+  }
+
+  svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+  /* PIE — each slice draws via clip-path rotation */
+  .pie-slice {
+    transition: transform 0.25s ease, filter 0.25s ease;
+    transform-origin: center;
+    transform-box: fill-box;
+    cursor: pointer;
+  }
+  .pie-slice:hover {
+    transform: scale(1.04);
+    filter: brightness(1.06);
+  }
+
+  /* Pie reveal: rotate the chart from 0 to 360deg via wedge animation */
+  .pie {
+    transform-origin: center;
+    animation: pieMask 1.1s var(--ease) 0.2s both;
+  }
+  @keyframes pieMask {
+    from { clip-path: polygon(50% 50%, 50% 0%, 50% 0%); opacity: 0; }
+    25%  { clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 50%); opacity: 1; }
+    50%  { clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%); }
+    75%  { clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%); }
+    to   { clip-path: polygon(50% 50%, 50% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 0%, 50% 0%); opacity: 1; }
+  }
+
+  /* LINE chart — stroke-dashoffset reveal */
+  .line-path {
+    fill: none;
+    stroke: var(--t4);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: var(--len, 2000);
+    stroke-dashoffset: var(--len, 2000);
+    animation: drawLine 1.4s var(--ease) 0.3s forwards;
+  }
+  @keyframes drawLine {
+    to { stroke-dashoffset: 0; }
+  }
+
+  /* AREA chart — clip-path reveals from left */
+  .area-clip {
+    clip-path: inset(0 100% 0 0);
+    animation: revealArea 1.4s var(--ease) 0.3s forwards;
+  }
+  .area-clip-tree {
+    animation-delay: 0.5s;
+  }
+  @keyframes revealArea {
+    to { clip-path: inset(0 0% 0 0); }
+  }
+
+  /* Axes + gridlines */
+  .axis text { font-size: 10px; fill: var(--text-3); font-family: inherit; }
+  .axis line { stroke: var(--border); }
+  .grid-line { stroke: var(--grid); stroke-width: 1; }
+
+  /* Tooltip */
+  .tt {
+    position: absolute;
+    pointer-events: none;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    box-shadow: 0 8px 20px -8px rgba(0,0,0,0.12);
+    font-size: 11px;
+    min-width: 120px;
+    opacity: 0;
+    transform: translate(-50%, -120%);
+    transition: opacity 0.15s ease;
+    z-index: 5;
+  }
+  .tt.is-on { opacity: 1; }
+  .tt-title { font-weight: 600; font-size: 11px; color: var(--text); margin-bottom: 4px; }
+  .tt-row { display: flex; justify-content: space-between; gap: 14px; color: var(--text-2); }
+  .tt-row b { color: var(--text); font-weight: 500; }
+  .tt-supp { color: var(--text-3); font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 6px; }
+  .tt-sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="wrap" id="wrap">
+  <header class="head">
+    <h2>Carbon Project Overview</h2>
+    <button id="replay" type="button">Replay animation</button>
+  </header>
+
+  <div class="grid" id="grid">
+    <article class="card">
+      <p class="card-title">VCUs by Planting Cycle</p>
+      <div class="card-body" id="pieBody"></div>
+    </article>
+    <article class="card">
+      <p class="card-title">Issued VCUs</p>
+      <div class="card-body" id="lineBody"></div>
+    </article>
+    <article class="card">
+      <p class="card-title">Tree CO₂ vs SOC CO₂</p>
+      <div class="card-body" id="areaBody"></div>
+    </article>
+  </div>
+
+  <div class="tt" id="tt" aria-hidden="true">
+    <div class="tt-supp" id="ttSupp"></div>
+    <div class="tt-title" id="ttTitle"></div>
+    <div id="ttRows"></div>
+  </div>
+</div>
+
+<script>
+  // -------- data (matches the Figma Make project) --------
+  const TEALS = ["#0F4F4A","#176B63","#1F857B","#2E9E92","#48B2A5","#6CC2B7","#94D3CB","#BFE3DE","#DCEFEC"];
+  const pieData = [22,16,14,12,10,8,7,6,5].map((v,i) => ({ label: `Cycle ${i+1}`, value: v, color: TEALS[i] }));
+
+  const lineData = [
+    {year:2025, v:0}, {year:2030, v:1200}, {year:2035, v:4500}, {year:2040, v:7200},
+    {year:2045, v:8500}, {year:2050, v:8500}, {year:2055, v:8500}, {year:2060, v:8500},
+    {year:2065, v:8500}, {year:2070, v:8200}, {year:2075, v:6500}, {year:2080, v:2500}
+  ];
+
+  const areaData = [
+    {year:2025, tree:0,    soc:0},
+    {year:2030, tree:1800, soc:1200},
+    {year:2035, tree:4600, soc:3200},
+    {year:2040, tree:7200, soc:5000},
+    {year:2045, tree:8400, soc:5900},
+    {year:2050, tree:8900, soc:6300},
+    {year:2055, tree:8900, soc:6300},
+    {year:2060, tree:8700, soc:6200},
+    {year:2065, tree:8200, soc:5800},
+    {year:2070, tree:6200, soc:4400},
+    {year:2075, tree:3200, soc:2300},
+    {year:2080, tree:1000, soc:700},
+    {year:2085, tree:300,  soc:200}
+  ];
+
+  // -------- tooltip helpers --------
+  const tt = document.getElementById('tt');
+  const ttSupp = document.getElementById('ttSupp');
+  const ttTitle = document.getElementById('ttTitle');
+  const ttRows = document.getElementById('ttRows');
+
+  function showTip(evt, opts) {
+    const r = document.getElementById('wrap').getBoundingClientRect();
+    tt.style.left = (evt.clientX - r.left) + 'px';
+    tt.style.top  = (evt.clientY - r.top)  + 'px';
+    ttSupp.textContent  = opts.supp || '';
+    ttTitle.textContent = opts.title || '';
+    ttRows.innerHTML = (opts.rows || []).map(row =>
+      `<div class="tt-row"><span><span class="tt-sw" style="background:${row.color}"></span>${row.label}</span><b>${row.value}</b></div>`
+    ).join('');
+    tt.classList.add('is-on');
+  }
+  function hideTip() { tt.classList.remove('is-on'); }
+
+  // -------- PIE --------
+  function renderPie() {
+    const el = document.getElementById('pieBody');
+    el.innerHTML = '';
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 220 220');
+    el.appendChild(svg);
+
+    const cx = 110, cy = 110, r = 90;
+    let total = pieData.reduce((s, d) => s + d.value, 0);
+    let start = -Math.PI / 2;     // start at 12 o'clock
+    const g = document.createElementNS(svgNS, 'g');
+    g.setAttribute('class', 'pie');
+    svg.appendChild(g);
+
+    pieData.forEach(d => {
+      const angle = (d.value / total) * Math.PI * 2;
+      const end = start + angle;
+      const x1 = cx + r * Math.cos(start);
+      const y1 = cy + r * Math.sin(start);
+      const x2 = cx + r * Math.cos(end);
+      const y2 = cy + r * Math.sin(end);
+      const large = angle > Math.PI ? 1 : 0;
+      const dPath = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('class', 'pie-slice');
+      path.setAttribute('d', dPath);
+      path.setAttribute('fill', d.color);
+      path.setAttribute('stroke', '#fff');
+      path.setAttribute('stroke-width', '2');
+      path.addEventListener('mousemove', (e) => {
+        showTip(e, { supp: 'Cycle', title: 'VCUs by Cycle', rows: [{ color: d.color, label: d.label, value: d.value + '%' }] });
+      });
+      path.addEventListener('mouseleave', hideTip);
+      g.appendChild(path);
+      start = end;
+    });
+  }
+
+  // -------- LINE / AREA scale helpers --------
+  function makeScales(data, xKey, yMax, w, h, padL = 36, padR = 12, padT = 12, padB = 22) {
+    const xs = data.map(d => d[xKey]);
+    const xMin = Math.min(...xs), xMax = Math.max(...xs);
+    const xScale = v => padL + ((v - xMin) / (xMax - xMin)) * (w - padL - padR);
+    const yScale = v => (h - padB) - (v / yMax) * (h - padT - padB);
+    return { xScale, yScale, padL, padR, padT, padB };
+  }
+
+  function drawAxes(svg, svgNS, data, xKey, yTicks, yMax, scales, w, h) {
+    const ax = document.createElementNS(svgNS, 'g');
+    ax.setAttribute('class', 'axis');
+    // y gridlines + labels
+    yTicks.forEach(t => {
+      const y = scales.yScale(t);
+      const ln = document.createElementNS(svgNS, 'line');
+      ln.setAttribute('class', 'grid-line');
+      ln.setAttribute('x1', scales.padL); ln.setAttribute('x2', w - scales.padR);
+      ln.setAttribute('y1', y); ln.setAttribute('y2', y);
+      ax.appendChild(ln);
+      const lbl = document.createElementNS(svgNS, 'text');
+      lbl.setAttribute('x', scales.padL - 6); lbl.setAttribute('y', y + 3);
+      lbl.setAttribute('text-anchor', 'end');
+      lbl.textContent = t.toLocaleString();
+      ax.appendChild(lbl);
+    });
+    // x labels (every other or selected)
+    data.forEach((d, i) => {
+      if (i % 2 !== 0 && i !== data.length - 1) return;
+      const x = scales.xScale(d[xKey]);
+      const lbl = document.createElementNS(svgNS, 'text');
+      lbl.setAttribute('x', x); lbl.setAttribute('y', h - 6);
+      lbl.setAttribute('text-anchor', 'middle');
+      lbl.textContent = d[xKey];
+      ax.appendChild(lbl);
+    });
+    svg.appendChild(ax);
+  }
+
+  // -------- LINE chart --------
+  function renderLine() {
+    const el = document.getElementById('lineBody');
+    el.innerHTML = '';
+    const svgNS = "http://www.w3.org/2000/svg";
+    const W = 360, H = 240;
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    el.appendChild(svg);
+
+    const scales = makeScales(lineData, 'year', 10000, W, H);
+    drawAxes(svg, svgNS, lineData, 'year', [0,2000,4000,6000,8000,10000], 10000, scales, W, H);
+
+    // monotone-ish path
+    let d = '';
+    lineData.forEach((p, i) => {
+      const x = scales.xScale(p.year), y = scales.yScale(p.v);
+      d += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+    });
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('class', 'line-path');
+    path.setAttribute('d', d);
+    svg.appendChild(path);
+    // compute length for stroke-dashoffset animation
+    const len = path.getTotalLength();
+    path.style.setProperty('--len', Math.ceil(len));
+
+    // invisible hover points
+    lineData.forEach(p => {
+      const cx = scales.xScale(p.year), cy = scales.yScale(p.v);
+      const dot = document.createElementNS(svgNS, 'circle');
+      dot.setAttribute('cx', cx); dot.setAttribute('cy', cy);
+      dot.setAttribute('r', 10);
+      dot.setAttribute('fill', 'transparent');
+      dot.style.cursor = 'pointer';
+      dot.addEventListener('mousemove', (e) => {
+        showTip(e, { supp: 'Year', title: 'Issued VCUs', rows: [{ color: '#2E9E92', label: 'Issued', value: p.v.toLocaleString() }] });
+      });
+      dot.addEventListener('mouseleave', hideTip);
+      svg.appendChild(dot);
+    });
+  }
+
+  // -------- AREA chart (stacked tree + SOC) --------
+  function renderArea() {
+    const el = document.getElementById('areaBody');
+    el.innerHTML = '';
+    const svgNS = "http://www.w3.org/2000/svg";
+    const W = 360, H = 240;
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    el.appendChild(svg);
+
+    // Compute stacked: bottom = soc, top = soc + tree
+    const stacked = areaData.map(d => ({ year: d.year, soc: d.soc, top: d.soc + d.tree, tree: d.tree }));
+    const yMax = 16000;
+    const scales = makeScales(stacked, 'year', yMax, W, H);
+    drawAxes(svg, svgNS, stacked, 'year', [0,4000,8000,12000,16000], yMax, scales, W, H);
+
+    // gradients
+    const defs = document.createElementNS(svgNS, 'defs');
+    defs.innerHTML = `
+      <linearGradient id="treeGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#A8E0C8" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="#A8E0C8" stop-opacity="0.7"/>
+      </linearGradient>
+      <linearGradient id="socGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#F4B89A" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="#F4B89A" stop-opacity="0.7"/>
+      </linearGradient>`;
+    svg.appendChild(defs);
+
+    // SOC area (bottom layer)
+    const socPath = buildAreaPath(stacked, 'soc', null, scales, H);
+    const socArea = document.createElementNS(svgNS, 'path');
+    socArea.setAttribute('class', 'area-clip');
+    socArea.setAttribute('d', socPath);
+    socArea.setAttribute('fill', 'url(#socGrad)');
+    socArea.setAttribute('stroke', '#E07B4A');
+    socArea.setAttribute('stroke-width', '1.5');
+    svg.appendChild(socArea);
+
+    // Tree area (top layer, on top of SOC)
+    const treePath = buildAreaPath(stacked, 'top', 'soc', scales, H);
+    const treeArea = document.createElementNS(svgNS, 'path');
+    treeArea.setAttribute('class', 'area-clip area-clip-tree');
+    treeArea.setAttribute('d', treePath);
+    treeArea.setAttribute('fill', 'url(#treeGrad)');
+    treeArea.setAttribute('stroke', '#4FAE85');
+    treeArea.setAttribute('stroke-width', '1.5');
+    svg.appendChild(treeArea);
+
+    // hover hit-zones
+    stacked.forEach(p => {
+      const cx = scales.xScale(p.year), cy = scales.yScale(p.top);
+      const hit = document.createElementNS(svgNS, 'rect');
+      const next = stacked[Math.min(stacked.length - 1, stacked.indexOf(p) + 1)];
+      const prev = stacked[Math.max(0, stacked.indexOf(p) - 1)];
+      const halfL = (cx - scales.xScale(prev.year)) / 2 || 14;
+      const halfR = (scales.xScale(next.year) - cx) / 2 || 14;
+      hit.setAttribute('x', cx - halfL);
+      hit.setAttribute('y', 0);
+      hit.setAttribute('width', halfL + halfR);
+      hit.setAttribute('height', H);
+      hit.setAttribute('fill', 'transparent');
+      hit.style.cursor = 'pointer';
+      hit.addEventListener('mousemove', (e) => {
+        showTip(e, { supp: 'Year', title: 'Tree CO₂ vs SOC CO₂', rows: [
+          { color: '#4FAE85', label: 'Tree CO₂', value: p.tree.toLocaleString() },
+          { color: '#E07B4A', label: 'SOC CO₂',  value: p.soc.toLocaleString() }
+        ]});
+      });
+      hit.addEventListener('mouseleave', hideTip);
+      svg.appendChild(hit);
+    });
+  }
+
+  /**
+   * Build an area path that fills between two series (top, bottom).
+   * If bottomKey is null, the path goes down to the x-axis baseline.
+   */
+  function buildAreaPath(data, topKey, bottomKey, scales, H) {
+    let p = '';
+    data.forEach((d, i) => {
+      const x = scales.xScale(d.year), y = scales.yScale(d[topKey]);
+      p += (i === 0 ? `M ${x} ${y}` : ` L ${x} ${y}`);
+    });
+    // back along the bottom
+    for (let i = data.length - 1; i >= 0; i--) {
+      const d = data[i];
+      const x = scales.xScale(d.year);
+      const baseVal = bottomKey ? d[bottomKey] : 0;
+      const y = scales.yScale(baseVal);
+      p += ` L ${x} ${y}`;
+    }
+    p += ' Z';
+    return p;
+  }
+
+  // -------- replay --------
+  function replay() {
+    const grid = document.getElementById('grid');
+    // re-trigger CSS animations by reflowing
+    const cards = grid.querySelectorAll('.card');
+    cards.forEach(c => {
+      c.style.animation = 'none';
+      void c.offsetWidth;
+      c.style.animation = '';
+    });
+    renderPie();
+    renderLine();
+    renderArea();
+  }
+  document.getElementById('replay').addEventListener('click', replay);
+
+  // initial draw
+  renderPie();
+  renderLine();
+  renderArea();
+</script>
+
+</body>
+</html>

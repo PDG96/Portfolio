@@ -1,0 +1,2072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Senior Product Designer for SaaS — turning complex problems into clear, scalable design.">
+  <meta name="theme-color" content="#fcfcfc">
+  <title>Pietra Gottardo — Product Designer for SaaS</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="alternate icon" type="image/png" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+
+  <link rel="stylesheet" href="assets/fonts/lausanne.css">
+
+  <style>
+    :root {
+      /* Gray True palette */
+      --gray-true-25:  #fcfcfc;
+      --gray-true-50:  #fafafa;
+      --gray-true-100: #f5f5f5;
+      --gray-true-200: #e5e5e5;
+      --gray-true-300: #d6d6d6;
+      --gray-true-400: #a3a3a3;
+      --gray-true-500: #737373;
+      --gray-true-600: #525252;
+      --gray-true-700: #424242;
+      --gray-true-800: #292929;
+      --gray-true-900: #141414;
+
+      /* Semantic tokens */
+      --bg:       var(--gray-true-25);
+      --bg-alt:   var(--gray-true-100);
+      --surface:  #ffffff;
+      --text:     var(--gray-true-900);
+      --text-2:   var(--gray-true-500);
+      --text-3:   var(--gray-true-400);
+      --border:   var(--gray-true-200);
+
+      /* Primary accent (brand) */
+      --accent: #3d5a3e;
+      --accent-light: #e8ede8;
+      --accent-glow: rgba(61,90,62,0.08);
+
+      /* Secondary accents */
+      --accent-yellow: #f7fdb9;
+      --accent-blue:   #c5e9ff;
+      --accent-pink:   #eee1ea;
+
+      --font: 'TWKLausanne', system-ui, sans-serif;
+      --mono: 'TWKLausanne', system-ui, sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+      /* Vertical rhythm */
+      --section-py: clamp(4.5rem, 9vw, 7rem);
+      --section-gap: clamp(2.5rem, 5vw, 3.5rem);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* Grain texture overlay */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.3;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+      background-size: 200px;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    /* Custom cursor — default: color-inverting dot */
+    .cursor {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #fff;
+      mix-blend-mode: difference;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate3d(-100px, -100px, 0);
+      will-change: transform;
+      transition: width 0.35s var(--ease), height 0.35s var(--ease);
+    }
+    /* Over buttons → glass magnifier lens */
+    .cursor.active {
+      width: 64px; height: 64px;
+      mix-blend-mode: normal;
+      background: transparent;
+      backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+      -webkit-backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+      border: 1.5px solid rgba(255,255,255,0.6);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.06),
+        0 6px 20px rgba(0,0,0,0.12),
+        inset 0 2px 3px rgba(255,255,255,0.35),
+        inset 0 -2px 3px rgba(0,0,0,0.06);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .cursor { display: block; }
+      html, body { cursor: none; }
+      a, button, input, textarea, .case-card, .work-scroll { cursor: none; }
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: clamp(72rem, 90vw, 110rem);   /* 1152 → 90vw → 1760 — grows on wide screens, capped before getting silly */
+      margin: 0 auto;
+      padding: 0 clamp(1.25rem, 4vw, 3rem);
+    }
+
+    /* ====== NAV ====== */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: transparent;
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
+    }
+    .nav.over-dark .nav-logo { color: var(--gray-true-25); }
+    .nav.over-dark .nav-links a { color: rgba(252,252,252,0.7); }
+    .nav.over-dark .nav-links a:hover { color: var(--gray-true-25); }
+    .nav.over-dark .lang-toggle { border-color: rgba(252,252,252,0.2); }
+    .nav.over-dark .lang-btn { color: rgba(252,252,252,0.5); }
+    .nav.over-dark .lang-btn.active { background: var(--gray-true-25); color: var(--gray-true-900); }
+    .nav.over-dark .nav-toggle span { background: var(--gray-true-25); }
+    .nav.scrolled {
+      background: rgba(252,252,252,0.85);
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .nav.scrolled.over-dark {
+      background: rgba(20,20,20,0.75);
+      box-shadow: 0 1px 0 rgba(252,252,252,0.08);
+    }
+
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 2rem; }
+
+    .nav-links {
+      display: none; list-style: none;
+      gap: 1.75rem; align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.8125rem; font-weight: 500;
+      color: var(--text-2);
+      transition: color 0.3s;
+      letter-spacing: 0.01em;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .lang-toggle {
+      display: flex; gap: 0;
+      border: 1px solid var(--border); border-radius: 6px;
+      overflow: hidden;
+    }
+    .lang-btn {
+      font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+      padding: 5px 10px; border: none; cursor: pointer;
+      background: transparent; color: var(--text-3);
+      transition: all 0.3s;
+    }
+    .lang-btn.active {
+      background: var(--text); color: var(--bg);
+    }
+
+    .nav-toggle {
+      display: flex; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-toggle span {
+      display: block; width: 20px; height: 1.5px;
+      background: var(--text); border-radius: 1px;
+      transition: all 0.3s var(--ease);
+    }
+    .nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(4.5px, 4.5px); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(4.5px, -4.5px); }
+
+    .mobile-menu {
+      display: none; position: fixed;
+      top: 60px; left: 0; right: 0; bottom: 0;
+      background: var(--bg); z-index: 99;
+      padding: 2rem clamp(1.25rem, 4vw, 3rem);
+    }
+    .mobile-menu.open { display: flex; flex-direction: column; gap: 1.5rem; }
+    .mobile-menu a {
+      font-size: 1.5rem; font-weight: 500; color: var(--text);
+    }
+    .mobile-menu .lang-toggle { align-self: flex-start; margin-top: 1rem; }
+
+    @media (min-width: 768px) {
+      .nav-links { display: flex; }
+      .nav-toggle { display: none; }
+    }
+
+    /* ====== REVEAL ====== */
+    .r {
+      opacity: 0; transform: translateY(32px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+    .r.v { opacity: 1; transform: none; }
+    .r-stagger > .r:nth-child(2) { transition-delay: 0.08s; }
+    .r-stagger > .r:nth-child(3) { transition-delay: 0.16s; }
+    .r-stagger > .r:nth-child(4) { transition-delay: 0.24s; }
+    .r-stagger > .r:nth-child(5) { transition-delay: 0.32s; }
+
+    /* ====== HERO ====== */
+    .hero {
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 0 4rem;
+      position: relative;
+      overflow: hidden;
+      background-color: var(--gray-true-900);
+      color: var(--gray-true-25);
+      text-align: center;
+    }
+
+    .hero-canvas-full {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: none;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: rgba(252,252,252,0.55);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.25rem, 5.5vw, 4rem);
+      font-weight: 300;
+      line-height: 1.1;
+      letter-spacing: -0.025em;
+      color: var(--gray-true-25);
+    }
+    .hero h1 em {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .hero-sub {
+      margin: 1.75rem auto 0;
+      font-size: 0.9375rem;
+      font-weight: 400;
+      color: rgba(252,252,252,0.55);
+      max-width: 440px;
+      line-height: 1.7;
+    }
+
+    .hero-ctas {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+    .hero .btn-primary {
+      background: var(--gray-true-25);
+      color: var(--gray-true-900);
+    }
+    .hero .btn-primary:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+    }
+    .hero .btn-ghost {
+      background: transparent;
+      color: var(--gray-true-25);
+      border-color: rgba(252,252,252,0.2);
+    }
+    .hero .btn-ghost:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+      border-color: var(--accent-yellow);
+    }
+
+    .btn {
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0;
+      padding: 0.875rem 1.5rem;
+      border-radius: 6px; border: none; cursor: pointer;
+      transition: all 0.35s var(--ease);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
+      line-height: 1;
+    }
+    .btn-primary {
+      background: var(--text); color: var(--bg);
+    }
+    .btn-primary:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+    }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+      border-color: var(--accent-yellow);
+    }
+
+
+    /* ====== CTC (chaos to momentum) — dark bg ====== */
+    .ctc {
+      background: var(--gray-true-900);
+      color: var(--gray-true-25);
+      padding: var(--section-py) 0;
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+    }
+    .ctc > .wrap { width: 100%; }
+    .ctc .ctc-label { color: rgba(252,252,252,0.45); }
+    .ctc h2 { color: var(--gray-true-25); }
+    .ctc p { color: rgba(252,252,252,0.55); }
+    .ctc .btn-primary {
+      background: var(--gray-true-25);
+      color: var(--gray-true-900);
+    }
+    .ctc .btn-primary:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+    }
+    .ctc-inner {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    @media (min-width: 900px) {
+      .ctc-inner {
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+      }
+    }
+    .ctc-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 1.25rem;
+    }
+    .ctc h2 {
+      font-size: clamp(1.875rem, 4vw, 2.75rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 1.5rem;
+    }
+    .ctc h2 em {
+      font-style: italic;
+      font-weight: 300;
+    }
+    .ctc p {
+      font-size: 0.9375rem;
+      color: var(--text-2);
+      line-height: 1.7;
+      max-width: 420px;
+      margin-bottom: 2rem;
+    }
+    .ctc-right {
+      position: relative;
+      aspect-ratio: 1;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .ctc-right canvas {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* ====== SERVICES — light bg ====== */
+    .services {
+      padding: clamp(7rem, 13vw, 11rem) 0;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+    }
+    .services > .wrap { width: 100%; }
+
+    /* Stage-card entrance — softer rise + scale, distinct from default reveal */
+    .stages .stage-card.r {
+      opacity: 0;
+      transform: translateY(40px) scale(0.985);
+      transition: opacity 0.85s var(--ease), transform 0.85s var(--ease);
+      transition-delay: 0s;
+    }
+    .stages .stage-card.r.v {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .stages.r-stagger > .stage-card.r:nth-child(1) { transition-delay: 0.05s; }
+    .stages.r-stagger > .stage-card.r:nth-child(2) { transition-delay: 0.15s; }
+    .stages.r-stagger > .stage-card.r:nth-child(3) { transition-delay: 0.25s; }
+    .stages.r-stagger > .stage-card.r:nth-child(4) { transition-delay: 0.35s; }
+    .stages.r-stagger > .stage-card.r:nth-child(5) { transition-delay: 0.45s; }
+
+    .section-header {
+      display: flex; flex-wrap: wrap;
+      justify-content: space-between; align-items: flex-end;
+      gap: 1rem;
+      margin-bottom: var(--section-gap);
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 0.75rem;
+    }
+    .section-header h2 {
+      font-size: clamp(1.875rem, 4vw, 2.75rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+    .section-header-num {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--text-3);
+    }
+
+    /* ============ STAGES (replaces the old service list) ============ */
+    .stages {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+    @media (min-width: 640px) {
+      .stages { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      /* 5-column flow on desktop — feels like a process, not a list. */
+      .stages { grid-template-columns: repeat(5, 1fr); gap: 1.25rem; }
+    }
+
+    .stage-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1.75rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: transform 0.4s var(--ease),
+                  border-color 0.4s var(--ease),
+                  box-shadow 0.4s var(--ease),
+                  background 0.4s var(--ease);
+      isolation: isolate;
+    }
+    .stage-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--text);
+      box-shadow: 0 18px 36px -18px rgba(20, 20, 20, 0.18);
+    }
+
+    /* Top row: number badge + a small connector dot mark */
+    .stage-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+    .stage-num {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      color: var(--text-3);
+      text-transform: uppercase;
+    }
+    /* Tiny mark — a glyph hinting the deliverable type per stage */
+    .stage-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--bg-alt);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-2);
+      transition: background 0.4s var(--ease), color 0.4s var(--ease);
+    }
+    .stage-card:hover .stage-mark {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .stage-mark svg {
+      width: 16px;
+      height: 16px;
+      display: block;
+    }
+
+    .stage-card h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.015em;
+      line-height: 1.25;
+      margin: 0;
+    }
+    .stage-desc {
+      color: var(--text-2);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      text-align: left;
+      margin: 0;
+      flex: 1;
+    }
+    /* Thin connector between cards on desktop — read as a process flow */
+    @media (min-width: 1024px) {
+      .stage-card + .stage-card::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -1.25rem;
+        width: 1.25rem;
+        height: 1px;
+        background: var(--border);
+        transform: translateY(-50%);
+      }
+    }
+    /* Bottom-of-card subtle accent line */
+    .stage-card::after {
+      content: '';
+      position: absolute;
+      left: 1.5rem;
+      bottom: 1rem;
+      width: 1.25rem;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+      opacity: 0;
+      transform: translateX(-6px);
+      transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+    }
+    .stage-card:hover::after {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* ============ legacy service-list styles — kept neutral as fallback */
+    .service-desc {
+      color: var(--text-2);
+      font-size: 0.9375rem;
+      line-height: 1.65;
+      text-align: right;
+      max-width: 320px;
+      display: none;
+    }
+    @media (min-width: 640px) {
+      .service-desc { display: block; }
+    }
+
+    /* ====== WORK ====== */
+    .work {
+      padding: var(--section-py) 0;
+      overflow: hidden;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+    }
+    .work > .wrap { width: 100%; }
+
+    .work-scroll {
+      display: flex;
+      gap: 1.5rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 1.5rem;
+      margin: 0 calc(-1 * clamp(1.25rem, 4vw, 3rem));
+      padding-left: clamp(1.25rem, 4vw, 3rem);
+      padding-right: clamp(1.25rem, 4vw, 3rem);
+      scrollbar-width: none;
+    }
+    .work-scroll::-webkit-scrollbar { display: none; }
+
+    .case-card-link {
+      flex: 0 0 85vw;
+      max-width: 560px;
+      scroll-snap-align: start;
+      display: block;
+    }
+    @media (min-width: 768px) {
+      .case-card-link { flex: 0 0 45vw; max-width: 620px; }
+    }
+    @media (min-width: 1100px) {
+      .case-card-link { flex: 0 0 38vw; max-width: 680px; }
+    }
+    .case-card-link .case-card {
+      flex: none;
+      max-width: none;
+      height: 100%;
+    }
+
+    .case-card {
+      flex: 0 0 85vw;
+      max-width: 560px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+      scroll-snap-align: start;
+    }
+    @media (min-width: 768px) {
+      .case-card { flex: 0 0 45vw; max-width: 620px; }
+    }
+    @media (min-width: 1100px) {
+      .case-card { flex: 0 0 38vw; max-width: 680px; }
+    }
+    .case-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 48px -12px rgba(0,0,0,0.06);
+    }
+
+    /* Coming-soon variant — not interactive. Sits flat in the carousel with a
+       subtle disabled state and a chip on the link slot. */
+    .case-card--soon {
+      cursor: default;
+    }
+    .case-card--soon:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    /* Hover-only dark overlay over the Safra hero image with centred "Coming soon" copy. */
+    .case-thumb--safra { position: relative; }
+    .case-thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 22, 18, 0.55);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fcfcfc;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s var(--ease);
+      z-index: 2;
+    }
+    .case-card--soon:hover .case-thumb-overlay {
+      opacity: 1;
+    }
+    .case-card--soon .case-link {
+      pointer-events: none;
+    }
+    .case-card--soon .case-link--soon {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      background: var(--bg-alt);
+      color: var(--text-2);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .case-card--soon .case-link--soon::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #d4a03a;
+      box-shadow: 0 0 0 0 rgba(212, 160, 58, 0.4);
+      animation: pulse-cs 2s infinite;
+    }
+    @keyframes pulse-cs {
+      0% { box-shadow: 0 0 0 0 rgba(212, 160, 58, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(212, 160, 58, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(212, 160, 58, 0); }
+    }
+
+    .case-thumb {
+      width: 100%;
+      aspect-ratio: 16/10;
+      background: var(--bg-alt);
+      position: relative;
+      overflow: hidden;
+    }
+    .case-card:nth-child(1) .case-thumb { background: var(--accent-yellow); }
+    .case-card:nth-child(2) .case-thumb { background: var(--accent-blue); }
+    .case-card:nth-child(3) .case-thumb { background: var(--accent-pink); }
+
+    /* Hero-image variant — replaces the abstract blob with a real photo */
+    .case-thumb--hero img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Abstract placeholder shapes */
+    .case-shape {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(20, 20, 20, 0.08);
+    }
+    .case-card:nth-child(1) .case-shape {
+      width: 180px; height: 180px;
+      top: 20%; left: 15%;
+      border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+    }
+    .case-card:nth-child(2) .case-shape {
+      width: 100px; height: 100px;
+      top: 25%; right: 20%;
+    }
+    .case-card:nth-child(3) .case-shape {
+      width: 140px; height: 60px;
+      bottom: 25%; left: 20%;
+      border-radius: 40px;
+    }
+
+    .case-body { padding: 1.75rem; }
+
+    .case-meta {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .case-tag {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    .case-body h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+    .case-body p {
+      font-size: 0.9375rem;
+      color: var(--text-2);
+      line-height: 1.65;
+      margin-bottom: 1.25rem;
+      max-width: 520px;
+    }
+    .case-link {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: gap 0.3s var(--ease);
+    }
+    .case-link:hover { gap: 0.85rem; }
+
+    /* Scroll indicator */
+    .work-scroll-hint {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .work-scroll-track {
+      flex: 1;
+      height: 2px;
+      background: var(--border);
+      border-radius: 1px;
+      position: relative;
+      overflow: hidden;
+    }
+    .work-scroll-thumb {
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%;
+      width: 33%;
+      background: var(--accent);
+      border-radius: 1px;
+      transition: left 0.15s ease-out;
+    }
+    .work-scroll-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      white-space: nowrap;
+    }
+
+    .work-process {
+      margin-top: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .work-process span {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
+    .work-process-arrow { color: var(--border); }
+
+    /* ====== ABOUT (editorial) ====== */
+    .about {
+      padding: var(--section-py) 0;
+      background: var(--bg-alt);
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+    }
+    .about > .wrap { width: 100%; }
+
+    /* Bio + photo grid — photo on the left, text on the right at the same height. */
+    .about-main {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      margin-top: clamp(2rem, 4vw, 3rem);
+      align-items: stretch;
+    }
+    @media (min-width: 900px) {
+      .about-main {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 80px;
+      }
+    }
+    .about-bio-col {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(1.5rem, 2.5vw, 2rem);
+      width: 100%;
+    }
+    .about-bio {
+      max-width: none;
+      width: 100%;
+    }
+    .about-photo {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      align-self: stretch;
+      min-height: 420px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      isolation: isolate;
+    }
+    .about-photo::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 25%, rgba(61, 90, 62, 0.18), transparent 60%),
+        linear-gradient(160deg, #e8ede8 0%, #f3f1e6 60%, #ddd1b5 100%);
+      z-index: 0;
+    }
+    .about-photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 1;
+      display: block;
+    }
+    .about-photo .ph-caption {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 1.25rem;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .about-photo .ph-caption-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
+    .about-photo .ph-caption-text {
+      font-size: 0.9375rem;
+      color: var(--text-2);
+    }
+    .about-bio .about-lead {
+      font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+      font-weight: 400;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+      color: var(--text);
+      margin: 0 0 1.75rem;
+      max-width: 38ch;
+    }
+    .about-bio p {
+      font-size: 1.0625rem;
+      color: var(--text-2);
+      line-height: 1.7;
+      margin: 0 0 1.25rem;
+    }
+    .about-bio p:last-of-type { margin-bottom: 0; }
+    .about-bio p strong { color: var(--text); font-weight: 500; }
+
+    /* Facts grid — sits inside the bio column, 2x2 layout */
+    .about-facts-row {
+      padding-top: clamp(1.5rem, 2.5vw, 2rem);
+      border-top: 1px solid var(--border);
+    }
+    .facts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+    @media (min-width: 640px) {
+      .facts-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .fact-card {
+      position: relative;
+      padding: 1rem 1.125rem 1.125rem;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+    }
+    .fact-card:hover {
+      border-color: var(--text-3);
+      background: var(--surface);
+    }
+    .fact-card .fact-label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-3);
+      display: block;
+      margin-bottom: 0.45rem;
+    }
+    .fact-card .fact-value {
+      font-size: 0.8125rem;
+      color: var(--text);
+      line-height: 1.45;
+      letter-spacing: -0.003em;
+      margin: 0;
+    }
+    .fact-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .fact-status::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: #21a06a;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(33, 160, 106, 0.4);
+      animation: about-pulse 2.2s infinite;
+    }
+    @keyframes about-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(33, 160, 106, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(33, 160, 106, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(33, 160, 106, 0); }
+    }
+
+    /* ====== CONTACT ====== */
+    .contact {
+      padding: var(--section-py) 0;
+      background: var(--gray-true-900);
+      color: var(--gray-true-25);
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+    }
+    .contact > .wrap { width: 100%; }
+
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+    @media (min-width: 900px) {
+      .contact-layout { grid-template-columns: 1fr 1fr; gap: 5rem; }
+    }
+
+    .contact-left h2 {
+      font-size: clamp(1.875rem, 4vw, 2.75rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      color: var(--gray-true-25);
+      margin-bottom: 1.5rem;
+    }
+    .contact-left p {
+      font-size: 0.9375rem;
+      color: rgba(252,252,252,0.55);
+      line-height: 1.7;
+      max-width: 440px;
+      margin-bottom: 2rem;
+    }
+    .contact-email {
+      font-family: var(--mono);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--accent-yellow);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      transition: opacity 0.3s;
+    }
+    .contact-email:hover { opacity: 0.7; }
+    .contact-calendly {
+      display: inline-flex;
+    }
+
+    /* Contact form */
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .form-group label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(252,252,252,0.45);
+    }
+    .form-group input,
+    .form-group textarea {
+      font-family: var(--font);
+      font-size: 0.9375rem;
+      color: var(--gray-true-25);
+      background: rgba(252,252,252,0.06);
+      border: 1px solid rgba(252,252,252,0.12);
+      border-radius: 8px;
+      padding: 0.875rem 1rem;
+      transition: border-color 0.3s, background 0.3s;
+      resize: vertical;
+    }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: rgba(252,252,252,0.25);
+    }
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: var(--accent-yellow);
+      background: rgba(252,252,252,0.08);
+    }
+    .form-group textarea { min-height: 120px; }
+
+    .contact .btn-primary {
+      background: var(--gray-true-25);
+      color: var(--gray-true-900);
+      align-self: flex-start;
+    }
+    .contact .btn-primary:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+    }
+
+    /* ====== FOOTER ====== */
+    .footer {
+      padding: 2rem 0;
+      background: var(--gray-true-900);
+      border-top: 1px solid rgba(252,252,252,0.08);
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .footer-copy {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(252,252,252,0.35);
+    }
+    .footer-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+    .footer-links a {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: rgba(252,252,252,0.35);
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--accent-yellow); }
+  </style>
+</head>
+
+<body>
+
+  <!-- Custom cursor -->
+  <div class="cursor" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a href="#" class="nav-logo">Pietra Gottardo.</a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="#work" data-i18n="nav_work">Work</a></li>
+          <li><a href="#services" data-i18n="nav_services">Services</a></li>
+          <li><a href="#about" data-i18n="nav_about">About</a></li>
+          <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
+        </ul>
+        <div class="lang-toggle" role="group" aria-label="Language selector">
+          <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+          <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
+        </div>
+        <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="mobile-menu" role="dialog" aria-label="Mobile navigation">
+    <a href="#work" data-i18n="nav_work">Work</a>
+    <a href="#services" data-i18n="nav_services">Services</a>
+    <a href="#about" data-i18n="nav_about">About</a>
+    <a href="#contact" data-i18n="nav_contact">Contact</a>
+    <div class="lang-toggle" role="group" aria-label="Language selector">
+      <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+      <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <canvas id="heroCanvas" class="hero-canvas-full" aria-hidden="true"></canvas>
+    <div class="wrap hero-content">
+      <p class="hero-eyebrow r" data-i18n="hero_eyebrow">Product Architect</p>
+      <h1 class="r" data-i18n="hero_h1">SaaS products that people<br><em>actually</em> understand.</h1>
+      <p class="hero-sub r" data-i18n="hero_sub">Helping SaaS companies turn complex products into interfaces that click. Strategy, design, and execution — embedded in your team.</p>
+      <div class="hero-ctas r">
+        <a href="#work" class="btn btn-primary" data-i18n="hero_cta_work">See selected work</a>
+        <a href="#contact" class="btn btn-ghost" data-i18n="hero_cta_call">Book a call</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES (position 2 — light bg) -->
+  <section class="services" id="services">
+    <div class="wrap">
+      <div class="section-header r">
+        <div>
+          <p class="section-label" data-i18n="services_label">Services</p>
+          <h2 data-i18n="services_heading">What I bring to the table</h2>
+        </div>
+        <p class="section-header-num">(05)</p>
+      </div>
+      <div class="stages r-stagger">
+        <article class="stage-card r">
+          <div class="stage-card-top">
+            <span class="stage-num">01</span>
+            <span class="stage-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Z"/>
+                <path d="M12 7v5l3 2"/>
+              </svg>
+            </span>
+          </div>
+          <h3 data-i18n="svc_1_t">Listen</h3>
+          <p class="stage-desc" data-i18n="svc_1_d">Desk research with citations, conversations with people in the field, ecosystem mapping. I figure out who holds what, before designing anything.</p>
+        </article>
+
+        <article class="stage-card r">
+          <div class="stage-card-top">
+            <span class="stage-num">02</span>
+            <span class="stage-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="6" height="6" rx="1.4"/>
+                <rect x="14" y="4" width="6" height="6" rx="1.4"/>
+                <rect x="4" y="14" width="6" height="6" rx="1.4"/>
+                <rect x="14" y="14" width="6" height="6" rx="1.4"/>
+                <path d="M10 7h4M10 17h4M7 10v4M17 10v4"/>
+              </svg>
+            </span>
+          </div>
+          <h3 data-i18n="svc_2_t">Map</h3>
+          <p class="stage-desc" data-i18n="svc_2_d">Information architecture, sitemaps, role models. I draw the structure of the product before any pixel — so the team has something to argue with.</p>
+        </article>
+
+        <article class="stage-card r">
+          <div class="stage-card-top">
+            <span class="stage-num">03</span>
+            <span class="stage-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h16"/>
+                <circle cx="8" cy="6" r="1.6" fill="currentColor"/>
+                <circle cx="14" cy="12" r="1.6" fill="currentColor"/>
+                <circle cx="18" cy="18" r="1.6" fill="currentColor"/>
+              </svg>
+            </span>
+          </div>
+          <h3 data-i18n="svc_3_t">Blueprint</h3>
+          <p class="stage-desc" data-i18n="svc_3_d">Swimlanes, service blueprints, user journeys. The map of how intent becomes action — across people, screens, and the platform behind them.</p>
+        </article>
+
+        <article class="stage-card r">
+          <div class="stage-card-top">
+            <span class="stage-num">04</span>
+            <span class="stage-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="3"/>
+                <path d="M3 9h18M9 9v12"/>
+              </svg>
+            </span>
+          </div>
+          <h3 data-i18n="svc_4_t">Design</h3>
+          <p class="stage-desc" data-i18n="svc_4_d">Visual identity, UI, dashboards, components. Where the structure turns into a product people open without thinking — and trust on second glance.</p>
+        </article>
+
+        <article class="stage-card r">
+          <div class="stage-card-top">
+            <span class="stage-num">05</span>
+            <span class="stage-mark" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12l4 4 10-10"/>
+              </svg>
+            </span>
+          </div>
+          <h3 data-i18n="svc_5_t">Ship</h3>
+          <p class="stage-desc" data-i18n="svc_5_d">Embedded with engineering — specs, tokens, design system, documentation. Often augmented by AI workflows, so handoff feels like one continuous build.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAOS TO MOMENTUM (position 3 — dark bg) -->
+  <section class="ctc" id="ctc">
+    <div class="wrap ctc-inner">
+      <div class="ctc-left">
+        <p class="ctc-label r" data-i18n="ctc_label">My design philosophy</p>
+        <h2 class="r" data-i18n="ctc_h2">From chaos to <em>momentum.</em></h2>
+        <p class="r" data-i18n="ctc_p">I take the messy, complex, and overwhelming — and shape it into something people can navigate with confidence.</p>
+        <a href="#work" class="btn btn-primary r" data-i18n="ctc_cta">See how I do it</a>
+      </div>
+      <div class="ctc-right r" aria-hidden="true">
+        <canvas id="swarmCanvas"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section class="work" id="work">
+    <div class="wrap">
+      <div class="section-header r">
+        <div>
+          <p class="section-label" data-i18n="work_label">Selected work</p>
+          <h2 data-i18n="work_heading">Problems solved,<br>products shipped</h2>
+        </div>
+        <p class="section-header-num">(03)</p>
+      </div>
+      <div class="work-scroll" id="workScroll">
+
+        <a href="projects/ecotrack.html" class="case-card-link">
+        <article class="case-card r">
+          <div class="case-thumb case-thumb--hero">
+            <img src="projects/assets/straatos-hero.png" alt="Straatos — Saloum Delta mangrove restoration project">
+          </div>
+          <div class="case-body">
+            <div class="case-meta"><span class="case-tag" data-i18n="c1_tag">Carbon Tech</span></div>
+            <h3 data-i18n="c1_t">Straatos</h3>
+            <p data-i18n="c1_d">A plataforma única para project developers de carbono — do cadastro de plots à submissão Verra, adaptada ao estágio do projeto.</p>
+            <span class="case-link"><span data-i18n="c1_l">Read case study</span> →</span>
+          </div>
+        </article>
+        </a>
+
+        <a href="projects/wazi.html" class="case-card-link">
+        <article class="case-card r">
+          <div class="case-thumb case-thumb--hero">
+            <img src="projects/assets/wazi/handheld-ipad.png?v=3" alt="WAZI Shipments view on a tablet held in two hands, over a warm gold gradient backdrop">
+          </div>
+          <div class="case-body">
+            <div class="case-meta"><span class="case-tag" data-i18n="c2_tag">Responsible Sourcing</span></div>
+            <h3 data-i18n="c2_t">WAZI — Digital Gold Ecosystem</h3>
+            <p data-i18n="c2_d">A platform bringing trust and transparency to artisanal gold mining — shared evidence base with sovereignty by design.</p>
+            <span class="case-link"><span data-i18n="c2_l">Read case study</span> →</span>
+          </div>
+        </article>
+        </a>
+
+        <article class="case-card case-card--soon r" aria-disabled="true">
+          <div class="case-thumb case-thumb--hero case-thumb--safra">
+            <img src="projects/assets/safra-hero.png" alt="Safra — a sunset-lit Brazilian crop field with a centred card showing a soy leaf texture and the 'safra' wordmark in yellow.">
+            <span class="case-thumb-overlay" aria-hidden="true">
+              <span data-i18n="c3_overlay">Coming soon</span>
+            </span>
+          </div>
+          <div class="case-body">
+            <div class="case-meta"><span class="case-tag" data-i18n="c3_tag">Sustainable Agribusiness</span></div>
+            <h3 data-i18n="c3_t">Safra — The operating system for sustainable Brazilian agriculture</h3>
+            <p data-i18n="c3_d">From planting to liquidation in one platform — plot management, soil health and traceable, low-carbon Brazilian grain.</p>
+            <span class="case-link case-link--soon"><span data-i18n="c3_l">Coming soon</span></span>
+          </div>
+        </article>
+
+      </div>
+      <div class="work-scroll-hint r">
+        <div class="work-scroll-track">
+          <div class="work-scroll-thumb" id="workScrollThumb"></div>
+        </div>
+        <span class="work-scroll-label" data-i18n="scroll_hint">Scroll to explore</span>
+      </div>
+      <div class="work-process r">
+        <span data-i18n="p1">Research</span>
+        <span class="work-process-arrow">→</span>
+        <span data-i18n="p2">Definition</span>
+        <span class="work-process-arrow">→</span>
+        <span data-i18n="p3">Solution</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT (editorial layout — bio + horizontal facts row) -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <div class="section-header r">
+        <p class="section-label" data-i18n="about_label">About</p>
+        <p class="section-header-num">(06)</p>
+      </div>
+
+      <div class="about-main">
+        <div class="about-photo r" aria-hidden="true">
+          <span class="ph-caption">
+            <span class="ph-caption-label">Photo</span>
+            <span class="ph-caption-text" data-i18n="about_photo_ph">Replace with portrait</span>
+          </span>
+        </div>
+        <div class="about-bio-col">
+          <div class="about-bio">
+            <p class="about-lead r" data-i18n="about_lead">Hey! I'm Pietra, I design solutions that work across borders.</p>
+            <p class="r" data-i18n="about_p1">I started in graphic design — branding, editorial, industrial — before moving into digital product design. For the past four years I've been focused on SaaS, working with international teams that need to turn complex, regulated, multi-stakeholder domains into interfaces people can actually use.</p>
+            <p class="r" data-i18n="about_p2">My work tends to live at the boundary between research, information architecture and the UI itself. I map ecosystems, draw service blueprints, design role-based sidebars, and ship the screens that come out the other end — often working alongside engineering as a product architect rather than handing files over a wall.</p>
+            <p class="r" data-i18n="about_p3">I work in EN and PT-BR. Available for embedded engagements with startups that take their domain seriously.</p>
+          </div>
+
+          <div class="about-facts-row">
+            <div class="facts-grid r-stagger">
+              <article class="fact-card r">
+                <span class="fact-label" data-i18n="fact_based_l">Based</span>
+                <p class="fact-value" data-i18n="fact_based_v">Remote · Brazil &amp; EU timezones</p>
+              </article>
+              <article class="fact-card r">
+                <span class="fact-label" data-i18n="fact_lang_l">Languages</span>
+                <p class="fact-value" data-i18n="fact_lang_v">EN · PT-BR</p>
+              </article>
+              <article class="fact-card r">
+                <span class="fact-label" data-i18n="fact_work_l">Engagement</span>
+                <p class="fact-value" data-i18n="fact_work_v">Embedded · specs, tokens, AI handoff</p>
+              </article>
+              <article class="fact-card r">
+                <span class="fact-label" data-i18n="fact_now_l">Currently</span>
+                <p class="fact-value"><span class="fact-status" data-i18n="fact_now_v">Available for new engagements</span></p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <div class="contact-layout">
+        <div class="contact-left">
+          <p class="mono-label r" style="color: rgba(252,252,252,0.45)" data-i18n="contact_label">Get in touch</p>
+          <h2 class="r" data-i18n="contact_heading">Let's build something<br>people understand.</h2>
+          <p class="r" data-i18n="contact_p">Have a SaaS product that needs clarity? A complex interface that users struggle with? I'd love to hear about it.</p>
+          <div class="r" style="margin-top: 2.5rem;">
+            <a href="#" class="btn btn-primary contact-calendly" data-i18n="contact_cal">Book a call ↗</a>
+          </div>
+        </div>
+        <form class="contact-form r" id="contactForm">
+          <div class="form-group">
+            <label for="name" data-i18n="form_name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" data-i18n-placeholder="form_name_ph" required>
+          </div>
+          <div class="form-group">
+            <label for="email" data-i18n="form_email">Email</label>
+            <input type="email" id="email" name="email" placeholder="you@company.com" required>
+          </div>
+          <div class="form-group">
+            <label for="message" data-i18n="form_message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell me about your project..." data-i18n-placeholder="form_msg_ph" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary" data-i18n="form_send">Send message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <span class="footer-copy" data-i18n="footer_copy">&copy; 2026 · Pietra Gottardo</span>
+      <ul class="footer-links">
+        <li><a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a></li>
+        <li><a href="#hero" data-i18n="footer_top">Back to top</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <script>
+    const T = {
+      en: {
+        nav_work:"Work", nav_services:"Services", nav_about:"About", nav_contact:"Contact",
+        hero_eyebrow:"Product Architect",
+        hero_h1:"SaaS products that people<br><em>actually</em> understand.",
+        hero_sub:"Helping SaaS companies turn complex products into interfaces that click. Strategy, design, and execution — embedded in your team.",
+        hero_cta_work:"See selected work",
+        hero_cta_call:"Book a call",
+        m1:"UI/UX Design", m2:"Design Systems", m3:"Product Strategy", m4:"User Research", m5:"SaaS", m6:"B2B Platforms",
+        services_label:"Services",
+        services_heading:"What I bring to the table",
+        svc_1_t:"Listen",
+        svc_1_d:"Desk research with citations, conversations with people in the field, ecosystem mapping. I figure out who holds what, before designing anything.",
+        svc_2_t:"Map",
+        svc_2_d:"Information architecture, sitemaps, role models. I draw the structure of the product before any pixel — so the team has something to argue with.",
+        svc_3_t:"Blueprint",
+        svc_3_d:"Swimlanes, service blueprints, user journeys. The map of how intent becomes action — across people, screens, and the platform behind them.",
+        svc_4_t:"Design",
+        svc_4_d:"Visual identity, UI, dashboards, components. Where the structure turns into a product people open without thinking — and trust on second glance.",
+        svc_5_t:"Ship",
+        svc_5_d:"Embedded with engineering — specs, tokens, design system, documentation. Often augmented by AI workflows, so handoff feels like one continuous build.",
+        work_label:"Selected work",
+        work_heading:"Problems solved, products shipped",
+        c1_tag:"Carbon Tech",
+        c1_t:"Straatos",
+        c1_d:"The single platform for carbon project developers — from plot registration to Verra submission, adapted to project stage.",
+        c1_l:"Read case study",
+        c2_tag:"Responsible Sourcing",
+        c2_t:"WAZI — Digital Gold Ecosystem",
+        c2_d:"A platform bringing trust and transparency to artisanal gold mining — shared evidence base with sovereignty by design.",
+        c2_l:"Read case study",
+        c3_tag:"Sustainable Agribusiness",
+        c3_t:"Safra — The operating system for sustainable Brazilian agriculture",
+        c3_d:"From planting to liquidation in one platform — plot management, soil health and traceable, low-carbon Brazilian grain.",
+        c3_l:"Coming soon",
+        c3_overlay:"Coming soon",
+        p1:"Research", p2:"Definition", p3:"Solution", scroll_hint:"Scroll to explore",
+        about_label:"About",
+        about_lead:"Hey! I'm Pietra, I design solutions that work across borders.",
+        about_p1:"I started in graphic design — branding, editorial, industrial — before moving into digital product design. For the past four years I've been focused on SaaS, working with international teams that need to turn complex, regulated, multi-stakeholder domains into interfaces people can actually use.",
+        about_p2:"My work tends to live at the boundary between research, information architecture and the UI itself. I map ecosystems, draw service blueprints, design role-based sidebars, and ship the screens that come out the other end — often working alongside engineering as a product architect rather than handing files over a wall.",
+        about_p3:"I work in EN and PT-BR. Available for embedded engagements with startups that take their domain seriously.",
+        about_photo_ph:"Replace with portrait",
+        fact_based_l:"Based",
+        fact_based_v:"Remote · Brazil & EU timezones",
+        fact_lang_l:"Languages",
+        fact_lang_v:"EN · PT-BR",
+        fact_work_l:"Engagement",
+        fact_work_v:"Embedded · specs, tokens, AI handoff",
+        fact_now_l:"Currently",
+        fact_now_v:"Available for new engagements",
+        contact_label:"Get in touch",
+        contact_heading:"Let's build something<br>people understand.",
+        contact_p:"Have a SaaS product that needs clarity? A complex interface that users struggle with? I'd love to hear about it.",
+        contact_email:"hello@yourname.com",
+        contact_cal:"Book a call ↗",
+        form_name:"Name",
+        form_email:"Email",
+        form_message:"Message",
+        form_send:"Send message",
+        footer_copy:"© 2026 · Pietra Gottardo",
+        footer_top:"Back to top",
+        ctc_label:"My design philosophy",
+        ctc_h2:"From chaos to momentum.",
+        ctc_p:"I take the messy, complex, and overwhelming — and shape it into something people can navigate with confidence.",
+        ctc_cta:"See how I do it"
+      },
+      pt: {
+        nav_work:"Projetos", nav_services:"Serviços", nav_about:"Sobre", nav_contact:"Contato",
+        hero_eyebrow:"Product Architect",
+        hero_h1:"Produtos SaaS que as pessoas<br><em>realmente</em> entendem.",
+        hero_sub:"Ajudo empresas SaaS a transformar produtos complexos em interfaces que funcionam. Estratégia, design e execução — integrado ao seu time.",
+        hero_cta_work:"Ver projetos",
+        hero_cta_call:"Agendar conversa",
+        m1:"UI/UX Design", m2:"Design Systems", m3:"Estratégia de Produto", m4:"Pesquisa com Usuários", m5:"SaaS", m6:"Plataformas B2B",
+        services_label:"Serviços",
+        services_heading:"O que eu trago para a mesa",
+        svc_1_t:"Escutar",
+        svc_1_d:"Desk research com citações, conversas com gente do campo, mapeamento de ecossistema. Descubro quem detém o quê antes de desenhar qualquer coisa.",
+        svc_2_t:"Mapear",
+        svc_2_d:"Arquitetura da informação, sitemaps, modelos de papéis. Desenho a estrutura do produto antes do pixel — pra o time ter algo concreto pra discutir.",
+        svc_3_t:"Esquematizar",
+        svc_3_d:"Swimlanes, service blueprints, jornadas. O mapa de como a intenção vira ação — entre pessoas, telas e a plataforma por trás.",
+        svc_4_t:"Desenhar",
+        svc_4_d:"Identidade visual, UI, dashboards, componentes. Onde a estrutura vira um produto que as pessoas abrem sem pensar — e confiam na segunda olhada.",
+        svc_5_t:"Entregar",
+        svc_5_d:"Embutida com engenharia — specs, tokens, design system, documentação. Frequentemente acelerada por workflows com IA, pro handoff ser uma construção contínua.",
+        work_label:"Projetos selecionados",
+        work_heading:"Problemas resolvidos, produtos entregues",
+        c1_tag:"Carbon Tech",
+        c1_t:"Straatos",
+        c1_d:"A plataforma única para project developers de carbono — do cadastro de plots à submissão Verra, adaptada ao estágio do projeto.",
+        c1_l:"Ler case study",
+        c2_tag:"Sourcing Responsável",
+        c2_t:"WAZI — Ecossistema Digital do Ouro",
+        c2_d:"Plataforma que traz confiança e transparência à mineração artesanal de ouro — base de evidências compartilhada com soberania dos dados.",
+        c2_l:"Ler case study",
+        c3_tag:"Agronegócio Sustentável",
+        c3_t:"Safra — O sistema operacional da agricultura sustentável brasileira",
+        c3_d:"Do plantio à liquidação em uma plataforma — gestão de talhões, saúde do solo e grãos brasileiros rastreáveis e de baixo carbono.",
+        c3_l:"Em breve",
+        c3_overlay:"Em breve",
+        p1:"Pesquisa", p2:"Definição", p3:"Solução", scroll_hint:"Deslize para explorar",
+        about_label:"Sobre",
+        about_lead:"Oi! Eu sou a Pietra, desenho soluções que funcionam sem fronteiras.",
+        about_p1:"Comecei em design gráfico — branding, editorial, industrial — antes de migrar pro design de produto digital. Nos últimos quatro anos foquei em SaaS, trabalhando com times internacionais que precisam transformar domínios complexos, regulados e multi-stakeholder em interfaces que as pessoas realmente conseguem usar.",
+        about_p2:"Meu trabalho vive na fronteira entre pesquisa, arquitetura da informação e a própria UI. Mapeio ecossistemas, desenho service blueprints, projeto sidebars baseadas em papel, e entrego as telas que saem do outro lado — frequentemente trabalhando lado a lado com engenharia como product architect, em vez de jogar arquivos por cima do muro.",
+        about_p3:"Trabalho em EN e PT-BR. Disponível pra engajamentos embedded com startups que levam o domínio delas a sério.",
+        about_photo_ph:"Substituir pelo retrato",
+        fact_based_l:"Base",
+        fact_based_v:"Remoto · Fusos do Brasil & Europa",
+        fact_lang_l:"Idiomas",
+        fact_lang_v:"EN · PT-BR",
+        fact_work_l:"Engajamento",
+        fact_work_v:"Embutida · specs, tokens, handoff com IA",
+        fact_now_l:"Agora",
+        fact_now_v:"Disponível pra novos engajamentos",
+        contact_label:"Entre em contato",
+        contact_heading:"Vamos construir algo<br>que as pessoas entendam.",
+        contact_p:"Tem um produto SaaS que precisa de clareza? Uma interface complexa que os usuários não entendem? Quero ouvir sobre.",
+        contact_email:"hello@yourname.com",
+        contact_cal:"Agendar conversa ↗",
+        form_name:"Nome",
+        form_email:"Email",
+        form_message:"Mensagem",
+        form_send:"Enviar mensagem",
+        footer_copy:"© 2026 · Pietra Gottardo",
+        footer_top:"Voltar ao topo",
+        ctc_label:"Minha filosofia de design",
+        ctc_h2:"Do caos ao movimento.",
+        ctc_p:"Pego o que é confuso, complexo e sobrecarregado — e transformo em algo que as pessoas navegam com confiança.",
+        ctc_cta:"Veja como eu faço"
+      }
+    };
+
+    let lang = localStorage.getItem('lang') || 'en';
+
+    function setLang(l) {
+      lang = l;
+      localStorage.setItem('lang', l);
+      document.documentElement.lang = l === 'pt' ? 'pt-BR' : 'en';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const k = el.getAttribute('data-i18n');
+        if (T[l]?.[k]) {
+          const v = T[l][k];
+          if (/<[a-z]/i.test(v)) el.innerHTML = v;
+          else el.textContent = v;
+        }
+      });
+      document.querySelectorAll('.lang-btn').forEach(b => {
+        const on = b.dataset.lang === l;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on);
+      });
+    }
+
+    document.querySelectorAll('.lang-btn').forEach(b =>
+      b.addEventListener('click', () => setLang(b.dataset.lang))
+    );
+    setLang(lang);
+
+// Contact form — opens the user's mail client with a prefilled message
+    // addressed to Pietra. No backend needed.
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = (document.getElementById('name').value || '').trim();
+        const email = (document.getElementById('email').value || '').trim();
+        const message = (document.getElementById('message').value || '').trim();
+        const subject = `Portfolio inquiry — ${name || 'no name'}`;
+        const body = `${message}\n\n— ${name}\n${email}`;
+        const href = `mailto:pietragottardo@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.location.href = href;
+      });
+    }
+
+    // Nav scroll + adapt over dark sections
+    const nav = document.querySelector('.nav');
+    function isOverDark() {
+      const navH = 64;
+      const probeY = navH / 2;
+      const els = document.elementsFromPoint(window.innerWidth / 2, probeY);
+      for (const el of els) {
+        const section = el.closest('.hero, .ctc, .contact');
+        if (section) return true;
+      }
+      return false;
+    }
+    function updateNav() {
+      nav.classList.toggle('scrolled', scrollY > 10);
+      nav.classList.toggle('over-dark', isOverDark());
+    }
+    window.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', updateNav, { passive: true });
+    updateNav();
+
+    // Mobile menu
+    const tog = document.querySelector('.nav-toggle');
+    const mob = document.querySelector('.mobile-menu');
+    tog.addEventListener('click', () => {
+      const open = mob.classList.toggle('open');
+      tog.classList.toggle('open', open);
+      tog.setAttribute('aria-expanded', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    mob.querySelectorAll('a').forEach(a =>
+      a.addEventListener('click', () => {
+        mob.classList.remove('open');
+        tog.classList.remove('open');
+        tog.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      })
+    );
+
+    // Work scroll progress bar
+    const workScroll = document.getElementById('workScroll');
+    const workThumb = document.getElementById('workScrollThumb');
+    if (workScroll && workThumb) {
+      workScroll.addEventListener('scroll', () => {
+        const max = workScroll.scrollWidth - workScroll.clientWidth;
+        if (max > 0) {
+          const pct = workScroll.scrollLeft / max;
+          workThumb.style.left = (pct * 67) + '%';
+        }
+      }, { passive: true });
+    }
+
+    // Reveal
+    const obs = new IntersectionObserver(es =>
+      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
+    , { threshold: 0.12 });
+    document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+    // ====== Custom cursor (color-inverting circle) ======
+    (() => {
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const cursor = document.querySelector('.cursor');
+      if (!cursor) return;
+      let mx = -100, my = -100, cx = -100, cy = -100;
+      document.addEventListener('pointermove', (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+      });
+      // Glass lens state on any clickable element
+      const clickables = 'a, button, .btn, .case-card, .lang-btn, .nav-toggle';
+      document.querySelectorAll(clickables).forEach(el => {
+        el.addEventListener('pointerenter', () => cursor.classList.add('active'));
+        el.addEventListener('pointerleave', () => cursor.classList.remove('active'));
+      });
+      function tick() {
+        cx += (mx - cx) * 0.22;
+        cy += (my - cy) * 0.22;
+        cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+
+    // ====== HERO GRID canvas (chaos → order pattern) ======
+    (() => {
+      const canvas = document.getElementById('heroCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const COUNT = 220;
+      let W, H, particles, running = false;
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = canvas.parentElement.getBoundingClientRect();
+        W = rect.width; H = rect.height;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function init() {
+        resize();
+        const cols = Math.ceil(Math.sqrt(COUNT * (W / H)));
+        const rows = Math.ceil(COUNT / cols);
+        const total = cols * rows; // ensure every grid slot is filled
+        const cellW = W / (cols + 1);
+        const cellH = H / (rows + 1);
+        particles = [];
+        // Constrain initial chaos to a radius around each grid point,
+        // so with 3s GATHER the perceived travel speed matches the old 5s version.
+        const scatterRadius = Math.min(W, H) * 0.35;
+        for (let i = 0; i < total; i++) {
+          const col = (i % cols) + 1;
+          const row = Math.floor(i / cols) + 1;
+          const gx = col * cellW;
+          const gy = row * cellH;
+          particles.push({
+            x: gx + (Math.random() - 0.5) * scatterRadius * 2,
+            y: gy + (Math.random() - 0.5) * scatterRadius * 2,
+            gridX: gx,
+            gridY: gy,
+            size: Math.random() * 2 + 0.6,
+            gridSize: 1.6,
+            chaosVx: (Math.random() - 0.5) * 0.85,
+            chaosVy: (Math.random() - 0.5) * 0.85,
+            alpha: Math.random() * 0.18 + 0.06,
+            gridAlpha: 0.35,
+            // Breathing wobble when aligned
+            wobblePhase: Math.random() * Math.PI * 2,
+            wobbleFreq: 0.0008 + Math.random() * 0.0008,
+            wobbleAmp: 1.5 + Math.random() * 2,
+          });
+        }
+      }
+
+      const GATHER = 3000;
+      const HOLD = 1800;
+      const SCATTER = 3200;
+      const HOLD2 = 0;
+      const TOTAL = GATHER + HOLD + SCATTER + HOLD2;
+
+      // Mouse repulsion
+      let mouseX = -9999, mouseY = -9999;
+      const REPEL_RADIUS = 140;
+      const REPEL_FORCE = 35;
+      const hero = canvas.parentElement;
+      hero.addEventListener('pointermove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+      });
+      hero.addEventListener('pointerleave', () => {
+        mouseX = -9999; mouseY = -9999;
+      });
+
+      function smoothstep(x) {
+        const c = Math.max(0, Math.min(1, x));
+        return c * c * (3 - 2 * c);
+      }
+
+      function getProgress(t) {
+        const p = t % TOTAL;
+        if (p < GATHER) return smoothstep(p / GATHER);
+        if (p < GATHER + HOLD) return 1;
+        if (p < GATHER + HOLD + SCATTER) return 1 - smoothstep((p - GATHER - HOLD) / SCATTER);
+        return 0;
+      }
+
+      function draw(time) {
+        if (!running) return;
+        ctx.clearRect(0, 0, W, H);
+        const prog = getProgress(time);
+
+        // Pass 1: compute final position for each particle
+        for (const p of particles) {
+          p.x += p.chaosVx * (1 - prog);
+          p.y += p.chaosVy * (1 - prog);
+          if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+          if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+
+          // Subtle breathing wobble — scales with alignment
+          const wx = Math.sin(time * p.wobbleFreq + p.wobblePhase) * p.wobbleAmp * prog;
+          const wy = Math.cos(time * p.wobbleFreq * 0.9 + p.wobblePhase * 1.3) * p.wobbleAmp * prog;
+
+          let dx = p.x + (p.gridX - p.x) * prog + wx;
+          let dy = p.y + (p.gridY - p.y) * prog + wy;
+
+          // Mouse repulsion
+          const mdx = dx - mouseX;
+          const mdy = dy - mouseY;
+          const distSq = mdx * mdx + mdy * mdy;
+          if (distSq < REPEL_RADIUS * REPEL_RADIUS) {
+            const dist = Math.sqrt(distSq) || 1;
+            const falloff = 1 - dist / REPEL_RADIUS;
+            const force = falloff * falloff * REPEL_FORCE;
+            dx += (mdx / dist) * force;
+            dy += (mdy / dist) * force;
+          }
+
+          p.drawX = dx;
+          p.drawY = dy;
+          p.drawSize = p.size + (p.gridSize - p.size) * prog;
+          p.drawAlpha = p.alpha + (p.gridAlpha - p.alpha) * prog;
+        }
+
+        // Pass 2: draw dots
+        for (const p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.drawX, p.drawY, p.drawSize, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(247,253,185,${p.drawAlpha})`;
+          ctx.fill();
+        }
+
+        // Pass 3: connecting lines when ordered
+        if (prog > 0.55) {
+          const la = (prog - 0.55) / 0.45 * 0.05;
+          ctx.strokeStyle = `rgba(247,253,185,${la})`;
+          ctx.lineWidth = 0.5;
+          for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+              const a = particles[i], b = particles[j];
+              if (Math.hypot(a.drawX - b.drawX, a.drawY - b.drawY) < 90) {
+                ctx.beginPath();
+                ctx.moveTo(a.drawX, a.drawY);
+                ctx.lineTo(b.drawX, b.drawY);
+                ctx.stroke();
+              }
+            }
+          }
+        }
+
+        requestAnimationFrame(draw);
+      }
+
+      const heroObs = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !running) {
+          running = true;
+          requestAnimationFrame(draw);
+        } else if (!entry.isIntersecting) {
+          running = false;
+        }
+      }, { threshold: 0.05 });
+      heroObs.observe(canvas.parentElement);
+
+      init();
+      window.addEventListener('resize', init, { passive: true });
+    })();
+
+    // ====== CTC CIRCLE canvas (chaos → circle, with hero-like behavior) ======
+    (() => {
+      const canvas = document.getElementById('swarmCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const N = 90;
+      const DOT_SIZE = 2;
+      let W, H, dots, running = false;
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const rect = canvas.parentElement.getBoundingClientRect();
+        W = rect.width; H = rect.height;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function init() {
+        resize();
+        const circleCx = W * 0.5;
+        const circleCy = H * 0.5;
+        const radius = Math.min(W, H) * 0.4;
+        dots = [];
+        for (let i = 0; i < N; i++) {
+          const baseAngle = (i / N) * Math.PI * 2;
+          dots.push({
+            baseAngle,
+            circleCx, circleCy, radius,
+            // Chaotic start position
+            x: Math.random() * W,
+            y: Math.random() * H,
+            chaosVx: (Math.random() - 0.5) * 1.4,
+            chaosVy: (Math.random() - 0.5) * 1.4,
+          });
+        }
+      }
+
+      const GATHER  = 3000;
+      const SPIN    = 4000;
+      const SCATTER = 3200;
+      const HOLD2   = 0;
+      const TOTAL   = GATHER + SPIN + SCATTER + HOLD2;
+
+      function smoothstep(x) {
+        const c = Math.max(0, Math.min(1, x));
+        return c * c * (3 - 2 * c);
+      }
+
+      // Mouse repulsion (canvas-local)
+      let mouseX = -9999, mouseY = -9999;
+      const REPEL_RADIUS = 100;
+      const REPEL_FORCE = 25;
+      canvas.addEventListener('pointermove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+      });
+      canvas.addEventListener('pointerleave', () => {
+        mouseX = -9999; mouseY = -9999;
+      });
+      canvas.style.pointerEvents = 'auto';
+
+      function draw(time) {
+        if (!running) return;
+        ctx.clearRect(0, 0, W, H);
+        const phase = time % TOTAL;
+
+        let formProg, spinAngle;
+        if (phase < GATHER) {
+          formProg = smoothstep(phase / GATHER);
+          spinAngle = 0;
+        } else if (phase < GATHER + SPIN) {
+          formProg = 1;
+          spinAngle = smoothstep((phase - GATHER) / SPIN) * Math.PI * 2;
+        } else if (phase < GATHER + SPIN + SCATTER) {
+          formProg = 1 - smoothstep((phase - GATHER - SPIN) / SCATTER);
+          spinAngle = Math.PI * 2;
+        } else {
+          formProg = 0;
+          spinAngle = 0;
+        }
+
+        // Pass 1: compute final positions
+        for (const d of dots) {
+          // Chaos drift
+          d.x += d.chaosVx * (1 - formProg);
+          d.y += d.chaosVy * (1 - formProg);
+          if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
+          if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
+
+          // Circle target (with spin)
+          const cAngle = d.baseAngle + spinAngle;
+          const circX = d.circleCx + Math.cos(cAngle) * d.radius;
+          const circY = d.circleCy + Math.sin(cAngle) * d.radius;
+
+          let dx = d.x + (circX - d.x) * formProg;
+          let dy = d.y + (circY - d.y) * formProg;
+
+          // Mouse repulsion
+          const mdx = dx - mouseX;
+          const mdy = dy - mouseY;
+          const distSq = mdx * mdx + mdy * mdy;
+          if (distSq < REPEL_RADIUS * REPEL_RADIUS) {
+            const dist = Math.sqrt(distSq) || 1;
+            const falloff = 1 - dist / REPEL_RADIUS;
+            const force = falloff * falloff * REPEL_FORCE;
+            dx += (mdx / dist) * force;
+            dy += (mdy / dist) * force;
+          }
+
+          d.drawX = dx;
+          d.drawY = dy;
+          d.drawAlpha = 0.12 + formProg * 0.38;
+        }
+
+        // Pass 2: draw dots
+        for (const d of dots) {
+          ctx.beginPath();
+          ctx.arc(d.drawX, d.drawY, DOT_SIZE, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(247,253,185,${d.drawAlpha})`;
+          ctx.fill();
+        }
+
+        requestAnimationFrame(draw);
+      }
+
+      const ctcObs = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && !running) {
+          running = true;
+          requestAnimationFrame(draw);
+        } else if (!entry.isIntersecting) {
+          running = false;
+        }
+      }, { threshold: 0.05 });
+      ctcObs.observe(canvas.parentElement);
+
+      init();
+      window.addEventListener('resize', init, { passive: true });
+    })();
+
+  </script>
+
+</body>
+</html>
