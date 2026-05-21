@@ -1866,13 +1866,10 @@
  contactForm.reset();
  setStatus(T[lang].form_success, 'ok');
  } else {
- // DEBUG, show actual server response so we can see the underlying cause
- const debugInfo = `[${resp.status}] ${data.error || 'unknown'} :: ${data.detail || ''}`.slice(0, 500);
- setStatus(T[lang].form_error + ' ' + debugInfo, 'err');
- console.log('contact_form_debug', resp.status, data);
+ setStatus(T[lang].form_error, 'err');
  }
  } catch (err) {
- setStatus(T[lang].form_error + ' (' + (err.message || err) + ')', 'err');
+ setStatus(T[lang].form_error, 'err');
  } finally {
  submitBtn.disabled = false;
  submitBtn.textContent = labelDefault();

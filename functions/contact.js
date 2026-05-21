@@ -18,7 +18,7 @@
  *        - Change FROM_ADDRESS below to "hello@pietragottardo.com"
  */
 
-const FROM_ADDRESS = 'Portfolio <onboarding@resend.dev>';
+const FROM_ADDRESS = 'Pietra Gottardo <contact@pietragottardo.com>';
 const TO_ADDRESS   = 'pietragottardo@gmail.com';
 
 function escapeHtml(str = '') {
@@ -30,58 +30,14 @@ function escapeHtml(str = '') {
     .replace(/'/g, '&#39;');
 }
 
-// Diagnostic: GET /contact returns whether the function is alive and whether
-// the RESEND_API_KEY env var is wired up. Never leaks the key itself.
-// GET /contact?test=1 also fires a real send through Resend and returns the
-// full response from their API so we can see what's actually going wrong.
-export async function onRequestGet({ env, request }) {
-  const url = new URL(request.url);
-  const wantTest = url.searchParams.get('test') === '1';
-
-  const base = {
+// Lightweight health check at GET /contact, useful for sanity checks but
+// intentionally does not leak the API key or expose a send endpoint.
+export async function onRequestGet({ env }) {
+  return json({
     ok: true,
     function: 'contact',
-    runtime: 'cloudflare-pages-function',
-    resend_key_set: Boolean(env.RESEND_API_KEY),
-    resend_key_length: env.RESEND_API_KEY ? env.RESEND_API_KEY.length : 0,
-    resend_key_prefix: env.RESEND_API_KEY ? env.RESEND_API_KEY.slice(0, 4) : null,
-    timestamp: new Date().toISOString()
-  };
-
-  if (!wantTest) return json(base);
-  if (!env.RESEND_API_KEY) return json({ ...base, test: 'skipped, no key' });
-
-  try {
-    const resp = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        'authorization': `Bearer ${env.RESEND_API_KEY}`,
-        'content-type': 'application/json'
-      },
-      body: JSON.stringify({
-        from: FROM_ADDRESS,
-        to: [TO_ADDRESS],
-        subject: 'Diagnostic test from /contact?test=1',
-        text: 'If you got this, Resend is wired up correctly.'
-      })
-    });
-    const body = await resp.text();
-    return json({
-      ...base,
-      test: {
-        status: resp.status,
-        ok: resp.ok,
-        body
-      }
-    });
-  } catch (err) {
-    return json({
-      ...base,
-      test: {
-        threw: String(err && err.message || err)
-      }
-    });
-  }
+    resend_key_set: Boolean(env.RESEND_API_KEY)
+  });
 }
 
 export async function onRequestPost({ request, env }) {
@@ -156,19 +112,16 @@ export async function onRequestPost({ request, env }) {
       }, 502);
     }
 
-    const detail = await resp.text();
     if (!resp.ok) {
-      return json({ ok: false, error: 'send_failed', status: resp.status, detail }, 502);
+      const detail = await resp.text();
+      console.log('resend_failed', resp.status, detail);
+      return json({ ok: false, error: 'send_failed', status: resp.status }, 502);
     }
 
-    return json({ ok: true, resend: detail });
+    return json({ ok: true });
   } catch (err) {
-    return json({
-      ok: false,
-      error: 'handler_threw',
-      detail: String(err && err.message || err),
-      stack: String(err && err.stack || '').slice(0, 800)
-    }, 500);
+    console.log('handler_threw', err && err.stack || err);
+    return json({ ok: false, error: 'handler_threw' }, 500);
   }
 }
 
