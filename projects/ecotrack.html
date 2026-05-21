@@ -1,2733 +1,3004 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Straatos Application — Digital infrastructure for environmental and outdoor projects, from field data collection to credit issuance.">
-  <meta name="theme-color" content="#fcfcfc">
-  <title>Straatos Application — Case Study · Pietra Gottardo</title>
-  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
-  <link rel="apple-touch-icon" href="../favicon.svg">
-
-  <link rel="stylesheet" href="../assets/fonts/lausanne.css">
-
-  <style>
-    :root {
-      /* Gray True palette */
-      --gray-true-25:  #fcfcfc;
-      --gray-true-50:  #fafafa;
-      --gray-true-100: #f5f5f5;
-      --gray-true-200: #e5e5e5;
-      --gray-true-300: #d6d6d6;
-      --gray-true-400: #a3a3a3;
-      --gray-true-500: #737373;
-      --gray-true-600: #525252;
-      --gray-true-700: #424242;
-      --gray-true-800: #292929;
-      --gray-true-900: #141414;
-
-      /* Semantic */
-      --bg:       var(--gray-true-25);
-      --bg-alt:   var(--gray-true-100);
-      --surface:  #ffffff;
-      --text:     var(--gray-true-900);
-      --text-2:   var(--gray-true-500);
-      --text-3:   var(--gray-true-400);
-      --border:   var(--gray-true-200);
-
-      --accent: #3d5a3e;
-      --accent-light: #e8ede8;
-      --accent-yellow: #f7fdb9;
-      --accent-blue:   #c5e9ff;
-      --accent-pink:   #eee1ea;
-
-      --font: 'TWKLausanne', system-ui, sans-serif;
-      --mono: 'TWKLausanne', system-ui, sans-serif;
-      --ease: cubic-bezier(0.16, 1, 0.3, 1);
-
-      --section-py: clamp(4.5rem, 9vw, 7rem);
-      --section-gap: clamp(2.5rem, 5vw, 3.5rem);
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: var(--font);
-      font-size: 1rem;
-      line-height: 1.6;
-      color: var(--text);
-      background: var(--bg);
-      -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
-    }
-    a { color: inherit; text-decoration: none; }
-    a:focus-visible, button:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
-    }
-
-    /* Custom cursor */
-    .cursor {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: #fff;
-      mix-blend-mode: difference;
-      pointer-events: none;
-      z-index: 10000;
-      transform: translate3d(-100px, -100px, 0);
-      will-change: transform;
-      transition: width 0.35s var(--ease), height 0.35s var(--ease);
-    }
-    .cursor.active {
-      width: 64px; height: 64px;
-      mix-blend-mode: normal;
-      background: transparent;
-      backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
-      -webkit-backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
-      border: 1.5px solid rgba(255,255,255,0.6);
-      box-shadow:
-        0 0 0 1px rgba(0,0,0,0.06),
-        0 6px 20px rgba(0,0,0,0.12),
-        inset 0 2px 3px rgba(255,255,255,0.35),
-        inset 0 -2px 3px rgba(0,0,0,0.06);
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .cursor { display: block; }
-      html, body { cursor: none; }
-      a, button, input, textarea { cursor: none; }
-    }
-
-    /* Typography */
-    h1, h2, h3, h4 {
-      font-family: var(--font);
-      font-weight: 300;
-      line-height: 1.15;
-      color: var(--text);
-      letter-spacing: -0.02em;
-    }
-    h1 { font-size: clamp(2.25rem, 5.5vw, 4rem); line-height: 1.1; letter-spacing: -0.025em; }
-    h2 { font-size: clamp(1.875rem, 4vw, 2.75rem); }
-    h3 { font-size: 1.25rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; }
-
-    p { max-width: none; }
-
-    /* Same container as the landing page — keeps grid + gutters consistent across the site */
-    .wrap {
-      width: 100%;
-      max-width: clamp(72rem, 90vw, 110rem);
-      margin: 0 auto;
-      padding: 0 clamp(1.25rem, 4vw, 3rem);
-    }
-
-    .mono-label {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-    }
-
-    /* Reveal */
-    .r {
-      opacity: 0; transform: translateY(24px);
-      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
-    }
-    .r.v { opacity: 1; transform: none; }
-    .r-stagger > .r:nth-child(2) { transition-delay: 0.06s; }
-    .r-stagger > .r:nth-child(3) { transition-delay: 0.12s; }
-    .r-stagger > .r:nth-child(4) { transition-delay: 0.18s; }
-    .r-stagger > .r:nth-child(5) { transition-delay: 0.24s; }
-    .r-stagger > .r:nth-child(6) { transition-delay: 0.30s; }
-
-    /* Buttons */
-    .btn {
-      font-family: var(--font);
-      font-size: 0.875rem;
-      font-weight: 500;
-      padding: 0.875rem 1.5rem;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.35s var(--ease);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      line-height: 1;
-    }
-    .btn-primary { background: var(--text); color: var(--bg); }
-    .btn-primary:hover {
-      background: var(--accent-yellow);
-      color: var(--gray-true-900);
-    }
-    .btn-ghost {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-ghost:hover {
-      background: var(--accent-yellow);
-      color: var(--gray-true-900);
-      border-color: var(--accent-yellow);
-    }
-
-    /* ====== NAV ====== */
-    .nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(252,252,252,0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: box-shadow 0.4s var(--ease);
-    }
-    .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
-    .nav-inner {
-      display: flex; align-items: center; justify-content: space-between;
-      height: 60px;
-    }
-    .nav-logo {
-      font-family: var(--mono);
-      font-size: 0.8125rem;
-      font-weight: 500;
-      color: var(--text);
-    }
-    .nav-right { display: flex; align-items: center; gap: 2rem; }
-    .nav-links {
-      display: none; list-style: none;
-      gap: 1.75rem; align-items: center;
-    }
-    .nav-links a {
-      font-size: 0.8125rem; font-weight: 500;
-      color: var(--text-2);
-      transition: color 0.3s;
-    }
-    .nav-links a:hover { color: var(--text); }
-
-    .lang-toggle {
-      display: flex; gap: 0;
-      border: 1px solid var(--border); border-radius: 6px;
-      overflow: hidden;
-    }
-    .lang-btn {
-      font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
-      padding: 5px 10px; border: none; cursor: pointer;
-      background: transparent; color: var(--text-3);
-      transition: all 0.3s;
-    }
-    .lang-btn.active { background: var(--text); color: var(--bg); }
-
-    @media (min-width: 768px) {
-      .nav-links { display: flex; }
-    }
-
-    /* ====== CASE HERO ====== */
-    .case-hero {
-      padding: calc(60px + var(--section-py)) 0 var(--section-py);
-      position: relative;
-    }
-
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-2);
-      margin-bottom: 2rem;
-      transition: color 0.3s, gap 0.3s var(--ease);
-    }
-    .back-link:hover {
-      color: var(--text);
-      gap: 0.85rem;
-    }
-    .back-arrow {
-      display: inline-block;
-      font-family: var(--font);
-    }
-
-    .case-tag {
-      display: inline-block;
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--accent);
-      background: var(--accent-light);
-      padding: 5px 11px;
-      border-radius: 4px;
-      margin-bottom: 1.5rem;
-    }
-
-    .case-hero h1 {
-      margin-bottom: 1.5rem;
-      max-width: none;
-    }
-
-    .case-lead {
-      font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
-      line-height: 1.6;
-      color: var(--text-2);
-      max-width: none;
-      margin-bottom: 3.5rem;
-    }
-
-    /* Meta grid */
-    .case-meta {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem 2.5rem;
-      padding: 2rem 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      margin-bottom: var(--section-gap);
-    }
-    @media (min-width: 720px) {
-      .case-meta { grid-template-columns: repeat(4, 1fr); }
-    }
-    .case-meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .case-meta-label {
-      font-family: var(--mono);
-      font-size: 0.625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-    }
-    .case-meta-value {
-      font-size: 1rem;
-      font-weight: 500;
-      color: var(--text);
-      line-height: 1.4;
-    }
-
-    /* Hero mockup placeholder */
-    .case-hero-mockup {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-    .case-hero-mockup img {
-      width: 100%;
-      height: auto;
-      max-width: 100%;
-      display: block;
-    }
-    .case-hero-mockup--placeholder {
-      border: 1px solid var(--border);
-    }
-    .case-hero-mockup--placeholder::before {
-      content: '';
-      position: absolute;
-      width: 220px;
-      height: 220px;
-      background: var(--accent);
-      opacity: 0.08;
-      border-radius: 40% 60% 65% 35% / 40% 45% 55% 60%;
-      top: 15%;
-      left: 20%;
-      filter: blur(20px);
-    }
-    .case-hero-mockup--placeholder::after {
-      content: '';
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      background: var(--accent-yellow);
-      opacity: 0.3;
-      border-radius: 50%;
-      bottom: 15%;
-      right: 20%;
-      filter: blur(30px);
-    }
-    .mockup-caption {
-      position: relative;
-      z-index: 1;
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-3);
-      background: var(--surface);
-      padding: 0.5rem 1rem;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-    }
-
-    /* ====== CASE SECTIONS (shared) ====== */
-    .case-section {
-      padding: var(--section-py) 0;
-      position: relative;
-    }
-    .case-section--alt { background: var(--bg-alt); }
-    .case-section--dark {
-      background: var(--gray-true-900);
-      color: var(--gray-true-25);
-    }
-    .case-section--dark h2,
-    .case-section--dark h3 { color: var(--gray-true-25); }
-    .case-section--dark p { color: rgba(252,252,252,0.6); }
-    .case-section--dark .case-section-label { color: rgba(252,252,252,0.45); }
-
-    .case-section-header {
-      margin-bottom: var(--section-gap);
-    }
-    .case-section-label {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-      margin-bottom: 0.75rem;
-    }
-    .case-section h2 {
-      max-width: none;
-    }
-
-    /* ====== CHALLENGE / SOLUTION (2-col) ====== */
-    .cs-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 3rem;
-    }
-    @media (min-width: 820px) {
-      .cs-grid { grid-template-columns: 1fr 1fr; gap: 4rem; }
-    }
-    /* Stacked variant — text on top, full-width media below */
-    .cs-grid--stack { grid-template-columns: 1fr; }
-    @media (min-width: 820px) {
-      .cs-grid--stack { grid-template-columns: 1fr; gap: clamp(2.5rem, 5vw, 4rem); }
-    }
-    .cs-block h3 {
-      font-size: clamp(1.875rem, 4vw, 2.75rem);
-      font-weight: 300;
-      line-height: 1.15;
-      letter-spacing: -0.015em;
-      margin-bottom: 1rem;
-    }
-    .cs-block p {
-      color: var(--text-2);
-      font-size: 1rem;
-      line-height: 1.7;
-      margin-bottom: 1rem;
-    }
-    .cs-block p:last-child { margin-bottom: 0; }
-    .cs-block-label {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 0.75rem;
-      display: block;
-    }
-    .cs-block--challenge .cs-block-label { color: #b85c3f; }
-    .cs-block--solution .cs-block-label { color: var(--accent); }
-    .cs-block--phases .cs-block-label { color: var(--accent); }
-
-    /* Media at the bottom of each .cs-block (challenge/solution) */
-    .cs-block-media {
-      margin-top: clamp(1.5rem, 3vw, 2.25rem);
-      width: 100%;
-      aspect-ratio: 4 / 3;
-      border-radius: 14px;
-      overflow: hidden;
-      background: var(--bg-alt);
-    }
-    .cs-block-media img,
-    .cs-block-media video {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    /* ====== PHASES VIDEO (replaces the pill animation) ======
-       Scales with the surrounding text column (no fixed max-width). */
-    .phases-video-wrap {
-      width: 100%;
-      margin: 0;
-      border-radius: 12px;
-      overflow: hidden;
-      aspect-ratio: 1366 / 768;
-    }
-    .phases-video {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: cover;
-    }
-
-    /* ====== PHASE SLIDER (animated component) ====== */
-    .phase-slider {
-      --ps-pill-w: 110px;
-      --ps-pill-h: 380px;
-      --ps-row-h: 28px;
-      --ps-rise-ms: 1200ms;
-      --ps-face-ms: 600ms;
-      --ps-rise-ease: cubic-bezier(.22, 1, .36, 1);
-
-      --ps-track: #ECEEF1;
-      --ps-green: #6FCC8C;
-      --ps-lime:  #C8CF63;
-      --ps-amber: #F0A864;
-      --ps-coral: #ED7E5E;
-      --ps-red:   #E2574A;
-      --ps-mute:  #c5c9cf;
-
-      position: relative;
-      width: 100%;
-      max-width: 440px;
-      height: calc(var(--ps-pill-h) + 80px);
-      margin: 0 auto;
-      font-family: var(--font);
-    }
-    .phase-slider .ps-pill {
-      position: absolute;
-      left: 50%;
-      top: 40px;
-      transform: translateX(-50%);
-      width: var(--ps-pill-w);
-      height: var(--ps-pill-h);
-      border-radius: calc(var(--ps-pill-w) / 2);
-      background: var(--ps-track);
-      overflow: hidden;
-      z-index: 2;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(0,0,0,.02);
-    }
-    .phase-slider .ps-fill {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top,
-        var(--ps-green)  0%,
-        var(--ps-lime)   28%,
-        var(--ps-amber)  55%,
-        var(--ps-coral)  78%,
-        var(--ps-red)    100%);
-      clip-path: inset(100% 0 0 0);
-      transition: clip-path var(--ps-rise-ms) var(--ps-rise-ease);
-    }
-    .phase-slider .ps-meniscus {
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      height: var(--ps-pill-h);
-      pointer-events: none;
-      background: linear-gradient(to top,
-        rgba(255,255,255,0) calc(var(--m, 0%) - 4px),
-        rgba(255,255,255,.5)  var(--m, 0%),
-        rgba(255,255,255,0) calc(var(--m, 0%) + 4px));
-      transition: background var(--ps-rise-ms) var(--ps-rise-ease);
-      mix-blend-mode: overlay;
-      opacity: .8;
-    }
-    .phase-slider .ps-row {
-      position: absolute;
-      left: 0; right: 0;
-      height: var(--ps-row-h);
-      display: flex;
-      align-items: center;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .phase-slider .ps-face {
-      position: absolute;
-      left: calc(50% - var(--ps-pill-w)/2 - 14px);
-      width: 26px; height: 26px;
-      color: var(--ps-mute);
-      opacity: 0;
-      transform: translate(-100%, 6px) scale(.92);
-      transition: opacity .35s ease, transform .35s ease, color .35s ease;
-    }
-    .phase-slider .ps-label {
-      position: absolute;
-      left: calc(50% + var(--ps-pill-w)/2 + 24px);
-      font-size: 0.875rem;
-      letter-spacing: .005em;
-      color: var(--ps-mute);
-      white-space: nowrap;
-      opacity: 0;
-      transform: translateY(6px);
-      transition: opacity .35s ease, transform .35s ease, color .35s ease;
-    }
-    .phase-slider .ps-row[data-level="1"] { bottom: calc(40px + var(--ps-pill-h) * 0.06 - var(--ps-row-h)/2); }
-    .phase-slider .ps-row[data-level="2"] { bottom: calc(40px + var(--ps-pill-h) * 0.32 - var(--ps-row-h)/2); }
-    .phase-slider .ps-row[data-level="3"] { bottom: calc(40px + var(--ps-pill-h) * 0.56 - var(--ps-row-h)/2); }
-    .phase-slider .ps-row[data-level="4"] { bottom: calc(40px + var(--ps-pill-h) * 0.78 - var(--ps-row-h)/2); }
-    .phase-slider .ps-row[data-level="5"] { bottom: calc(40px + var(--ps-pill-h) * 0.96 - var(--ps-row-h)/2); }
-
-    .phase-slider .ps-row.is-active .ps-face {
-      opacity: 1;
-      transform: translate(-100%, 0) scale(1);
-      color: var(--accent);
-      transition:
-        opacity   var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms)),
-        transform var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms)),
-        color     var(--ps-face-ms) ease                calc(var(--ps-rise-ms) - var(--ps-face-ms));
-    }
-    .phase-slider .ps-row.is-active .ps-label {
-      opacity: 1;
-      transform: translateY(0);
-      color: var(--text);
-      font-weight: 500;
-      transition:
-        opacity   var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms) + 60ms),
-        transform var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms) + 60ms),
-        color     var(--ps-face-ms) ease                calc(var(--ps-rise-ms) - var(--ps-face-ms) + 60ms);
-    }
-    .phase-slider .ps-row.is-past .ps-face,
-    .phase-slider .ps-row.is-past .ps-label {
-      opacity: 1;
-      color: var(--ps-mute);
-      transition: opacity .4s ease, transform .4s ease, color .5s ease;
-    }
-    .phase-slider .ps-row.is-past .ps-face  { transform: translate(-100%, 0) scale(1); }
-    .phase-slider .ps-row.is-past .ps-label { transform: translateY(0); font-weight: 400; }
-
-    .phase-slider .ps-row[data-tone="green"] { --accent: var(--ps-green); }
-    .phase-slider .ps-row[data-tone="lime"]  { --accent: #b8b842; }
-    .phase-slider .ps-row[data-tone="amber"] { --accent: var(--ps-amber); }
-    .phase-slider .ps-row[data-tone="coral"] { --accent: var(--ps-coral); }
-    .phase-slider .ps-row[data-tone="red"]   { --accent: var(--ps-red); }
-
-    /* ====== VISUAL IDENTITY · BENTO (palette top, type+icons bottom) ====== */
-    .vis-bento {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: clamp(1rem, 2.5vw, 1.5rem);
-      margin-top: 2rem;
-    }
-    .vis-bento__bottom {
-      display: flex;
-      flex-direction: column;
-      gap: clamp(1rem, 2.5vw, 1.5rem);
-    }
-    @media (min-width: 820px) {
-      .vis-bento__bottom {
-        /* Explicit row height on the container — both children stretch to fill
-           it exactly, so the video and icons cards have identical heights. */
-        flex-direction: row;
-        align-items: stretch;
-        height: clamp(320px, 36vw, 620px);
-      }
-    }
-    .vis-bento__palette,
-    .vis-bento__type,
-    .vis-bento__icons {
-      position: relative;
-      border-radius: 18px;
-      overflow: hidden;
-    }
-    /* Palette — keeps its full content, no crop. Native aspect 5120/1961 ≈ 2.61. */
-    .vis-bento__palette {
-      aspect-ratio: 5120 / 1961;
-    }
-    .vis-bento__palette img {
-      width: 100%; height: 100%; object-fit: contain; display: block;
-    }
-    /* Typography — fills the bottom-row height, with video background */
-    .vis-bento__type {
-      flex: 1 1 auto;
-      min-width: 0;
-      height: 100%;
-    }
-    .vis-bento__type video {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    .vis-bento__type::after {
-      content: "";
-      position: absolute; inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.42));
-      pointer-events: none;
-    }
-    .vis-bento__type-overlay {
-      position: absolute; inset: 0;
-      padding: clamp(1.5rem, 3vw, 2.5rem);
-      pointer-events: none;
-      z-index: 2;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", "Helvetica Neue", Arial, sans-serif;
-      display: flex; flex-direction: column;
-    }
-    .vis-bento__type-tag {
-      align-self: flex-start;
-      font-family: var(--mono);
-      font-size: clamp(.6875rem, 1vw, .8125rem);
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.85);
-    }
-    .vis-bento__type-spec {
-      flex: 1;
-      display: flex; flex-direction: column;
-      justify-content: center; align-items: center;
-      text-align: center;
-      gap: clamp(.35rem, .8vw, .8rem);
-      text-shadow: 0 2px 22px rgba(0,0,0,.35);
-    }
-    .vis-bento__type-row {
-      line-height: 1;
-      font-weight: 500;
-      letter-spacing: -.005em;
-      font-size: clamp(1.5rem, 3.8vw, 3rem);
-    }
-    .vis-bento__type-row--lower { font-weight: 300; letter-spacing: -.01em; }
-    .vis-bento__type-row--num {
-      font-weight: 300;
-      font-size: clamp(1.25rem, 2.6vw, 2rem);
-      letter-spacing: 0.06em;
-      color: rgba(255,255,255,.9);
-    }
-    .vis-bento__type-meta {
-      align-self: flex-end;
-      text-align: right;
-      font-family: var(--mono);
-      font-size: clamp(.625rem, .9vw, .75rem);
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,.75);
-      line-height: 1.5;
-    }
-    .vis-bento__type-meta b {
-      display: block;
-      font-weight: 600;
-      font-size: clamp(.8125rem, 1.2vw, 1rem);
-      letter-spacing: -.005em;
-      text-transform: none;
-      color: #fff;
-      margin-bottom: 2px;
-    }
-    /* Icons — already styled in the PNG (peach background + rounded corners).
-       Card matches the asset's native aspect so no side gaps appear. */
-    .vis-bento__icons {
-      flex: 0 0 auto;
-      height: 100%;
-      aspect-ratio: 1536 / 2016;
-      border-radius: 0;
-    }
-    .vis-bento__icons img {
-      width: 100%; height: 100%; object-fit: contain; display: block;
-    }
-
-    /* ====== APPLICATION · STACKED MOCKUPS ====== */
-    .app-stack {
-      margin-top: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: clamp(2.5rem, 5vw, 4rem);
-    }
-    .app-shot {
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 0.875rem;
-    }
-    .app-shot img {
-      width: 100%;
-      max-width: 100%;
-      display: block;
-      border-radius: 14px;
-    }
-    .app-shot figcaption {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-3);
-      margin: 0;
-    }
-    @media (max-width: 640px) {
-      .app-shot { gap: 0.625rem; }
-      .app-shot figcaption {
-        font-size: 0.5625rem;
-        letter-spacing: 0.1em;
-        line-height: 1.4;
-      }
-    }
-    /* Embedded composition (iframe) — same outer treatment as .app-shot img */
-    .app-shot--embed .embed-frame {
-      position: relative;
-      width: 100%;
-      overflow: hidden;
-      background: transparent;
-    }
-    .app-shot--embed .embed-iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-      background: transparent;
-    }
-    /* Gray background variant — matches the section-alt color used elsewhere */
-    .app-shot--bg .embed-frame {
-      background: var(--bg-alt);
-      border-radius: 14px;
-    }
-    /* Full-bleed gray bg — escapes the .wrap so the gray stretches edge-to-edge
-       like 'The Challenge' section. The iframe stays at .wrap content width. */
-    .app-shot--bg-full {
-      width: 100vw;
-      margin-left: calc(50% - 50vw);
-      margin-right: calc(50% - 50vw);
-      background: var(--bg-alt);
-      padding: clamp(1.25rem, 2.5vw, 2rem) clamp(1.25rem, 4vw, 3rem);
-    }
-    /* Same full-bleed gray background but holding a static image instead of an embed. */
-    .app-shot--bg-full > img {
-      display: block;
-      width: 100%;
-      max-width: calc(clamp(72rem, 90vw, 110rem) - 2 * clamp(1.25rem, 4vw, 3rem));
-      margin: 0 auto;
-      height: auto;
-    }
-    .app-shot--bg-full .embed-frame {
-      width: 100%;
-      /* Wrap content width = wrap max-width minus the wrap's horizontal padding.
-         Matches the width of regular .app-shot figures inside .wrap. */
-      max-width: calc(clamp(72rem, 90vw, 110rem) - 2 * clamp(1.25rem, 4vw, 3rem));
-      margin: 0 auto;
-      background: transparent;
-    }
-    .app-shot--bg-full figcaption {
-      max-width: calc(clamp(72rem, 90vw, 110rem) - 2 * clamp(1.25rem, 4vw, 3rem));
-      margin: 0 auto;
-    }
-    /* Left-bleed variant — escapes the .wrap left padding so the asset
-       visually touches the left edge of the viewport. Right padding stays. */
-    .app-shot--bleed-left {
-      margin-left: calc(-1 * clamp(1.25rem, 4vw, 3rem));
-    }
-    .app-shot--bleed-left .embed-frame {
-      width: calc(100% + clamp(1.25rem, 4vw, 3rem));
-    }
-
-    /* Video-bg variant — looping video behind a foreground composition image */
-    .app-shot--video-bg .video-bg-frame {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 5073 / 3718;        /* matches the foreground PNG */
-      border-radius: 28px;
-      overflow: hidden;
-      background: #0e1418;
-    }
-    .app-shot--video-bg .video-bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-    }
-    .app-shot--video-bg .video-bg-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(10, 18, 24, 0.35), rgba(10, 18, 24, 0.50));
-      z-index: 1;
-      pointer-events: none;
-    }
-    .app-shot--video-bg .video-bg-fg {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      padding: clamp(2rem, 5vw, 6rem);
-    }
-
-    /* Foreground video over the bg water video — rounded corners + soft shadow.
-       Keeps full width (no horizontal crop) and crops excess height. */
-    .app-shot--video-bg .video-bg-fg.ipad-fg {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      object-fit: unset;
-    }
-    .app-shot--video-bg .fg-video-card {
-      position: relative;
-      width: 100%;
-      max-height: 100%;
-      border-radius: clamp(14px, 1.4vw, 22px);
-      overflow: hidden;
-      box-shadow:
-        0 30px 60px -20px rgba(8, 16, 24, 0.55),
-        0 12px 24px -10px rgba(8, 16, 24, 0.35),
-        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-    }
-    .app-shot--video-bg .fg-video-card video {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    /* Pair variant — two side-by-side cards (phone + map/video) */
-    .app-pair {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      gap: clamp(1rem, 2.5vw, 1.5rem);
-    }
-    @media (min-width: 780px) {
-      .app-pair {
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        /* explicit row height forces both cells to identical dimensions
-           regardless of each image/video's intrinsic size */
-        grid-auto-rows: clamp(280px, 34vw, 560px);
-      }
-    }
-    .app-pair__cell {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      border-radius: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .app-pair__cell--phone {
-      background: transparent;
-    }
-    .app-pair__cell--phone img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .app-pair__cell--polygon video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    /* ====== IDENTITY CAROUSEL ====== */
-    .id-car {
-      position: relative;
-      margin-top: 3rem;
-    }
-    /* Track stays INSIDE the .wrap grid — slides overflow horizontally
-       within the grid, so the next slide peeks at the right edge. */
-    .id-car-track {
-      display: flex;
-      align-items: stretch;
-      gap: clamp(1.25rem, 2vw, 2rem);
-      overflow-x: auto;
-      scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      scroll-padding-left: 0;
-      padding: 8px 0 2.25rem;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: thin;
-      scrollbar-color: var(--gray-true-300, #d6d6d6) transparent;
-    }
-    .id-car-track::-webkit-scrollbar { height: 6px; }
-    .id-car-track::-webkit-scrollbar-track { background: transparent; }
-    .id-car-track::-webkit-scrollbar-thumb {
-      background: var(--gray-true-300, #d6d6d6);
-      border-radius: 4px;
-    }
-    .id-car-track::-webkit-scrollbar-thumb:hover { background: var(--gray-true-400, #a3a3a3); }
-
-    /* All slides share the same height — width follows each image's natural aspect.
-       No max-width cap: wide slides (palette) keep their full size so the track
-       scrolls horizontally to reveal the entire content. */
-    .id-car-slide {
-      flex: 0 0 auto;
-      height: clamp(340px, 52vh, 620px);
-      max-width: 88%;            /* leaves a slim peek for the next slide */
-      scroll-snap-align: start;
-      display: block;
-      border-radius: 18px;
-      overflow: hidden;
-      background: transparent;
-    }
-    .id-car-slide img,
-    .id-car-slide video {
-      height: 100%;
-      width: auto;
-      display: block;
-      object-fit: contain;
-    }
-    /* Palette keeps its full content — no cropping. */
-    .id-car-slide--palette img { object-fit: contain; }
-    /* Bare variant — keep the icon image at natural aspect, no card chrome */
-    .id-car-slide--bare {
-      border-radius: 0;
-      overflow: visible;
-    }
-
-    /* slide variant with media + overlay text (e.g. type specimen on video) */
-    .id-car-slide--overlay {
-      position: relative;
-    }
-    .id-car-slide--overlay video,
-    .id-car-slide--overlay img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;                   /* fill the slide so text always sits on a backdrop */
-    }
-    /* darkening scrim — even, slight darken so the family stays legible */
-    .id-car-slide--overlay::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,.22) 0%, rgba(0,0,0,.42) 100%);
-      pointer-events: none;
-    }
-    .id-car-slide__type {
-      position: absolute;
-      inset: 0;
-      padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.5rem, 3.5vw, 3rem);
-      pointer-events: none;
-      z-index: 2;
-      color: #fff;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", "Helvetica Neue", Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* top-left editorial tag — sits over the video */
-    .id-car-slide__type-tag {
-      align-self: flex-start;
-      font-family: var(--mono);
-      font-size: clamp(.6875rem, 1vw, .8125rem);
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, .85);
-      mix-blend-mode: difference;
-    }
-
-    /* bottom-right meta line — typeface name + tiny caption */
-    .id-car-slide__type-meta {
-      position: absolute;
-      right: clamp(1.5rem, 3.5vw, 3rem);
-      bottom: clamp(1.5rem, 3.5vw, 3rem);
-      text-align: right;
-      font-family: var(--mono);
-      font-size: clamp(.6875rem, 1vw, .8125rem);
-      font-weight: 500;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, .75);
-      line-height: 1.5;
-    }
-    .id-car-slide__type-meta b {
-      display: block;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", sans-serif;
-      font-weight: 600;
-      font-size: clamp(.875rem, 1.4vw, 1.125rem);
-      letter-spacing: -.005em;
-      text-transform: none;
-      color: #fff;
-      margin-bottom: 2px;
-    }
-
-    /* the specimen itself — centered, dominant, shows the family */
-    .id-car-slide__type-spec {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      gap: clamp(.4rem, .8vw, 1rem);
-      text-shadow: 0 2px 24px rgba(0, 0, 0, .35);
-    }
-    .id-car-slide__type-row {
-      font-weight: 500;
-      letter-spacing: -.005em;
-      line-height: 1;
-    }
-    .id-car-slide__type-row--caps {
-      font-size: clamp(1.5rem, 3.8vw, 3.5rem);
-      letter-spacing: 0.005em;
-    }
-    .id-car-slide__type-row--lower {
-      font-size: clamp(1.5rem, 3.8vw, 3.5rem);
-      font-weight: 300;
-      letter-spacing: -.01em;
-    }
-    .id-car-slide__type-row--num {
-      font-size: clamp(1rem, 2.2vw, 1.875rem);
-      font-weight: 200;
-      letter-spacing: 0.04em;
-      color: rgba(255, 255, 255, .85);
-      margin-top: clamp(.4rem, 1vw, 1rem);
-    }
-    /* fallback look for placeholder slides without an <img> */
-    .id-car-slide[data-placeholder] {
-      width: clamp(360px, 60vw, 720px);
-      max-width: 92vw;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-3);
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      background: repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 8px, #fafafa 8px, #fafafa 16px);
-    }
-
-    /* on narrow viewports, anchor by width instead of height — avoids the wide
-       palette image dictating an absurd slide width when the screen is small */
-    @media (max-width: 900px) {
-      .id-car-slide {
-        height: auto;
-        width: 88vw;
-        max-width: 88vw;
-        aspect-ratio: 16 / 10;
-      }
-      .id-car-slide img,
-      .id-car-slide video {
-        width: 100%;
-        height: 100%;
-        max-width: 100%;
-        object-fit: contain;
-      }
-      .id-car-slide[data-placeholder] {
-        width: 88vw;
-        aspect-ratio: 16 / 10;
-      }
-      .id-car-slide--overlay video,
-      .id-car-slide--overlay img { object-fit: cover; }
-    }
-
-    /* nav controls */
-    .id-car-controls {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      margin-top: 1.5rem;
-    }
-    .id-car-counter {
-      font-family: var(--mono);
-      font-size: 0.75rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-3);
-      white-space: nowrap;
-    }
-    .id-car-counter .num-current { color: var(--text); font-size: 0.9375rem; }
-    .id-car-buttons {
-      display: flex;
-      gap: 0.625rem;
-    }
-    .id-car-btn {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      color: var(--text);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background .2s ease, border-color .2s ease, transform .2s ease, color .2s ease, opacity .2s ease;
-    }
-    .id-car-btn:hover { background: var(--accent-yellow, #f7fdb9); border-color: var(--text); }
-    .id-car-btn:active { transform: scale(.94); }
-    .id-car-btn[disabled] { opacity: .3; cursor: not-allowed; }
-    .id-car-btn[disabled]:hover { background: var(--surface); border-color: var(--border); }
-    .id-car-btn svg { width: 20px; height: 20px; }
-
-    @media (max-width: 720px) {
-      .id-car-slide { border-radius: 16px; }
-      .id-car-slide__body { padding: 1.5rem 1.5rem 1.75rem; }
-      .id-car-btn { width: 44px; height: 44px; }
-      .id-car-btn svg { width: 16px; height: 16px; }
-    }
-
-    /* ====== RESEARCH ====== */
-    .research-layout {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 3rem;
-      align-items: start;
-    }
-    @media (min-width: 900px) {
-      .research-layout { grid-template-columns: 1.1fr 0.9fr; gap: 4rem; }
-    }
-    .research-text p {
-      color: var(--text-2);
-      line-height: 1.7;
-      margin-bottom: 1.25rem;
-    }
-    .research-list {
-      list-style: none;
-      padding: 0;
-      margin-top: 1.5rem;
-    }
-    .research-list li {
-      padding: 0.75rem 0;
-      border-top: 1px solid var(--border);
-      font-size: 0.9375rem;
-      color: var(--text);
-      display: flex;
-      align-items: baseline;
-      gap: 0.75rem;
-    }
-    .research-list li:last-child { border-bottom: 1px solid var(--border); }
-    .research-list li::before {
-      content: '';
-      display: inline-block;
-      width: 6px; height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      flex-shrink: 0;
-      transform: translateY(-2px);
-    }
-    .research-visual {
-      background: var(--bg-alt);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      aspect-ratio: 4 / 5;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-      padding: 1.5rem;
-    }
-    .research-visual::before {
-      content: '';
-      position: absolute;
-      width: 70%; height: 70%;
-      top: 10%; left: 15%;
-      background: var(--accent);
-      opacity: 0.1;
-      border-radius: 45% 55% 60% 40% / 50% 40% 60% 50%;
-      filter: blur(30px);
-    }
-    .placeholder-caption {
-      position: relative;
-      z-index: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.875rem 1rem;
-      max-width: 100%;
-    }
-    .placeholder-caption-label {
-      font-family: var(--mono);
-      font-size: 0.625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    /* Data flow diagram — sources converging into Guardian form */
-    .research-visual--diagram {
-      align-items: stretch;
-      padding: 1.75rem 1.5rem;
-    }
-    .data-flow {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.875rem;
-    }
-    .data-flow-label {
-      font-family: var(--mono);
-      font-size: 0.5625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-3);
-      text-align: center;
-      margin-bottom: 0.25rem;
-    }
-    .data-sources {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-    .data-source {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 0.75rem;
-      align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.625rem 0.875rem;
-    }
-    .data-source-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .data-source--whatsapp .data-source-dot { background: #25d366; }
-    .data-source--kobo     .data-source-dot { background: #4a90c2; }
-    .data-source--email    .data-source-dot { background: #d4a37a; }
-    .data-source--sheets   .data-source-dot { background: #c2b03a; }
-    .data-source--photos   .data-source-dot { background: #b85c8b; }
-
-    .data-source-text {
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-      min-width: 0;
-    }
-    .data-source-name {
-      font-family: var(--mono);
-      font-size: 0.625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text);
-    }
-    .data-source-meta {
-      font-size: 0.6875rem;
-      color: var(--text-2);
-      line-height: 1.35;
-    }
-
-    .data-flow-funnel {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.25rem 0;
-    }
-    .data-flow-funnel svg {
-      width: 60%;
-      height: 28px;
-      display: block;
-    }
-
-    .data-flow-output {
-      background: var(--gray-true-900);
-      color: var(--gray-true-25);
-      border-radius: 8px;
-      padding: 0.875rem 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .data-flow-output-name {
-      font-size: 0.8125rem;
-      font-weight: 500;
-      color: var(--gray-true-25);
-      letter-spacing: -0.005em;
-    }
-    .data-flow-output-meta {
-      font-family: var(--mono);
-      font-size: 0.5625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: rgba(252,252,252,0.55);
-    }
-
-    /* Before state — fragmented, broken flow */
-    .data-source--broken {
-      border-style: dashed;
-      border-color: var(--gray-true-300);
-      opacity: 0.85;
-    }
-    .data-flow-warning {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 0.75rem;
-      background: #fef3ec;
-      border: 1px dashed #d4a37a;
-      border-radius: 6px;
-      font-family: var(--mono);
-      font-size: 0.5625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: #a04e2f;
-    }
-    .data-flow-warning-icon {
-      font-style: normal;
-      font-size: 0.75rem;
-    }
-    .data-flow-output--warn {
-      background: transparent;
-      border: 1px dashed var(--gray-true-300);
-      color: var(--text);
-    }
-    .data-flow-output--warn .data-flow-output-name {
-      color: var(--text-2);
-      text-decoration: line-through;
-      text-decoration-color: var(--gray-true-300);
-    }
-    .data-flow-output--warn .data-flow-output-meta {
-      color: #a04e2f;
-    }
-
-    .placeholder-caption-text {
-      font-size: 0.8125rem;
-      color: var(--text-2);
-      line-height: 1.5;
-    }
-
-    /* ====== INSIGHTS ====== */
-    /* Insights section — video background with dark overlay */
-    .case-section--insights {
-      position: relative;
-      overflow: hidden;
-      color: #fff;
-      background: #0e1418;
-    }
-    .case-section--insights .insights-bg {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: 0;
-    }
-    .case-section--insights .insights-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(10, 18, 24, 0.72) 0%, rgba(10, 18, 24, 0.62) 50%, rgba(10, 18, 24, 0.78) 100%);
-      z-index: 1;
-      pointer-events: none;
-    }
-    .case-section--insights > .wrap {
-      position: relative;
-      z-index: 2;
-    }
-    .case-section--insights .case-section-label {
-      color: rgba(255, 255, 255, 0.7);
-    }
-    .case-section--insights h2 {
-      color: #fff;
-    }
-
-    .insights-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-    }
-    @media (min-width: 780px) {
-      .insights-grid {
-        grid-template-columns: repeat(3, 1fr);
-        gap: clamp(1.25rem, 2vw, 1.75rem);
-        align-items: stretch;
-      }
-    }
-    .insight-item {
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      background: #ffffff;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: clamp(1.75rem, 2.75vw, 2.5rem);
-      box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
-      transition: transform .35s var(--ease, cubic-bezier(0.16, 1, 0.3, 1)),
-                  border-color .35s ease,
-                  box-shadow .35s ease;
-    }
-    .insight-item::before {
-      content: "";
-      position: absolute;
-      top: 0; left: clamp(1.75rem, 2.75vw, 2.5rem);
-      width: 28px; height: 2px;
-      background: var(--accent);
-      border-radius: 0 0 2px 2px;
-      opacity: 0.85;
-    }
-    .insight-item:hover {
-      transform: translateY(-4px);
-      border-color: var(--gray-true-300, #d6d6d6);
-      box-shadow: 0 16px 36px -18px rgba(15, 23, 42, 0.18),
-                  0 2px 6px -2px rgba(15, 23, 42, 0.06);
-    }
-    .insight-num { display: none; }
-    .insight-content h3 {
-      font-size: clamp(1.125rem, 1.5vw, 1.375rem);
-      font-weight: 500;
-      line-height: 1.3;
-      letter-spacing: -0.012em;
-      margin-bottom: 0.9rem;
-      color: var(--text);
-    }
-    .insight-content p {
-      color: var(--text-2);
-      font-size: 0.9375rem;
-      line-height: 1.65;
-      max-width: none;
-      flex: 1;
-    }
-
-    /* ====== PRINCIPLES ====== */
-    .principles-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-    @media (min-width: 700px) {
-      .principles-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (min-width: 1000px) {
-      .principles-grid { grid-template-columns: repeat(4, 1fr); }
-    }
-    .principle-card {
-      padding: 2rem 1.75rem;
-      border-radius: 12px;
-      background: rgba(252,252,252,0.03);
-      border: 1px solid rgba(252,252,252,0.12);
-    }
-    .principle-num {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      color: rgba(252,252,252,0.5);
-      margin-bottom: 1.25rem;
-      display: block;
-    }
-    .principle-card h3 {
-      font-size: 1.125rem;
-      font-weight: 500;
-      line-height: 1.35;
-      letter-spacing: -0.01em;
-      margin-bottom: 0.75rem;
-    }
-    .principle-card p {
-      font-size: 0.875rem;
-      line-height: 1.6;
-      color: rgba(252,252,252,0.55);
-    }
-
-    /* ====== REUSABLE PLACEHOLDER SYSTEM ====== */
-    .ph {
-      background: var(--bg-alt);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: flex-end;
-      padding: 1.25rem;
-    }
-    .ph--16x9 { aspect-ratio: 16 / 9; }
-    .ph--4x3  { aspect-ratio: 4 / 3; }
-    .ph--3x4  { aspect-ratio: 3 / 4; }
-    .ph--1x1  { aspect-ratio: 1 / 1; }
-    .ph--3x2  { aspect-ratio: 3 / 2; }
-
-    .ph::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      opacity: 0.12;
-      filter: blur(30px);
-      pointer-events: none;
-    }
-    .ph--green::before {
-      background: radial-gradient(circle at 30% 40%, var(--accent), transparent 60%);
-    }
-    .ph--yellow::before {
-      background: radial-gradient(circle at 70% 60%, var(--accent-yellow), transparent 60%);
-      opacity: 0.4;
-    }
-    .ph--blue::before {
-      background: radial-gradient(circle at 40% 30%, var(--accent-blue), transparent 60%);
-      opacity: 0.5;
-    }
-    .ph--pink::before {
-      background: radial-gradient(circle at 60% 50%, var(--accent-pink), transparent 60%);
-      opacity: 0.5;
-    }
-    .ph--warn::before {
-      background: radial-gradient(circle at 50% 50%, #d4a37a, transparent 60%);
-      opacity: 0.25;
-    }
-
-    /* Grid lines decoration */
-    .ph--grid::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(20,20,20,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(20,20,20,0.04) 1px, transparent 1px);
-      background-size: 32px 32px;
-      pointer-events: none;
-    }
-
-    .ph-caption {
-      position: relative;
-      z-index: 1;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.75rem 0.9rem;
-      max-width: 340px;
-      box-shadow: 0 4px 12px rgba(20,20,20,0.04);
-    }
-    .ph-caption-label {
-      font-family: var(--mono);
-      font-size: 0.625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-      display: block;
-      margin-bottom: 0.25rem;
-    }
-    .ph-caption-text {
-      font-size: 0.8125rem;
-      color: var(--text-2);
-      line-height: 1.45;
-    }
-
-    /* ====== BEFORE / AFTER ====== */
-    .ba-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    @media (min-width: 820px) {
-      .ba-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
-    }
-    .ba-block {
-      display: flex;
-      flex-direction: column;
-      gap: 1.25rem;
-    }
-    .ba-tag {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      padding: 4px 10px;
-      border-radius: 4px;
-      align-self: flex-start;
-    }
-    .ba-tag--before {
-      color: #a04e2f;
-      background: #f5e4db;
-    }
-    .ba-tag--after {
-      color: var(--accent);
-      background: var(--accent-light);
-    }
-    .ba-block h3 {
-      font-size: 1.25rem;
-      font-weight: 500;
-      letter-spacing: -0.01em;
-    }
-    .ba-block p {
-      font-size: 0.9375rem;
-      color: var(--text-2);
-      line-height: 1.65;
-    }
-
-    /* ====== UX PROCESS GALLERY ====== */
-    .process-gallery {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
-    }
-    @media (min-width: 700px) {
-      .process-gallery {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-    @media (min-width: 1000px) {
-      .process-gallery {
-        grid-template-columns: repeat(6, 1fr);
-        grid-auto-rows: minmax(180px, auto);
-      }
-      /* Asymmetric spans for visual rhythm */
-      .process-gallery > .process-item:nth-child(1) { grid-column: span 4; }
-      .process-gallery > .process-item:nth-child(2) { grid-column: span 2; }
-      .process-gallery > .process-item:nth-child(3) { grid-column: span 2; }
-      .process-gallery > .process-item:nth-child(4) { grid-column: span 2; }
-      .process-gallery > .process-item:nth-child(5) { grid-column: span 2; }
-      .process-gallery > .process-item:nth-child(6) { grid-column: span 3; }
-      .process-gallery > .process-item:nth-child(7) { grid-column: span 3; }
-    }
-    .process-item {
-      display: flex;
-      flex-direction: column;
-      gap: 0.875rem;
-    }
-    .process-item .ph {
-      flex: 1;
-      min-height: 180px;
-    }
-    .process-item-label {
-      font-family: var(--mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-    }
-    .process-item-title {
-      font-size: 0.9375rem;
-      font-weight: 500;
-      color: var(--text);
-      letter-spacing: -0.005em;
-    }
-
-    /* ====== DESIGN EXPLORATIONS ====== */
-    .explore-intro {
-      font-size: 1rem;
-      color: var(--text-2);
-      line-height: 1.7;
-      max-width: none;
-      margin-top: 0.75rem;
-    }
-    .explore-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-    @media (min-width: 700px) {
-      .explore-grid { grid-template-columns: repeat(3, 1fr); gap: 1.75rem; }
-    }
-    .explore-item {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .explore-num {
-      font-family: var(--mono);
-      font-size: 0.625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.14em;
-      color: var(--text-3);
-    }
-    .explore-item h3 {
-      font-size: 1.0625rem;
-      font-weight: 500;
-      letter-spacing: -0.005em;
-    }
-    .explore-item p {
-      font-size: 0.875rem;
-      color: var(--text-2);
-      line-height: 1.65;
-    }
-
-    /* ====== FINAL PRODUCT GALLERY ====== */
-    .gallery-hero { margin-bottom: 1.5rem; }
-    .gallery-detail {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
-    @media (min-width: 700px) {
-      .gallery-detail { grid-template-columns: 1fr 1fr; }
-    }
-    .gallery-mobile {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.25rem;
-    }
-    @media (min-width: 700px) {
-      .gallery-mobile { grid-template-columns: repeat(4, 1fr); }
-    }
-    .gallery-caption {
-      font-family: var(--mono);
-      font-size: 0.625rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-3);
-      margin-top: 0.625rem;
-      display: block;
-    }
-
-    /* ====== MOCKUP UI SYSTEM ====== */
-    .mock-browser {
-      background: #fff;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
-      font-family: var(--font);
-    }
-    .mock-bar {
-      display: flex; align-items: center; gap: 6px;
-      padding: 8px 12px;
-      background: var(--gray-true-100);
-      border-bottom: 1px solid var(--border);
-    }
-    .mock-dots { display: flex; gap: 5px; }
-    .mock-dots i { width: 7px; height: 7px; border-radius: 50%; display: block; font-style: normal; }
-    .mock-dots i:nth-child(1) { background: #ff5f57; }
-    .mock-dots i:nth-child(2) { background: #ffbd2e; }
-    .mock-dots i:nth-child(3) { background: #28c840; }
-    .mock-url {
-      flex: 1; margin-left: 8px;
-      background: #fff; border-radius: 4px;
-      padding: 3px 8px;
-      font-size: 0.5rem; color: var(--text-3);
-      font-family: var(--mono); letter-spacing: 0.02em;
-    }
-
-    .mock-app {
-      display: grid;
-      grid-template-columns: 160px 1fr;
-      min-height: 340px;
-    }
-    @media (max-width: 600px) {
-      .mock-app { grid-template-columns: 1fr; }
-      .mock-side { display: none; }
-    }
-
-    /* Sidebar */
-    .mock-side {
-      background: #0d2b2e; color: rgba(255,255,255,0.65);
-      padding: 12px 0; font-size: 0.5625rem;
-      display: flex; flex-direction: column;
-    }
-    .mock-side-logo {
-      padding: 2px 14px 10px;
-      font-weight: 700; font-size: 0.6875rem;
-      color: #fff; letter-spacing: -0.02em;
-      font-style: italic;
-    }
-    .mock-side-sec {
-      padding: 10px 14px 3px;
-      font-size: 0.4375rem; text-transform: uppercase;
-      letter-spacing: 0.1em; color: rgba(255,255,255,0.3);
-    }
-    .mock-side-item {
-      padding: 5px 14px; font-size: 0.5625rem;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .mock-side-item--on {
-      background: rgba(255,255,255,0.12); color: #fff;
-      border-radius: 0 4px 4px 0; margin-right: 6px;
-    }
-    .mock-side-dot {
-      width: 4px; height: 4px; border-radius: 50%;
-      background: currentColor; opacity: 0.5;
-    }
-
-    /* Content area */
-    .mock-body {
-      padding: 14px 16px; background: #f8f9fa;
-      overflow: hidden; font-size: 0.5625rem; color: var(--text);
-    }
-    .mock-breadcrumb {
-      font-size: 0.4375rem; color: var(--text-3);
-      margin-bottom: 4px; font-family: var(--mono);
-      letter-spacing: 0.04em;
-    }
-    .mock-title {
-      font-size: 0.75rem; font-weight: 600;
-      margin-bottom: 10px; letter-spacing: -0.01em;
-    }
-
-    /* Metric cards */
-    .mock-metrics { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-    .mock-m {
-      flex: 1; min-width: 60px;
-      background: #fff; border-radius: 5px;
-      padding: 8px 10px; border: 1px solid #eee;
-    }
-    .mock-m-label {
-      font-size: 0.375rem; text-transform: uppercase;
-      letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 3px;
-    }
-    .mock-m-val { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
-    .mock-m-delta {
-      font-size: 0.375rem; margin-top: 2px;
-    }
-    .mock-m-delta--up { color: #28a745; }
-    .mock-m-delta--down { color: #dc3545; }
-
-    /* Map */
-    .mock-map {
-      background: linear-gradient(145deg, #d4e8df, #a8d5c2 40%, #7ec4a5 70%, #5aad8a);
-      border-radius: 5px; height: 110px;
-      position: relative; margin-bottom: 10px;
-      overflow: hidden;
-    }
-    .mock-map-pin {
-      position: absolute; width: 8px; height: 8px;
-      background: #e74c3c; border-radius: 50%;
-      border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-    .mock-map-overlay {
-      position: absolute; top: 6px; right: 6px;
-      background: rgba(255,255,255,0.92); border-radius: 4px;
-      padding: 5px 8px; font-size: 0.4375rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
-    }
-    .mock-map-overlay b { display: block; font-size: 0.5rem; }
-
-    /* Table */
-    .mock-tbl {
-      width: 100%; border-collapse: collapse;
-      background: #fff; border-radius: 5px;
-      overflow: hidden; border: 1px solid #eee;
-    }
-    .mock-tbl th {
-      text-align: left; padding: 6px 8px;
-      background: #f8f9fa; font-weight: 600;
-      font-size: 0.375rem; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--text-3);
-      border-bottom: 1px solid #eee;
-    }
-    .mock-tbl td {
-      padding: 5px 8px; border-bottom: 1px solid #f5f5f5;
-      font-size: 0.5rem; color: var(--text);
-    }
-    .mock-badge {
-      display: inline-block; padding: 1px 5px;
-      border-radius: 3px; font-size: 0.375rem;
-      font-weight: 600;
-    }
-    .mock-badge--green { background: #e6f7ee; color: #1a7f43; }
-    .mock-badge--yellow { background: #fef7e0; color: #9a7b1a; }
-    .mock-badge--blue { background: #e8f0fe; color: #1a5fb4; }
-
-    /* Charts */
-    .mock-chart {
-      background: #fff; border-radius: 5px;
-      border: 1px solid #eee; padding: 10px;
-      margin-bottom: 10px;
-    }
-    .mock-chart-title {
-      font-size: 0.4375rem; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.06em;
-      color: var(--text-3); margin-bottom: 8px;
-    }
-    .mock-chart-bars { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
-    .mock-chart-bar {
-      flex: 1; background: #0d2b2e; border-radius: 2px 2px 0 0;
-      min-width: 6px; transition: height 0.3s;
-    }
-    .mock-chart-bar--accent { background: var(--accent-yellow); }
-    .mock-chart-line {
-      height: 60px; position: relative;
-    }
-    .mock-chart-line svg {
-      width: 100%; height: 100%;
-    }
-
-    /* Tabs */
-    .mock-tabs { display: flex; gap: 0; margin-bottom: 10px; }
-    .mock-tab {
-      padding: 5px 12px; font-size: 0.4375rem; font-weight: 500;
-      color: var(--text-3); border-bottom: 2px solid transparent;
-    }
-    .mock-tab--on { color: #0d2b2e; border-bottom-color: #0d2b2e; }
-
-    /* Form elements */
-    .mock-input {
-      background: #fff; border: 1px solid #ddd; border-radius: 4px;
-      padding: 5px 8px; font-size: 0.5rem; color: var(--text);
-      width: 100%; margin-bottom: 6px;
-    }
-    .mock-select { composes: mock-input; appearance: none; }
-    .mock-checkbox {
-      display: flex; align-items: center; gap: 5px;
-      font-size: 0.5rem; color: var(--text); margin-bottom: 4px;
-    }
-    .mock-checkbox i {
-      width: 10px; height: 10px; border-radius: 2px;
-      border: 1.5px solid #0d2b2e; display: block; font-style: normal;
-      position: relative;
-    }
-    .mock-checkbox i.on { background: #0d2b2e; }
-    .mock-checkbox i.on::after {
-      content: ''; position: absolute;
-      left: 2px; top: 0; width: 3px; height: 6px;
-      border: solid #fff; border-width: 0 1.5px 1.5px 0;
-      transform: rotate(45deg);
-    }
-    .mock-btn-sm {
-      display: inline-block; padding: 4px 10px;
-      background: #0d2b2e; color: #fff;
-      border-radius: 4px; font-size: 0.4375rem; font-weight: 600;
-    }
-
-    /* Phone frame */
-    .mock-phone {
-      background: #1a1a1a; border-radius: 24px;
-      padding: 8px; max-width: 180px; margin: 0 auto;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    }
-    .mock-phone-screen {
-      background: #fff; border-radius: 18px;
-      overflow: hidden; min-height: 320px;
-      font-family: var(--font); font-size: 0.5rem;
-      color: var(--text);
-    }
-    .mock-phone-status {
-      display: flex; justify-content: space-between;
-      padding: 6px 12px 2px;
-      font-size: 0.375rem; color: var(--text-3);
-    }
-    .mock-phone-header {
-      padding: 4px 12px 8px;
-      font-size: 0.6875rem; font-weight: 700;
-      color: var(--text); letter-spacing: -0.01em;
-    }
-    .mock-phone-body { padding: 0 12px 12px; }
-    .mock-phone-nav {
-      display: flex; justify-content: space-around;
-      padding: 8px 0; border-top: 1px solid #eee;
-      font-size: 0.3125rem; text-transform: uppercase;
-      letter-spacing: 0.06em; color: var(--text-3);
-    }
-    .mock-phone-nav span { text-align: center; }
-    .mock-phone-nav span.on { color: #0d2b2e; font-weight: 700; }
-
-    .mock-phone-card {
-      background: #f8f9fa; border-radius: 6px;
-      padding: 8px; margin-bottom: 6px;
-    }
-    .mock-phone-row {
-      display: flex; justify-content: space-between;
-      align-items: center; padding: 4px 0;
-      font-size: 0.4375rem; border-bottom: 1px solid #f0f0f0;
-    }
-    .mock-phone-row:last-child { border-bottom: none; }
-    .mock-offline {
-      display: flex; align-items: center; gap: 4px;
-      padding: 4px 12px; background: #fef7e0;
-      font-size: 0.3125rem; color: #9a7b1a; font-weight: 600;
-    }
-
-    /* Wireframe style (mid-fi process artifacts) */
-    .mock-wire {
-      background: #f5f5f5; border-radius: 8px;
-      border: 1px solid #e0e0e0; padding: 16px;
-      font-family: var(--font); font-size: 0.5rem;
-      color: #666; overflow: hidden;
-      height: 100%; min-height: 200px;
-      display: flex; flex-direction: column;
-    }
-    .mock-wire-title {
-      font-size: 0.5625rem; font-weight: 700; color: #444;
-      margin-bottom: 10px; padding-bottom: 6px;
-      border-bottom: 1px dashed #ddd;
-    }
-    /* Sticky notes */
-    .mock-stickies { display: flex; flex-wrap: wrap; gap: 4px; }
-    .mock-sticky {
-      padding: 5px 7px; border-radius: 2px;
-      font-size: 0.375rem; line-height: 1.3;
-      box-shadow: 1px 1px 2px rgba(0,0,0,0.06);
-      width: calc(33% - 3px); min-width: 48px;
-    }
-    .mock-sticky--y { background: #fff9c4; color: #6d5e00; }
-    .mock-sticky--b { background: #e3f2fd; color: #1565c0; }
-    .mock-sticky--p { background: #fce4ec; color: #ad1457; }
-    .mock-sticky--g { background: #e8f5e9; color: #2e7d32; }
-    /* Flow arrows */
-    .mock-flow { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
-    .mock-flow-step {
-      background: #fff; border: 1px solid #ddd; border-radius: 4px;
-      padding: 6px 8px; font-size: 0.4375rem; font-weight: 500;
-      color: #444; text-align: center; flex: 1; min-width: 50px;
-    }
-    .mock-flow-step--on { background: #0d2b2e; color: #fff; border-color: #0d2b2e; }
-    .mock-flow-step--warn { border-color: #e74c3c; color: #e74c3c; }
-    .mock-flow-arrow { color: #ccc; font-size: 0.625rem; flex-shrink: 0; }
-    /* Tree diagram */
-    .mock-tree { padding-left: 12px; }
-    .mock-tree-node {
-      position: relative; padding: 3px 0 3px 14px;
-      font-size: 0.4375rem; color: #555;
-    }
-    .mock-tree-node::before {
-      content: ''; position: absolute; left: 0; top: 0;
-      width: 8px; height: 100%;
-      border-left: 1px solid #ccc; border-bottom: 1px solid #ccc;
-    }
-    .mock-tree-node:last-child::before { height: 50%; }
-    .mock-tree-node b { color: #333; font-weight: 600; }
-    /* Gray wireframe boxes */
-    .mock-wire-box {
-      background: #e8e8e8; border-radius: 3px;
-      padding: 6px 8px; margin-bottom: 4px;
-      font-size: 0.375rem; color: #888;
-    }
-    .mock-wire-box--dark { background: #d0d0d0; color: #666; }
-    .mock-wire-row { display: flex; gap: 4px; margin-bottom: 4px; }
-    .mock-wire-sidebar {
-      width: 40px; background: #ddd; border-radius: 3px;
-      padding: 4px; flex-shrink: 0;
-    }
-    .mock-wire-main { flex: 1; }
-    /* Annotation dots */
-    .mock-annot {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 14px; height: 14px; border-radius: 50%;
-      background: #e74c3c; color: #fff;
-      font-size: 0.3125rem; font-weight: 700;
-      position: absolute;
-    }
-
-    /* ============ LIGHTBOX (click any case-study image to expand) ============ */
-    [data-zoom] { cursor: zoom-in; }
-    .lightbox {
-      position: fixed; inset: 0;
-      background: rgba(15, 18, 22, 0.92);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      z-index: 9999;
-      display: flex; align-items: center; justify-content: center;
-      padding: clamp(1rem, 3vw, 3rem);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s var(--ease);
-    }
-    .lightbox.is-open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    .lightbox img {
-      max-width: 100%;
-      max-height: 100%;
-      width: auto;
-      height: auto;
-      object-fit: contain;
-      border-radius: 12px;
-      /* Light backdrop so SVG diagrams keep their text contrast when expanded. */
-      background: #fafafa;
-      box-shadow: 0 32px 80px -20px rgba(0,0,0,0.6);
-      transform: scale(0.94);
-      transition: transform 0.32s var(--ease);
-    }
-    .lightbox.is-open img { transform: scale(1); }
-    .lightbox-close {
-      position: absolute;
-      top: clamp(0.75rem, 2vw, 1.5rem);
-      right: clamp(0.75rem, 2vw, 1.5rem);
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      border: 1px solid rgba(255,255,255,0.25);
-      background: rgba(255,255,255,0.08);
-      color: #fcfcfc;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.25s, transform 0.25s;
-    }
-    .lightbox-close:hover {
-      background: rgba(255,255,255,0.18);
-      transform: scale(1.06);
-    }
-    .lightbox-close svg { width: 18px; height: 18px; }
-    body.lightbox-open { overflow: hidden; }
-    @media (prefers-reduced-motion: reduce) {
-      .lightbox, .lightbox img { transition: none; }
-    }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <meta name="description" content="Straatos Application, Digital infrastructure for environmental and outdoor projects, from field data collection to credit issuance.">
+ <meta name="theme-color" content="#fcfcfc">
+ <title>Straatos Application, Case Study · Pietra Gottardo</title>
+ <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+ <link rel="apple-touch-icon" href="../favicon.svg">
+
+ <link rel="stylesheet" href="../assets/fonts/lausanne.css">
+
+ <style>
+ :root {
+ /* Gray True palette */
+ --gray-true-25: #fcfcfc;
+ --gray-true-50: #fafafa;
+ --gray-true-100: #f5f5f5;
+ --gray-true-200: #e5e5e5;
+ --gray-true-300: #d6d6d6;
+ --gray-true-400: #a3a3a3;
+ --gray-true-500: #737373;
+ --gray-true-600: #525252;
+ --gray-true-700: #424242;
+ --gray-true-800: #292929;
+ --gray-true-900: #141414;
+
+ /* Semantic */
+ --bg: var(--gray-true-25);
+ --bg-alt: var(--gray-true-100);
+ --surface: #ffffff;
+ --text: var(--gray-true-900);
+ --text-2: var(--gray-true-500);
+ --text-3: var(--gray-true-400);
+ --border: var(--gray-true-200);
+
+ --accent: #3d5a3e;
+ --accent-light: #e8ede8;
+ --accent-yellow: #f7fdb9;
+ --accent-blue: #c5e9ff;
+ --accent-pink: #eee1ea;
+
+ --font: 'TWKLausanne', system-ui, sans-serif;
+ --mono: 'TWKLausanne', system-ui, sans-serif;
+ --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+ --section-py: clamp(3rem, 8vw, 7rem);
+ --section-gap: clamp(2.5rem, 5vw, 3.5rem);
+ }
+
+ *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+ html { scroll-behavior: smooth; }
+ body {
+ font-family: var(--font);
+ font-size: 1rem;
+ line-height: 1.6;
+ color: var(--text);
+ background: var(--bg);
+ -webkit-font-smoothing: antialiased;
+ overflow-x: hidden;
+ }
+ a { color: inherit; text-decoration: none; }
+ a:focus-visible, button:focus-visible {
+ outline: 2px solid var(--accent);
+ outline-offset: 3px;
+ }
+
+ /* Custom cursor */
+ .cursor {
+ display: none;
+ position: fixed;
+ top: 0; left: 0;
+ width: 28px; height: 28px;
+ border-radius: 50%;
+ background: #fff;
+ mix-blend-mode: difference;
+ pointer-events: none;
+ z-index: 10000;
+ transform: translate3d(-100px, -100px, 0);
+ will-change: transform;
+ transition: width 0.35s var(--ease), height 0.35s var(--ease);
+ }
+ .cursor.active {
+ width: 64px; height: 64px;
+ mix-blend-mode: normal;
+ background: transparent;
+ backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+ -webkit-backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+ border: 1.5px solid rgba(255,255,255,0.6);
+ box-shadow:
+ 0 0 0 1px rgba(0,0,0,0.06),
+ 0 6px 20px rgba(0,0,0,0.12),
+ inset 0 2px 3px rgba(255,255,255,0.35),
+ inset 0 -2px 3px rgba(0,0,0,0.06);
+ }
+ @media (hover: hover) and (pointer: fine) {
+ .cursor { display: block; }
+ html, body { cursor: none; }
+ a, button, input, textarea { cursor: none; }
+ }
+
+ /* Typography */
+ h1, h2, h3, h4 {
+ font-family: var(--font);
+ font-weight: 300;
+ line-height: 1.15;
+ color: var(--text);
+ letter-spacing: -0.02em;
+ }
+ h1 { font-size: clamp(2.25rem, 5.5vw, 4rem); line-height: 1.1; letter-spacing: -0.025em; }
+ h2 { font-size: clamp(1.875rem, 4vw, 2.75rem); }
+ h3 { font-size: 1.25rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; }
+
+ p { max-width: none; }
+
+ /* Same container as the landing page, keeps grid + gutters consistent across the site */
+ .wrap {
+ width: 100%;
+ max-width: clamp(72rem, 90vw, 110rem);
+ margin: 0 auto;
+ padding: 0 clamp(1.25rem, 4vw, 3rem);
+ }
+
+ .mono-label {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ }
+
+ /* Reveal */
+ .r {
+ opacity: 0; transform: translateY(24px);
+ transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+ }
+ .r.v { opacity: 1; transform: none; }
+ .r-stagger > .r:nth-child(2) { transition-delay: 0.06s; }
+ .r-stagger > .r:nth-child(3) { transition-delay: 0.12s; }
+ .r-stagger > .r:nth-child(4) { transition-delay: 0.18s; }
+ .r-stagger > .r:nth-child(5) { transition-delay: 0.24s; }
+ .r-stagger > .r:nth-child(6) { transition-delay: 0.30s; }
+
+ /* Buttons */
+ .btn {
+ font-family: var(--font);
+ font-size: 0.875rem;
+ font-weight: 500;
+ padding: 0.875rem 1.5rem;
+ border-radius: 6px;
+ border: none;
+ cursor: pointer;
+ transition: all 0.35s var(--ease);
+ text-decoration: none;
+ display: inline-flex;
+ align-items: center;
+ gap: 0.5rem;
+ line-height: 1;
+ }
+ .btn-primary { background: var(--text); color: var(--bg); }
+ .btn-primary:hover {
+ background: var(--accent-yellow);
+ color: var(--gray-true-900);
+ }
+ .btn-ghost {
+ background: transparent;
+ color: var(--text);
+ border: 1px solid var(--border);
+ }
+ .btn-ghost:hover {
+ background: var(--accent-yellow);
+ color: var(--gray-true-900);
+ border-color: var(--accent-yellow);
+ }
+
+ /* ====== NAV ====== */
+ .nav {
+ position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+ background: rgba(252,252,252,0.85);
+ backdrop-filter: blur(12px);
+ -webkit-backdrop-filter: blur(12px);
+ transition: box-shadow 0.4s var(--ease);
+ }
+ .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
+ .nav-inner {
+ display: flex; align-items: center; justify-content: space-between;
+ height: 60px;
+ }
+ .nav-logo {
+ font-family: var(--mono);
+ font-size: 0.8125rem;
+ font-weight: 500;
+ color: var(--text);
+ }
+ .nav-right { display: flex; align-items: center; gap: 2rem; }
+ .nav-links {
+ display: none; list-style: none;
+ gap: 1.75rem; align-items: center;
+ }
+ .nav-links a {
+ font-size: 0.8125rem; font-weight: 500;
+ color: var(--text-2);
+ transition: color 0.3s;
+ }
+ .nav-links a:hover { color: var(--text); }
+
+ .lang-toggle {
+ display: flex; gap: 0;
+ border: 1px solid var(--border); border-radius: 6px;
+ overflow: hidden;
+ }
+ .lang-btn {
+ font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+ padding: 5px 10px; border: none; cursor: pointer;
+ background: transparent; color: var(--text-3);
+ transition: all 0.3s;
+ }
+ .lang-btn.active { background: var(--text); color: var(--bg); }
+
+ @media (min-width: 768px) {
+ .nav-links { display: flex; }
+ }
+
+ /* ====== CASE HERO ====== */
+ .case-hero {
+ padding: calc(60px + var(--section-py)) 0 var(--section-py);
+ position: relative;
+ }
+
+ .back-link {
+ display: inline-flex;
+ align-items: center;
+ gap: 0.5rem;
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-2);
+ margin-bottom: 2rem;
+ transition: color 0.3s, gap 0.3s var(--ease);
+ }
+ .back-link:hover {
+ color: var(--text);
+ gap: 0.85rem;
+ }
+ .back-arrow {
+ display: inline-block;
+ font-family: var(--font);
+ }
+
+ .case-tag {
+ display: inline-block;
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--accent);
+ background: var(--accent-light);
+ padding: 5px 11px;
+ border-radius: 4px;
+ margin-bottom: 1.5rem;
+ }
+
+ .case-hero h1 {
+ margin-bottom: 1.5rem;
+ max-width: none;
+ }
+
+ .case-lead {
+ font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
+ line-height: 1.6;
+ color: var(--text-2);
+ max-width: none;
+ margin-bottom: 3.5rem;
+ }
+
+ /* Meta grid */
+ .case-meta {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ gap: 2rem 2.5rem;
+ padding: 2rem 0;
+ border-top: 1px solid var(--border);
+ border-bottom: 1px solid var(--border);
+ margin-bottom: var(--section-gap);
+ }
+ @media (min-width: 720px) {
+ .case-meta { grid-template-columns: repeat(4, 1fr); }
+ }
+ .case-meta-item {
+ display: flex;
+ flex-direction: column;
+ gap: 0.5rem;
+ }
+ .case-meta-label {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ }
+ .case-meta-value {
+ font-size: 1rem;
+ font-weight: 500;
+ color: var(--text);
+ line-height: 1.4;
+ }
+
+ /* Hero mockup placeholder */
+ .case-hero-mockup {
+ width: 100%;
+ display: flex;
+ justify-content: center;
+ }
+ .case-hero-mockup img {
+ width: 100%;
+ height: auto;
+ max-width: 100%;
+ display: block;
+ }
+ .case-hero-mockup--placeholder {
+ border: 1px solid var(--border);
+ }
+ .case-hero-mockup--placeholder::before {
+ content: '';
+ position: absolute;
+ width: 220px;
+ height: 220px;
+ background: var(--accent);
+ opacity: 0.08;
+ border-radius: 40% 60% 65% 35% / 40% 45% 55% 60%;
+ top: 15%;
+ left: 20%;
+ filter: blur(20px);
+ }
+ .case-hero-mockup--placeholder::after {
+ content: '';
+ position: absolute;
+ width: 180px;
+ height: 180px;
+ background: var(--accent-yellow);
+ opacity: 0.3;
+ border-radius: 50%;
+ bottom: 15%;
+ right: 20%;
+ filter: blur(30px);
+ }
+ .mockup-caption {
+ position: relative;
+ z-index: 1;
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.14em;
+ color: var(--text-3);
+ background: var(--surface);
+ padding: 0.5rem 1rem;
+ border-radius: 4px;
+ border: 1px solid var(--border);
+ }
+
+ /* ====== CASE SECTIONS (shared) ====== */
+ .case-section {
+ padding: var(--section-py) 0;
+ position: relative;
+ }
+ .case-section--alt { background: var(--bg-alt); }
+ .case-section--dark {
+ background: var(--gray-true-900);
+ color: var(--gray-true-25);
+ }
+ .case-section--dark h2,
+ .case-section--dark h3 { color: var(--gray-true-25); }
+ .case-section--dark p { color: rgba(252,252,252,0.6); }
+ .case-section--dark .case-section-label { color: rgba(252,252,252,0.45); }
+
+ .case-section-header {
+ margin-bottom: var(--section-gap);
+ }
+ .case-section-label {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ margin-bottom: 0.75rem;
+ }
+ .case-section h2 {
+ max-width: none;
+ }
+
+ /* ====== CHALLENGE / SOLUTION (2-col) ====== */
+ .cs-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 3rem;
+ }
+ @media (min-width: 820px) {
+ .cs-grid { grid-template-columns: 1fr 1fr; gap: 4rem; }
+ }
+ /* Stacked variant, text on top, full-width media below */
+ .cs-grid--stack { grid-template-columns: 1fr; }
+ @media (min-width: 820px) {
+ .cs-grid--stack { grid-template-columns: 1fr; gap: clamp(2.5rem, 5vw, 4rem); }
+ }
+ .cs-block h3 {
+ font-size: clamp(1.875rem, 4vw, 2.75rem);
+ font-weight: 300;
+ line-height: 1.15;
+ letter-spacing: -0.015em;
+ margin-bottom: 1rem;
+ }
+ .cs-block p {
+ color: var(--text-2);
+ font-size: 1rem;
+ line-height: 1.7;
+ margin-bottom: 1rem;
+ }
+ .cs-block p:last-child { margin-bottom: 0; }
+ .cs-block-label {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ margin-bottom: 0.75rem;
+ display: block;
+ }
+ .cs-block--challenge .cs-block-label { color: #b85c3f; }
+ .cs-block--solution .cs-block-label { color: var(--accent); }
+ .cs-block--phases .cs-block-label { color: var(--accent); }
+
+ /* Media at the bottom of each .cs-block (challenge/solution) */
+ .cs-block-media {
+ margin-top: clamp(1.5rem, 3vw, 2.25rem);
+ width: 100%;
+ aspect-ratio: 4 / 3;
+ border-radius: 14px;
+ overflow: hidden;
+ background: var(--bg-alt);
+ }
+ .cs-block-media img,
+ .cs-block-media video {
+ width: 100%;
+ height: 100%;
+ display: block;
+ object-fit: cover;
+ }
+
+ /* ====== PHASES VIDEO (replaces the pill animation) ======
+ Scales with the surrounding text column (no fixed max-width). */
+ .phases-video-wrap {
+ width: 100%;
+ margin: 0;
+ border-radius: 12px;
+ overflow: hidden;
+ aspect-ratio: 1366 / 768;
+ }
+ .phases-video {
+ width: 100%;
+ height: 100%;
+ display: block;
+ object-fit: cover;
+ }
+
+ /* ====== PHASE SLIDER (animated component) ====== */
+ .phase-slider {
+ --ps-pill-w: 110px;
+ --ps-pill-h: 380px;
+ --ps-row-h: 28px;
+ --ps-rise-ms: 1200ms;
+ --ps-face-ms: 600ms;
+ --ps-rise-ease: cubic-bezier(.22, 1, .36, 1);
+
+ --ps-track: #ECEEF1;
+ --ps-green: #6FCC8C;
+ --ps-lime: #C8CF63;
+ --ps-amber: #F0A864;
+ --ps-coral: #ED7E5E;
+ --ps-red: #E2574A;
+ --ps-mute: #c5c9cf;
+
+ position: relative;
+ width: 100%;
+ max-width: 440px;
+ height: calc(var(--ps-pill-h) + 80px);
+ margin: 0 auto;
+ font-family: var(--font);
+ }
+ .phase-slider .ps-pill {
+ position: absolute;
+ left: 50%;
+ top: 40px;
+ transform: translateX(-50%);
+ width: var(--ps-pill-w);
+ height: var(--ps-pill-h);
+ border-radius: calc(var(--ps-pill-w) / 2);
+ background: var(--ps-track);
+ overflow: hidden;
+ z-index: 2;
+ box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 -1px 0 rgba(0,0,0,.02);
+ }
+ .phase-slider .ps-fill {
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(to top,
+ var(--ps-green) 0%,
+ var(--ps-lime) 28%,
+ var(--ps-amber) 55%,
+ var(--ps-coral) 78%,
+ var(--ps-red) 100%);
+ clip-path: inset(100% 0 0 0);
+ transition: clip-path var(--ps-rise-ms) var(--ps-rise-ease);
+ }
+ .phase-slider .ps-meniscus {
+ position: absolute;
+ left: 0; right: 0; bottom: 0;
+ height: var(--ps-pill-h);
+ pointer-events: none;
+ background: linear-gradient(to top,
+ rgba(255,255,255,0) calc(var(--m, 0%) - 4px),
+ rgba(255,255,255,.5) var(--m, 0%),
+ rgba(255,255,255,0) calc(var(--m, 0%) + 4px));
+ transition: background var(--ps-rise-ms) var(--ps-rise-ease);
+ mix-blend-mode: overlay;
+ opacity: .8;
+ }
+ .phase-slider .ps-row {
+ position: absolute;
+ left: 0; right: 0;
+ height: var(--ps-row-h);
+ display: flex;
+ align-items: center;
+ z-index: 3;
+ pointer-events: none;
+ }
+ .phase-slider .ps-face {
+ position: absolute;
+ left: calc(50% - var(--ps-pill-w)/2 - 14px);
+ width: 26px; height: 26px;
+ color: var(--ps-mute);
+ opacity: 0;
+ transform: translate(-100%, 6px) scale(.92);
+ transition: opacity .35s ease, transform .35s ease, color .35s ease;
+ }
+ .phase-slider .ps-label {
+ position: absolute;
+ left: calc(50% + var(--ps-pill-w)/2 + 24px);
+ font-size: 0.875rem;
+ letter-spacing: .005em;
+ color: var(--ps-mute);
+ white-space: nowrap;
+ opacity: 0;
+ transform: translateY(6px);
+ transition: opacity .35s ease, transform .35s ease, color .35s ease;
+ }
+ .phase-slider .ps-row[data-level="1"] { bottom: calc(40px + var(--ps-pill-h) * 0.06 - var(--ps-row-h)/2); }
+ .phase-slider .ps-row[data-level="2"] { bottom: calc(40px + var(--ps-pill-h) * 0.32 - var(--ps-row-h)/2); }
+ .phase-slider .ps-row[data-level="3"] { bottom: calc(40px + var(--ps-pill-h) * 0.56 - var(--ps-row-h)/2); }
+ .phase-slider .ps-row[data-level="4"] { bottom: calc(40px + var(--ps-pill-h) * 0.78 - var(--ps-row-h)/2); }
+ .phase-slider .ps-row[data-level="5"] { bottom: calc(40px + var(--ps-pill-h) * 0.96 - var(--ps-row-h)/2); }
+
+ .phase-slider .ps-row.is-active .ps-face {
+ opacity: 1;
+ transform: translate(-100%, 0) scale(1);
+ color: var(--accent);
+ transition:
+ opacity var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms)),
+ transform var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms)),
+ color var(--ps-face-ms) ease calc(var(--ps-rise-ms) - var(--ps-face-ms));
+ }
+ .phase-slider .ps-row.is-active .ps-label {
+ opacity: 1;
+ transform: translateY(0);
+ color: var(--text);
+ font-weight: 500;
+ transition:
+ opacity var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms) + 60ms),
+ transform var(--ps-face-ms) var(--ps-rise-ease) calc(var(--ps-rise-ms) - var(--ps-face-ms) + 60ms),
+ color var(--ps-face-ms) ease calc(var(--ps-rise-ms) - var(--ps-face-ms) + 60ms);
+ }
+ .phase-slider .ps-row.is-past .ps-face,
+ .phase-slider .ps-row.is-past .ps-label {
+ opacity: 1;
+ color: var(--ps-mute);
+ transition: opacity .4s ease, transform .4s ease, color .5s ease;
+ }
+ .phase-slider .ps-row.is-past .ps-face { transform: translate(-100%, 0) scale(1); }
+ .phase-slider .ps-row.is-past .ps-label { transform: translateY(0); font-weight: 400; }
+
+ .phase-slider .ps-row[data-tone="green"] { --accent: var(--ps-green); }
+ .phase-slider .ps-row[data-tone="lime"] { --accent: #b8b842; }
+ .phase-slider .ps-row[data-tone="amber"] { --accent: var(--ps-amber); }
+ .phase-slider .ps-row[data-tone="coral"] { --accent: var(--ps-coral); }
+ .phase-slider .ps-row[data-tone="red"] { --accent: var(--ps-red); }
+
+ /* ====== VISUAL IDENTITY · BENTO (palette top, type+icons bottom) ====== */
+ .vis-bento {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: clamp(1rem, 2.5vw, 1.5rem);
+ margin-top: 2rem;
+ }
+ .vis-bento__bottom {
+ display: flex;
+ flex-direction: column;
+ gap: clamp(1rem, 2.5vw, 1.5rem);
+ }
+ @media (min-width: 820px) {
+ .vis-bento__bottom {
+ /* Explicit row height on the container, both children stretch to fill
+ it exactly, so the video and icons cards have identical heights. */
+ flex-direction: row;
+ align-items: stretch;
+ height: clamp(320px, 36vw, 620px);
+ }
+ }
+ .vis-bento__palette,
+ .vis-bento__type,
+ .vis-bento__icons {
+ position: relative;
+ border-radius: 18px;
+ overflow: hidden;
+ }
+ /* Palette, keeps its full content, no crop. Native aspect 5120/1961 ≈ 2.61. */
+ .vis-bento__palette {
+ aspect-ratio: 5120 / 1961;
+ }
+ .vis-bento__palette img {
+ width: 100%; height: 100%; object-fit: contain; display: block;
+ }
+ /* Typography, fills the bottom-row height, with video background */
+ .vis-bento__type {
+ flex: 1 1 auto;
+ min-width: 0;
+ height: 100%;
+ }
+ .vis-bento__type video {
+ width: 100%; height: 100%; object-fit: cover; display: block;
+ }
+ .vis-bento__type::after {
+ content: "";
+ position: absolute; inset: 0;
+ background: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.42));
+ pointer-events: none;
+ }
+ .vis-bento__type-overlay {
+ position: absolute; inset: 0;
+ padding: clamp(1.5rem, 3vw, 2.5rem);
+ pointer-events: none;
+ z-index: 2;
+ color: #fff;
+ font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", "Helvetica Neue", Arial, sans-serif;
+ display: flex; flex-direction: column;
+ }
+ .vis-bento__type-tag {
+ align-self: flex-start;
+ font-family: var(--mono);
+ font-size: clamp(.6875rem, 1vw, .8125rem);
+ font-weight: 500;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ color: rgba(255,255,255,.85);
+ }
+ .vis-bento__type-spec {
+ flex: 1;
+ display: flex; flex-direction: column;
+ justify-content: center; align-items: center;
+ text-align: center;
+ gap: clamp(.35rem, .8vw, .8rem);
+ text-shadow: 0 2px 22px rgba(0,0,0,.35);
+ }
+ .vis-bento__type-row {
+ line-height: 1;
+ font-weight: 500;
+ letter-spacing: -.005em;
+ font-size: clamp(1.5rem, 3.8vw, 3rem);
+ }
+ .vis-bento__type-row--lower { font-weight: 300; letter-spacing: -.01em; }
+ .vis-bento__type-row--num {
+ font-weight: 300;
+ font-size: clamp(1.25rem, 2.6vw, 2rem);
+ letter-spacing: 0.06em;
+ color: rgba(255,255,255,.9);
+ }
+ .vis-bento__type-meta {
+ align-self: flex-end;
+ text-align: right;
+ font-family: var(--mono);
+ font-size: clamp(.625rem, .9vw, .75rem);
+ font-weight: 500;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
+ color: rgba(255,255,255,.75);
+ line-height: 1.5;
+ }
+ .vis-bento__type-meta b {
+ display: block;
+ font-weight: 600;
+ font-size: clamp(.8125rem, 1.2vw, 1rem);
+ letter-spacing: -.005em;
+ text-transform: none;
+ color: #fff;
+ margin-bottom: 2px;
+ }
+ /* Icons, already styled in the PNG (peach background + rounded corners).
+ Card matches the asset's native aspect so no side gaps appear. */
+ .vis-bento__icons {
+ flex: 0 0 auto;
+ height: 100%;
+ aspect-ratio: 1536 / 2016;
+ border-radius: 0;
+ }
+ .vis-bento__icons img {
+ width: 100%; height: 100%; object-fit: contain; display: block;
+ }
+
+ /* ====== APPLICATION · STACKED MOCKUPS ====== */
+ .app-stack {
+ margin-top: 2rem;
+ display: flex;
+ flex-direction: column;
+ gap: clamp(2.5rem, 5vw, 4rem);
+ }
+ .app-shot {
+ margin: 0;
+ display: flex;
+ flex-direction: column;
+ gap: 0.875rem;
+ }
+ .app-shot img {
+ width: 100%;
+ max-width: 100%;
+ display: block;
+ border-radius: 14px;
+ }
+ .app-shot figcaption {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ letter-spacing: 0.14em;
+ text-transform: uppercase;
+ color: var(--text-3);
+ margin: 0;
+ }
+ @media (max-width: 640px) {
+ .app-shot { gap: 0.625rem; }
+ .app-shot figcaption {
+ font-size: 0.5625rem;
+ letter-spacing: 0.1em;
+ line-height: 1.4;
+ }
+ }
+ /* Embedded composition (iframe), same outer treatment as .app-shot img */
+ .app-shot--embed .embed-frame {
+ position: relative;
+ width: 100%;
+ overflow: hidden;
+ background: transparent;
+ }
+ .app-shot--embed .embed-iframe {
+ position: absolute;
+ inset: 0;
+ width: 100%;
+ height: 100%;
+ border: 0;
+ display: block;
+ background: transparent;
+ }
+ /* Gray background variant, matches the section-alt color used elsewhere */
+ .app-shot--bg .embed-frame {
+ background: var(--bg-alt);
+ border-radius: 14px;
+ }
+ /* Full-bleed gray bg, escapes the .wrap so the gray stretches edge-to-edge
+ like 'The Challenge' section. The iframe stays at .wrap content width. */
+ .app-shot--bg-full {
+ width: 100vw;
+ margin-left: calc(50% - 50vw);
+ margin-right: calc(50% - 50vw);
+ background: var(--bg-alt);
+ padding: clamp(1.25rem, 2.5vw, 2rem) clamp(1.25rem, 4vw, 3rem);
+ }
+ /* Same full-bleed gray background but holding a static image instead of an embed. */
+ .app-shot--bg-full > img {
+ display: block;
+ width: 100%;
+ max-width: calc(clamp(72rem, 90vw, 110rem) - 2 * clamp(1.25rem, 4vw, 3rem));
+ margin: 0 auto;
+ height: auto;
+ }
+ .app-shot--bg-full .embed-frame {
+ width: 100%;
+ /* Wrap content width = wrap max-width minus the wrap's horizontal padding.
+ Matches the width of regular .app-shot figures inside .wrap. */
+ max-width: calc(clamp(72rem, 90vw, 110rem) - 2 * clamp(1.25rem, 4vw, 3rem));
+ margin: 0 auto;
+ background: transparent;
+ }
+ .app-shot--bg-full figcaption {
+ max-width: calc(clamp(72rem, 90vw, 110rem) - 2 * clamp(1.25rem, 4vw, 3rem));
+ margin: 0 auto;
+ }
+ /* Left-bleed variant, escapes the .wrap left padding so the asset
+ visually touches the left edge of the viewport. Right padding stays. */
+ .app-shot--bleed-left {
+ margin-left: calc(-1 * clamp(1.25rem, 4vw, 3rem));
+ }
+ .app-shot--bleed-left .embed-frame {
+ width: calc(100% + clamp(1.25rem, 4vw, 3rem));
+ }
+
+ /* Video-bg variant, looping video behind a foreground composition image */
+ .app-shot--video-bg .video-bg-frame {
+ position: relative;
+ width: 100%;
+ aspect-ratio: 5073 / 3718; /* matches the foreground PNG */
+ border-radius: 28px;
+ overflow: hidden;
+ background: #0e1418;
+ }
+ .app-shot--video-bg .video-bg {
+ position: absolute;
+ inset: 0;
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ z-index: 0;
+ }
+ .app-shot--video-bg .video-bg-overlay {
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(180deg, rgba(10, 18, 24, 0.35), rgba(10, 18, 24, 0.50));
+ z-index: 1;
+ pointer-events: none;
+ }
+ .app-shot--video-bg .video-bg-fg {
+ position: relative;
+ z-index: 2;
+ width: 100%;
+ height: 100%;
+ object-fit: contain;
+ display: block;
+ padding: clamp(2rem, 5vw, 6rem);
+ }
+
+ /* Foreground video over the bg water video, rounded corners + soft shadow.
+ Keeps full width (no horizontal crop) and crops excess height. */
+ .app-shot--video-bg .video-bg-fg.ipad-fg {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ object-fit: unset;
+ }
+ .app-shot--video-bg .fg-video-card {
+ position: relative;
+ width: 100%;
+ max-height: 100%;
+ border-radius: clamp(14px, 1.4vw, 22px);
+ overflow: hidden;
+ box-shadow:
+ 0 30px 60px -20px rgba(8, 16, 24, 0.55),
+ 0 12px 24px -10px rgba(8, 16, 24, 0.35),
+ 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+ }
+ .app-shot--video-bg .fg-video-card video {
+ display: block;
+ width: 100%;
+ height: auto;
+ }
+
+ /* Pair variant, two side-by-side cards (phone + map/video) */
+ .app-pair {
+ display: grid;
+ grid-template-columns: minmax(0, 1fr);
+ gap: clamp(1rem, 2.5vw, 1.5rem);
+ }
+ @media (min-width: 780px) {
+ .app-pair {
+ grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+ /* explicit row height forces both cells to identical dimensions
+ regardless of each image/video's intrinsic size */
+ grid-auto-rows: clamp(280px, 34vw, 560px);
+ }
+ }
+ .app-pair__cell {
+ width: 100%;
+ height: 100%;
+ overflow: hidden;
+ border-radius: 28px;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ }
+ .app-pair__cell--phone {
+ background: transparent;
+ }
+ .app-pair__cell--phone img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
+ }
+ .app-pair__cell--polygon video {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
+ }
+
+ /* ====== IDENTITY CAROUSEL ====== */
+ .id-car {
+ position: relative;
+ margin-top: 3rem;
+ }
+ /* Track stays INSIDE the .wrap grid, slides overflow horizontally
+ within the grid, so the next slide peeks at the right edge. */
+ .id-car-track {
+ display: flex;
+ align-items: stretch;
+ gap: clamp(1.25rem, 2vw, 2rem);
+ overflow-x: auto;
+ scroll-snap-type: x mandatory;
+ scroll-behavior: smooth;
+ scroll-padding-left: 0;
+ padding: 8px 0 2.25rem;
+ -webkit-overflow-scrolling: touch;
+ scrollbar-width: thin;
+ scrollbar-color: var(--gray-true-300, #d6d6d6) transparent;
+ }
+ .id-car-track::-webkit-scrollbar { height: 6px; }
+ .id-car-track::-webkit-scrollbar-track { background: transparent; }
+ .id-car-track::-webkit-scrollbar-thumb {
+ background: var(--gray-true-300, #d6d6d6);
+ border-radius: 4px;
+ }
+ .id-car-track::-webkit-scrollbar-thumb:hover { background: var(--gray-true-400, #a3a3a3); }
+
+ /* All slides share the same height, width follows each image's natural aspect.
+ No max-width cap: wide slides (palette) keep their full size so the track
+ scrolls horizontally to reveal the entire content. */
+ .id-car-slide {
+ flex: 0 0 auto;
+ height: clamp(340px, 52vh, 620px);
+ max-width: 88%; /* leaves a slim peek for the next slide */
+ scroll-snap-align: start;
+ display: block;
+ border-radius: 18px;
+ overflow: hidden;
+ background: transparent;
+ }
+ .id-car-slide img,
+ .id-car-slide video {
+ height: 100%;
+ width: auto;
+ display: block;
+ object-fit: contain;
+ }
+ /* Palette keeps its full content, no cropping. */
+ .id-car-slide--palette img { object-fit: contain; }
+ /* Bare variant, keep the icon image at natural aspect, no card chrome */
+ .id-car-slide--bare {
+ border-radius: 0;
+ overflow: visible;
+ }
+
+ /* slide variant with media + overlay text (e.g. type specimen on video) */
+ .id-car-slide--overlay {
+ position: relative;
+ }
+ .id-car-slide--overlay video,
+ .id-car-slide--overlay img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover; /* fill the slide so text always sits on a backdrop */
+ }
+ /* darkening scrim, even, slight darken so the family stays legible */
+ .id-car-slide--overlay::after {
+ content: "";
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(180deg, rgba(0,0,0,.22) 0%, rgba(0,0,0,.42) 100%);
+ pointer-events: none;
+ }
+ .id-car-slide__type {
+ position: absolute;
+ inset: 0;
+ padding: clamp(1.5rem, 3.5vw, 3rem) clamp(1.5rem, 3.5vw, 3rem);
+ pointer-events: none;
+ z-index: 2;
+ color: #fff;
+ font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", "Helvetica Neue", Arial, sans-serif;
+ display: flex;
+ flex-direction: column;
+ }
+
+ /* top-left editorial tag, sits over the video */
+ .id-car-slide__type-tag {
+ align-self: flex-start;
+ font-family: var(--mono);
+ font-size: clamp(.6875rem, 1vw, .8125rem);
+ font-weight: 500;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ color: rgba(255, 255, 255, .85);
+ mix-blend-mode: difference;
+ }
+
+ /* bottom-right meta line, typeface name + tiny caption */
+ .id-car-slide__type-meta {
+ position: absolute;
+ right: clamp(1.5rem, 3.5vw, 3rem);
+ bottom: clamp(1.5rem, 3.5vw, 3rem);
+ text-align: right;
+ font-family: var(--mono);
+ font-size: clamp(.6875rem, 1vw, .8125rem);
+ font-weight: 500;
+ letter-spacing: 0.14em;
+ text-transform: uppercase;
+ color: rgba(255, 255, 255, .75);
+ line-height: 1.5;
+ }
+ .id-car-slide__type-meta b {
+ display: block;
+ font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", sans-serif;
+ font-weight: 600;
+ font-size: clamp(.875rem, 1.4vw, 1.125rem);
+ letter-spacing: -.005em;
+ text-transform: none;
+ color: #fff;
+ margin-bottom: 2px;
+ }
+
+ /* the specimen itself, centered, dominant, shows the family */
+ .id-car-slide__type-spec {
+ flex: 1;
+ display: flex;
+ flex-direction: column;
+ justify-content: center;
+ align-items: center;
+ text-align: center;
+ gap: clamp(.4rem, .8vw, 1rem);
+ text-shadow: 0 2px 24px rgba(0, 0, 0, .35);
+ }
+ .id-car-slide__type-row {
+ font-weight: 500;
+ letter-spacing: -.005em;
+ line-height: 1;
+ }
+ .id-car-slide__type-row--caps {
+ font-size: clamp(1.5rem, 3.8vw, 3.5rem);
+ letter-spacing: 0.005em;
+ }
+ .id-car-slide__type-row--lower {
+ font-size: clamp(1.5rem, 3.8vw, 3.5rem);
+ font-weight: 300;
+ letter-spacing: -.01em;
+ }
+ .id-car-slide__type-row--num {
+ font-size: clamp(1rem, 2.2vw, 1.875rem);
+ font-weight: 200;
+ letter-spacing: 0.04em;
+ color: rgba(255, 255, 255, .85);
+ margin-top: clamp(.4rem, 1vw, 1rem);
+ }
+ /* Mobile, meta line moves into flow below the spec so it doesn't overlap
+ the number row, and type sizes drop a bit. */
+ @media (max-width: 640px) {
+ .id-car-slide__type {
+ padding: 1rem;
+ }
+ .id-car-slide__type-spec {
+ gap: 0.25rem;
+ justify-content: center;
+ padding-top: 1.5rem;
+ padding-bottom: 0.75rem;
+ }
+ .id-car-slide__type-meta {
+ position: static;
+ align-self: center;
+ text-align: center;
+ margin-top: 0.5rem;
+ font-size: 0.625rem;
+ letter-spacing: 0.12em;
+ }
+ .id-car-slide__type-meta b {
+ font-size: 0.8125rem;
+ margin-bottom: 1px;
+ }
+ .id-car-slide__type-row--caps,
+ .id-car-slide__type-row--lower {
+ font-size: clamp(1.125rem, 5.5vw, 1.625rem);
+ }
+ .id-car-slide__type-row--num {
+ font-size: clamp(0.75rem, 3.5vw, 1rem);
+ margin-top: 0.25rem;
+ }
+ }
+ /* fallback look for placeholder slides without an <img> */
+ .id-car-slide[data-placeholder] {
+ width: clamp(360px, 60vw, 720px);
+ max-width: 92vw;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ color: var(--text-3);
+ font-family: var(--mono);
+ font-size: 0.75rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.14em;
+ background: repeating-linear-gradient(45deg, #f5f5f5, #f5f5f5 8px, #fafafa 8px, #fafafa 16px);
+ }
+
+ /* on narrow viewports, anchor by width instead of height, avoids the wide
+ palette image dictating an absurd slide width when the screen is small */
+ @media (max-width: 900px) {
+ .id-car-slide {
+ height: auto;
+ width: 88vw;
+ max-width: 88vw;
+ aspect-ratio: 16 / 10;
+ }
+ .id-car-slide img,
+ .id-car-slide video {
+ width: 100%;
+ height: 100%;
+ max-width: 100%;
+ object-fit: contain;
+ }
+ .id-car-slide[data-placeholder] {
+ width: 88vw;
+ aspect-ratio: 16 / 10;
+ }
+ .id-car-slide--overlay video,
+ .id-car-slide--overlay img { object-fit: cover; }
+ }
+
+ /* nav controls */
+ .id-car-controls {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ gap: 1rem;
+ margin-top: 1.5rem;
+ }
+ .id-car-counter {
+ font-family: var(--mono);
+ font-size: 0.75rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.14em;
+ color: var(--text-3);
+ white-space: nowrap;
+ }
+ .id-car-counter .num-current { color: var(--text); font-size: 0.9375rem; }
+ .id-car-buttons {
+ display: flex;
+ gap: 0.625rem;
+ }
+ .id-car-btn {
+ width: 52px;
+ height: 52px;
+ border-radius: 50%;
+ border: 1px solid var(--border);
+ background: var(--surface);
+ color: var(--text);
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ transition: background .2s ease, border-color .2s ease, transform .2s ease, color .2s ease, opacity .2s ease;
+ }
+ .id-car-btn:hover { background: var(--accent-yellow, #f7fdb9); border-color: var(--text); }
+ .id-car-btn:active { transform: scale(.94); }
+ .id-car-btn[disabled] { opacity: .3; cursor: not-allowed; }
+ .id-car-btn[disabled]:hover { background: var(--surface); border-color: var(--border); }
+ .id-car-btn svg { width: 20px; height: 20px; }
+
+ @media (max-width: 720px) {
+ .id-car-slide { border-radius: 16px; }
+ .id-car-slide__body { padding: 1.5rem 1.5rem 1.75rem; }
+ .id-car-btn { width: 44px; height: 44px; }
+ .id-car-btn svg { width: 16px; height: 16px; }
+ }
+
+ /* ====== RESEARCH ====== */
+ .research-layout {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 3rem;
+ align-items: start;
+ }
+ @media (min-width: 900px) {
+ .research-layout { grid-template-columns: 1.1fr 0.9fr; gap: 4rem; }
+ }
+ .research-text p {
+ color: var(--text-2);
+ line-height: 1.7;
+ margin-bottom: 1.25rem;
+ }
+ .research-list {
+ list-style: none;
+ padding: 0;
+ margin-top: 1.5rem;
+ }
+ .research-list li {
+ padding: 0.75rem 0;
+ border-top: 1px solid var(--border);
+ font-size: 0.9375rem;
+ color: var(--text);
+ display: flex;
+ align-items: baseline;
+ gap: 0.75rem;
+ }
+ .research-list li:last-child { border-bottom: 1px solid var(--border); }
+ .research-list li::before {
+ content: '';
+ display: inline-block;
+ width: 6px; height: 6px;
+ background: var(--accent);
+ border-radius: 50%;
+ flex-shrink: 0;
+ transform: translateY(-2px);
+ }
+ .research-visual {
+ background: var(--bg-alt);
+ border: 1px solid var(--border);
+ border-radius: 12px;
+ aspect-ratio: 4 / 5;
+ position: relative;
+ overflow: hidden;
+ display: flex;
+ align-items: flex-end;
+ padding: 1.5rem;
+ }
+ .research-visual::before {
+ content: '';
+ position: absolute;
+ width: 70%; height: 70%;
+ top: 10%; left: 15%;
+ background: var(--accent);
+ opacity: 0.1;
+ border-radius: 45% 55% 60% 40% / 50% 40% 60% 50%;
+ filter: blur(30px);
+ }
+ .placeholder-caption {
+ position: relative;
+ z-index: 1;
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: 8px;
+ padding: 0.875rem 1rem;
+ max-width: 100%;
+ }
+ .placeholder-caption-label {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ display: block;
+ margin-bottom: 0.25rem;
+ }
+ /* Data flow diagram, sources converging into Guardian form */
+ .research-visual--diagram {
+ align-items: stretch;
+ padding: 1.75rem 1.5rem;
+ }
+ .data-flow {
+ position: relative;
+ z-index: 1;
+ width: 100%;
+ display: flex;
+ flex-direction: column;
+ gap: 0.875rem;
+ }
+ .data-flow-label {
+ font-family: var(--mono);
+ font-size: 0.5625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.14em;
+ color: var(--text-3);
+ text-align: center;
+ margin-bottom: 0.25rem;
+ }
+ .data-sources {
+ display: flex;
+ flex-direction: column;
+ gap: 0.5rem;
+ }
+ .data-source {
+ display: grid;
+ grid-template-columns: auto 1fr;
+ gap: 0.75rem;
+ align-items: center;
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: 8px;
+ padding: 0.625rem 0.875rem;
+ }
+ .data-source-dot {
+ width: 8px;
+ height: 8px;
+ border-radius: 50%;
+ flex-shrink: 0;
+ }
+ .data-source--whatsapp .data-source-dot { background: #25d366; }
+ .data-source--kobo .data-source-dot { background: #4a90c2; }
+ .data-source--email .data-source-dot { background: #d4a37a; }
+ .data-source--sheets .data-source-dot { background: #c2b03a; }
+ .data-source--photos .data-source-dot { background: #b85c8b; }
+
+ .data-source-text {
+ display: flex;
+ flex-direction: column;
+ gap: 1px;
+ min-width: 0;
+ }
+ .data-source-name {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.1em;
+ color: var(--text);
+ }
+ .data-source-meta {
+ font-size: 0.6875rem;
+ color: var(--text-2);
+ line-height: 1.35;
+ }
+
+ .data-flow-funnel {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ padding: 0.25rem 0;
+ }
+ .data-flow-funnel svg {
+ width: 60%;
+ height: 28px;
+ display: block;
+ }
+
+ .data-flow-output {
+ background: var(--gray-true-900);
+ color: var(--gray-true-25);
+ border-radius: 8px;
+ padding: 0.875rem 1rem;
+ display: flex;
+ flex-direction: column;
+ gap: 4px;
+ }
+ .data-flow-output-name {
+ font-size: 0.8125rem;
+ font-weight: 500;
+ color: var(--gray-true-25);
+ letter-spacing: -0.005em;
+ }
+ .data-flow-output-meta {
+ font-family: var(--mono);
+ font-size: 0.5625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: rgba(252,252,252,0.55);
+ }
+
+ /* Before state, fragmented, broken flow */
+ .data-source--broken {
+ border-style: dashed;
+ border-color: var(--gray-true-300);
+ opacity: 0.85;
+ }
+ .data-flow-warning {
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ padding: 0.5rem 0.75rem;
+ background: #fef3ec;
+ border: 1px dashed #d4a37a;
+ border-radius: 6px;
+ font-family: var(--mono);
+ font-size: 0.5625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.1em;
+ color: #a04e2f;
+ }
+ .data-flow-warning-icon {
+ font-style: normal;
+ font-size: 0.75rem;
+ }
+ .data-flow-output--warn {
+ background: transparent;
+ border: 1px dashed var(--gray-true-300);
+ color: var(--text);
+ }
+ .data-flow-output--warn .data-flow-output-name {
+ color: var(--text-2);
+ text-decoration: line-through;
+ text-decoration-color: var(--gray-true-300);
+ }
+ .data-flow-output--warn .data-flow-output-meta {
+ color: #a04e2f;
+ }
+
+ .placeholder-caption-text {
+ font-size: 0.8125rem;
+ color: var(--text-2);
+ line-height: 1.5;
+ }
+
+ /* ====== INSIGHTS ====== */
+ /* Insights section, video background with dark overlay */
+ .case-section--insights {
+ position: relative;
+ overflow: hidden;
+ color: #fff;
+ background: #0e1418;
+ }
+ .case-section--insights .insights-bg {
+ position: absolute;
+ inset: 0;
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ z-index: 0;
+ }
+ .case-section--insights .insights-overlay {
+ position: absolute;
+ inset: 0;
+ background: linear-gradient(180deg, rgba(10, 18, 24, 0.72) 0%, rgba(10, 18, 24, 0.62) 50%, rgba(10, 18, 24, 0.78) 100%);
+ z-index: 1;
+ pointer-events: none;
+ }
+ .case-section--insights > .wrap {
+ position: relative;
+ z-index: 2;
+ }
+ .case-section--insights .case-section-label {
+ color: rgba(255, 255, 255, 0.7);
+ }
+ .case-section--insights h2 {
+ color: #fff;
+ }
+
+ .insights-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 1.25rem;
+ }
+ @media (min-width: 780px) {
+ .insights-grid {
+ grid-template-columns: repeat(3, 1fr);
+ gap: clamp(1.25rem, 2vw, 1.75rem);
+ align-items: stretch;
+ }
+ }
+ .insight-item {
+ position: relative;
+ display: flex;
+ flex-direction: column;
+ background: #ffffff;
+ border: 1px solid var(--border);
+ border-radius: 16px;
+ padding: clamp(1.75rem, 2.75vw, 2.5rem);
+ box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+ transition: transform .35s var(--ease, cubic-bezier(0.16, 1, 0.3, 1)),
+ border-color .35s ease,
+ box-shadow .35s ease;
+ }
+ .insight-item::before {
+ content: "";
+ position: absolute;
+ top: 0; left: clamp(1.75rem, 2.75vw, 2.5rem);
+ width: 28px; height: 2px;
+ background: var(--accent);
+ border-radius: 0 0 2px 2px;
+ opacity: 0.85;
+ }
+ .insight-item:hover {
+ transform: translateY(-4px);
+ border-color: var(--gray-true-300, #d6d6d6);
+ box-shadow: 0 16px 36px -18px rgba(15, 23, 42, 0.18),
+ 0 2px 6px -2px rgba(15, 23, 42, 0.06);
+ }
+ .insight-num { display: none; }
+ .insight-content h3 {
+ font-size: clamp(1.125rem, 1.5vw, 1.375rem);
+ font-weight: 500;
+ line-height: 1.3;
+ letter-spacing: -0.012em;
+ margin-bottom: 0.9rem;
+ color: var(--text);
+ }
+ .insight-content p {
+ color: var(--text-2);
+ font-size: 0.9375rem;
+ line-height: 1.65;
+ max-width: none;
+ flex: 1;
+ }
+
+ /* ====== PRINCIPLES ====== */
+ .principles-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 1.5rem;
+ }
+ @media (min-width: 700px) {
+ .principles-grid { grid-template-columns: repeat(2, 1fr); }
+ }
+ @media (min-width: 1000px) {
+ .principles-grid { grid-template-columns: repeat(4, 1fr); }
+ }
+ .principle-card {
+ padding: 2rem 1.75rem;
+ border-radius: 12px;
+ background: rgba(252,252,252,0.03);
+ border: 1px solid rgba(252,252,252,0.12);
+ }
+ .principle-num {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ color: rgba(252,252,252,0.5);
+ margin-bottom: 1.25rem;
+ display: block;
+ }
+ .principle-card h3 {
+ font-size: 1.125rem;
+ font-weight: 500;
+ line-height: 1.35;
+ letter-spacing: -0.01em;
+ margin-bottom: 0.75rem;
+ }
+ .principle-card p {
+ font-size: 0.875rem;
+ line-height: 1.6;
+ color: rgba(252,252,252,0.55);
+ }
+
+ /* ====== REUSABLE PLACEHOLDER SYSTEM ====== */
+ .ph {
+ background: var(--bg-alt);
+ border: 1px solid var(--border);
+ border-radius: 12px;
+ position: relative;
+ overflow: hidden;
+ display: flex;
+ align-items: flex-end;
+ padding: 1.25rem;
+ }
+ .ph--16x9 { aspect-ratio: 16 / 9; }
+ .ph--4x3 { aspect-ratio: 4 / 3; }
+ .ph--3x4 { aspect-ratio: 3 / 4; }
+ .ph--1x1 { aspect-ratio: 1 / 1; }
+ .ph--3x2 { aspect-ratio: 3 / 2; }
+
+ .ph::before {
+ content: '';
+ position: absolute;
+ inset: 0;
+ opacity: 0.12;
+ filter: blur(30px);
+ pointer-events: none;
+ }
+ .ph--green::before {
+ background: radial-gradient(circle at 30% 40%, var(--accent), transparent 60%);
+ }
+ .ph--yellow::before {
+ background: radial-gradient(circle at 70% 60%, var(--accent-yellow), transparent 60%);
+ opacity: 0.4;
+ }
+ .ph--blue::before {
+ background: radial-gradient(circle at 40% 30%, var(--accent-blue), transparent 60%);
+ opacity: 0.5;
+ }
+ .ph--pink::before {
+ background: radial-gradient(circle at 60% 50%, var(--accent-pink), transparent 60%);
+ opacity: 0.5;
+ }
+ .ph--warn::before {
+ background: radial-gradient(circle at 50% 50%, #d4a37a, transparent 60%);
+ opacity: 0.25;
+ }
+
+ /* Grid lines decoration */
+ .ph--grid::after {
+ content: '';
+ position: absolute;
+ inset: 0;
+ background-image:
+ linear-gradient(rgba(20,20,20,0.04) 1px, transparent 1px),
+ linear-gradient(90deg, rgba(20,20,20,0.04) 1px, transparent 1px);
+ background-size: 32px 32px;
+ pointer-events: none;
+ }
+
+ .ph-caption {
+ position: relative;
+ z-index: 1;
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: 8px;
+ padding: 0.75rem 0.9rem;
+ max-width: 340px;
+ box-shadow: 0 4px 12px rgba(20,20,20,0.04);
+ }
+ .ph-caption-label {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ display: block;
+ margin-bottom: 0.25rem;
+ }
+ .ph-caption-text {
+ font-size: 0.8125rem;
+ color: var(--text-2);
+ line-height: 1.45;
+ }
+
+ /* ====== BEFORE / AFTER ====== */
+ .ba-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 2rem;
+ }
+ @media (min-width: 820px) {
+ .ba-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+ }
+ .ba-block {
+ display: flex;
+ flex-direction: column;
+ gap: 1.25rem;
+ }
+ .ba-tag {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ padding: 4px 10px;
+ border-radius: 4px;
+ align-self: flex-start;
+ }
+ .ba-tag--before {
+ color: #a04e2f;
+ background: #f5e4db;
+ }
+ .ba-tag--after {
+ color: var(--accent);
+ background: var(--accent-light);
+ }
+ .ba-block h3 {
+ font-size: 1.25rem;
+ font-weight: 500;
+ letter-spacing: -0.01em;
+ }
+ .ba-block p {
+ font-size: 0.9375rem;
+ color: var(--text-2);
+ line-height: 1.65;
+ }
+
+ /* ====== UX PROCESS GALLERY ====== */
+ .process-gallery {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 1.25rem;
+ }
+ @media (min-width: 700px) {
+ .process-gallery {
+ grid-template-columns: repeat(2, 1fr);
+ }
+ }
+ @media (min-width: 1000px) {
+ .process-gallery {
+ grid-template-columns: repeat(6, 1fr);
+ grid-auto-rows: minmax(180px, auto);
+ }
+ /* Asymmetric spans for visual rhythm */
+ .process-gallery > .process-item:nth-child(1) { grid-column: span 4; }
+ .process-gallery > .process-item:nth-child(2) { grid-column: span 2; }
+ .process-gallery > .process-item:nth-child(3) { grid-column: span 2; }
+ .process-gallery > .process-item:nth-child(4) { grid-column: span 2; }
+ .process-gallery > .process-item:nth-child(5) { grid-column: span 2; }
+ .process-gallery > .process-item:nth-child(6) { grid-column: span 3; }
+ .process-gallery > .process-item:nth-child(7) { grid-column: span 3; }
+ }
+ .process-item {
+ display: flex;
+ flex-direction: column;
+ gap: 0.875rem;
+ }
+ .process-item .ph {
+ flex: 1;
+ min-height: 180px;
+ }
+ .process-item-label {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ }
+ .process-item-title {
+ font-size: 0.9375rem;
+ font-weight: 500;
+ color: var(--text);
+ letter-spacing: -0.005em;
+ }
+
+ /* ====== DESIGN EXPLORATIONS ====== */
+ .explore-intro {
+ font-size: 1rem;
+ color: var(--text-2);
+ line-height: 1.7;
+ max-width: none;
+ margin-top: 0.75rem;
+ }
+ .explore-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 2rem;
+ }
+ @media (min-width: 700px) {
+ .explore-grid { grid-template-columns: repeat(3, 1fr); gap: 1.75rem; }
+ }
+ .explore-item {
+ display: flex;
+ flex-direction: column;
+ gap: 1rem;
+ }
+ .explore-num {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.14em;
+ color: var(--text-3);
+ }
+ .explore-item h3 {
+ font-size: 1.0625rem;
+ font-weight: 500;
+ letter-spacing: -0.005em;
+ }
+ .explore-item p {
+ font-size: 0.875rem;
+ color: var(--text-2);
+ line-height: 1.65;
+ }
+
+ /* ====== FINAL PRODUCT GALLERY ====== */
+ .gallery-hero { margin-bottom: 1.5rem; }
+ .gallery-detail {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 1.5rem;
+ margin-bottom: 1.5rem;
+ }
+ @media (min-width: 700px) {
+ .gallery-detail { grid-template-columns: 1fr 1fr; }
+ }
+ .gallery-mobile {
+ display: grid;
+ grid-template-columns: repeat(2, 1fr);
+ gap: 1.25rem;
+ }
+ @media (min-width: 700px) {
+ .gallery-mobile { grid-template-columns: repeat(4, 1fr); }
+ }
+ .gallery-caption {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ margin-top: 0.625rem;
+ display: block;
+ }
+
+ /* ====== MOCKUP UI SYSTEM ====== */
+ .mock-browser {
+ background: #fff;
+ border-radius: 10px;
+ border: 1px solid var(--border);
+ overflow: hidden;
+ box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+ font-family: var(--font);
+ }
+ .mock-bar {
+ display: flex; align-items: center; gap: 6px;
+ padding: 8px 12px;
+ background: var(--gray-true-100);
+ border-bottom: 1px solid var(--border);
+ }
+ .mock-dots { display: flex; gap: 5px; }
+ .mock-dots i { width: 7px; height: 7px; border-radius: 50%; display: block; font-style: normal; }
+ .mock-dots i:nth-child(1) { background: #ff5f57; }
+ .mock-dots i:nth-child(2) { background: #ffbd2e; }
+ .mock-dots i:nth-child(3) { background: #28c840; }
+ .mock-url {
+ flex: 1; margin-left: 8px;
+ background: #fff; border-radius: 4px;
+ padding: 3px 8px;
+ font-size: 0.5rem; color: var(--text-3);
+ font-family: var(--mono); letter-spacing: 0.02em;
+ }
+
+ .mock-app {
+ display: grid;
+ grid-template-columns: 160px 1fr;
+ min-height: 340px;
+ }
+ @media (max-width: 600px) {
+ .mock-app { grid-template-columns: 1fr; }
+ .mock-side { display: none; }
+ }
+
+ /* Sidebar */
+ .mock-side {
+ background: #0d2b2e; color: rgba(255,255,255,0.65);
+ padding: 12px 0; font-size: 0.5625rem;
+ display: flex; flex-direction: column;
+ }
+ .mock-side-logo {
+ padding: 2px 14px 10px;
+ font-weight: 700; font-size: 0.6875rem;
+ color: #fff; letter-spacing: -0.02em;
+ font-style: italic;
+ }
+ .mock-side-sec {
+ padding: 10px 14px 3px;
+ font-size: 0.4375rem; text-transform: uppercase;
+ letter-spacing: 0.1em; color: rgba(255,255,255,0.3);
+ }
+ .mock-side-item {
+ padding: 5px 14px; font-size: 0.5625rem;
+ display: flex; align-items: center; gap: 6px;
+ }
+ .mock-side-item--on {
+ background: rgba(255,255,255,0.12); color: #fff;
+ border-radius: 0 4px 4px 0; margin-right: 6px;
+ }
+ .mock-side-dot {
+ width: 4px; height: 4px; border-radius: 50%;
+ background: currentColor; opacity: 0.5;
+ }
+
+ /* Content area */
+ .mock-body {
+ padding: 14px 16px; background: #f8f9fa;
+ overflow: hidden; font-size: 0.5625rem; color: var(--text);
+ }
+ .mock-breadcrumb {
+ font-size: 0.4375rem; color: var(--text-3);
+ margin-bottom: 4px; font-family: var(--mono);
+ letter-spacing: 0.04em;
+ }
+ .mock-title {
+ font-size: 0.75rem; font-weight: 600;
+ margin-bottom: 10px; letter-spacing: -0.01em;
+ }
+
+ /* Metric cards */
+ .mock-metrics { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+ .mock-m {
+ flex: 1; min-width: 60px;
+ background: #fff; border-radius: 5px;
+ padding: 8px 10px; border: 1px solid #eee;
+ }
+ .mock-m-label {
+ font-size: 0.375rem; text-transform: uppercase;
+ letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 3px;
+ }
+ .mock-m-val { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
+ .mock-m-delta {
+ font-size: 0.375rem; margin-top: 2px;
+ }
+ .mock-m-delta--up { color: #28a745; }
+ .mock-m-delta--down { color: #dc3545; }
+
+ /* Map */
+ .mock-map {
+ background: linear-gradient(145deg, #d4e8df, #a8d5c2 40%, #7ec4a5 70%, #5aad8a);
+ border-radius: 5px; height: 110px;
+ position: relative; margin-bottom: 10px;
+ overflow: hidden;
+ }
+ .mock-map-pin {
+ position: absolute; width: 8px; height: 8px;
+ background: #e74c3c; border-radius: 50%;
+ border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+ }
+ .mock-map-overlay {
+ position: absolute; top: 6px; right: 6px;
+ background: rgba(255,255,255,0.92); border-radius: 4px;
+ padding: 5px 8px; font-size: 0.4375rem;
+ box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+ }
+ .mock-map-overlay b { display: block; font-size: 0.5rem; }
+
+ /* Table */
+ .mock-tbl {
+ width: 100%; border-collapse: collapse;
+ background: #fff; border-radius: 5px;
+ overflow: hidden; border: 1px solid #eee;
+ }
+ .mock-tbl th {
+ text-align: left; padding: 6px 8px;
+ background: #f8f9fa; font-weight: 600;
+ font-size: 0.375rem; text-transform: uppercase;
+ letter-spacing: 0.06em; color: var(--text-3);
+ border-bottom: 1px solid #eee;
+ }
+ .mock-tbl td {
+ padding: 5px 8px; border-bottom: 1px solid #f5f5f5;
+ font-size: 0.5rem; color: var(--text);
+ }
+ .mock-badge {
+ display: inline-block; padding: 1px 5px;
+ border-radius: 3px; font-size: 0.375rem;
+ font-weight: 600;
+ }
+ .mock-badge--green { background: #e6f7ee; color: #1a7f43; }
+ .mock-badge--yellow { background: #fef7e0; color: #9a7b1a; }
+ .mock-badge--blue { background: #e8f0fe; color: #1a5fb4; }
+
+ /* Charts */
+ .mock-chart {
+ background: #fff; border-radius: 5px;
+ border: 1px solid #eee; padding: 10px;
+ margin-bottom: 10px;
+ }
+ .mock-chart-title {
+ font-size: 0.4375rem; font-weight: 600;
+ text-transform: uppercase; letter-spacing: 0.06em;
+ color: var(--text-3); margin-bottom: 8px;
+ }
+ .mock-chart-bars { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
+ .mock-chart-bar {
+ flex: 1; background: #0d2b2e; border-radius: 2px 2px 0 0;
+ min-width: 6px; transition: height 0.3s;
+ }
+ .mock-chart-bar--accent { background: var(--accent-yellow); }
+ .mock-chart-line {
+ height: 60px; position: relative;
+ }
+ .mock-chart-line svg {
+ width: 100%; height: 100%;
+ }
+
+ /* Tabs */
+ .mock-tabs { display: flex; gap: 0; margin-bottom: 10px; }
+ .mock-tab {
+ padding: 5px 12px; font-size: 0.4375rem; font-weight: 500;
+ color: var(--text-3); border-bottom: 2px solid transparent;
+ }
+ .mock-tab--on { color: #0d2b2e; border-bottom-color: #0d2b2e; }
+
+ /* Form elements */
+ .mock-input {
+ background: #fff; border: 1px solid #ddd; border-radius: 4px;
+ padding: 5px 8px; font-size: 0.5rem; color: var(--text);
+ width: 100%; margin-bottom: 6px;
+ }
+ .mock-select { composes: mock-input; appearance: none; }
+ .mock-checkbox {
+ display: flex; align-items: center; gap: 5px;
+ font-size: 0.5rem; color: var(--text); margin-bottom: 4px;
+ }
+ .mock-checkbox i {
+ width: 10px; height: 10px; border-radius: 2px;
+ border: 1.5px solid #0d2b2e; display: block; font-style: normal;
+ position: relative;
+ }
+ .mock-checkbox i.on { background: #0d2b2e; }
+ .mock-checkbox i.on::after {
+ content: ''; position: absolute;
+ left: 2px; top: 0; width: 3px; height: 6px;
+ border: solid #fff; border-width: 0 1.5px 1.5px 0;
+ transform: rotate(45deg);
+ }
+ .mock-btn-sm {
+ display: inline-block; padding: 4px 10px;
+ background: #0d2b2e; color: #fff;
+ border-radius: 4px; font-size: 0.4375rem; font-weight: 600;
+ }
+
+ /* Phone frame */
+ .mock-phone {
+ background: #1a1a1a; border-radius: 24px;
+ padding: 8px; max-width: 180px; margin: 0 auto;
+ box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+ }
+ .mock-phone-screen {
+ background: #fff; border-radius: 18px;
+ overflow: hidden; min-height: 320px;
+ font-family: var(--font); font-size: 0.5rem;
+ color: var(--text);
+ }
+ .mock-phone-status {
+ display: flex; justify-content: space-between;
+ padding: 6px 12px 2px;
+ font-size: 0.375rem; color: var(--text-3);
+ }
+ .mock-phone-header {
+ padding: 4px 12px 8px;
+ font-size: 0.6875rem; font-weight: 700;
+ color: var(--text); letter-spacing: -0.01em;
+ }
+ .mock-phone-body { padding: 0 12px 12px; }
+ .mock-phone-nav {
+ display: flex; justify-content: space-around;
+ padding: 8px 0; border-top: 1px solid #eee;
+ font-size: 0.3125rem; text-transform: uppercase;
+ letter-spacing: 0.06em; color: var(--text-3);
+ }
+ .mock-phone-nav span { text-align: center; }
+ .mock-phone-nav span.on { color: #0d2b2e; font-weight: 700; }
+
+ .mock-phone-card {
+ background: #f8f9fa; border-radius: 6px;
+ padding: 8px; margin-bottom: 6px;
+ }
+ .mock-phone-row {
+ display: flex; justify-content: space-between;
+ align-items: center; padding: 4px 0;
+ font-size: 0.4375rem; border-bottom: 1px solid #f0f0f0;
+ }
+ .mock-phone-row:last-child { border-bottom: none; }
+ .mock-offline {
+ display: flex; align-items: center; gap: 4px;
+ padding: 4px 12px; background: #fef7e0;
+ font-size: 0.3125rem; color: #9a7b1a; font-weight: 600;
+ }
+
+ /* Wireframe style (mid-fi process artifacts) */
+ .mock-wire {
+ background: #f5f5f5; border-radius: 8px;
+ border: 1px solid #e0e0e0; padding: 16px;
+ font-family: var(--font); font-size: 0.5rem;
+ color: #666; overflow: hidden;
+ height: 100%; min-height: 200px;
+ display: flex; flex-direction: column;
+ }
+ .mock-wire-title {
+ font-size: 0.5625rem; font-weight: 700; color: #444;
+ margin-bottom: 10px; padding-bottom: 6px;
+ border-bottom: 1px dashed #ddd;
+ }
+ /* Sticky notes */
+ .mock-stickies { display: flex; flex-wrap: wrap; gap: 4px; }
+ .mock-sticky {
+ padding: 5px 7px; border-radius: 2px;
+ font-size: 0.375rem; line-height: 1.3;
+ box-shadow: 1px 1px 2px rgba(0,0,0,0.06);
+ width: calc(33% - 3px); min-width: 48px;
+ }
+ .mock-sticky--y { background: #fff9c4; color: #6d5e00; }
+ .mock-sticky--b { background: #e3f2fd; color: #1565c0; }
+ .mock-sticky--p { background: #fce4ec; color: #ad1457; }
+ .mock-sticky--g { background: #e8f5e9; color: #2e7d32; }
+ /* Flow arrows */
+ .mock-flow { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+ .mock-flow-step {
+ background: #fff; border: 1px solid #ddd; border-radius: 4px;
+ padding: 6px 8px; font-size: 0.4375rem; font-weight: 500;
+ color: #444; text-align: center; flex: 1; min-width: 50px;
+ }
+ .mock-flow-step--on { background: #0d2b2e; color: #fff; border-color: #0d2b2e; }
+ .mock-flow-step--warn { border-color: #e74c3c; color: #e74c3c; }
+ .mock-flow-arrow { color: #ccc; font-size: 0.625rem; flex-shrink: 0; }
+ /* Tree diagram */
+ .mock-tree { padding-left: 12px; }
+ .mock-tree-node {
+ position: relative; padding: 3px 0 3px 14px;
+ font-size: 0.4375rem; color: #555;
+ }
+ .mock-tree-node::before {
+ content: ''; position: absolute; left: 0; top: 0;
+ width: 8px; height: 100%;
+ border-left: 1px solid #ccc; border-bottom: 1px solid #ccc;
+ }
+ .mock-tree-node:last-child::before { height: 50%; }
+ .mock-tree-node b { color: #333; font-weight: 600; }
+ /* Gray wireframe boxes */
+ .mock-wire-box {
+ background: #e8e8e8; border-radius: 3px;
+ padding: 6px 8px; margin-bottom: 4px;
+ font-size: 0.375rem; color: #888;
+ }
+ .mock-wire-box--dark { background: #d0d0d0; color: #666; }
+ .mock-wire-row { display: flex; gap: 4px; margin-bottom: 4px; }
+ .mock-wire-sidebar {
+ width: 40px; background: #ddd; border-radius: 3px;
+ padding: 4px; flex-shrink: 0;
+ }
+ .mock-wire-main { flex: 1; }
+ /* Annotation dots */
+ .mock-annot {
+ display: inline-flex; align-items: center; justify-content: center;
+ width: 14px; height: 14px; border-radius: 50%;
+ background: #e74c3c; color: #fff;
+ font-size: 0.3125rem; font-weight: 700;
+ position: absolute;
+ }
+
+ /* ============ LIGHTBOX (click any case-study image to expand) ============ */
+ [data-zoom] { cursor: zoom-in; }
+ .lightbox {
+ position: fixed; inset: 0;
+ background: rgba(15, 18, 22, 0.92);
+ backdrop-filter: blur(6px);
+ -webkit-backdrop-filter: blur(6px);
+ z-index: 9999;
+ display: flex; align-items: center; justify-content: center;
+ padding: clamp(1rem, 3vw, 3rem);
+ opacity: 0;
+ pointer-events: none;
+ transition: opacity 0.3s var(--ease);
+ }
+ .lightbox.is-open {
+ opacity: 1;
+ pointer-events: auto;
+ }
+ .lightbox img {
+ max-width: 100%;
+ max-height: 100%;
+ width: auto;
+ height: auto;
+ object-fit: contain;
+ border-radius: 12px;
+ /* Light backdrop so SVG diagrams keep their text contrast when expanded. */
+ background: #fafafa;
+ box-shadow: 0 32px 80px -20px rgba(0,0,0,0.6);
+ transform: scale(0.94);
+ transition: transform 0.32s var(--ease);
+ }
+ .lightbox.is-open img { transform: scale(1); }
+ .lightbox-close {
+ position: absolute;
+ top: clamp(0.75rem, 2vw, 1.5rem);
+ right: clamp(0.75rem, 2vw, 1.5rem);
+ width: 44px; height: 44px;
+ border-radius: 50%;
+ border: 1px solid rgba(255,255,255,0.25);
+ background: rgba(255,255,255,0.08);
+ color: #fcfcfc;
+ cursor: pointer;
+ display: flex; align-items: center; justify-content: center;
+ transition: background 0.25s, transform 0.25s;
+ }
+ .lightbox-close:hover {
+ background: rgba(255,255,255,0.18);
+ transform: scale(1.06);
+ }
+ .lightbox-close svg { width: 18px; height: 18px; }
+ body.lightbox-open { overflow: hidden; }
+ @media (prefers-reduced-motion: reduce) {
+ .lightbox, .lightbox img { transition: none; }
+ }
+ /* Live site link, sits below the case lead */
+ .case-live-link {
+   display: inline-flex; align-items: center; gap: 0.5rem;
+   font-family: var(--mono);
+   font-size: 0.6875rem; font-weight: 500;
+   letter-spacing: 0.14em; text-transform: uppercase;
+   color: var(--text);
+   padding: 0.5rem 0; margin: 1.25rem 0 2.25rem;
+   border-bottom: 1px solid var(--text);
+   transition: gap 0.25s var(--ease);
+   align-self: flex-start;
+   width: max-content;
+ }
+ .case-live-link:hover { gap: 0.75rem; }
+
+ /* Generic scroll-hint indicator for horizontal carousels */
+ .h-scroll-hint {
+ display: flex;
+ align-items: center;
+ gap: 0.75rem;
+ margin-top: 1.25rem;
+ }
+ .h-scroll-track {
+ flex: 1;
+ height: 2px;
+ background: var(--border);
+ border-radius: 1px;
+ position: relative;
+ overflow: hidden;
+ }
+ .h-scroll-thumb {
+ position: absolute;
+ top: 0; left: 0;
+ height: 100%;
+ width: 33%;
+ background: var(--accent-yellow, #f7fdb9);
+ border-radius: 1px;
+ transition: left 0.15s ease-out;
+ }
+ .h-scroll-label {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ white-space: nowrap;
+ }
+
+ /* ====== NEXT / OTHER WORK ====== */
+ .case-next {
+ padding-block: var(--section-py);
+ }
+ .case-next-header {
+ margin-bottom: clamp(2rem, 4vw, 3rem);
+ }
+ .case-next-header h2 {
+ max-width: none;
+ }
+ .case-next-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 1.5rem;
+ }
+ @media (min-width: 800px) {
+ .case-next-grid { grid-template-columns: 1fr 1fr; gap: 1.75rem; align-items: stretch; }
+ }
+ .case-next-card {
+ display: flex;
+ flex-direction: column;
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: 16px;
+ overflow: hidden;
+ text-decoration: none;
+ color: var(--text);
+ transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+ }
+ .case-next-card:hover {
+ transform: translateY(-6px);
+ border-color: var(--text);
+ box-shadow: 0 28px 56px -22px rgba(15, 23, 42, 0.18);
+ }
+ .case-next-thumb {
+ width: 100%;
+ aspect-ratio: 16/10;
+ overflow: hidden;
+ background: var(--bg-alt);
+ }
+ .case-next-thumb img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
+ }
+ .case-next-body {
+ padding: 1.75rem;
+ display: flex;
+ flex-direction: column;
+ gap: 0.6rem;
+ }
+ .case-next-body h3 {
+ font-size: 1.375rem;
+ font-weight: 500;
+ letter-spacing: -0.015em;
+ line-height: 1.3;
+ margin: 0;
+ }
+ .case-next-body .case-tag {
+ align-self: flex-start;
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ letter-spacing: 0.12em;
+ text-transform: uppercase;
+ color: var(--text-2);
+ background: var(--bg-alt);
+ padding: 4px 10px;
+ border-radius: 4px;
+ }
+ .case-next-body .case-link {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ letter-spacing: 0.14em;
+ text-transform: uppercase;
+ color: var(--text);
+ margin-top: 0.5rem;
+ }
+ /* Coming-soon variant, not interactive, with chip on the thumb */
+ .case-next-card--soon { cursor: default; }
+ .case-next-card--soon:hover {
+ transform: none;
+ border-color: var(--border);
+ box-shadow: none;
+ }
+ .case-next-card--soon .case-next-thumb { position: relative; cursor: default; }
+ /* Hover overlay, dark transparent backdrop with centred "Coming soon" copy */
+ .case-next-overlay {
+ position: absolute; inset: 0;
+ background: rgba(15, 22, 18, 0.55);
+ backdrop-filter: blur(2px);
+ -webkit-backdrop-filter: blur(2px);
+ display: flex; align-items: center; justify-content: center;
+ color: #fcfcfc;
+ font-family: var(--mono);
+ font-size: 0.75rem;
+ font-weight: 500;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ opacity: 0;
+ pointer-events: none;
+ transition: opacity 0.35s var(--ease);
+ }
+ .case-next-card--soon:hover .case-next-overlay { opacity: 1; }
+ </style>
 </head>
 
 <body>
 
-  <!-- Custom cursor -->
-  <div class="cursor" aria-hidden="true"></div>
+ <!-- Custom cursor -->
+ <div class="cursor" aria-hidden="true"></div>
 
-  <!-- NAV -->
-  <nav class="nav" role="navigation" aria-label="Main navigation">
-    <div class="wrap nav-inner">
-      <a href="../index.html" class="nav-logo">Pietra Gottardo.</a>
-      <div class="nav-right">
-        <ul class="nav-links">
-          <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
-          <li><a href="../index.html#services" data-i18n="nav_services">Services</a></li>
-          <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
-        </ul>
-        <div class="lang-toggle" role="group" aria-label="Language selector">
-          <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
-          <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
-        </div>
-      </div>
-    </div>
-  </nav>
+ <!-- NAV -->
+ <nav class="nav" role="navigation" aria-label="Main navigation">
+ <div class="wrap nav-inner">
+ <a href="../index.html" class="nav-logo">Pietra Gottardo.</a>
+ <div class="nav-right">
+ <ul class="nav-links">
+ <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
+ <li><a href="../index.html#services" data-i18n="nav_services">Services</a></li>
+ <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
+ </ul>
+ <div class="lang-toggle" role="group" aria-label="Language selector">
+ <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
+ <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
+ </div>
+ </div>
+ </div>
+ </nav>
 
-  <!-- CASE HERO -->
-  <section class="case-hero">
-    <div class="wrap">
-      <a href="../index.html#work" class="back-link r">
-        <span class="back-arrow">←</span>
-        <span data-i18n="back_to_projects">Back to projects</span>
-      </a>
+ <!-- CASE HERO -->
+ <section class="case-hero">
+ <div class="wrap">
+ <a href="../index.html#work" class="back-link r">
+ <span class="back-arrow">←</span>
+ <span data-i18n="back_to_projects">Back to projects</span>
+ </a>
 
-      <span class="case-tag r" data-i18n="case_tag">Environmental Tech · Climate Action Infrastructure</span>
+ <span class="case-tag r" data-i18n="case_tag">Environmental Tech · Climate Action Infrastructure</span>
 
-      <h1 class="r" data-i18n="case_title">Straatos Application</h1>
+ <h1 class="r" data-i18n="case_title">Straatos Application</h1>
 
-      <p class="case-lead r" data-i18n="case_lead">Straatos is a digital infrastructure for environmental and outdoor projects. It supports the full lifecycle of climate action: from field data collection to credit issuance, ensuring that every data point is traceable, verifiable, and fair.</p>
+ <p class="case-lead r" data-i18n="case_lead">Straatos is a digital infrastructure for environmental and outdoor projects. It supports the full lifecycle of climate action: from field data collection to credit issuance, ensuring that every data point is traceable, verifiable, and fair.</p>
 
-      <div class="case-meta r-stagger">
-        <div class="case-meta-item r">
-          <span class="case-meta-label" data-i18n="meta_role">Role</span>
-          <span class="case-meta-value" data-i18n="meta_role_val">Lead Product Designer</span>
-        </div>
-        <div class="case-meta-item r">
-          <span class="case-meta-label" data-i18n="meta_timeline">Timeline</span>
-          <span class="case-meta-value" data-i18n="meta_timeline_val">6 months · 2024</span>
-        </div>
-        <div class="case-meta-item r">
-          <span class="case-meta-label" data-i18n="meta_deliverables">Deliverables</span>
-          <span class="case-meta-value" data-i18n="meta_deliverables_val">Web App, Mobile App</span>
-        </div>
-        <div class="case-meta-item r">
-          <span class="case-meta-label" data-i18n="meta_team">Team</span>
-          <span class="case-meta-value" data-i18n="meta_team_val">Me + 6 Engineers</span>
-        </div>
-      </div>
+ <a href="https://www.straatos.io/" target="_blank" rel="noopener" class="case-live-link r">
+   <span data-i18n="live_link">Visit live site</span>
+   <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+     <path d="M6 2h8v8M14 2L6 10M12 9v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h4"/>
+   </svg>
+ </a>
 
-      <div class="case-hero-mockup r">
-        <img src="assets/straatos-hero.png" alt="Straatos hero — platform overview">
-      </div>
-    </div>
-  </section>
+ <div class="case-meta r-stagger">
+ <div class="case-meta-item r">
+ <span class="case-meta-label" data-i18n="meta_role">Role</span>
+ <span class="case-meta-value" data-i18n="meta_role_val">Lead Product Designer</span>
+ </div>
+ <div class="case-meta-item r">
+ <span class="case-meta-label" data-i18n="meta_timeline">Timeline</span>
+ <span class="case-meta-value" data-i18n="meta_timeline_val">6 months · 2024</span>
+ </div>
+ <div class="case-meta-item r">
+ <span class="case-meta-label" data-i18n="meta_deliverables">Deliverables</span>
+ <span class="case-meta-value" data-i18n="meta_deliverables_val">Web App, Mobile App</span>
+ </div>
+ <div class="case-meta-item r">
+ <span class="case-meta-label" data-i18n="meta_team">Team</span>
+ <span class="case-meta-value" data-i18n="meta_team_val">Me + 6 Engineers</span>
+ </div>
+ </div>
 
-  <!-- ====== CHALLENGE / SOLUTION ====== -->
-  <section class="case-section case-section--alt">
-    <div class="wrap">
-      <div class="cs-grid">
-        <div class="cs-block cs-block--challenge r">
-          <span class="cs-block-label" data-i18n="challenge_label">The Challenge</span>
-          <h3 data-i18n="challenge_title">Restoration projects ran on spreadsheets, paper, and hope.</h3>
-          <p data-i18n="challenge_p1">Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.</p>
-          <p data-i18n="challenge_p2">Compliance with Verra methodologies like VM0033 required meticulous audit trails — weeks of manual reconciliation per project cycle, prone to errors, delaying critical verification milestones.</p>
-        </div>
+ <div class="case-hero-mockup r">
+ <img src="assets/straatos-hero.png" alt="Straatos hero, platform overview">
+ </div>
+ </div>
+ </section>
 
-        <div class="cs-block cs-block--solution r">
-          <span class="cs-block-label" data-i18n="solution_label">The Solution</span>
-          <h3 data-i18n="solution_title">One platform. Every data point traceable.</h3>
-          <p data-i18n="solution_p1">Straatos unifies field capture, project management, and verifier-ready reporting in a single digital workspace. Technicians record offline on tablet or mobile; once back online, data flows into structured, methodology-aware records.</p>
-          <p data-i18n="solution_p2">Audit trails build themselves. Every entry carries provenance, timestamps, and the operator's identity, so verification becomes a review of what's already documented — not a forensic reconstruction.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+ <!-- ====== CHALLENGE / SOLUTION ====== -->
+ <section class="case-section case-section--alt">
+ <div class="wrap">
+ <div class="cs-grid">
+ <div class="cs-block cs-block--challenge r">
+ <span class="cs-block-label" data-i18n="challenge_label">The Challenge</span>
+ <h3 data-i18n="challenge_title">Restoration projects ran on spreadsheets, paper, and hope.</h3>
+ <p data-i18n="challenge_p1">Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.</p>
+ <p data-i18n="challenge_p2">Compliance with Verra methodologies like VM0033 required meticulous audit trails, weeks of manual reconciliation per project cycle, prone to errors, delaying critical verification milestones.</p>
+ </div>
 
-  <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
-  <section class="case-section">
-    <div class="wrap">
-      <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
-        <h2 data-i18n="ia_title">Two scopes, one navigation grammar.</h2>
-        <p class="explore-intro" data-i18n="ia_intro">The platform lives in two modes. <strong>Application</strong> is the cross-project shell — analysis, modules and data that sit above any single project. <strong>Project</strong> is the working file — profile, preparation, plots, cycles, monitoring. Same sidebar, same hierarchy, different scope. The user never has to relearn where things are.</p>
-      </div>
-      <div class="r" style="margin-top: 2rem; border-radius: 12px; overflow: hidden; background: #f5f6f7;">
-        <img src="assets/straatos-sitemap.png?v=4" alt="Sitemap diagram showing two branches: Application (Analysis, Modules, Data) and Projects (Overview, Project profile, Preparation, Operations, Planting cycles)" style="width:100%; display:block;">
-      </div>
-    </div>
-  </section>
+ <div class="cs-block cs-block--solution r">
+ <span class="cs-block-label" data-i18n="solution_label">The Solution</span>
+ <h3 data-i18n="solution_title">One platform. Every data point traceable.</h3>
+ <p data-i18n="solution_p1">Straatos unifies field capture, project management, and verifier-ready reporting in a single digital workspace. Technicians record offline on tablet or mobile; once back online, data flows into structured, methodology-aware records.</p>
+ <p data-i18n="solution_p2">Audit trails build themselves. Every entry carries provenance, timestamps, and the operator's identity, so verification becomes a review of what's already documented, not a forensic reconstruction.</p>
+ </div>
+ </div>
+ </div>
+ </section>
 
-  <!-- ====== KEY INSIGHTS ====== -->
-  <section class="case-section case-section--insights">
-    <video class="insights-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true"
-           src="assets/insights-bg.mp4"></video>
-    <div class="insights-overlay" aria-hidden="true"></div>
-    <div class="wrap">
-      <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="insights_label">Design Principles</p>
-        <h2 data-i18n="insights_title">What the research made impossible to ignore.</h2>
-      </div>
-      <div class="insights-grid r-stagger">
+ <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
+ <h2 data-i18n="ia_title">Two scopes, one navigation grammar.</h2>
+ <p class="explore-intro" data-i18n="ia_intro">The platform lives in two modes. <strong>Application</strong> is the cross-project shell, analysis, modules and data that sit above any single project. <strong>Project</strong> is the working file, profile, preparation, plots, cycles, monitoring. Same sidebar, same hierarchy, different scope. The user never has to relearn where things are.</p>
+ </div>
+ <div class="r" style="margin-top: 2rem; border-radius: 12px; overflow: hidden; background: #f5f6f7;">
+ <img src="assets/straatos-sitemap.png?v=4" alt="Sitemap diagram showing two branches: Application (Analysis, Modules, Data) and Projects (Overview, Project profile, Preparation, Operations, Planting cycles)" style="width:100%; display:block;">
+ </div>
+ </div>
+ </section>
 
-        <div class="insight-item r">
-          <span class="insight-num">01</span>
-          <div class="insight-content">
-            <h3 data-i18n="insight_1_t">Compliance is a by-product, not a goal.</h3>
-            <p data-i18n="insight_1_d">Users don't wake up thinking about VM0033. They need the platform to quietly translate their field data into compliant outputs, without requiring them to memorize the methodology's internals.</p>
-          </div>
-        </div>
+ <!-- ====== KEY INSIGHTS ====== -->
+ <section class="case-section case-section--insights">
+ <video class="insights-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true"
+ src="assets/insights-bg.mp4"></video>
+ <div class="insights-overlay" aria-hidden="true"></div>
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="insights_label">Design Principles</p>
+ <h2 data-i18n="insights_title">What the research made impossible to ignore.</h2>
+ </div>
+ <div class="insights-grid r-stagger">
 
-        <div class="insight-item r">
-          <span class="insight-num">02</span>
-          <div class="insight-content">
-            <h3 data-i18n="insight_2_t">Local voices are undervalued by existing tools.</h3>
-            <p data-i18n="insight_2_d">Testimonials from community members — often gathered in local languages — carried real weight in reports, yet most carbon tools treated them as an afterthought. I gave them first-class status.</p>
-          </div>
-        </div>
+ <div class="insight-item r">
+ <span class="insight-num">01</span>
+ <div class="insight-content">
+ <h3 data-i18n="insight_1_t">Compliance is a by-product, not a goal.</h3>
+ <p data-i18n="insight_1_d">Users don't wake up thinking about VM0033. They need the platform to quietly translate their field data into compliant outputs, without requiring them to memorize the methodology's internals.</p>
+ </div>
+ </div>
 
-        <div class="insight-item r">
-          <span class="insight-num">03</span>
-          <div class="insight-content">
-            <h3 data-i18n="insight_3_t">Data must be structured, but able to flow.</h3>
-            <p data-i18n="insight_3_d">The data gathered on the platform must be structured so every source — from Brazil to Japan — compiles the same way, online or offline, then flows into different methodologies and analyses.</p>
-          </div>
-        </div>
+ <div class="insight-item r">
+ <span class="insight-num">02</span>
+ <div class="insight-content">
+ <h3 data-i18n="insight_2_t">Local voices are undervalued by existing tools.</h3>
+ <p data-i18n="insight_2_d">Testimonials from community members, often gathered in local languages, carried real weight in reports, yet most carbon tools treated them as an afterthought. I gave them first-class status.</p>
+ </div>
+ </div>
 
-      </div>
-    </div>
-  </section>
+ <div class="insight-item r">
+ <span class="insight-num">03</span>
+ <div class="insight-content">
+ <h3 data-i18n="insight_3_t">Data must be structured, but able to flow.</h3>
+ <p data-i18n="insight_3_d">The data gathered on the platform must be structured so every source, from Brazil to Japan, compiles the same way, online or offline, then flows into different methodologies and analyses.</p>
+ </div>
+ </div>
 
-  <!-- ====== SWIMLANE / PROCESS ====== -->
-  <section class="case-section">
-    <div class="wrap">
-      <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="swim_label">Process · Swimlane</p>
-        <h2 data-i18n="swim_title">Who does what, when — across a Straatos project lifecycle.</h2>
-        <p class="explore-intro" data-i18n="swim_intro">Four actors, five phases. The Platform sits as its own lane because it carries the data continuously between human handoffs — picking up offline captures, surfacing them upstream, and packaging everything for the verifier at the end.</p>
-      </div>
-      <div class="r" style="margin-top: 2rem; overflow-x: auto; -webkit-overflow-scrolling: touch;">
-        <img src="assets/straatos-swimlane.png?v=1" alt="Swimlane diagram — Project Developer, Field Technician, Straatos and Verra Verifier across five phases: Project starts, Data gathering, Area mapping, Site visits, Apply methodology" style="width:100%; display:block; margin: 0 auto;">
-      </div>
-    </div>
-  </section>
+ </div>
+ </div>
+ </section>
 
-  <!-- ====== VISUAL SYSTEM (bento: palette + typography + icons) ====== -->
-  <section class="case-section case-section--alt">
-    <div class="wrap">
-      <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="visual_label">Visual System</p>
-        <h2 data-i18n="visual_title">Visual identity.</h2>
-      </div>
+ <!-- ====== SWIMLANE / PROCESS ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="swim_label">Process · Swimlane</p>
+ <h2 data-i18n="swim_title">Who does what, when, across a Straatos project lifecycle.</h2>
+ <p class="explore-intro" data-i18n="swim_intro">Four actors, five phases. The Platform sits as its own lane because it carries the data continuously between human handoffs, picking up offline captures, surfacing them upstream, and packaging everything for the verifier at the end.</p>
+ </div>
+ <div class="r" style="margin-top: 2rem; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+ <img src="assets/straatos-swimlane.png?v=1" alt="Swimlane diagram, Project Developer, Field Technician, Straatos and Verra Verifier across five phases: Project starts, Data gathering, Area mapping, Site visits, Apply methodology" style="width:100%; display:block; margin: 0 auto;">
+ </div>
+ </div>
+ </section>
 
-      <div class="id-car r">
-        <div class="id-car-track">
-          <div class="id-car-slide id-car-slide--palette">
-            <img src="assets/straatos-palette.png?v=5" alt="Color palette with hex codes: #1B989B teal primary, #197778/#095D5E deep teals, #E4FCFD/#C5F5F5/#A2E9E9/#57CACB ice and mint tints, #F85531 coral, #FE9065 peach">
-          </div>
+ <!-- ====== VISUAL SYSTEM (bento: palette + typography + icons) ====== -->
+ <section class="case-section case-section--alt">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="visual_label">Visual System</p>
+ <h2 data-i18n="visual_title">Visual identity.</h2>
+ </div>
 
-          <div class="id-car-slide id-car-slide--overlay">
-            <video src="assets/straatos-flamingos.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Looping video of flamingos in the field"></video>
-            <div class="id-car-slide__type" aria-hidden="true">
-              <span class="id-car-slide__type-tag">Typeface</span>
-              <div class="id-car-slide__type-spec">
-                <span class="id-car-slide__type-row id-car-slide__type-row--caps">ABCDEFGHIJKLMN</span>
-                <span class="id-car-slide__type-row id-car-slide__type-row--caps">OPQRSTUVWXYZ</span>
-                <span class="id-car-slide__type-row id-car-slide__type-row--lower">abcdefghijklmno</span>
-                <span class="id-car-slide__type-row id-car-slide__type-row--lower">pqrstuvwxyz</span>
-                <span class="id-car-slide__type-row id-car-slide__type-row--num">0 1 2 3 4 5 6 7 8 9</span>
-              </div>
-              <div class="id-car-slide__type-meta">
-                <b>SF UI Display</b>
-                Apple system · 200–700
-              </div>
-            </div>
-          </div>
+ <div class="id-car r">
+ <div class="id-car-track" id="idCarTrack">
+ <div class="id-car-slide id-car-slide--palette">
+ <img src="assets/straatos-palette.png?v=5" alt="Color palette with hex codes: #1B989B teal primary, #197778/#095D5E deep teals, #E4FCFD/#C5F5F5/#A2E9E9/#57CACB ice and mint tints, #F85531 coral, #FE9065 peach">
+ </div>
 
-          <div class="id-car-slide id-car-slide--bare">
-            <img src="assets/straatos-icons.png" alt="Icon set — fauna, flora and field markers in teal stroke style">
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+ <div class="id-car-slide id-car-slide--overlay">
+ <video src="assets/straatos-flamingos.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Looping video of flamingos in the field"></video>
+ <div class="id-car-slide__type" aria-hidden="true">
+ <span class="id-car-slide__type-tag">Typeface</span>
+ <div class="id-car-slide__type-spec">
+ <span class="id-car-slide__type-row id-car-slide__type-row--caps">ABCDEFGHIJKLMN</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--caps">OPQRSTUVWXYZ</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--lower">abcdefghijklmno</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--lower">pqrstuvwxyz</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--num">0 1 2 3 4 5 6 7 8 9</span>
+ </div>
+ <div class="id-car-slide__type-meta">
+ <b>SF UI Display</b>
+ Apple system · 200–700
+ </div>
+ </div>
+ </div>
 
-  <!-- ====== APPLICATION (all product mockups in one section) ====== -->
-  <section class="case-section">
-    <div class="wrap">
-      <div class="case-section-header r">
-        <p class="case-section-label" data-i18n="product_label">The Product</p>
-        <h2 data-i18n="product_title">Application.</h2>
-        <p class="explore-intro" data-i18n="product_intro">Five surfaces — one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.</p>
-      </div>
+ <div class="id-car-slide id-car-slide--bare">
+ <img src="assets/straatos-icons.png" alt="Icon set, fauna, flora and field markers in teal stroke style">
+ </div>
+ </div>
+ <div class="h-scroll-hint">
+ <div class="h-scroll-track">
+ <div class="h-scroll-thumb" id="idCarThumb"></div>
+ </div>
+ <span class="h-scroll-label" data-i18n="scroll_hint">Scroll to explore</span>
+ </div>
+ </div>
+ </div>
+ </section>
 
-      <div class="app-stack r-stagger">
-        <figure class="app-shot r">
-          <img src="assets/straatos-final.png" alt="Straatos product overview mockup">
-        </figure>
+ <!-- ====== APPLICATION (all product mockups in one section) ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="product_label">The Product</p>
+ <h2 data-i18n="product_title">Application.</h2>
+ <p class="explore-intro" data-i18n="product_intro">Five surfaces, one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.</p>
+ </div>
 
-        <figure class="app-shot app-shot--embed r">
-          <div class="embed-frame" style="aspect-ratio: 5171 / 2840;">
-            <iframe class="embed-iframe" src="assets/straatos-bento.html"
-                    title="Straatos analysis composition — Salinity levels, Key indicators, Awareness Raising, Species composition with video background, and Stakeholder Engagement"
-                    loading="lazy" scrolling="no" allow="autoplay"></iframe>
-          </div>
-          <figcaption data-i18n="fig_analysis">Analysis — charts, KPIs and field telemetry composed for verifier review</figcaption>
-        </figure>
+ <div class="app-stack r-stagger">
+ <figure class="app-shot r">
+ <img src="assets/straatos-final.png" alt="Straatos product overview mockup">
+ </figure>
 
-        <figure class="app-shot app-shot--bg-full r">
-          <img src="assets/project-creation.png" alt="Straatos project creation composition — laptop with the New Project drawer (cover image, project type, country, activity type, stage, title), a New Document panel for uploading files (SOS Mangrove Records: validation evidence, satellite boundary maps, field survey participants), and a Comments panel with stakeholder messages from Mary Brown and John Fontaine">
-          <figcaption data-i18n="fig_project">Project creation — drawer for new projects, document upload and stakeholder comments</figcaption>
-        </figure>
+ <figure class="app-shot app-shot--embed r">
+ <div class="embed-frame" style="aspect-ratio: 5171 / 2840;">
+ <iframe class="embed-iframe" src="assets/straatos-bento.html"
+ title="Straatos analysis composition, Salinity levels, Key indicators, Awareness Raising, Species composition with video background, and Stakeholder Engagement"
+ loading="lazy" scrolling="no" allow="autoplay"></iframe>
+ </div>
+ <figcaption data-i18n="fig_analysis">Analysis, charts, KPIs and field telemetry composed for verifier review</figcaption>
+ </figure>
 
-        <figure class="app-shot app-shot--pair r">
-          <div class="app-pair">
-            <div class="app-pair__cell app-pair__cell--phone">
-              <img src="assets/straatos-phone.png?v=2" alt="Two iPhones showing the Daily Planting form — details, species data, photo evidence, and submit/save draft actions">
-            </div>
-            <div class="app-pair__cell app-pair__cell--polygon">
-              <video src="assets/polygon-draw.mp4" autoplay muted loop playsinline preload="metadata"
-                     aria-label="Pen tool drawing a polygon around a mangrove area on satellite imagery, then closing and filling the shape"></video>
-            </div>
-          </div>
-          <figcaption data-i18n="fig_field">Field capture — daily planting forms on mobile + boundary drawing on satellite</figcaption>
-        </figure>
+ <figure class="app-shot app-shot--bg-full r">
+ <img src="assets/project-creation.png" alt="Straatos project creation composition, laptop with the New Project drawer (cover image, project type, country, activity type, stage, title), a New Document panel for uploading files (SOS Mangrove Records: validation evidence, satellite boundary maps, field survey participants), and a Comments panel with stakeholder messages from Mary Brown and John Fontaine">
+ <figcaption data-i18n="fig_project">Project creation, drawer for new projects, document upload and stakeholder comments</figcaption>
+ </figure>
 
-        <figure class="app-shot app-shot--video-bg r">
-          <div class="video-bg-frame">
-            <video class="video-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true"
-                   src="assets/calculations-bg.mp4"></video>
-            <div class="video-bg-overlay" aria-hidden="true"></div>
-            <div class="video-bg-fg ipad-fg">
-              <div class="fg-video-card">
-                <video autoplay muted loop playsinline preload="auto"
-                       src="assets/calculations.mov"
-                       aria-label="Straatos calculations module — biomass, carbon stock and uncertainty figures derived from field measurements"></video>
-              </div>
-            </div>
-          </div>
-          <figcaption data-i18n="fig_calc">Calculations — biomass, carbon stock and uncertainty derived from field data</figcaption>
-        </figure>
+ <figure class="app-shot app-shot--pair r">
+ <div class="app-pair">
+ <div class="app-pair__cell app-pair__cell--phone">
+ <img src="assets/straatos-phone.png?v=2" alt="Two iPhones showing the Daily Planting form, details, species data, photo evidence, and submit/save draft actions">
+ </div>
+ <div class="app-pair__cell app-pair__cell--polygon">
+ <video src="assets/polygon-draw.mp4" autoplay muted loop playsinline preload="metadata"
+ aria-label="Pen tool drawing a polygon around a mangrove area on satellite imagery, then closing and filling the shape"></video>
+ </div>
+ </div>
+ <figcaption data-i18n="fig_field">Field capture, daily planting forms on mobile + boundary drawing on satellite</figcaption>
+ </figure>
 
-        <figure class="app-shot app-shot--bg-full r">
-          <img src="assets/straatos-mockup-04.png?v=2" alt="Straatos analysis composition — second view">
-          <figcaption data-i18n="fig_sim">Simulation — forecast canopy and sequestration before lock-in</figcaption>
-        </figure>
+ <figure class="app-shot app-shot--video-bg r">
+ <div class="video-bg-frame">
+ <video class="video-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true"
+ src="assets/calculations-bg.mp4"></video>
+ <div class="video-bg-overlay" aria-hidden="true"></div>
+ <div class="video-bg-fg ipad-fg">
+ <div class="fg-video-card">
+ <video autoplay muted loop playsinline preload="auto"
+ src="assets/calculations.mov"
+ aria-label="Straatos calculations module, biomass, carbon stock and uncertainty figures derived from field measurements"></video>
+ </div>
+ </div>
+ </div>
+ <figcaption data-i18n="fig_calc">Calculations, biomass, carbon stock and uncertainty derived from field data</figcaption>
+ </figure>
 
-        <figure class="app-shot r">
-          <img src="assets/straatos-mockup-03.png" alt="Two stacked screens: a desktop showing the Saloum 2025 Planting Cycle Summary, and a tablet showing the Saloum 2025 Monitoring Campaign Summary">
-          <figcaption data-i18n="fig_cycles">Cycles &amp; monitoring — audit-ready by default</figcaption>
-        </figure>
+ <figure class="app-shot app-shot--bg-full r">
+ <img src="assets/straatos-mockup-04.png?v=2" alt="Straatos analysis composition, second view">
+ <figcaption data-i18n="fig_sim">Simulation, forecast canopy and sequestration before lock-in</figcaption>
+ </figure>
 
-      </div>
-    </div>
-  </section>
+ <figure class="app-shot r">
+ <img src="assets/straatos-mockup-03.png" alt="Two stacked screens: a desktop showing the Saloum 2025 Planting Cycle Summary, and a tablet showing the Saloum 2025 Monitoring Campaign Summary">
+ <figcaption data-i18n="fig_cycles">Cycles &amp; monitoring, audit-ready by default</figcaption>
+ </figure>
+
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== NEXT / OTHER WORK ====== -->
+ <section class="case-section case-section--alt case-next">
+ <div class="wrap">
+ <div class="case-next-header r">
+ <p class="case-section-label" data-i18n="next_label">Next up</p>
+ <h2 data-i18n="next_title">Other work</h2>
+ </div>
+ <div class="case-next-grid r-stagger">
+ <a href="wazi.html" class="case-next-card r">
+ <div class="case-next-thumb">
+ <img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI Shipments view on a tablet held in two hands">
+ </div>
+ <div class="case-next-body">
+ <span class="case-tag" data-i18n="next_wazi_tag">Responsible Sourcing</span>
+ <h3 data-i18n="next_wazi_t">WAZI, The Digital Backbone for Ethical Gold</h3>
+ <span class="case-link" data-i18n="next_cta">Read case study →</span>
+ </div>
+ </a>
+ <div class="case-next-card case-next-card--soon r" aria-disabled="true">
+ <div class="case-next-thumb">
+ <img src="assets/safra-hero.png" alt="Safra, a sunset-lit Brazilian crop field with a centred card showing a soy leaf texture and the 'safra' wordmark in yellow.">
+ <span class="case-next-overlay" aria-hidden="true">
+   <span data-i18n="next_soon">Coming soon</span>
+ </span>
+ </div>
+ <div class="case-next-body">
+ <span class="case-tag" data-i18n="next_safra_tag">Sustainable Agribusiness</span>
+ <h3 data-i18n="next_safra_t">Safra, Operating system for sustainable Brazilian agriculture</h3>
+ <span class="case-link" data-i18n="next_soon">Coming soon</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ </section>
 
 
-  <!-- ====== STAGE 3 sections go here ======-->
+ <!-- ====== STAGE 3 sections go here ======-->
 
-  <script>
-    /* ------- i18n (EN / PT-BR) ------- */
-    const T = {
-      en: {
-        nav_work: "Work",
-        nav_services: "Services",
-        nav_contact: "Contact",
-        back_to_projects: "Back to projects",
-        case_tag: "Environmental Tech · Climate Action Infrastructure",
-        case_title: "Straatos Application",
-        case_lead: "Straatos is a digital infrastructure for environmental and outdoor projects. It supports the full lifecycle of climate action: from field data collection to credit issuance, ensuring that every data point is traceable, verifiable, and fair.",
-        meta_role: "Role",
-        meta_role_val: "Lead Product Designer",
-        meta_timeline: "Timeline",
-        meta_timeline_val: "6 months · 2024",
-        meta_deliverables: "Deliverables",
-        meta_deliverables_val: "Web App, Mobile App",
-        meta_team: "Team",
-        meta_team_val: "Me + 6 Engineers",
-        challenge_label: "The Challenge",
-        challenge_title: "Restoration projects ran on spreadsheets, paper, and hope.",
-        challenge_p1: "Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.",
-        challenge_p2: "Compliance with Verra methodologies like VM0033 required meticulous audit trails — weeks of manual reconciliation per project cycle, prone to errors, delaying critical verification milestones.",
-        solution_label: "The Solution",
-        solution_title: "One platform. Every data point traceable.",
-        solution_p1: "Straatos unifies field capture, project management, and verifier-ready reporting in a single digital workspace. Technicians record offline on tablet or mobile; once back online, data flows into structured, methodology-aware records.",
-        solution_p2: "Audit trails build themselves. Every entry carries provenance, timestamps, and the operator's identity, so verification becomes a review of what's already documented — not a forensic reconstruction.",
-        ia_label: "Information Architecture",
-        ia_title: "Two scopes, one navigation grammar.",
-        ia_intro: "The platform lives in two modes. <strong>Application</strong> is the cross-project shell — analysis, modules and data that sit above any single project. <strong>Project</strong> is the working file — profile, preparation, plots, cycles, monitoring. Same sidebar, same hierarchy, different scope. The user never has to relearn where things are.",
-        insights_label: "Design Principles",
-        insights_title: "What the research made impossible to ignore.",
-        insight_1_t: "Compliance is a by-product, not a goal.",
-        insight_1_d: "Users don't wake up thinking about VM0033. They need the platform to quietly translate their field data into compliant outputs, without requiring them to memorize the methodology's internals.",
-        insight_2_t: "Local voices are undervalued by existing tools.",
-        insight_2_d: "Testimonials from community members — often gathered in local languages — carried real weight in reports, yet most carbon tools treated them as an afterthought. I gave them first-class status.",
-        insight_3_t: "Data must be structured, but able to flow.",
-        insight_3_d: "The data gathered on the platform must be structured so every source — from Brazil to Japan — compiles the same way, online or offline, then flows into different methodologies and analyses.",
-        swim_label: "Process · Swimlane",
-        swim_title: "Who does what, when — across a Straatos project lifecycle.",
-        swim_intro: "Four actors, five phases. The Platform sits as its own lane because it carries the data continuously between human handoffs — picking up offline captures, surfacing them upstream, and packaging everything for the verifier at the end.",
-        visual_label: "Visual System",
-        visual_title: "Visual identity.",
-        product_label: "The Product",
-        product_title: "Application.",
-        product_intro: "Five surfaces — one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.",
-        fig_analysis: "Analysis — charts, KPIs and field telemetry composed for verifier review",
-        fig_project: "Project creation — drawer for new projects, document upload and stakeholder comments",
-        fig_field: "Field capture — daily planting forms on mobile + boundary drawing on satellite",
-        fig_calc: "Calculations — biomass, carbon stock and uncertainty derived from field data",
-        fig_sim: "Simulation — forecast canopy and sequestration before lock-in",
-        fig_cycles: "Cycles &amp; monitoring — audit-ready by default"
-      },
-      pt: {
-        nav_work: "Projetos",
-        nav_services: "Serviços",
-        nav_contact: "Contato",
-        back_to_projects: "Voltar para projetos",
-        case_tag: "Tecnologia Ambiental · Infraestrutura para Ação Climática",
-        case_title: "Straatos Application",
-        case_lead: "Straatos é uma infraestrutura digital para projetos ambientais e de campo. Suporta todo o ciclo de vida da ação climática: da coleta de dados em campo à emissão de créditos, garantindo que cada dado seja rastreável, verificável e justo.",
-        meta_role: "Função",
-        meta_role_val: "Lead Product Designer",
-        meta_timeline: "Período",
-        meta_timeline_val: "6 meses · 2024",
-        meta_deliverables: "Entregas",
-        meta_deliverables_val: "Web App, App Mobile",
-        meta_team: "Time",
-        meta_team_val: "Eu + 6 Engenheiros",
-        challenge_label: "O Desafio",
-        challenge_title: "Projetos de restauração rodavam em planilhas, papel e esperança.",
-        challenge_p1: "Times gerenciando projetos de carbono baseados em natureza malabarismo de dados entre planilhas, anotações de campo em papel, imagens de satélite e sistemas legados desconectados. Técnicos em locais remotos não tinham ferramentas que funcionassem offline e acompanhassem o fluxo de trabalho do dia a dia.",
-        challenge_p2: "Conformidade com metodologias Verra como a VM0033 exigia trilhas de auditoria meticulosas — semanas de reconciliação manual por ciclo de projeto, sujeitas a erros, atrasando marcos críticos de verificação.",
-        solution_label: "A Solução",
-        solution_title: "Uma plataforma. Cada dado rastreável.",
-        solution_p1: "A Straatos unifica captura em campo, gestão de projetos e relatórios prontos para verificação em um único workspace digital. Os técnicos registram offline em tablet ou celular; ao voltar online, os dados fluem para registros estruturados e cientes da metodologia.",
-        solution_p2: "Trilhas de auditoria se constroem sozinhas. Cada entrada carrega proveniência, timestamps e a identidade do operador, então a verificação vira uma revisão do que já está documentado — não uma reconstrução forense.",
-        ia_label: "Arquitetura da Informação",
-        ia_title: "Dois escopos, uma única gramática de navegação.",
-        ia_intro: "A plataforma vive em dois modos. <strong>Application</strong> é a camada que atravessa projetos — análises, módulos e dados que ficam acima de qualquer projeto isolado. <strong>Project</strong> é o arquivo de trabalho — perfil, preparação, parcelas, ciclos, monitoramento. Mesma sidebar, mesma hierarquia, escopo diferente. O usuário nunca precisa reaprender onde as coisas estão.",
-        insights_label: "Princípios de Design",
-        insights_title: "O que a pesquisa tornou impossível ignorar.",
-        insight_1_t: "Conformidade é subproduto, não objetivo.",
-        insight_1_d: "Usuários não acordam pensando em VM0033. Eles precisam que a plataforma traduza silenciosamente os dados de campo em outputs em conformidade — sem precisar memorizar os detalhes da metodologia.",
-        insight_2_t: "Vozes locais são subvalorizadas pelas ferramentas existentes.",
-        insight_2_d: "Depoimentos de membros da comunidade — muitas vezes coletados em idiomas locais — pesavam de verdade nos relatórios, mas a maioria das ferramentas de carbono os tratava como detalhe secundário. Eu os elevei a status de primeira classe.",
-        insight_3_t: "Os dados precisam ser estruturados, mas com fluidez.",
-        insight_3_d: "Os dados coletados na plataforma têm que ser estruturados para que toda fonte — do Brasil ao Japão — se compile da mesma forma, online ou offline, e então flua para diferentes metodologias e análises.",
-        swim_label: "Processo · Swimlane",
-        swim_title: "Quem faz o quê, e quando — ao longo do ciclo de um projeto Straatos.",
-        swim_intro: "Quatro atores, cinco fases. A Plataforma ocupa sua própria pista porque carrega os dados continuamente entre os handoffs humanos — recolhendo capturas offline, levando-as adiante e empacotando tudo para o verificador no fim.",
-        visual_label: "Sistema Visual",
-        visual_title: "Identidade visual.",
-        product_label: "O Produto",
-        product_title: "Application.",
-        product_intro: "Cinco superfícies — um único modelo mental. O dashboard se ancora num globo 3D, cada projeto fixado em seu lugar. Dali, project developers entram em ciclos e campanhas, vistas de parcelas via satélite, e por fim simulações que projetam os mesmos números que o verificador vai ler no final. Sem tradução entre telas; os dados fluem por uma estrutura só.",
-        fig_analysis: "Análise — gráficos, KPIs e telemetria de campo compostos para revisão do verificador",
-        fig_project: "Criação de projeto — drawer para novos projetos, upload de documento e comentários de stakeholders",
-        fig_field: "Captura em campo — formulários diários de plantio no mobile + desenho de polígono no satélite",
-        fig_calc: "Cálculos — biomassa, estoque de carbono e incerteza derivados dos dados de campo",
-        fig_sim: "Simulação — projeção de copa e sequestro antes do lock-in",
-        fig_cycles: "Ciclos &amp; monitoramento — pronto para auditoria por padrão"
-      }
-    };
+ <script>
+ /* ------- i18n (EN / PT-BR) ------- */
+ const T = {
+ en: {
+ nav_work: "Work",
+ nav_services: "Services",
+ nav_contact: "Contact",
+ back_to_projects: "Back to projects",
+ case_tag: "Environmental Tech · Climate Action Infrastructure",
+ case_title: "Straatos Application",
+ case_lead: "Straatos is a digital infrastructure for environmental and outdoor projects. It supports the full lifecycle of climate action: from field data collection to credit issuance, ensuring that every data point is traceable, verifiable, and fair.",
+ meta_role: "Role",
+ meta_role_val: "Lead Product Designer",
+ meta_timeline: "Timeline",
+ meta_timeline_val: "6 months · 2024",
+ meta_deliverables: "Deliverables",
+ meta_deliverables_val: "Web App, Mobile App",
+ meta_team: "Team",
+ meta_team_val: "Me + 6 Engineers",
+ challenge_label: "The Challenge",
+ challenge_title: "Restoration projects ran on spreadsheets, paper, and hope.",
+ challenge_p1: "Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.",
+ challenge_p2: "Compliance with Verra methodologies like VM0033 required meticulous audit trails, weeks of manual reconciliation per project cycle, prone to errors, delaying critical verification milestones.",
+ solution_label: "The Solution",
+ solution_title: "One platform. Every data point traceable.",
+ solution_p1: "Straatos unifies field capture, project management, and verifier-ready reporting in a single digital workspace. Technicians record offline on tablet or mobile; once back online, data flows into structured, methodology-aware records.",
+ solution_p2: "Audit trails build themselves. Every entry carries provenance, timestamps, and the operator's identity, so verification becomes a review of what's already documented, not a forensic reconstruction.",
+ ia_label: "Information Architecture",
+ ia_title: "Two scopes, one navigation grammar.",
+ ia_intro: "The platform lives in two modes. <strong>Application</strong> is the cross-project shell, analysis, modules and data that sit above any single project. <strong>Project</strong> is the working file, profile, preparation, plots, cycles, monitoring. Same sidebar, same hierarchy, different scope. The user never has to relearn where things are.",
+ insights_label: "Design Principles",
+ insights_title: "What the research made impossible to ignore.",
+ insight_1_t: "Compliance is a by-product, not a goal.",
+ insight_1_d: "Users don't wake up thinking about VM0033. They need the platform to quietly translate their field data into compliant outputs, without requiring them to memorize the methodology's internals.",
+ insight_2_t: "Local voices are undervalued by existing tools.",
+ insight_2_d: "Testimonials from community members, often gathered in local languages, carried real weight in reports, yet most carbon tools treated them as an afterthought. I gave them first-class status.",
+ insight_3_t: "Data must be structured, but able to flow.",
+ insight_3_d: "The data gathered on the platform must be structured so every source, from Brazil to Japan, compiles the same way, online or offline, then flows into different methodologies and analyses.",
+ swim_label: "Process · Swimlane",
+ swim_title: "Who does what, when, across a Straatos project lifecycle.",
+ swim_intro: "Four actors, five phases. The Platform sits as its own lane because it carries the data continuously between human handoffs, picking up offline captures, surfacing them upstream, and packaging everything for the verifier at the end.",
+ visual_label: "Visual System",
+ visual_title: "Visual identity.",
+ product_label: "The Product",
+ product_title: "Application.",
+ product_intro: "Five surfaces, one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.",
+ fig_analysis: "Analysis, charts, KPIs and field telemetry composed for verifier review",
+ fig_project: "Project creation, drawer for new projects, document upload and stakeholder comments",
+ fig_field: "Field capture, daily planting forms on mobile + boundary drawing on satellite",
+ fig_calc: "Calculations, biomass, carbon stock and uncertainty derived from field data",
+ fig_sim: "Simulation, forecast canopy and sequestration before lock-in",
+ fig_cycles: "Cycles &amp; monitoring, audit-ready by default",
+ next_label: "Next up",
+ next_title: "Other work",
+ next_wazi_tag: "Responsible Sourcing",
+ next_wazi_t: "WAZI, The Digital Backbone for Ethical Gold",
+ next_cta: "Read case study →",
+ next_safra_tag: "Sustainable Agribusiness",
+ next_safra_t: "Safra, Operating system for sustainable Brazilian agriculture",
+ next_soon: "Coming soon",
+ live_link: "Visit live site",
+ scroll_hint: "Scroll to explore"
+ },
+ pt: {
+ nav_work: "Projetos",
+ nav_services: "Serviços",
+ nav_contact: "Contato",
+ back_to_projects: "Voltar para projetos",
+ case_tag: "Tecnologia Ambiental · Infraestrutura para Ação Climática",
+ case_title: "Straatos Application",
+ case_lead: "Straatos é uma infraestrutura digital para projetos ambientais e de campo. Suporta todo o ciclo de vida da ação climática: da coleta de dados em campo à emissão de créditos, garantindo que cada dado seja rastreável, verificável e justo.",
+ meta_role: "Função",
+ meta_role_val: "Lead Product Designer",
+ meta_timeline: "Período",
+ meta_timeline_val: "6 meses · 2024",
+ meta_deliverables: "Entregas",
+ meta_deliverables_val: "Web App, App Mobile",
+ meta_team: "Time",
+ meta_team_val: "Eu + 6 Engenheiros",
+ challenge_label: "O Desafio",
+ challenge_title: "Projetos de restauração rodavam em planilhas, papel e esperança.",
+ challenge_p1: "Times gerenciando projetos de carbono baseados em natureza malabarismo de dados entre planilhas, anotações de campo em papel, imagens de satélite e sistemas legados desconectados. Técnicos em locais remotos não tinham ferramentas que funcionassem offline e acompanhassem o fluxo de trabalho do dia a dia.",
+ challenge_p2: "Conformidade com metodologias Verra como a VM0033 exigia trilhas de auditoria meticulosas, semanas de reconciliação manual por ciclo de projeto, sujeitas a erros, atrasando marcos críticos de verificação.",
+ solution_label: "A Solução",
+ solution_title: "Uma plataforma. Cada dado rastreável.",
+ solution_p1: "A Straatos unifica captura em campo, gestão de projetos e relatórios prontos para verificação em um único workspace digital. Os técnicos registram offline em tablet ou celular; ao voltar online, os dados fluem para registros estruturados e cientes da metodologia.",
+ solution_p2: "Trilhas de auditoria se constroem sozinhas. Cada entrada carrega proveniência, timestamps e a identidade do operador, então a verificação vira uma revisão do que já está documentado, não uma reconstrução forense.",
+ ia_label: "Arquitetura da Informação",
+ ia_title: "Dois escopos, uma única gramática de navegação.",
+ ia_intro: "A plataforma vive em dois modos. <strong>Application</strong> é a camada que atravessa projetos, análises, módulos e dados que ficam acima de qualquer projeto isolado. <strong>Project</strong> é o arquivo de trabalho, perfil, preparação, parcelas, ciclos, monitoramento. Mesma sidebar, mesma hierarquia, escopo diferente. O usuário nunca precisa reaprender onde as coisas estão.",
+ insights_label: "Princípios de Design",
+ insights_title: "O que a pesquisa tornou impossível ignorar.",
+ insight_1_t: "Conformidade é subproduto, não objetivo.",
+ insight_1_d: "Usuários não acordam pensando em VM0033. Eles precisam que a plataforma traduza silenciosamente os dados de campo em outputs em conformidade, sem precisar memorizar os detalhes da metodologia.",
+ insight_2_t: "Vozes locais são subvalorizadas pelas ferramentas existentes.",
+ insight_2_d: "Depoimentos de membros da comunidade, muitas vezes coletados em idiomas locais, pesavam de verdade nos relatórios, mas a maioria das ferramentas de carbono os tratava como detalhe secundário. Eu os elevei a status de primeira classe.",
+ insight_3_t: "Os dados precisam ser estruturados, mas com fluidez.",
+ insight_3_d: "Os dados coletados na plataforma têm que ser estruturados para que toda fonte, do Brasil ao Japão, se compile da mesma forma, online ou offline, e então flua para diferentes metodologias e análises.",
+ swim_label: "Processo · Swimlane",
+ swim_title: "Quem faz o quê, e quando, ao longo do ciclo de um projeto Straatos.",
+ swim_intro: "Quatro atores, cinco fases. A Plataforma ocupa sua própria pista porque carrega os dados continuamente entre os handoffs humanos, recolhendo capturas offline, levando-as adiante e empacotando tudo para o verificador no fim.",
+ visual_label: "Sistema Visual",
+ visual_title: "Identidade visual.",
+ product_label: "O Produto",
+ product_title: "Application.",
+ product_intro: "Cinco superfícies, um único modelo mental. O dashboard se ancora num globo 3D, cada projeto fixado em seu lugar. Dali, project developers entram em ciclos e campanhas, vistas de parcelas via satélite, e por fim simulações que projetam os mesmos números que o verificador vai ler no final. Sem tradução entre telas; os dados fluem por uma estrutura só.",
+ fig_analysis: "Análise, gráficos, KPIs e telemetria de campo compostos para revisão do verificador",
+ fig_project: "Criação de projeto, drawer para novos projetos, upload de documento e comentários de stakeholders",
+ fig_field: "Captura em campo, formulários diários de plantio no mobile + desenho de polígono no satélite",
+ fig_calc: "Cálculos, biomassa, estoque de carbono e incerteza derivados dos dados de campo",
+ fig_sim: "Simulação, projeção de copa e sequestro antes do lock-in",
+ fig_cycles: "Ciclos &amp; monitoramento, pronto para auditoria por padrão",
+ next_label: "A seguir",
+ next_title: "Outros projetos",
+ next_wazi_tag: "Sourcing Responsável",
+ next_wazi_t: "WAZI, A Espinha Dorsal Digital do Ouro Ético",
+ next_cta: "Ler case study →",
+ next_safra_tag: "Agronegócio Sustentável",
+ next_safra_t: "Safra, Sistema operacional da agricultura sustentável brasileira",
+ next_soon: "Em breve",
+ live_link: "Visitar site",
+ scroll_hint: "Deslize para explorar"
+ }
+ };
 
-    let lang = localStorage.getItem('lang') || 'en';
-    function setLang(l) {
-      lang = l;
-      localStorage.setItem('lang', l);
-      document.documentElement.lang = l === 'pt' ? 'pt-BR' : 'en';
-      document.querySelectorAll('[data-i18n]').forEach(el => {
-        const k = el.getAttribute('data-i18n');
-        if (T[l]?.[k]) {
-          const v = T[l][k];
-          if (/<[a-z]/i.test(v)) el.innerHTML = v;
-          else el.textContent = v;
-        }
-      });
-      document.querySelectorAll('.lang-btn').forEach(b => {
-        const on = b.dataset.lang === l;
-        b.classList.toggle('active', on);
-        b.setAttribute('aria-pressed', on);
-      });
-    }
-    document.querySelectorAll('.lang-btn').forEach(b =>
-      b.addEventListener('click', () => setLang(b.dataset.lang))
-    );
-    setLang(lang);
+ let lang = localStorage.getItem('lang') || 'en';
+ function setLang(l) {
+ lang = l;
+ localStorage.setItem('lang', l);
+ document.documentElement.lang = l === 'pt' ? 'pt-BR' : 'en';
+ document.querySelectorAll('[data-i18n]').forEach(el => {
+ const k = el.getAttribute('data-i18n');
+ if (T[l]?.[k]) {
+ const v = T[l][k];
+ if (/<[a-z]/i.test(v)) el.innerHTML = v;
+ else el.textContent = v;
+ }
+ });
+ document.querySelectorAll('.lang-btn').forEach(b => {
+ const on = b.dataset.lang === l;
+ b.classList.toggle('active', on);
+ b.setAttribute('aria-pressed', on);
+ });
+ }
+ document.querySelectorAll('.lang-btn').forEach(b =>
+ b.addEventListener('click', () => setLang(b.dataset.lang))
+ );
+ setLang(lang);
 
-    // Minimal JS for Stage 1 — full version comes in Stage 3
-    const nav = document.querySelector('.nav');
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', scrollY > 10);
-    }, { passive: true });
+ /* Horizontal scroll-hint thumbs, track each carousel and move the
+ yellow indicator across the rail proportionally to the scroll. */
+ [['idCarTrack', 'idCarThumb']].forEach(([trackId, thumbId]) => {
+ const track = document.getElementById(trackId);
+ const thumb = document.getElementById(thumbId);
+ if (!track || !thumb) return;
+ track.addEventListener('scroll', () => {
+ const max = track.scrollWidth - track.clientWidth;
+ if (max > 0) {
+ const pct = track.scrollLeft / max;
+ thumb.style.left = (pct * 67) + '%';
+ }
+ }, { passive: true });
+ });
 
-    // Reveal
-    const obs = new IntersectionObserver(es =>
-      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
-    , { threshold: 0.12 });
-    document.querySelectorAll('.r').forEach(el => obs.observe(el));
+ // Minimal JS for Stage 1, full version comes in Stage 3
+ const nav = document.querySelector('.nav');
+ window.addEventListener('scroll', () => {
+ nav.classList.toggle('scrolled', scrollY > 10);
+ }, { passive: true });
 
-    // Phase slider — climbs once when scrolled into view, replays on re-entry
-    (() => {
-      const slider = document.getElementById('phaseSlider');
-      if (!slider) return;
-      const fill     = slider.querySelector('.ps-fill');
-      const meniscus = slider.querySelector('.ps-meniscus');
-      const rows     = [...slider.querySelectorAll('.ps-row')];
-      const RISE_MS = 1200, HOLD_MS = 350, STEP_MS = RISE_MS + HOLD_MS;
-      const meniscusY = [0, 6, 32, 56, 78, 100];
-      let level = 0, timers = [];
+ // Reveal
+ const obs = new IntersectionObserver(es =>
+ es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
+ , { threshold: 0.12 });
+ document.querySelectorAll('.r').forEach(el => obs.observe(el));
 
-      const clear = () => { timers.forEach(t => clearTimeout(t)); timers = []; };
-      const paint = (n) => {
-        fill.style.clipPath = `inset(${100 - meniscusY[n]}% 0 0 0)`;
-        meniscus.style.setProperty('--m', meniscusY[n] + '%');
-      };
-      const reset = () => {
-        clear();
-        level = 0;
-        rows.forEach(r => r.classList.remove('is-active', 'is-past'));
-        paint(0);
-      };
-      const step = (to) => {
-        const prev = level;
-        level = to;
-        if (prev > 0) {
-          rows[prev - 1].classList.remove('is-active');
-          rows[prev - 1].classList.add('is-past');
-        }
-        if (to > 0) rows[to - 1].classList.add('is-active');
-        paint(to);
-      };
-      const climb = () => {
-        clear();
-        const tick = () => {
-          if (level >= 5) return;
-          step(level + 1);
-          timers.push(setTimeout(tick, STEP_MS));
-        };
-        tick();
-      };
+ // Phase slider, climbs once when scrolled into view, replays on re-entry
+ (() => {
+ const slider = document.getElementById('phaseSlider');
+ if (!slider) return;
+ const fill = slider.querySelector('.ps-fill');
+ const meniscus = slider.querySelector('.ps-meniscus');
+ const rows = [...slider.querySelectorAll('.ps-row')];
+ const RISE_MS = 1200, HOLD_MS = 350, STEP_MS = RISE_MS + HOLD_MS;
+ const meniscusY = [0, 6, 32, 56, 78, 100];
+ let level = 0, timers = [];
 
-      const visObs = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            reset();
-            timers.push(setTimeout(climb, 250));
-          } else {
-            clear();
-          }
-        });
-      }, { threshold: 0.45 });
-      visObs.observe(slider);
-    })();
+ const clear = () => { timers.forEach(t => clearTimeout(t)); timers = []; };
+ const paint = (n) => {
+ fill.style.clipPath = `inset(${100 - meniscusY[n]}% 0 0 0)`;
+ meniscus.style.setProperty('--m', meniscusY[n] + '%');
+ };
+ const reset = () => {
+ clear();
+ level = 0;
+ rows.forEach(r => r.classList.remove('is-active', 'is-past'));
+ paint(0);
+ };
+ const step = (to) => {
+ const prev = level;
+ level = to;
+ if (prev > 0) {
+ rows[prev - 1].classList.remove('is-active');
+ rows[prev - 1].classList.add('is-past');
+ }
+ if (to > 0) rows[to - 1].classList.add('is-active');
+ paint(to);
+ };
+ const climb = () => {
+ clear();
+ const tick = () => {
+ if (level >= 5) return;
+ step(level + 1);
+ timers.push(setTimeout(tick, STEP_MS));
+ };
+ tick();
+ };
 
-    // Identity carousel — auto-nudge on enter view + edge-fade toggle
-    (() => {
-      const carousel = document.querySelector('.id-car');
-      if (!carousel) return;
-      const track = carousel.querySelector('.id-car-track');
-      if (!track) return;
+ const visObs = new IntersectionObserver((entries) => {
+ entries.forEach(e => {
+ if (e.isIntersecting) {
+ reset();
+ timers.push(setTimeout(climb, 250));
+ } else {
+ clear();
+ }
+ });
+ }, { threshold: 0.45 });
+ visObs.observe(slider);
+ })();
 
-      // Toggle fade overlay when the user has scrolled to the very end
-      const updateEnd = () => {
-        const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
-        carousel.classList.toggle('is-at-end', atEnd);
-      };
-      track.addEventListener('scroll', updateEnd, { passive: true });
-      updateEnd();
+ // Identity carousel, auto-nudge on enter view + edge-fade toggle
+ (() => {
+ const carousel = document.querySelector('.id-car');
+ if (!carousel) return;
+ const track = carousel.querySelector('.id-car-track');
+ if (!track) return;
 
-      // Auto-nudge once when the carousel enters the viewport — gentle scroll
-      // forward then back so users understand it scrolls horizontally.
-      let nudged = false;
-      const nudge = () => {
-        if (nudged) return;
-        nudged = true;
-        const distance = Math.min(120, track.scrollWidth - track.clientWidth);
-        if (distance <= 0) return;
-        const startMs = performance.now();
-        const DUR_OUT = 700, HOLD = 250, DUR_BACK = 600;
-        const ease = t => 1 - Math.pow(1 - t, 3);
-        function step(now) {
-          const t = now - startMs;
-          if (t < DUR_OUT) {
-            track.scrollLeft = distance * ease(t / DUR_OUT);
-            requestAnimationFrame(step);
-          } else if (t < DUR_OUT + HOLD) {
-            track.scrollLeft = distance;
-            requestAnimationFrame(step);
-          } else if (t < DUR_OUT + HOLD + DUR_BACK) {
-            const k = (t - DUR_OUT - HOLD) / DUR_BACK;
-            track.scrollLeft = distance * (1 - ease(k));
-            requestAnimationFrame(step);
-          } else {
-            track.scrollLeft = 0;
-          }
-        }
-        requestAnimationFrame(step);
-      };
-      const carObs = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting && !nudged) {
-            setTimeout(nudge, 350);
-            carObs.disconnect();
-          }
-        });
-      }, { threshold: 0.5 });
-      carObs.observe(carousel);
-    })();
+ // Toggle fade overlay when the user has scrolled to the very end
+ const updateEnd = () => {
+ const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+ carousel.classList.toggle('is-at-end', atEnd);
+ };
+ track.addEventListener('scroll', updateEnd, { passive: true });
+ updateEnd();
 
-    // Custom cursor
-    (() => {
-      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-      const cursor = document.querySelector('.cursor');
-      if (!cursor) return;
-      let mx = -100, my = -100, cx = -100, cy = -100;
-      document.addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; });
-      document.querySelectorAll('a, button, .btn, .lang-btn').forEach(el => {
-        el.addEventListener('pointerenter', () => cursor.classList.add('active'));
-        el.addEventListener('pointerleave', () => cursor.classList.remove('active'));
-      });
-      function tick() {
-        cx += (mx - cx) * 0.22;
-        cy += (my - cy) * 0.22;
-        cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
-        requestAnimationFrame(tick);
-      }
-      tick();
-    })();
+ // Auto-nudge once when the carousel enters the viewport, gentle scroll
+ // forward then back so users understand it scrolls horizontally.
+ let nudged = false;
+ const nudge = () => {
+ if (nudged) return;
+ nudged = true;
+ const distance = Math.min(120, track.scrollWidth - track.clientWidth);
+ if (distance <= 0) return;
+ const startMs = performance.now();
+ const DUR_OUT = 700, HOLD = 250, DUR_BACK = 600;
+ const ease = t => 1 - Math.pow(1 - t, 3);
+ function step(now) {
+ const t = now - startMs;
+ if (t < DUR_OUT) {
+ track.scrollLeft = distance * ease(t / DUR_OUT);
+ requestAnimationFrame(step);
+ } else if (t < DUR_OUT + HOLD) {
+ track.scrollLeft = distance;
+ requestAnimationFrame(step);
+ } else if (t < DUR_OUT + HOLD + DUR_BACK) {
+ const k = (t - DUR_OUT - HOLD) / DUR_BACK;
+ track.scrollLeft = distance * (1 - ease(k));
+ requestAnimationFrame(step);
+ } else {
+ track.scrollLeft = 0;
+ }
+ }
+ requestAnimationFrame(step);
+ };
+ const carObs = new IntersectionObserver((entries) => {
+ entries.forEach(e => {
+ if (e.isIntersecting && !nudged) {
+ setTimeout(nudge, 350);
+ carObs.disconnect();
+ }
+ });
+ }, { threshold: 0.5 });
+ carObs.observe(carousel);
+ })();
 
-    /* ============ Image lightbox ============ */
-    (() => {
-      const selectors = [
-        '.app-shot img',
-        '.case-hero-mockup img',
-        '.id-car-slide img'
-      ];
-      const targets = document.querySelectorAll(selectors.join(','));
-      if (!targets.length) return;
+ // Custom cursor
+ (() => {
+ if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+ const cursor = document.querySelector('.cursor');
+ if (!cursor) return;
+ let mx = -100, my = -100, cx = -100, cy = -100;
+ document.addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; });
+ document.querySelectorAll('a, button, .btn, .lang-btn').forEach(el => {
+ el.addEventListener('pointerenter', () => cursor.classList.add('active'));
+ el.addEventListener('pointerleave', () => cursor.classList.remove('active'));
+ });
+ function tick() {
+ cx += (mx - cx) * 0.22;
+ cy += (my - cy) * 0.22;
+ cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+ requestAnimationFrame(tick);
+ }
+ tick();
+ })();
 
-      const lb = document.createElement('div');
-      lb.className = 'lightbox';
-      lb.setAttribute('role', 'dialog');
-      lb.setAttribute('aria-modal', 'true');
-      lb.innerHTML = `
-        <button class="lightbox-close" type="button" aria-label="Close">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
-        </button>
-        <img alt="">
-      `;
-      document.body.appendChild(lb);
-      const lbImg = lb.querySelector('img');
-      const close = () => {
-        lb.classList.remove('is-open');
-        document.body.classList.remove('lightbox-open');
-        setTimeout(() => { lbImg.src = ''; }, 320);
-      };
-      const open = (src, alt) => {
-        lbImg.src = src;
-        lbImg.alt = alt || '';
-        document.body.classList.add('lightbox-open');
-        requestAnimationFrame(() => lb.classList.add('is-open'));
-      };
-      targets.forEach(img => {
-        img.setAttribute('data-zoom', '');
-        img.addEventListener('click', () => open(img.currentSrc || img.src, img.alt));
-      });
-      lb.addEventListener('click', (e) => {
-        if (e.target === lb || e.target.closest('.lightbox-close')) close();
-      });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && lb.classList.contains('is-open')) close();
-      });
-    })();
-  </script>
+ /* ============ Image lightbox ============ */
+ (() => {
+ const selectors = [
+ '.app-shot img',
+ '.case-hero-mockup img',
+ '.id-car-slide img'
+ ];
+ const targets = document.querySelectorAll(selectors.join(','));
+ if (!targets.length) return;
+
+ const lb = document.createElement('div');
+ lb.className = 'lightbox';
+ lb.setAttribute('role', 'dialog');
+ lb.setAttribute('aria-modal', 'true');
+ lb.innerHTML = `
+ <button class="lightbox-close" type="button" aria-label="Close">
+ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+ </button>
+ <img alt="">
+ `;
+ document.body.appendChild(lb);
+ const lbImg = lb.querySelector('img');
+ const close = () => {
+ lb.classList.remove('is-open');
+ document.body.classList.remove('lightbox-open');
+ setTimeout(() => { lbImg.src = ''; }, 320);
+ };
+ const open = (src, alt) => {
+ lbImg.src = src;
+ lbImg.alt = alt || '';
+ document.body.classList.add('lightbox-open');
+ requestAnimationFrame(() => lb.classList.add('is-open'));
+ };
+ targets.forEach(img => {
+ img.setAttribute('data-zoom', '');
+ img.addEventListener('click', () => open(img.currentSrc || img.src, img.alt));
+ });
+ lb.addEventListener('click', (e) => {
+ if (e.target === lb || e.target.closest('.lightbox-close')) close();
+ });
+ document.addEventListener('keydown', (e) => {
+ if (e.key === 'Escape' && lb.classList.contains('is-open')) close();
+ });
+ })();
+ </script>
 
 </body>
 </html>
