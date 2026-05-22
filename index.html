@@ -618,7 +618,7 @@
 
  .work-scroll {
  display: flex;
- align-items: flex-start;
+ align-items: stretch;
  gap: 1.5rem;
  overflow-x: auto;
  scroll-snap-type: x mandatory;
@@ -658,7 +658,19 @@
  overflow: hidden;
  transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
  scroll-snap-align: start;
+ display: flex;
+ flex-direction: column;
+ height: 100%;
  }
+ /* The body fills the leftover height so the bottom "Read case study"
+ line lands at the same baseline across all cards regardless of how
+ much copy each one carries. */
+ .case-body {
+ flex: 1;
+ display: flex;
+ flex-direction: column;
+ }
+ .case-body p { flex: 1; }
  @media (min-width: 768px) {
  .case-card { flex: 0 0 45vw; max-width: 620px; }
  }
@@ -1388,8 +1400,8 @@
  </div>
  <div class="case-body">
  <div class="case-meta"><span class="case-tag" data-i18n="c1_tag">Carbon Tech</span></div>
- <h3 data-i18n="c1_t">Straatos</h3>
- <p data-i18n="c1_d">A plataforma única para project developers de carbono, do cadastro de plots à submissão Verra, adaptada ao estágio do projeto.</p>
+ <h3 data-i18n="c1_t">Straatos, Climate action infrastructure</h3>
+ <p data-i18n="c1_d">The single platform for carbon project developers, from plot registration to Verra submission, adapted to each stage.</p>
  <span class="case-link"><span data-i18n="c1_l">Read case study</span> →</span>
  </div>
  </article>
@@ -1402,8 +1414,8 @@
  </div>
  <div class="case-body">
  <div class="case-meta"><span class="case-tag" data-i18n="c2_tag">Responsible Sourcing</span></div>
- <h3 data-i18n="c2_t">WAZI, Digital Gold Ecosystem</h3>
- <p data-i18n="c2_d">A platform bringing trust and transparency to artisanal gold mining, shared evidence base with sovereignty by design.</p>
+ <h3 data-i18n="c2_t">WAZI, Digital gold ecosystem</h3>
+ <p data-i18n="c2_d">Trust and transparency for artisanal gold mining, a shared evidence base built with sovereignty by design.</p>
  <span class="case-link"><span data-i18n="c2_l">Read case study</span> →</span>
  </div>
  </article>
@@ -1418,8 +1430,8 @@
  </div>
  <div class="case-body">
  <div class="case-meta"><span class="case-tag" data-i18n="c3_tag">Sustainable Agribusiness</span></div>
- <h3 data-i18n="c3_t">Safra, The operating system for sustainable Brazilian agriculture</h3>
- <p data-i18n="c3_d">From planting to liquidation in one platform, plot management, soil health and traceable, low-carbon Brazilian grain.</p>
+ <h3 data-i18n="c3_t">Safra, Sustainable Brazilian agriculture</h3>
+ <p data-i18n="c3_d">From planting to liquidation in one platform, plot management, soil health and traceable low-carbon grain.</p>
  <span class="case-link case-link--muted"><span data-i18n="c3_l">Coming soon</span></span>
  </div>
  </article>
@@ -1560,16 +1572,16 @@
  work_label:"Selected work",
  work_heading:"Problems solved, products shipped",
  c1_tag:"Carbon Tech",
- c1_t:"Straatos",
- c1_d:"The single platform for carbon project developers, from plot registration to Verra submission, adapted to project stage.",
+ c1_t:"Straatos, Climate action infrastructure",
+ c1_d:"The single platform for carbon project developers, from plot registration to Verra submission, adapted to each stage.",
  c1_l:"Read case study",
  c2_tag:"Responsible Sourcing",
- c2_t:"WAZI, Digital Gold Ecosystem",
- c2_d:"A platform bringing trust and transparency to artisanal gold mining, shared evidence base with sovereignty by design.",
+ c2_t:"WAZI, Digital gold ecosystem",
+ c2_d:"Trust and transparency for artisanal gold mining, a shared evidence base built with sovereignty by design.",
  c2_l:"Read case study",
  c3_tag:"Sustainable Agribusiness",
- c3_t:"Safra, The operating system for sustainable Brazilian agriculture",
- c3_d:"From planting to liquidation in one platform, plot management, soil health and traceable, low-carbon Brazilian grain.",
+ c3_t:"Safra, Sustainable Brazilian agriculture",
+ c3_d:"From planting to liquidation in one platform, plot management, soil health and traceable low-carbon grain.",
  c3_l:"Coming soon",
  c3_overlay:"Coming soon",
  p1:"Research", p2:"Definition", p3:"Solution", scroll_hint:"Scroll to explore",
@@ -1631,16 +1643,16 @@
  work_label:"Projetos selecionados",
  work_heading:"Problemas resolvidos, produtos entregues",
  c1_tag:"Carbon Tech",
- c1_t:"Straatos",
- c1_d:"A plataforma única para project developers de carbono, do cadastro de plots à submissão Verra, adaptada ao estágio do projeto.",
+ c1_t:"Straatos, Infraestrutura para ação climática",
+ c1_d:"A plataforma única para project developers de carbono, do cadastro de plots à submissão Verra, adaptada ao estágio.",
  c1_l:"Ler case study",
  c2_tag:"Sourcing Responsável",
- c2_t:"WAZI, Ecossistema Digital do Ouro",
- c2_d:"Plataforma que traz confiança e transparência à mineração artesanal de ouro, base de evidências compartilhada com soberania dos dados.",
+ c2_t:"WAZI, Ecossistema digital do ouro",
+ c2_d:"Confiança e transparência para mineração artesanal de ouro, base de evidências compartilhada com soberania de dados.",
  c2_l:"Ler case study",
  c3_tag:"Agronegócio Sustentável",
- c3_t:"Safra, O sistema operacional da agricultura sustentável brasileira",
- c3_d:"Do plantio à liquidação em uma plataforma, gestão de talhões, saúde do solo e grãos brasileiros rastreáveis e de baixo carbono.",
+ c3_t:"Safra, Agricultura sustentável brasileira",
+ c3_d:"Do plantio à liquidação em uma plataforma, gestão de talhões, saúde do solo e grãos rastreáveis de baixo carbono.",
  c3_l:"Em breve",
  c3_overlay:"Em breve",
  p1:"Pesquisa", p2:"Definição", p3:"Solução", scroll_hint:"Deslize para explorar",
