@@ -20,3 +20,6 @@ portfolio/
 node_modules/
 dist/
 .cache/
+
+# Source assets, not part of deployed site
+about me/
