@@ -2088,7 +2088,20 @@
  }
  };
 
- let lang = localStorage.getItem('lang') || 'en';
+ function readCookie(name) {
+ const m = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]+)'));
+ return m ? decodeURIComponent(m[1]) : null;
+ }
+ function detectInitialLang() {
+ const saved = localStorage.getItem('lang');
+ if (saved === 'en' || saved === 'pt') return saved;
+ const cookieLang = readCookie('default_lang');
+ if (cookieLang === 'en' || cookieLang === 'pt') return cookieLang;
+ const nav = (navigator.language || '').toLowerCase();
+ if (nav.startsWith('pt')) return 'pt';
+ return 'en';
+ }
+ let lang = detectInitialLang();
  function setLang(l) {
  lang = l;
  localStorage.setItem('lang', l);
