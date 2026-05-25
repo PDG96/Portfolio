@@ -418,14 +418,6 @@
  isolation: isolate;
  }
  .services > .wrap { width: 100%; position: relative; z-index: 1; }
- .services-dots {
- position: absolute;
- inset: 0;
- width: 100%;
- height: 100%;
- pointer-events: none;
- z-index: 0;
- }
 
  /* Stage-card entrance, softer rise + scale, distinct from default reveal */
  .stages .stage-card.r {
@@ -1280,7 +1272,6 @@
 
  <!-- SERVICES, dark, with drifting dots behind glass cards -->
  <section class="services" id="services">
- <canvas class="services-dots" id="servicesCanvas" aria-hidden="true"></canvas>
  <div class="wrap">
  <div class="section-header r">
  <div>
@@ -1727,117 +1718,6 @@
  b.addEventListener('click', () => setLang(b.dataset.lang))
  );
  setLang(lang);
-
- // Services, soft accent-yellow dots flowing along a wavy path with some
- // diffuse "stragglers" breaking out of the path. No sweep, no triggers , 
- // just a quiet, breathing current behind the glass cards.
- (() => {
- const canvas = document.getElementById('servicesCanvas');
- if (!canvas) return;
- const section = canvas.parentElement;
- const ctx = canvas.getContext('2d');
- const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
- let W = 0, H = 0, midY = 0, amplitude = 0;
- let dots = [];
- let raf = null;
- let running = false;
-
- function resize() {
- const dpr = Math.min(window.devicePixelRatio || 1, 2);
- const rect = section.getBoundingClientRect();
- W = Math.max(1, rect.width); H = Math.max(1, rect.height);
- canvas.width = W * dpr; canvas.height = H * dpr;
- canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
- ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
- midY = H * 0.50;
- amplitude = Math.min(H * 0.22, 110);
- }
-
- // Sinusoidal path, 1.4 wavelengths across, phase animates over time.
- function pathY(x, t) {
- const k = (Math.PI * 2 * 1.4) / W;
- const phase = t * 0.0004;
- const k2 = (Math.PI * 2 * 0.6) / W;
- return midY
- + Math.sin(x * k + phase) * amplitude
- + Math.sin(x * k2 + phase * 1.3) * amplitude * 0.18;
- }
-
- function init() {
- resize();
- const density = Math.max(80, Math.floor(W / 11));
- dots = [];
- for (let i = 0; i < density; i++) {
- // ~50% of dots are "stragglers", they break out of the path with a
- // big perpendicular offset and a slow vertical drift. The rest hug
- // the path with subtle jitter.
- const straggler = Math.random() < 0.50;
- // ~18% of dots take a green tone (sage-lime), like the CTC animation
- // accents. Greenish dots are slightly brighter so the colour reads
- // through the heavy backdrop blur.
- const greenish = Math.random() < 0.18;
- const baseAlpha = straggler ? 0.05 : 0.10;
- dots.push({
- x: (i / density) * W + (Math.random() - 0.5) * (W / density),
- yOffset: straggler
- ? (Math.random() - 0.5) * (H * 0.80)
- : (Math.random() - 0.5) * 40,
- vy: straggler ? (Math.random() - 0.5) * 0.10 : 0,
- r: 0.5 + Math.random() * (straggler ? 1.4 : 1.7),
- vx: 0.08 + Math.random() * 0.30,
- // Greenish dots get a small alpha + size bump so they stand out a
- // little more without breaking the soft overall feel.
- alpha: (greenish ? baseAlpha + 0.10 : baseAlpha) + Math.random() * 0.16,
- straggler,
- greenish,
- twPhase: Math.random() * Math.PI * 2,
- twFreq: 0.0008 + Math.random() * 0.0012,
- });
- }
- }
-
- function draw(time) {
- if (!running) return;
- ctx.clearRect(0, 0, W, H);
- for (const d of dots) {
- d.x += d.vx;
- d.yOffset += d.vy;
- if (d.x - d.r > W) d.x = -d.r;
- // Stragglers drift vertically a little and wrap softly
- if (d.straggler) {
- if (d.yOffset > H * 0.55) d.vy = -Math.abs(d.vy);
- if (d.yOffset < -H * 0.55) d.vy = Math.abs(d.vy);
- }
- const baseY = d.straggler ? midY : pathY(d.x, time);
- const y = baseY + d.yOffset;
- // breathing twinkle
- const tw = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(time * d.twFreq + d.twPhase));
- ctx.beginPath();
- ctx.arc(d.x, y, d.r, 0, Math.PI * 2);
- ctx.fillStyle = d.greenish
- ? `rgba(178, 220, 130, ${d.alpha * tw})` // sage-lime accent, brighter green
- : `rgba(247, 253, 185, ${d.alpha * tw})`; // soft warm yellow
- ctx.fill();
- }
- raf = requestAnimationFrame(draw);
- }
-
- function start() { if (!running) { running = true; raf = requestAnimationFrame(draw); } }
- function stop() { running = false; if (raf) cancelAnimationFrame(raf); raf = null; }
-
- window.addEventListener('resize', init, { passive: true });
- init();
-
- if (reduce) {
- running = true; draw(performance.now()); running = false;
- return;
- }
- const io = new IntersectionObserver(entries => {
- for (const e of entries) e.isIntersecting ? start() : stop();
- }, { threshold: 0 });
- io.observe(section);
- })();
 
  // Contact form, POSTs to the Cloudflare Pages Function at /contact,
  // which relays via MailChannels. No mail client opens.
