@@ -1,0 +1,1781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Continuous due diligence for commodity supply chains. Supplier assessment, risk scoring, and OECD-aligned audit management.">
+  <meta name="theme-color" content="#fcfcfc">
+  <title>Continuous Due Diligence for Commodity Supply Chains · Case Study · Pietra Gottardo</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="apple-touch-icon" href="../favicon.svg">
+
+  <link rel="stylesheet" href="../assets/fonts/lausanne.css">
+
+   <!-- Stamped before first paint so a dark-theme reload doesn't flash white. -->
+   <script>
+   (function () {
+   var saved = null;
+   try { saved = localStorage.getItem('theme'); } catch (e) {}
+   // Dark is the default landing state, same as the main site — the OS
+   // preference no longer decides it.
+   document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+   })();
+   </script>
+
+  <style>
+    :root {
+      /* Gray True palette */
+      --gray-true-25:  #fcfcfc;
+      --gray-true-50:  #fafafa;
+      --gray-true-100: #f5f5f5;
+      --gray-true-200: #e5e5e5;
+      --gray-true-300: #d6d6d6;
+      --gray-true-400: #a3a3a3;
+      --gray-true-500: #737373;
+      --gray-true-600: #525252;
+      --gray-true-700: #424242;
+      --gray-true-800: #292929;
+      --gray-true-900: #141414;
+
+      /* Semantic */
+      --bg:       #fbfaf8;
+      --bg-alt:   #f1efea;
+      --surface:  #ffffff;
+      --text:     var(--gray-true-900);
+      --text-2:   #6b6b6b; /* gray-500 only reached 4.16:1 on the #f0f0ee gutter */
+      --text-3:   var(--gray-true-500);
+      --border:   var(--gray-true-200);
+    /* Shell layer: the gutter behind the panes, and the pane surface itself.
+    Tokenized so light/dark can swap them — they used to be hardcoded
+    #f0f0ee and #ffffff in the shell rules. */
+    --shell-bg: #ebe9e4;
+    --sheet: #fbfaf8;
+    /* One side spacing for everything inside the sheet. Components used to
+       offset themselves by the old page gutter (4vw) while the wrap padded
+       at a flat 2rem, so every bled element sat a different distance from
+       the edge and the wide ones spilled. */
+    --sheet-gutter: clamp(1.25rem, 2.5vw, 2rem);
+
+      --accent: #3d5a3e;
+      --accent-light: #e8ede8;
+      --accent-yellow: #f7fdb9;
+      --accent-blue:   #c5e9ff;
+      --accent-pink:   #eee1ea;
+    /* Teal used for links/meta. #1B989B only reaches 3.5:1 on white, so the
+    light theme uses the palette's deeper teal (5.3:1) and the dark theme
+    uses the ice tint. */
+    --link: #197778;
+    /* Terracotta "Challenge" label, per theme: 5.3:1 light, 5.9:1 dark. */
+    --label-warn: #a04e2f;
+
+      --font: 'TWKLausanne', system-ui, sans-serif;
+      --mono: 'TWKLausanne', system-ui, sans-serif;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+      --section-py: clamp(4.5rem, 9vw, 7rem);
+      --section-gap: clamp(2.5rem, 5vw, 3.5rem);
+    }
+
+        /* Dark theme. Only the semantic layer is redefined — the gray ramp keeps
+    its meaning, the roles swap ends of it. Ratios against the pane
+    (#1a1a1a): text 16.7:1, text-2 6.9:1, text-3 5.4:1, link 8.9:1. */
+    [data-theme="dark"] {
+    --bg: #141414;
+    --bg-alt: #232323;
+    --surface: #1a1a1a;
+    --text: #fafafa;
+    --text-2: #a3a3a3;
+    --text-3: #8f8f8f;
+    --border: #333333;
+
+    --shell-bg: #0f0f0f;
+    --sheet: #1a1a1a;
+
+    /* Sage reads as near-black on a dark pane, so focus rings and accents
+    move to the light end. */
+    --accent: #7fae80;
+    --accent-light: #24302a;
+    --link: #57CACB;
+    --label-warn: #d98b68;
+    }
+
+   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--text);
+      background: var(--bg);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    /* Grain texture overlay, same one the landing wears: a fine fractal-noise
+     film over the whole viewport so neither theme reads as a flat wash. */
+     body::after {
+     content: '';
+     position: fixed;
+     inset: 0;
+     pointer-events: none;
+     z-index: 9998; /* under the lightbox (9999) and the cursor (10000) */
+     opacity: 0.3;
+     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+     background-size: 200px;
+     }
+     /* On a light ground the same overlay lightens instead of textures, so the
+     grain multiplies into the paper and runs a little stronger to survive
+     the brighter surface. */
+     [data-theme="light"] body::after {
+     opacity: 0.42;
+     mix-blend-mode: multiply;
+     }
+    a { color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #fff;
+      mix-blend-mode: difference;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate3d(-100px, -100px, 0);
+      will-change: transform;
+      transition: width 0.35s var(--ease), height 0.35s var(--ease);
+    }
+    .cursor.active {
+      width: 64px; height: 64px;
+      mix-blend-mode: normal;
+      background: transparent;
+      backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+      -webkit-backdrop-filter: contrast(1.08) saturate(1.35) brightness(1.03);
+      border: 1.5px solid rgba(255,255,255,0.6);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.06),
+        0 6px 20px rgba(0,0,0,0.12),
+        inset 0 2px 3px rgba(255,255,255,0.35),
+        inset 0 -2px 3px rgba(0,0,0,0.06);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .cursor { display: block; }
+      html, body { cursor: none; }
+      a, button, input, textarea { cursor: none; }
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      font-family: var(--font);
+      font-weight: 300;
+      line-height: 1.15;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    h1 { font-size: clamp(2.25rem, 5.5vw, 4rem); line-height: 1.1; letter-spacing: -0.025em; }
+    h2 { font-size: clamp(1.875rem, 4vw, 2.75rem); }
+    h3 { font-size: 1.25rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.01em; }
+
+    p { max-width: none; }
+
+    .wrap {
+      width: 100%;
+      max-width: clamp(72rem, 90vw, 110rem);
+      margin: 0 auto;
+      padding: 0 var(--sheet-gutter);
+    }
+
+    .mono-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
+
+    /* Reveal */
+    .r {
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+    .r.v { opacity: 1; transform: none; }
+    .r-stagger > .r:nth-child(2) { transition-delay: 0.06s; }
+    .r-stagger > .r:nth-child(3) { transition-delay: 0.12s; }
+    .r-stagger > .r:nth-child(4) { transition-delay: 0.18s; }
+    .r-stagger > .r:nth-child(5) { transition-delay: 0.24s; }
+    .r-stagger > .r:nth-child(6) { transition-delay: 0.30s; }
+
+    /* Buttons */
+    .btn {
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.875rem 1.5rem;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.35s var(--ease);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      line-height: 1;
+    }
+    .btn-primary { background: var(--text); color: var(--bg); }
+    .btn-primary:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: var(--accent-yellow);
+      color: var(--gray-true-900);
+      border-color: var(--accent-yellow);
+    }
+
+    /* ====== NAV ====== */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(252,252,252,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      transition: box-shadow 0.4s var(--ease);
+    }
+    .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .nav-right { display: flex; align-items: center; gap: 2rem; }
+    .nav-links {
+      display: none; list-style: none;
+      gap: 1.75rem; align-items: center;
+    }
+    .nav-links a {
+      font-size: 0.8125rem; font-weight: 500;
+      color: var(--text-2);
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .theme-toggle {
+    display: flex; gap: 0;
+    border: 1px solid var(--border); border-radius: 6px;
+    overflow: hidden;
+    }
+    .theme-btn svg { width: 14px; height: 14px; display: block; }
+    .theme-btn {
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+    padding: 5px 10px; border: none; cursor: pointer;
+    background: transparent; color: var(--text-2);
+    transition: background 0.3s, color 0.3s;
+    }
+    .theme-btn.active { background: var(--text); color: var(--sheet); }
+
+    @media (min-width: 768px) {
+      .nav-links { display: flex; }
+    }
+
+        /* ====== SIDEBAR SHELL ====== */
+    /* White mode: light gutter, white sidebar + sheet cards. Same structure
+    as the dark version, colors flipped to the site's default light tokens. */
+    .shell-page { background: var(--shell-bg); }
+
+    /* Header matches the page background instead of the usual white frosted bar */
+    .shell-page .nav { background: var(--shell-bg); }
+    .shell-page .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
+    .shell-page .nav-logo { color: var(--text); }
+    .shell-page .nav-links a { color: var(--text-2); }
+    .shell-page .nav-links a:hover { color: var(--text); }
+    .shell-page .nav .theme-toggle { border-color: var(--border); }
+    .shell-page .nav .theme-btn { color: var(--text-2); }
+    .shell-page .nav .theme-btn.active { background: var(--text); color: var(--sheet); }
+    /* Nav uses the site-wide .wrap grid (max-width clamp + 4vw padding), the
+    shell spans the full viewport with flat 1.5rem gutters. Match them so the
+    logo/theme-toggle line up with the sidebar/sheet edges below. */
+    .shell-page .nav .wrap {
+    max-width: none;
+    padding: 0 1.5rem;
+    }
+    @media (max-width: 900px) {
+    .shell-page .nav .wrap { padding: 0 1rem; }
+    }
+    /* App-shell pane pattern (desktop): the window itself doesn't scroll,
+    .shell is pinned at exactly the viewport height below the nav, and its
+    two children stretch (default flex align-items) to that same height —
+    growing or shrinking together, leaving blank space in whichever pane is
+    shorter, instead of one trailing off past the other. Each pane scrolls
+    its own content internally, so neither card ever slides up and hides
+    behind the fixed nav. */
+    html, body.shell-page { height: 100%; }
+    body.shell-page { overflow: hidden; }
+    .shell {
+    /* No max-width: the two panes fill whatever the window gives them and
+    grow together, so the layout never becomes a narrow island floating in
+    the middle of a wide display. */
+    /* Pinned frame rather than a flowed block with a 60px top margin. That
+    margin escaped to the root and left the document 60px scrollable, so
+    the panes crept up under the nav (no gap at the top) while the gap at
+    the bottom grew by the same amount. Insets subtract the nav height
+    directly, which also drops the dependency on 100svh: the 1.5rem
+    padding is then identical on all four sides at every window size. */
+    position: fixed;
+    inset: 60px 0 0 0;
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    }
+    @media (max-width: 900px) {
+    /* Nested independent-scroll panes only make sense side by side. Stacked
+    on mobile, revert to one continuous page scroll like any other case
+    study, sidebar-content first, then the project content below it. */
+    html, body.shell-page { height: auto; }
+    body.shell-page { overflow: visible; }
+    .shell { position: static; inset: auto; flex-direction: column; align-items: stretch; height: auto; margin: 0; padding: calc(60px + 1.25rem) 1rem 1rem; gap: 1rem; }
+    }
+
+    .sidebar {
+    /* Pure proportional width — a fixed share of the window at every size,
+    with only a floor to keep it usable just above the 900px stack
+    breakpoint. No ceiling, so on a wide display it keeps growing with the
+    sheet instead of freezing while the other pane runs away. */
+    flex: 0 0 max(260px, 23vw);
+    width: max(260px, 23vw);
+    display: flex;
+    flex-direction: column;
+    background: var(--sheet);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    }
+    @media (max-width: 900px) {
+    .sidebar { width: 100%; height: auto; overflow-y: visible; }
+    }
+
+    .sidebar-topbar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    }
+    .sidebar .back-link { margin: 0; color: var(--text-2); }
+    .sidebar .back-link:hover { color: var(--text); }
+    .sidebar .theme-toggle { border-color: var(--border); }
+    .sidebar .theme-btn { color: var(--text-2); }
+    .sidebar .theme-btn.active { background: var(--text); color: var(--sheet); }
+
+    .sidebar .case-tag {
+    margin: 1.5rem 0 0;
+    }
+    .sidebar h1 {
+    /* +15% on every stop of the old clamp(1.875rem, 2.4vw, 2.375rem), and one
+    step up from the 300 the headings share. */
+    font-size: clamp(2.156rem, 2.76vw, 2.731rem);
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 1rem;
+    }
+    .sidebar .case-lead {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--text-2);
+    margin-bottom: 0;
+    }
+
+    .sidebar-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin: 1.75rem 0;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    }
+    .sidebar-meta-item { display: flex; flex-direction: column; gap: 0.375rem; }
+    .sidebar-meta-item .case-meta-label { color: var(--text-3); }
+    .sidebar-meta-item .case-meta-value { color: var(--text); font-size: 0.9375rem; }
+    .sidebar-meta-item a.case-meta-value { color: var(--link); }
+
+    /* Flows right after the meta block like everything else in the sidebar —
+    no margin-top:auto, which used to shove it against the bottom edge and
+    leave a dead gap in the middle on tall windows. */
+    .sidebar-next { padding-top: 0.5rem; }
+    .sidebar-next-label {
+    font-family: var(--mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+    margin-bottom: 0.75rem;
+    display: block;
+    }
+    .sidebar-next-list {
+    /* Vertical stack instead of the old horizontal carousel: every project
+    is visible at full card width and the sidebar's own overflow-y carries
+    the scroll, so nothing is hidden off to the side. */
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    }
+    .sidebar-card {
+    flex: 0 0 auto;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--bg-alt);
+    transition: opacity 0.3s var(--ease);
+    }
+    /* Coming-soon variant, same treatment as the case-next cards on the other
+    pages: the thumb stays at full strength and only reveals a dark overlay
+    on hover, instead of sitting permanently dimmed. */
+    .sidebar-card--soon { cursor: default; }
+    .sidebar-card--soon .sidebar-card-thumb { position: relative; cursor: default; }
+    .sidebar-card-overlay {
+    position: absolute; inset: 0;
+    background: rgba(15, 22, 18, 0.55);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: flex; align-items: center; justify-content: center;
+    color: #fcfcfc;
+    font-family: var(--mono);
+    /* A notch smaller than the full-width version — the sidebar card is
+    roughly a third of its width. */
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease);
+    }
+    .sidebar-card--soon:hover .sidebar-card-overlay { opacity: 1; }
+    /* Every thumb lands on the same 16:10 box regardless of the source file's
+    own proportions (they run 1.31 to 1.78), so the carousel reads as one
+    even row instead of three different heights. Cover crops the excess —
+    which also trims the rounded corners baked into some of the PNGs, so
+    the 8px radius below is the only corner the card actually shows. */
+    .sidebar-card-thumb {
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: 8px;
+    }
+    .sidebar-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    /* Nudged past the transparent rounded corners in the source art. */
+    transform: scale(1.02);
+    }
+
+    .main-sheet {
+    /* White mode: the site's default tokens are already light-theme (dark
+    text on white/light-gray), so no token overrides needed here, just the
+    white card surface matching the sidebar. */
+    flex: 1 1 0%;
+    min-width: 0;
+    background: var(--sheet);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    }
+    @media (max-width: 900px) {
+    .main-sheet { height: auto; overflow-y: visible; }
+   /* Stacked, the "Next up" cards landed between the case title and the
+    case itself, so the reader met the other projects before this one. On
+    mobile the sidebar stops being a box and hands its children straight to
+    .shell, which is what lets the list be ordered after the content.
+    .sidebar-intro keeps the card treatment the sidebar used to carry. */
+    .sidebar { display: contents; }
+    .sidebar-intro {
+    background: var(--sheet);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    }
+    .main-sheet { order: 1; }
+    .sidebar-next { order: 2; }
+    /* The meta block closed with a rule because "Next up" used to sit right
+    under it. With the list moved to the end of the page that line, and the
+    space under it, separate nothing -- so the card ends on the last value. */
+    .sidebar-meta { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    }
+    .main-sheet .case-hero { padding: 2rem 0; }
+    .main-sheet .case-hero .wrap,
+    .main-sheet .case-section .wrap { max-width: 100%; padding-left: var(--sheet-gutter); padding-right: var(--sheet-gutter); }
+
+    /* Hero shot + big diagrams expand edge-to-edge inside the sheet, breaking
+    out of .wrap's side padding, matching masid.design's full-bleed panels. */
+    .main-sheet .bleed {
+    /* width:auto is the fix: some bled elements (case-hero-mockup) carry
+    their own hardcoded width:100%, which fixes the box size independently
+    of margin. Negative margins only ever shift a fixed-width box, they
+    don't grow it, that's why the right edge fell short. auto lets the
+    negative margins pull both edges and the width fill what's left. */
+    width: auto;
+    margin-left: calc(-1 * var(--sheet-gutter));
+    margin-right: calc(-1 * var(--sheet-gutter));
+    border-radius: 0;
+    }
+    .main-sheet .bleed img { border-radius: 0; }
+
+    /* app-shot--bg-full's 100vw/50vw breakout trick assumed .wrap sits centered
+    in the full browser viewport (true on the plain case study page). Nested
+    inside the sidebar layout it isn't, so it blew out past the sheet's own
+    edges instead of framing the image. Neutralize the breakout and let it
+    sit as a normal padded block, sized like every other figure in .wrap. */
+    .main-sheet .app-shot--bg-full {
+    width: auto;
+    margin-left: 0;
+    margin-right: 0;
+    border-radius: 14px;
+    }
+    .main-sheet .app-shot--bg-full > img {
+    max-width: 100%;
+    }
+
+    /* Insight cards ride on --surface, so their text follows the theme too —
+    pinning it to gray-900 left dark text on a dark card once the surface
+    token started flipping. */
+    .main-sheet .insight-content h3 { color: var(--text); }
+    .main-sheet .insight-content p { color: var(--text-2); }
+
+    /* Headline/body scale, tuned down from the site's full-viewport clamps:
+    the sheet is a ~65vw column now, not the full page, so vw-based sizing
+    read oversized next to the sidebar. Brought in line with the sidebar's
+    title/lead so both columns read at the same visual weight. */
+    .main-sheet h2,
+    .main-sheet .cs-block h3 {
+    font-size: clamp(1.625rem, 2.6vw, 2.125rem);
+    }
+    .main-sheet .cs-block p,
+    .main-sheet .explore-intro {
+    font-size: 0.9375rem;
+    }
+
+    /* Bento iframes render at their natural desktop width always (JS below
+    sets width/height from data-w/data-h and scales the whole thing down to
+    fit), so the embedded page never crosses its own internal mobile
+    breakpoint just because the sidebar narrowed this column. Without this,
+    the iframe "thinks" it's on a narrow phone and reflows into a stacked
+    layout that then gets squashed into the wide aspect-ratio frame. */
+    .embed-iframe--scaled {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: top left;
+    }
+
+   /* Blanket guard: every picture, video and frame in the sheet stays inside
+ its column and keeps its own proportions. Individual components used to
+ set this themselves, or not at all, which is where the crops came from. */
+ .main-sheet img,
+ .main-sheet video,
+ .main-sheet iframe { max-width: 100%; }
+ .main-sheet img,
+ .main-sheet video { height: auto; }
+
+ /* ====== CASE HERO ====== */
+    .case-hero {
+      padding: calc(60px + var(--section-py)) 0 var(--section-py);
+      position: relative;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-2);
+      margin-bottom: 2rem;
+      transition: color 0.3s, gap 0.3s var(--ease);
+    }
+    .back-link:hover {
+      color: var(--text);
+      gap: 0.85rem;
+    }
+    .back-arrow {
+      display: inline-block;
+      font-family: var(--font);
+    }
+
+    .case-tag {
+      display: inline-block;
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--accent);
+      background: var(--accent-light);
+      padding: 5px 11px;
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+    }
+
+    .case-hero h1 {
+      margin-bottom: 1.5rem;
+      max-width: none;
+    }
+
+    .case-lead {
+      font-size: clamp(1.0625rem, 1.6vw, 1.25rem);
+      line-height: 1.6;
+      color: var(--text-2);
+      max-width: none;
+      margin-bottom: 3.5rem;
+    }
+
+    /* Meta grid */
+    .case-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem 2.5rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: var(--section-gap);
+    }
+    @media (min-width: 720px) {
+      .case-meta { grid-template-columns: repeat(4, 1fr); }
+    }
+    .case-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .case-meta-label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
+    .case-meta-value {
+      font-size: 1rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    /* Hero mockup placeholder */
+    .case-hero-mockup {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--bg-alt);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .case-hero-mockup::before {
+      content: '';
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      background: var(--accent);
+      opacity: 0.08;
+      border-radius: 40% 60% 65% 35% / 40% 45% 55% 60%;
+      top: 15%;
+      left: 20%;
+      filter: blur(20px);
+    }
+    .case-hero-mockup::after {
+      content: '';
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      background: var(--accent-yellow);
+      opacity: 0.3;
+      border-radius: 50%;
+      bottom: 15%;
+      right: 20%;
+      filter: blur(30px);
+    }
+    .mockup-caption {
+      position: relative;
+      z-index: 1;
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+      background: var(--surface);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    /* ====== CASE SECTIONS (shared) ====== */
+    .case-section {
+      padding: var(--section-py) 0;
+      position: relative;
+    }
+    .case-section--alt { background: var(--bg-alt); }
+    .case-section--dark {
+      background: var(--gray-true-900);
+      color: var(--gray-true-25);
+    }
+    .case-section--dark h2,
+    .case-section--dark h3 { color: var(--gray-true-25); }
+    .case-section--dark p { color: rgba(252,252,252,0.6); }
+    .case-section--dark .case-section-label { color: rgba(252,252,252,0.45); }
+
+    .case-section-header {
+      margin-bottom: var(--section-gap);
+    }
+    .case-section-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-bottom: 0.75rem;
+    }
+    .case-section h2 {
+      max-width: 780px;
+    }
+
+    /* ====== CHALLENGE / SOLUTION (2-col) ====== */
+    .cs-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+    @media (min-width: 820px) {
+      .cs-grid { grid-template-columns: 1fr 1fr; gap: 4rem; }
+    }
+    .cs-block h3 {
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: -0.015em;
+      margin-bottom: 1rem;
+    }
+    .cs-block p {
+      color: var(--text-2);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .cs-block p:last-child { margin-bottom: 0; }
+    .cs-block-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.75rem;
+      display: block;
+    }
+    .cs-block--challenge .cs-block-label { color: #b85c3f; }
+    .cs-block--solution .cs-block-label { color: var(--accent); }
+
+    /* ====== RESEARCH ====== */
+    .research-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (min-width: 900px) {
+      .research-layout { grid-template-columns: 1.1fr 0.9fr; gap: 4rem; }
+    }
+    .research-text p {
+      color: var(--text-2);
+      line-height: 1.7;
+      margin-bottom: 1.25rem;
+    }
+    .research-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 1.5rem;
+    }
+    .research-list li {
+      padding: 0.75rem 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.9375rem;
+      color: var(--text);
+      display: flex;
+      align-items: baseline;
+      gap: 0.75rem;
+    }
+    .research-list li:last-child { border-bottom: 1px solid var(--border); }
+    .research-list li::before {
+      content: '';
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      flex-shrink: 0;
+      transform: translateY(-2px);
+    }
+    .research-visual {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      aspect-ratio: 4 / 5;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+    }
+    .research-visual::before {
+      content: '';
+      position: absolute;
+      width: 70%; height: 70%;
+      top: 10%; left: 15%;
+      background: var(--accent);
+      opacity: 0.1;
+      border-radius: 45% 55% 60% 40% / 50% 40% 60% 50%;
+      filter: blur(30px);
+    }
+    .placeholder-caption {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.875rem 1rem;
+      max-width: 100%;
+    }
+    .placeholder-caption-label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .placeholder-caption-text {
+      font-size: 0.8125rem;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    /* ====== INSIGHTS ====== */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+    .insight-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.5rem;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border);
+      align-items: start;
+    }
+    .insight-item:last-child { border-bottom: 1px solid var(--border); }
+    .insight-num {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-3);
+      padding-top: 0.5rem;
+    }
+    .insight-content h3 {
+      font-size: 1.375rem;
+      font-weight: 400;
+      line-height: 1.3;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+    .insight-content p {
+      color: var(--text-2);
+      font-size: 0.9375rem;
+      line-height: 1.7;
+      max-width: 640px;
+    }
+
+    /* ====== PRINCIPLES ====== */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    @media (min-width: 700px) {
+      .principles-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1000px) {
+      .principles-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    .principle-card {
+      padding: 2rem 1.75rem;
+      border-radius: 12px;
+      background: rgba(252,252,252,0.03);
+      border: 1px solid rgba(252,252,252,0.12);
+    }
+    .principle-num {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: rgba(252,252,252,0.5);
+      margin-bottom: 1.25rem;
+      display: block;
+    }
+    .principle-card h3 {
+      font-size: 1.125rem;
+      font-weight: 500;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.75rem;
+    }
+    .principle-card p {
+      font-size: 0.875rem;
+      line-height: 1.6;
+      color: rgba(252,252,252,0.55);
+    }
+
+    /* ====== REUSABLE PLACEHOLDER SYSTEM ====== */
+    .ph {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.25rem;
+    }
+    .ph--16x9 { aspect-ratio: 16 / 9; }
+    .ph--4x3  { aspect-ratio: 4 / 3; }
+    .ph--3x4  { aspect-ratio: 3 / 4; }
+    .ph--1x1  { aspect-ratio: 1 / 1; }
+    .ph--3x2  { aspect-ratio: 3 / 2; }
+
+    .ph::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0.12;
+      filter: blur(30px);
+      pointer-events: none;
+    }
+    .ph--green::before {
+      background: radial-gradient(circle at 30% 40%, var(--accent), transparent 60%);
+    }
+    .ph--yellow::before {
+      background: radial-gradient(circle at 70% 60%, var(--accent-yellow), transparent 60%);
+      opacity: 0.4;
+    }
+    .ph--blue::before {
+      background: radial-gradient(circle at 40% 30%, var(--accent-blue), transparent 60%);
+      opacity: 0.5;
+    }
+    .ph--pink::before {
+      background: radial-gradient(circle at 60% 50%, var(--accent-pink), transparent 60%);
+      opacity: 0.5;
+    }
+    .ph--warn::before {
+      background: radial-gradient(circle at 50% 50%, #d4a37a, transparent 60%);
+      opacity: 0.25;
+    }
+
+    /* Grid lines decoration */
+    .ph--grid::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(20,20,20,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20,20,20,0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+
+    .ph-caption {
+      position: relative;
+      z-index: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 0.9rem;
+      max-width: 340px;
+      box-shadow: 0 4px 12px rgba(20,20,20,0.04);
+    }
+    .ph-caption-label {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .ph-caption-text {
+      font-size: 0.8125rem;
+      color: var(--text-2);
+      line-height: 1.45;
+    }
+
+    /* ====== BEFORE / AFTER ====== */
+    .ba-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 820px) {
+      .ba-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; }
+    }
+    .ba-block {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .ba-tag {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      padding: 4px 10px;
+      border-radius: 4px;
+      align-self: flex-start;
+    }
+    .ba-tag--before {
+      color: #a04e2f;
+      background: #f5e4db;
+    }
+    .ba-tag--after {
+      color: var(--accent);
+      background: var(--accent-light);
+    }
+    .ba-block h3 {
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+    .ba-block p {
+      font-size: 0.9375rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* ====== UX PROCESS GALLERY ====== */
+    .process-gallery {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+    @media (min-width: 700px) {
+      .process-gallery {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (min-width: 1000px) {
+      .process-gallery {
+        grid-template-columns: repeat(6, 1fr);
+        grid-auto-rows: minmax(180px, auto);
+      }
+      /* Asymmetric spans for visual rhythm */
+      .process-gallery > .process-item:nth-child(1) { grid-column: span 4; }
+      .process-gallery > .process-item:nth-child(2) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(3) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(4) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(5) { grid-column: span 2; }
+      .process-gallery > .process-item:nth-child(6) { grid-column: span 3; }
+      .process-gallery > .process-item:nth-child(7) { grid-column: span 3; }
+    }
+    .process-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.875rem;
+    }
+    .process-item .ph {
+      flex: 1;
+      min-height: 180px;
+    }
+    .process-item-label {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+    }
+    .process-item-title {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: -0.005em;
+    }
+
+    /* ====== DESIGN EXPLORATIONS ====== */
+    .explore-intro {
+      font-size: 1rem;
+      color: var(--text-2);
+      line-height: 1.7;
+      max-width: 640px;
+      margin-top: 0.75rem;
+    }
+    .explore-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 700px) {
+      .explore-grid { grid-template-columns: repeat(3, 1fr); gap: 1.75rem; }
+    }
+    .explore-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .explore-num {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-3);
+    }
+    .explore-item h3 {
+      font-size: 1.0625rem;
+      font-weight: 500;
+      letter-spacing: -0.005em;
+    }
+    .explore-item p {
+      font-size: 0.875rem;
+      color: var(--text-2);
+      line-height: 1.65;
+    }
+
+    /* ====== FINAL PRODUCT GALLERY ====== */
+    .gallery-hero { margin-bottom: 1.5rem; }
+    .gallery-detail {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (min-width: 700px) {
+      .gallery-detail { grid-template-columns: 1fr 1fr; }
+    }
+    .gallery-mobile {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
+    }
+    @media (min-width: 700px) {
+      .gallery-mobile { grid-template-columns: repeat(4, 1fr); }
+    }
+    .gallery-caption {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-3);
+      margin-top: 0.625rem;
+      display: block;
+    }
+
+    /* ====== MOCKUP UI SYSTEM ====== */
+    .mock-browser {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+      font-family: var(--font);
+    }
+    .mock-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 12px;
+      background: var(--gray-true-100);
+      border-bottom: 1px solid var(--border);
+    }
+    .mock-dots { display: flex; gap: 5px; }
+    .mock-dots i { width: 7px; height: 7px; border-radius: 50%; display: block; font-style: normal; }
+    .mock-dots i:nth-child(1) { background: #ff5f57; }
+    .mock-dots i:nth-child(2) { background: #ffbd2e; }
+    .mock-dots i:nth-child(3) { background: #28c840; }
+    .mock-url {
+      flex: 1; margin-left: 8px;
+      background: #fff; border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.5rem; color: var(--text-3);
+      font-family: var(--mono); letter-spacing: 0.02em;
+    }
+
+    .mock-app {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      min-height: 340px;
+    }
+    @media (max-width: 600px) {
+      .mock-app { grid-template-columns: 1fr; }
+      .mock-side { display: none; }
+    }
+
+    /* Sidebar */
+    .mock-side {
+      background: #0d2b2e; color: rgba(255,255,255,0.65);
+      padding: 12px 0; font-size: 0.5625rem;
+      display: flex; flex-direction: column;
+    }
+    .mock-side-logo {
+      padding: 2px 14px 10px;
+      font-weight: 700; font-size: 0.6875rem;
+      color: #fff; letter-spacing: -0.02em;
+      font-style: italic;
+    }
+    .mock-side-sec {
+      padding: 10px 14px 3px;
+      font-size: 0.4375rem; text-transform: uppercase;
+      letter-spacing: 0.1em; color: rgba(255,255,255,0.3);
+    }
+    .mock-side-item {
+      padding: 5px 14px; font-size: 0.5625rem;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .mock-side-item--on {
+      background: rgba(255,255,255,0.12); color: #fff;
+      border-radius: 0 4px 4px 0; margin-right: 6px;
+    }
+    .mock-side-dot {
+      width: 4px; height: 4px; border-radius: 50%;
+      background: currentColor; opacity: 0.5;
+    }
+
+    /* Content area */
+    .mock-body {
+      padding: 14px 16px; background: #f8f9fa;
+      overflow: hidden; font-size: 0.5625rem; color: var(--text);
+    }
+    .mock-breadcrumb {
+      font-size: 0.4375rem; color: var(--text-3);
+      margin-bottom: 4px; font-family: var(--mono);
+      letter-spacing: 0.04em;
+    }
+    .mock-title {
+      font-size: 0.75rem; font-weight: 600;
+      margin-bottom: 10px; letter-spacing: -0.01em;
+    }
+
+    /* Metric cards */
+    .mock-metrics { display: flex; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
+    .mock-m {
+      flex: 1; min-width: 60px;
+      background: #fff; border-radius: 5px;
+      padding: 8px 10px; border: 1px solid #eee;
+    }
+    .mock-m-label {
+      font-size: 0.375rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-3); margin-bottom: 3px;
+    }
+    .mock-m-val { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
+    .mock-m-delta {
+      font-size: 0.375rem; margin-top: 2px;
+    }
+    .mock-m-delta--up { color: #28a745; }
+    .mock-m-delta--down { color: #dc3545; }
+
+    /* Map */
+    .mock-map {
+      background: linear-gradient(145deg, #d4e8df, #a8d5c2 40%, #7ec4a5 70%, #5aad8a);
+      border-radius: 5px; height: 110px;
+      position: relative; margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .mock-map-pin {
+      position: absolute; width: 8px; height: 8px;
+      background: #e74c3c; border-radius: 50%;
+      border: 1.5px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .mock-map-overlay {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(255,255,255,0.92); border-radius: 4px;
+      padding: 5px 8px; font-size: 0.4375rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    .mock-map-overlay b { display: block; font-size: 0.5rem; }
+
+    /* Table */
+    .mock-tbl {
+      width: 100%; border-collapse: collapse;
+      background: #fff; border-radius: 5px;
+      overflow: hidden; border: 1px solid #eee;
+    }
+    .mock-tbl th {
+      text-align: left; padding: 6px 8px;
+      background: #f8f9fa; font-weight: 600;
+      font-size: 0.375rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-3);
+      border-bottom: 1px solid #eee;
+    }
+    .mock-tbl td {
+      padding: 5px 8px; border-bottom: 1px solid #f5f5f5;
+      font-size: 0.5rem; color: var(--text);
+    }
+    .mock-badge {
+      display: inline-block; padding: 1px 5px;
+      border-radius: 3px; font-size: 0.375rem;
+      font-weight: 600;
+    }
+    .mock-badge--green { background: #e6f7ee; color: #1a7f43; }
+    .mock-badge--yellow { background: #fef7e0; color: #9a7b1a; }
+    .mock-badge--blue { background: #e8f0fe; color: #1a5fb4; }
+    .mock-badge--red { background: #fde8e8; color: #c62828; }
+
+    /* Charts */
+    .mock-chart {
+      background: #fff; border-radius: 5px;
+      border: 1px solid #eee; padding: 10px;
+      margin-bottom: 10px;
+    }
+    .mock-chart-title {
+      font-size: 0.4375rem; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--text-3); margin-bottom: 8px;
+    }
+    .mock-chart-bars { display: flex; align-items: flex-end; gap: 3px; height: 60px; }
+    .mock-chart-bar {
+      flex: 1; background: #0d2b2e; border-radius: 2px 2px 0 0;
+      min-width: 6px; transition: height 0.3s;
+    }
+    .mock-chart-bar--accent { background: var(--accent-yellow); }
+    .mock-chart-bar--red { background: #e74c3c; }
+    .mock-chart-bar--blue { background: #1a5fb4; }
+    .mock-chart-line {
+      height: 60px; position: relative;
+    }
+    .mock-chart-line svg {
+      width: 100%; height: 100%;
+    }
+
+    /* Tabs */
+    .mock-tabs { display: flex; gap: 0; margin-bottom: 10px; }
+    .mock-tab {
+      padding: 5px 12px; font-size: 0.4375rem; font-weight: 500;
+      color: var(--text-3); border-bottom: 2px solid transparent;
+    }
+    .mock-tab--on { color: #0d2b2e; border-bottom-color: #0d2b2e; }
+
+    /* Form elements */
+    .mock-input {
+      background: #fff; border: 1px solid #ddd; border-radius: 4px;
+      padding: 5px 8px; font-size: 0.5rem; color: var(--text);
+      width: 100%; margin-bottom: 6px;
+    }
+    .mock-select { composes: mock-input; appearance: none; }
+    .mock-checkbox {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.5rem; color: var(--text); margin-bottom: 4px;
+    }
+    .mock-checkbox i {
+      width: 10px; height: 10px; border-radius: 2px;
+      border: 1.5px solid #0d2b2e; display: block; font-style: normal;
+      position: relative;
+    }
+    .mock-checkbox i.on { background: #0d2b2e; }
+    .mock-checkbox i.on::after {
+      content: ''; position: absolute;
+      left: 2px; top: 0; width: 3px; height: 6px;
+      border: solid #fff; border-width: 0 1.5px 1.5px 0;
+      transform: rotate(45deg);
+    }
+    .mock-btn-sm {
+      display: inline-block; padding: 4px 10px;
+      background: #0d2b2e; color: #fff;
+      border-radius: 4px; font-size: 0.4375rem; font-weight: 600;
+    }
+
+    /* Phone frame */
+    .mock-phone {
+      background: #1a1a1a; border-radius: 24px;
+      padding: 8px; max-width: 180px; margin: 0 auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+    .mock-phone-screen {
+      background: #fff; border-radius: 18px;
+      overflow: hidden; min-height: 320px;
+      font-family: var(--font); font-size: 0.5rem;
+      color: var(--text);
+    }
+    .mock-phone-status {
+      display: flex; justify-content: space-between;
+      padding: 6px 12px 2px;
+      font-size: 0.375rem; color: var(--text-3);
+    }
+    .mock-phone-header {
+      padding: 4px 12px 8px;
+      font-size: 0.6875rem; font-weight: 700;
+      color: var(--text); letter-spacing: -0.01em;
+    }
+    .mock-phone-body { padding: 0 12px 12px; }
+    .mock-phone-nav {
+      display: flex; justify-content: space-around;
+      padding: 8px 0; border-top: 1px solid #eee;
+      font-size: 0.3125rem; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--text-3);
+    }
+    .mock-phone-nav span { text-align: center; }
+    .mock-phone-nav span.on { color: #0d2b2e; font-weight: 700; }
+
+    .mock-phone-card {
+      background: #f8f9fa; border-radius: 6px;
+      padding: 8px; margin-bottom: 6px;
+    }
+    .mock-phone-row {
+      display: flex; justify-content: space-between;
+      align-items: center; padding: 4px 0;
+      font-size: 0.4375rem; border-bottom: 1px solid #f0f0f0;
+    }
+    .mock-phone-row:last-child { border-bottom: none; }
+
+    /* Wireframe style (mid-fi process artifacts) */
+    .mock-wire {
+      background: #f5f5f5; border-radius: 8px;
+      border: 1px solid #e0e0e0; padding: 16px;
+      font-family: var(--font); font-size: 0.5rem;
+      color: #666; overflow: hidden;
+      height: 100%; min-height: 200px;
+      display: flex; flex-direction: column;
+    }
+    .mock-wire-title {
+      font-size: 0.5625rem; font-weight: 700; color: #444;
+      margin-bottom: 10px; padding-bottom: 6px;
+      border-bottom: 1px dashed #ddd;
+    }
+    /* Sticky notes */
+    .mock-stickies { display: flex; flex-wrap: wrap; gap: 4px; }
+    .mock-sticky {
+      padding: 5px 7px; border-radius: 2px;
+      font-size: 0.375rem; line-height: 1.3;
+      box-shadow: 1px 1px 2px rgba(0,0,0,0.06);
+      width: calc(33% - 3px); min-width: 48px;
+    }
+    .mock-sticky--y { background: #fff9c4; color: #6d5e00; }
+    .mock-sticky--b { background: #e3f2fd; color: #1565c0; }
+    .mock-sticky--p { background: #fce4ec; color: #ad1457; }
+    .mock-sticky--g { background: #e8f5e9; color: #2e7d32; }
+    /* Flow arrows */
+    .mock-flow { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .mock-flow-step {
+      background: #fff; border: 1px solid #ddd; border-radius: 4px;
+      padding: 6px 8px; font-size: 0.4375rem; font-weight: 500;
+      color: #444; text-align: center; flex: 1; min-width: 50px;
+    }
+    .mock-flow-step--on { background: #0d2b2e; color: #fff; border-color: #0d2b2e; }
+    .mock-flow-step--warn { border-color: #e74c3c; color: #e74c3c; }
+    .mock-flow-arrow { color: #ccc; font-size: 0.625rem; flex-shrink: 0; }
+    /* Tree diagram */
+    .mock-tree { padding-left: 12px; }
+    .mock-tree-node {
+      position: relative; padding: 3px 0 3px 14px;
+      font-size: 0.4375rem; color: #555;
+    }
+    .mock-tree-node::before {
+      content: ''; position: absolute; left: 0; top: 0;
+      width: 8px; height: 100%;
+      border-left: 1px solid #ccc; border-bottom: 1px solid #ccc;
+    }
+    .mock-tree-node:last-child::before { height: 50%; }
+    .mock-tree-node b { color: #333; font-weight: 600; }
+    /* Gray wireframe boxes */
+    .mock-wire-box {
+      background: #e8e8e8; border-radius: 3px;
+      padding: 6px 8px; margin-bottom: 4px;
+      font-size: 0.375rem; color: #888;
+    }
+    .mock-wire-box--dark { background: #d0d0d0; color: #666; }
+    .mock-wire-row { display: flex; gap: 4px; margin-bottom: 4px; }
+    .mock-wire-sidebar {
+      width: 40px; background: #ddd; border-radius: 3px;
+      padding: 4px; flex-shrink: 0;
+    }
+    .mock-wire-main { flex: 1; }
+    /* Annotation dots */
+    .mock-annot {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #e74c3c; color: #fff;
+      font-size: 0.3125rem; font-weight: 700;
+      position: absolute;
+    }
+    /* Heatmap grid for risk visualization */
+    .mock-heatmap { display: grid; gap: 2px; margin-bottom: 8px; }
+    .mock-heatmap-cell {
+      border-radius: 2px; padding: 3px; text-align: center;
+      font-size: 0.3125rem; font-weight: 600; color: #fff;
+    }
+    .mock-heatmap-cell--low { background: #28a745; }
+    .mock-heatmap-cell--med { background: #ffc107; color: #333; }
+    .mock-heatmap-cell--high { background: #e74c3c; }
+    .mock-heatmap-cell--header { background: #e8e8e8; color: #666; font-weight: 600; }
+    /* Risk score circles */
+    .mock-risk-score {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 50%;
+      font-size: 0.5rem; font-weight: 700; color: #fff;
+    }
+    .mock-risk-score--low { background: #28a745; }
+    .mock-risk-score--med { background: #ffc107; color: #333; }
+    .mock-risk-score--high { background: #e74c3c; }
+    /* Source provenance tag */
+    .mock-source-tag {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 1px 5px; border-radius: 3px;
+      font-size: 0.3125rem; font-weight: 500;
+      background: #f0f0f0; color: #666;
+      border: 1px solid #e0e0e0;
+    }
+    .mock-source-tag--self { border-color: #ffc107; background: #fef7e0; color: #9a7b1a; }
+    .mock-source-tag--audit { border-color: #28a745; background: #e6f7ee; color: #1a7f43; }
+    .mock-source-tag--research { border-color: #1a5fb4; background: #e8f0fe; color: #1a5fb4; }
+    /* Timeline */
+    .mock-timeline { position: relative; padding-left: 12px; }
+    .mock-timeline::before {
+      content: ''; position: absolute; left: 3px; top: 0; bottom: 0;
+      width: 1px; background: #ddd;
+    }
+    .mock-timeline-item {
+      position: relative; padding: 4px 0 8px 8px;
+      font-size: 0.4375rem; color: #555;
+    }
+    .mock-timeline-item::before {
+      content: ''; position: absolute; left: -12px; top: 7px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #0d2b2e; border: 1.5px solid #fff;
+      box-shadow: 0 0 0 1px #ddd;
+    }
+    .mock-timeline-item--alert::before { background: #e74c3c; }
+    .mock-timeline-date {
+      font-size: 0.3125rem; color: var(--text-3);
+      font-family: var(--mono); margin-bottom: 1px;
+    }
+    /* Confidence bar */
+    .mock-confidence {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 0.3125rem; color: #888;
+    }
+    .mock-confidence-bar {
+      width: 40px; height: 4px; background: #eee; border-radius: 2px;
+      overflow: hidden;
+    }
+    .mock-confidence-fill {
+      height: 100%; border-radius: 2px;
+    }
+    .mock-confidence-fill--high { background: #28a745; }
+    .mock-confidence-fill--med { background: #ffc107; }
+    .mock-confidence-fill--low { background: #e74c3c; }
+  </style>
+</head>
+
+<body class="shell-page">
+
+  <!-- Custom cursor -->
+  <div class="cursor" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="wrap nav-inner">
+      <a href="../index.html" class="nav-logo">Pietra Gottardo.</a>
+      <div class="nav-right">
+        <ul class="nav-links">
+          <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
+          <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
+        </ul>
+        <div class="theme-toggle" role="group" aria-label="Color theme">
+   <button class="theme-btn" data-theme-set="dark" aria-pressed="false" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
+   <button class="theme-btn active" data-theme-set="light" aria-pressed="true" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
+ </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Shell: fixed sidebar (project info + other cases) + scrolling main sheet -->
+  <div class="shell">
+
+    <aside class="sidebar">
+      <div class="sidebar-intro">
+      <h1 class="r">Continuous Due Diligence for Commodity Supply Chains</h1>
+      <p class="case-lead r">An integrated platform that turns supplier assessment into a living, continuously updated graph.</p>
+
+      <div class="sidebar-meta r-stagger">
+        <div class="sidebar-meta-item r">
+          <span class="case-meta-label">Role</span>
+          <span class="case-meta-value">Senior Product Designer</span>
+        </div>
+        <div class="sidebar-meta-item r">
+          <span class="case-meta-label">Deliverables</span>
+          <span class="case-meta-value">Web Platform, Assessment Engine</span>
+        </div>
+        <div class="sidebar-meta-item r">
+          <span class="case-meta-label">Team</span>
+          <span class="case-meta-value">Datastake product team</span>
+        </div>
+      </div>
+
+      </div><!-- /.sidebar-intro -->
+
+      <div class="sidebar-next">
+        <span class="sidebar-next-label">Next up</span>
+        <div class="sidebar-next-list">
+         <!-- Image-only cards: the alt text carries the project name for
+              screen readers and the link label. -->
+         <a href="straatos.html" class="sidebar-card">
+          <div class="sidebar-card-thumb"><img src="assets/straatos-hero.png" alt="Straatos, Digital infrastructure for climate action"></div>
+         </a>
+         <a href="wazi.html" class="sidebar-card">
+          <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
+         </a>
+         <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
+          <div class="sidebar-card-thumb">
+          <img src="assets/kota-cover.jpg" alt="Kota, Counterparty due-diligence infrastructure">
+          <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
+          </div>
+         </div>
+         <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
+          <div class="sidebar-card-thumb">
+          <img src="assets/safra-hero.png" alt="Safra, Operating system for sustainable Brazilian agriculture">
+          <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
+          </div>
+         </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-sheet">
+
+  <!-- CASE HERO (image only, sidebar carries title/meta) -->
+  <section class="case-hero">
+    <div class="wrap">
+      <div class="case-hero-mockup r" style="aspect-ratio:auto;padding:0;background:transparent;border:none;">
+        <img src="assets/supply-chain/flow-map.jpg" alt="The supply chain flow map open on a laptop: the cobalt route traced from artisanal mine sites in the Democratic Republic of the Congo up through smelters, refiners and cathode makers to the battery pack manufacturer, with a supplier panel below showing position, country of origin and risk level">
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== CHALLENGE / SOLUTION ====== -->
+  <section class="case-section case-section--alt">
+    <div class="wrap">
+      <div class="cs-grid">
+        <div class="cs-block cs-block--challenge r">
+          <span class="cs-block-label">The Challenge</span>
+          <h3>Due diligence was static, and the world wasn't.</h3>
+          <p>Sourcing commodities like copper, cobalt and gold from high-risk regions demands meticulous due diligence — OECD Annex II, AML/CFT checks, watchlist screening, site audits, ESG scoring. Traditional approaches were static: a supplier filled in a form, an analyst scored it, and six months later the risk profile was already out of date.</p>
+          <p>Compliance teams juggled disconnected tools for financial verification, watchlist cross-referencing, audit tracking and ESG reporting — with no way to triangulate evidence across sources or surface red flags automatically.</p>
+        </div>
+        <div class="cs-block cs-block--solution r">
+          <span class="cs-block-label">The Solution</span>
+          <h3>Living supplier profiles, always up to date.</h3>
+          <p>An integrated platform where each supplier is a continuously evolving record. Inherent risk, residual risk and audit performance are tracked as three independent dimensions. Triangulation from multiple sources — self-assessment, third-party audits, independent research — keeps every field current and traceable.</p>
+          <p>Red flags surface automatically when new information contradicts a supplier's record. Reports are generated on demand for any regulatory framework — OECD, LBMA, RMI — with full source-tracking baked in.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== THE PLATFORM (real screens) ====== -->
+  <section class="case-section">
+    <div class="wrap">
+      <div class="app-stack r-stagger">
+        <figure class="app-shot r">
+          <img src="assets/supply-chain/supplier-assessment.jpg" alt="Supplier assessment for a copper mine: inherent risk, residual risk and audit performance as three separate readings, location on a map, audit criteria scored against the OECD-aligned checklist, and the self-assessment entry form the supplier fills in alongside it">
+          <figcaption>Supplier assessment, the analyst's read and the supplier's own entry form side by side</figcaption>
+        </figure>
+
+        <figure class="app-shot r">
+          <img src="assets/supply-chain/composition.jpg" alt="Composition of platform surfaces: the country risk table, the flow overview tracing the chain from mine to manufacturer, the supply chain participants list, and the globe view plotting the route across continents">
+          <figcaption>One chain, four ways in, table, flow, participants and the globe</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+    </div><!-- /.main-sheet -->
+  </div><!-- /.shell -->
+
+  <script>
+    // Minimal JS for Stage 1 — full version comes in Stage 3
+    const nav = document.querySelector('.nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', scrollY > 10);
+    }, { passive: true });
+
+    // Reveal
+    const obs = new IntersectionObserver(es =>
+      es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
+    , { threshold: 0.12 });
+    document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+    /* ============ Light / dark theme ============ */
+    function setTheme(t) {
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    document.querySelector('meta[name="theme-color"]')
+    ?.setAttribute('content', t === 'dark' ? '#0f0f0f' : '#f0f0ee');
+    document.querySelectorAll('.theme-btn').forEach(b => {
+    const on = b.dataset.themeSet === t;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-pressed', on);
+    });
+    }
+    document.querySelectorAll('.theme-btn').forEach(b =>
+    b.addEventListener('click', () => setTheme(b.dataset.themeSet))
+    );
+    setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+
+    // Custom cursor
+    (() => {
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const cursor = document.querySelector('.cursor');
+      if (!cursor) return;
+      let mx = -100, my = -100, cx = -100, cy = -100;
+      document.addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; });
+      document.querySelectorAll('a, button, .btn, .theme-btn').forEach(el => {
+        el.addEventListener('pointerenter', () => cursor.classList.add('active'));
+        el.addEventListener('pointerleave', () => cursor.classList.remove('active'));
+      });
+      function tick() {
+        cx += (mx - cx) * 0.22;
+        cy += (my - cy) * 0.22;
+        cursor.style.transform = `translate3d(${cx}px, ${cy}px, 0) translate(-50%, -50%)`;
+        requestAnimationFrame(tick);
+      }
+      tick();
+    })();
+  </script>
+
+</body>
+</html>

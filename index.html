@@ -12,6 +12,16 @@
 
  <link rel="stylesheet" href="assets/fonts/lausanne.css">
 
+ <!-- Stamped before first paint so a light-theme reload doesn't flash dark.
+      Defaults to dark, which is this page's native look. -->
+ <script>
+ (function () {
+ var saved = null;
+ try { saved = localStorage.getItem('theme'); } catch (e) {}
+ document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+ })();
+ </script>
+
  <style>
  :root {
  /* Gray True palette */
@@ -33,7 +43,7 @@
  --surface: rgba(255, 255, 255, 0.04);
  --text: var(--gray-true-25);
  --text-2: rgba(252, 252, 252, 0.62);
- --text-3: rgba(252, 252, 252, 0.40);
+ --text-3: rgba(252, 252, 252, 0.50); /* 0.40 only reached 3.7:1 on the cards */
  --border: rgba(255, 255, 255, 0.10);
 
  /* Primary accent (brand) */
@@ -50,14 +60,47 @@
  --mono: 'TWKLausanne', system-ui, sans-serif;
  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
+ /* Dot color for the hero canvas, read by the animation at draw time. */
+ --dot-rgb: 238, 250, 138;
+ /* Card CTA. Pale yellow only works on the dark card. */
+ --cta: var(--accent-yellow);
+
  /* Vertical rhythm */
  --section-py: clamp(4.5rem, 9vw, 7rem);
  --section-gap: clamp(2.5rem, 5vw, 3.5rem);
  }
 
+ /* Light theme. This page is dark-native — :root above is the dark set —
+ so light is the override. Ratios on the light surfaces: text 18.4:1,
+ text-2 5.7:1, text-3 4.7:1. */
+ [data-theme="light"] {
+ /* Warm off-white instead of the neutral gray-25: pure white reads flat
+ under the grain, and the slight warmth gives the page a paper ground
+ for the texture to sit on. */
+ --bg: #fbfaf8;
+ /* The second tone, same job the #1c1c1c band does in dark: it lifts the
+ About section and the case thumbs off the page ground instead of
+ leaving everything on one flat sheet. */
+ --bg-alt: #f1efea;
+ --surface: rgba(20, 20, 20, 0.03);
+ --text: var(--gray-true-900);
+ --text-2: #666666;
+ --text-3: #6b6b6b;
+ --border: rgba(20, 20, 20, 0.12);
+
+ /* Pale yellow disappears on a light ground, so the dots go sage. */
+ /* Dots are decorative, so they can stay lighter than the text accent —
+        soft olive, same yellow family, ~2.8:1 so the pattern is visible. */
+        --dot-rgb: 134, 143, 46;
+ /* Same hue as the brand yellow (65deg), darkened until it reads on a
+        light ground: 4.7:1 even on the tinted card. The literal #f7fdb9 sits at 1.04:1 there. */
+        --cta: #6b7310;
+ --accent-glow: rgba(61,90,62,0.10);
+ }
+
  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
- html { scroll-behavior: smooth; }
+ html { scroll-behavior: smooth; scroll-snap-type: y proximity; }
 
  body {
  font-family: var(--font);
@@ -75,10 +118,17 @@
  position: fixed;
  inset: 0;
  pointer-events: none;
- z-index: 9999;
+ z-index: 9998; /* under the lightbox (9999) and the cursor (10000) */
  opacity: 0.3;
  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
  background-size: 200px;
+ }
+ /* On a light ground the same overlay lightens instead of textures, so the
+ grain multiplies into the paper and runs a little stronger to survive
+ the brighter surface. */
+ [data-theme="light"] body::after {
+ opacity: 0.42;
+ mix-blend-mode: multiply;
  }
 
  a { color: inherit; text-decoration: none; }
@@ -139,9 +189,9 @@
  .nav.over-dark .nav-logo { color: var(--gray-true-25); }
  .nav.over-dark .nav-links a { color: rgba(252,252,252,0.7); }
  .nav.over-dark .nav-links a:hover { color: var(--gray-true-25); }
- .nav.over-dark .lang-toggle { border-color: rgba(252,252,252,0.2); }
- .nav.over-dark .lang-btn { color: rgba(252,252,252,0.5); }
- .nav.over-dark .lang-btn.active { background: var(--gray-true-25); color: var(--gray-true-900); }
+ .nav.over-dark .theme-toggle { border-color: rgba(252,252,252,0.2); }
+ .nav.over-dark .theme-btn { color: rgba(252,252,252,0.72); }
+ .nav.over-dark .theme-btn.active { background: var(--gray-true-25); color: var(--gray-true-900); }
  .nav.over-dark .nav-toggle span { background: var(--gray-true-25); }
  .nav.scrolled {
  background: rgba(252,252,252,0.85);
@@ -179,18 +229,19 @@
  }
  .nav-links a:hover { color: var(--text); }
 
- .lang-toggle {
+ .theme-toggle {
  display: flex; gap: 0;
  border: 1px solid var(--border); border-radius: 6px;
  overflow: hidden;
  }
- .lang-btn {
- font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
- padding: 5px 10px; border: none; cursor: pointer;
- background: transparent; color: var(--text-3);
- transition: all 0.3s;
+ .theme-btn {
+ display: flex; align-items: center; justify-content: center;
+ padding: 5px 9px; border: none; cursor: pointer;
+ background: transparent; color: var(--text-2);
+ transition: background 0.3s, color 0.3s;
  }
- .lang-btn.active {
+ .theme-btn svg { width: 14px; height: 14px; display: block; }
+ .theme-btn.active {
  background: var(--text); color: var(--bg);
  }
 
@@ -217,7 +268,7 @@
  .mobile-menu a {
  font-size: 1.5rem; font-weight: 500; color: var(--text);
  }
- .mobile-menu .lang-toggle { align-self: flex-start; margin-top: 1rem; }
+ .mobile-menu .theme-toggle { align-self: flex-start; margin-top: 1rem; }
 
  @media (min-width: 768px) {
  .nav-links { display: flex; }
@@ -244,9 +295,12 @@
  padding: 80px 0 4rem;
  position: relative;
  overflow: hidden;
- background-color: var(--gray-true-900);
- color: var(--gray-true-25);
+ /* Was pinned to gray-900. Token-driven now so the hero band flips with
+ the theme instead of staying black on a light page. */
+ background-color: var(--bg);
+ color: var(--text);
  text-align: center;
+ scroll-snap-align: start;
  }
 
  .hero-canvas-full {
@@ -267,7 +321,7 @@
  font-family: var(--mono);
  font-size: 0.6875rem;
  font-weight: 500;
- color: var(--accent-yellow);
+ color: var(--cta);
  letter-spacing: 0.12em;
  text-transform: uppercase;
  margin-bottom: 1.75rem;
@@ -278,7 +332,7 @@
  font-weight: 300;
  line-height: 1.1;
  letter-spacing: -0.025em;
- color: var(--gray-true-25);
+ color: var(--text);
  }
  .hero h1 em {
  font-style: italic;
@@ -289,7 +343,7 @@
  margin: 1.75rem auto 0;
  font-size: 0.9375rem;
  font-weight: 400;
- color: rgba(252,252,252,0.55);
+ color: var(--text-2);
  max-width: 440px;
  line-height: 1.7;
  }
@@ -302,8 +356,8 @@
  justify-content: center;
  }
  .hero .btn-primary {
- background: var(--gray-true-25);
- color: var(--gray-true-900);
+ background: var(--text);
+ color: var(--bg);
  }
  .hero .btn-primary:hover {
  background: var(--accent-yellow);
@@ -311,13 +365,43 @@
  }
  .hero .btn-ghost {
  background: transparent;
- color: var(--gray-true-25);
- border-color: rgba(252,252,252,0.2);
+ color: var(--text);
+ border-color: var(--border);
  }
  .hero .btn-ghost:hover {
  background: var(--accent-yellow);
  color: var(--gray-true-900);
  border-color: var(--accent-yellow);
+ }
+
+ .hero-scroll-hint {
+ position: absolute;
+ left: 50%;
+ bottom: clamp(1.5rem, 4vw, 2.75rem);
+ transform: translateX(-50%);
+ z-index: 1;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: 0.5rem;
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ text-decoration: none;
+ transition: color 0.35s var(--ease);
+ }
+ .hero-scroll-hint:hover { color: var(--cta); }
+ .hero-scroll-hint svg {
+ width: 14px;
+ height: 14px;
+ animation: hero-hint-bounce 2.2s var(--ease) infinite;
+ }
+ @keyframes hero-hint-bounce {
+ 0%, 100% { transform: translateY(0); }
+ 50% { transform: translateY(5px); }
  }
 
  .btn {
@@ -349,93 +433,6 @@
  }
 
 
- /* ====== CTC (chaos to momentum), dark bg ====== */
- .ctc {
- background: var(--gray-true-900);
- color: var(--gray-true-25);
- padding: clamp(6rem, 11vw, 9rem) 0;
- position: relative;
- min-height: 70svh;
- display: flex;
- align-items: center;
- }
- .ctc > .wrap { width: 100%; }
- .ctc h2 { color: var(--gray-true-25); }
- .ctc .ctc-p { color: rgba(252,252,252,0.6); margin: 1rem 0 2rem; max-width: 48ch; }
- .ctc .btn-primary {
- background: var(--gray-true-25);
- color: var(--gray-true-900);
- }
- .ctc .btn-primary:hover {
- background: var(--accent-yellow);
- color: var(--gray-true-900);
- }
- .ctc-inner {
- display: grid;
- grid-template-columns: 1fr;
- gap: 3rem;
- align-items: center;
- }
- @media (min-width: 900px) {
- .ctc-inner {
- grid-template-columns: 1fr 1fr;
- gap: 4rem;
- }
- }
- /* CTC heading is styled by .section-header h2; just keep the em accent. */
- .ctc h2 em {
- font-style: italic;
- font-weight: 300;
- }
- .ctc p:not(.section-label):not(.section-header-num) {
- font-size: 0.9375rem;
- color: var(--text-2);
- line-height: 1.7;
- max-width: 420px;
- margin-bottom: 2rem;
- }
- .ctc-right {
- position: relative;
- aspect-ratio: 1;
- max-width: 480px;
- width: 100%;
- margin: 0 auto;
- }
- .ctc-right canvas {
- width: 100%;
- height: 100%;
- }
-
- /* ====== SERVICES, dark, with a slow drifting dot field behind the cards ====== */
- .services {
- padding: clamp(7rem, 13vw, 11rem) 0;
- background: transparent;
- color: var(--text);
- display: flex;
- align-items: center;
- position: relative;
- overflow: hidden;
- isolation: isolate;
- }
- .services > .wrap { width: 100%; position: relative; z-index: 1; }
-
- /* Stage-card entrance, softer rise + scale, distinct from default reveal */
- .stages .stage-card.r {
- opacity: 0;
- transform: translateY(40px) scale(0.985);
- transition: opacity 0.85s var(--ease), transform 0.85s var(--ease);
- transition-delay: 0s;
- }
- .stages .stage-card.r.v {
- opacity: 1;
- transform: translateY(0) scale(1);
- }
- .stages.r-stagger > .stage-card.r:nth-child(1) { transition-delay: 0.05s; }
- .stages.r-stagger > .stage-card.r:nth-child(2) { transition-delay: 0.15s; }
- .stages.r-stagger > .stage-card.r:nth-child(3) { transition-delay: 0.25s; }
- .stages.r-stagger > .stage-card.r:nth-child(4) { transition-delay: 0.35s; }
- .stages.r-stagger > .stage-card.r:nth-child(5) { transition-delay: 0.45s; }
-
  .section-header {
  display: flex; flex-wrap: wrap;
  justify-content: space-between; align-items: flex-end;
@@ -462,140 +459,6 @@
  font-size: 0.6875rem;
  font-weight: 500;
  color: var(--text-3);
- }
-
- /* ============ STAGES (replaces the old service list) ============ */
- .stages {
- display: grid;
- grid-template-columns: 1fr;
- gap: 1rem;
- }
- @media (min-width: 640px) {
- .stages { grid-template-columns: repeat(2, 1fr); }
- }
- @media (min-width: 1024px) {
- /* 5-column flow on desktop, feels like a process, not a list. */
- .stages { grid-template-columns: repeat(5, 1fr); gap: 1.25rem; }
- }
-
- .stage-card {
- position: relative;
- display: flex;
- flex-direction: column;
- gap: 1rem;
- padding: 1.75rem 1.5rem;
- background: transparent;
- border: 1px solid rgba(252, 252, 252, 0.12);
- border-radius: 16px;
- backdrop-filter: blur(28px) saturate(1.25);
- -webkit-backdrop-filter: blur(28px) saturate(1.25);
- transition: transform 0.4s var(--ease),
- border-color 0.4s var(--ease),
- box-shadow 0.4s var(--ease),
- background 0.4s var(--ease);
- }
- .stage-card:hover {
- transform: translateY(-4px);
- border-color: rgba(252, 252, 252, 0.28);
- background: rgba(252, 252, 252, 0.07);
- box-shadow: 0 22px 44px -16px rgba(0, 0, 0, 0.5);
- }
-
- /* Top row: number badge + a small connector dot mark */
- .stage-card-top {
- display: flex;
- align-items: center;
- justify-content: space-between;
- gap: 0.75rem;
- }
- .stage-num {
- font-family: var(--mono);
- font-size: 0.6875rem;
- font-weight: 500;
- letter-spacing: 0.16em;
- color: var(--text-3);
- text-transform: uppercase;
- }
- /* Tiny mark, a glyph hinting the deliverable type per stage */
- .stage-mark {
- width: 28px;
- height: 28px;
- border-radius: 8px;
- background: var(--bg-alt);
- display: inline-flex;
- align-items: center;
- justify-content: center;
- color: var(--text-2);
- transition: background 0.4s var(--ease), color 0.4s var(--ease);
- }
- .stage-card:hover .stage-mark {
- background: var(--text);
- color: var(--bg);
- }
- .stage-mark svg {
- width: 16px;
- height: 16px;
- display: block;
- }
-
- .stage-card h3 {
- font-size: 1.25rem;
- font-weight: 500;
- letter-spacing: -0.015em;
- line-height: 1.25;
- margin: 0;
- }
- .stage-desc {
- color: var(--text-2);
- font-size: 0.9375rem;
- line-height: 1.6;
- text-align: left;
- margin: 0;
- flex: 1;
- }
- /* Thin connector between cards on desktop, read as a process flow */
- @media (min-width: 1024px) {
- .stage-card + .stage-card::before {
- content: '';
- position: absolute;
- top: 50%;
- left: -1.25rem;
- width: 1.25rem;
- height: 1px;
- background: var(--border);
- transform: translateY(-50%);
- }
- }
- /* Bottom-of-card subtle accent line */
- .stage-card::after {
- content: '';
- position: absolute;
- left: 1.5rem;
- bottom: 1rem;
- width: 1.25rem;
- height: 2px;
- background: var(--text);
- border-radius: 2px;
- opacity: 0;
- transform: translateX(-6px);
- transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
- }
- .stage-card:hover::after {
- opacity: 1;
- transform: translateX(0);
- }
-
- /* ============ legacy service-list styles, kept neutral as fallback */
- .service-desc {
- color: var(--text-2);
- font-size: 0.9375rem;
- line-height: 1.65;
- text-align: right;
- max-width: 320px;
- display: none;
- }
- @media (min-width: 640px) {
- .service-desc { display: block; }
  }
 
  /* ====== WORK ====== */
@@ -671,7 +534,7 @@
  }
  .case-card:hover {
  transform: translateY(-6px);
- border-color: rgba(252, 252, 252, 0.25);
+ border-color: var(--text-3);
  box-shadow: 0 28px 56px -18px rgba(0,0,0,0.6);
  }
 
@@ -685,7 +548,7 @@
  box-shadow: none;
  }
  /* Hover-only dark overlay over the Safra hero image with centred "Coming soon" copy. */
- .case-thumb--safra { position: relative; }
+ .case-thumb--safra, .case-thumb--kota { position: relative; }
  .case-thumb-overlay {
  position: absolute;
  inset: 0;
@@ -795,7 +658,7 @@
  font-weight: 500;
  text-transform: uppercase;
  letter-spacing: 0.12em;
- color: rgba(252, 252, 252, 0.78);
+ color: var(--text-2);
  background: rgba(252, 252, 252, 0.08);
  padding: 4px 10px;
  border-radius: 4px;
@@ -824,7 +687,7 @@
  font-weight: 500;
  text-transform: uppercase;
  letter-spacing: 0.12em;
- color: var(--accent-yellow);
+ color: var(--cta);
  display: inline-flex; align-items: center; gap: 0.5rem;
  transition: gap 0.3s var(--ease);
  }
@@ -866,24 +729,6 @@
  color: var(--text-3);
  white-space: nowrap;
  }
-
- .work-process {
- margin-top: 2.5rem;
- display: flex;
- align-items: center;
- justify-content: center;
- gap: 1rem;
- flex-wrap: wrap;
- }
- .work-process span {
- font-family: var(--mono);
- font-size: 0.6875rem;
- font-weight: 500;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- color: var(--text-3);
- }
- .work-process-arrow { color: var(--border); }
 
  /* ====== ABOUT (editorial) ====== */
  .about {
@@ -1052,11 +897,12 @@
  /* ====== CONTACT ====== */
  .contact {
  padding: var(--section-py) 0;
- background: var(--gray-true-900);
- color: var(--gray-true-25);
- min-height: 100svh;
+ background: var(--bg);
+ color: var(--text);
  display: flex;
  align-items: center;
+ scroll-snap-align: start;
+ scroll-margin-top: 60px;
  }
  .contact > .wrap { width: 100%; }
 
@@ -1070,11 +916,11 @@
  }
 
  /* Inherits size/weight from .section-header h2; just sets dark-section colour */
- .contact-left h2 { color: var(--gray-true-25); }
+ .contact-left h2 { color: var(--text); }
  /* Body paragraph styling, scoped to NOT touch .section-label which is also a <p>. */
  .contact-left p:not(.section-label):not(.section-header-num) {
  font-size: 0.9375rem;
- color: rgba(252,252,252,0.55);
+ color: var(--text-2);
  line-height: 1.7;
  max-width: 440px;
  margin-bottom: 2rem;
@@ -1083,7 +929,7 @@
  font-family: var(--mono);
  font-size: 0.875rem;
  font-weight: 500;
- color: var(--accent-yellow);
+ color: var(--cta);
  display: inline-flex;
  align-items: center;
  gap: 0.5rem;
@@ -1112,15 +958,17 @@
  font-weight: 500;
  text-transform: uppercase;
  letter-spacing: 0.12em;
- color: rgba(252,252,252,0.45);
+ color: var(--text-2);
  }
  .form-group input,
  .form-group textarea {
  font-family: var(--font);
  font-size: 0.9375rem;
- color: var(--gray-true-25);
- background: rgba(252,252,252,0.06);
- border: 1px solid rgba(252,252,252,0.12);
+ color: var(--text);
+ /* Was a white-on-white wash in light mode — the field boundary vanished.
+ Tokenized so the inputs read on either ground. */
+ background: var(--surface);
+ border: 1px solid var(--border);
  border-radius: 8px;
  padding: 0.875rem 1rem;
  transition: border-color 0.3s, background 0.3s;
@@ -1128,13 +976,13 @@
  }
  .form-group input::placeholder,
  .form-group textarea::placeholder {
- color: rgba(252,252,252,0.25);
+ color: var(--text-3);
  }
  .form-group input:focus,
  .form-group textarea:focus {
  outline: none;
- border-color: var(--accent-yellow);
- background: rgba(252,252,252,0.08);
+ border-color: var(--cta);
+ background: var(--bg-alt);
  }
  .form-group textarea { min-height: 120px; }
 
@@ -1161,7 +1009,7 @@
  transition: opacity 0.25s var(--ease);
  }
  .form-status.is-visible { opacity: 1; }
- .form-status.is-success { color: var(--accent-yellow); }
+ .form-status.is-success { color: var(--cta); }
  .form-status.is-error   { color: #f08a8a; }
 
  .contact-form .btn-primary[disabled] {
@@ -1170,8 +1018,8 @@
  }
 
  .contact .btn-primary {
- background: var(--gray-true-25);
- color: var(--gray-true-900);
+ background: var(--text);
+ color: var(--bg);
  align-self: flex-start;
  }
  .contact .btn-primary:hover {
@@ -1182,8 +1030,8 @@
  /* ====== FOOTER ====== */
  .footer {
  padding: 2rem 0;
- background: var(--gray-true-900);
- border-top: 1px solid rgba(252,252,252,0.08);
+ background: var(--bg);
+ border-top: 1px solid var(--border);
  }
  .footer-inner {
  display: flex;
@@ -1198,7 +1046,7 @@
  font-weight: 500;
  text-transform: uppercase;
  letter-spacing: 0.12em;
- color: rgba(252,252,252,0.35);
+ color: var(--text-2);
  }
  .footer-links {
  display: flex;
@@ -1211,10 +1059,10 @@
  font-weight: 500;
  text-transform: uppercase;
  letter-spacing: 0.12em;
- color: rgba(252,252,252,0.35);
+ color: var(--text-2);
  transition: color 0.3s;
  }
- .footer-links a:hover { color: var(--accent-yellow); }
+ .footer-links a:hover { color: var(--cta); }
  </style>
 </head>
 
@@ -1230,13 +1078,12 @@
  <div class="nav-right">
  <ul class="nav-links">
  <li><a href="#work" data-i18n="nav_work">Work</a></li>
- <li><a href="#services" data-i18n="nav_services">Services</a></li>
  <li><a href="#about" data-i18n="nav_about">About</a></li>
  <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
  </ul>
- <div class="lang-toggle" role="group" aria-label="Language selector">
- <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
- <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
+ <div class="theme-toggle" role="group" aria-label="Color theme">
+   <button class="theme-btn active" data-theme-set="dark" aria-pressed="true" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
+   <button class="theme-btn" data-theme-set="light" aria-pressed="false" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
  <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
  <span></span><span></span><span></span>
@@ -1247,12 +1094,11 @@
 
  <div class="mobile-menu" role="dialog" aria-label="Mobile navigation">
  <a href="#work" data-i18n="nav_work">Work</a>
- <a href="#services" data-i18n="nav_services">Services</a>
  <a href="#about" data-i18n="nav_about">About</a>
  <a href="#contact" data-i18n="nav_contact">Contact</a>
- <div class="lang-toggle" role="group" aria-label="Language selector">
- <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
- <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
+ <div class="theme-toggle" role="group" aria-label="Color theme">
+   <button class="theme-btn active" data-theme-set="dark" aria-pressed="true" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
+   <button class="theme-btn" data-theme-set="light" aria-pressed="false" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
  </div>
 
@@ -1260,109 +1106,17 @@
  <section class="hero" id="hero">
  <canvas id="heroCanvas" class="hero-canvas-full" aria-hidden="true"></canvas>
  <div class="wrap hero-content">
- <p class="hero-eyebrow r" data-i18n="hero_eyebrow">Product Architect</p>
- <h1 class="r" data-i18n="hero_h1">SaaS products that people<br><em>actually</em> understand.</h1>
- <p class="hero-sub r" data-i18n="hero_sub">Helping companies turn complex products into interfaces that click. Strategy, design, and execution, embedded in your team.</p>
+ <p class="hero-eyebrow r" data-i18n="hero_eyebrow">Product Designer</p>
+ <h1 class="r" data-i18n="hero_h1">I turn dense, regulated products<br>into <em>interfaces people trust</em>.</h1>
  <div class="hero-ctas r">
  <a href="#work" class="btn btn-primary" data-i18n="hero_cta_work">See selected work</a>
  <a href="#contact" class="btn btn-ghost" data-i18n="hero_cta_contact">Get in touch</a>
  </div>
  </div>
- </section>
-
- <!-- SERVICES, dark, with drifting dots behind glass cards -->
- <section class="services" id="services">
- <div class="wrap">
- <div class="section-header r">
- <div>
- <h2 data-i18n="services_heading">Practice areas.</h2>
- </div>
- </div>
- <div class="stages r-stagger">
- <article class="stage-card r">
- <div class="stage-card-top">
- <span class="stage-num">01</span>
- <span class="stage-mark" aria-hidden="true">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
- <path d="M8 14C8 14 9.5 16 12 16C14.5 16 16 14 16 14M17 9.24C16.605 9.725 16.065 10 15.5 10C14.935 10 14.41 9.725 14 9.24M10 9.24C9.605 9.725 9.065 10 8.5 10C7.935 10 7.41 9.725 7 9.24M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"/>
- </svg>
- </span>
- </div>
- <h3 data-i18n="svc_1_t">Listen</h3>
- <p class="stage-desc" data-i18n="svc_1_d">Desk research with citations, conversations with people in the field, ecosystem mapping. I figure out who holds what, before designing anything.</p>
- </article>
-
- <article class="stage-card r">
- <div class="stage-card-top">
- <span class="stage-num">02</span>
- <span class="stage-mark" aria-hidden="true">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
- <path d="M21 21L16.65 16.65M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"/>
- </svg>
- </span>
- </div>
- <h3 data-i18n="svc_2_t">Map</h3>
- <p class="stage-desc" data-i18n="svc_2_d">Information architecture, sitemaps, role models. I draw the structure of the product before any pixel, so the team has something to argue with.</p>
- </article>
-
- <article class="stage-card r">
- <div class="stage-card-top">
- <span class="stage-num">03</span>
- <span class="stage-mark" aria-hidden="true">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
- <path d="M16 8V5L19 2L20 4L22 5L19 8H16ZM16 8L12 11.9999M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2M17 12C17 14.7614 14.7614 17 12 17C9.23858 17 7 14.7614 7 12C7 9.23858 9.23858 7 12 7"/>
- </svg>
- </span>
- </div>
- <h3 data-i18n="svc_3_t">Blueprint</h3>
- <p class="stage-desc" data-i18n="svc_3_d">Swimlanes, service blueprints, user journeys. The map of how intent becomes action, across people, screens, and the platform behind them.</p>
- </article>
-
- <article class="stage-card r">
- <div class="stage-card-top">
- <span class="stage-num">04</span>
- <span class="stage-mark" aria-hidden="true">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
- <path d="M13 18L6.50182 16.7004C6.13883 16.6278 5.95733 16.5915 5.80953 16.5032C5.67886 16.4252 5.56773 16.3183 5.4846 16.1908C5.39057 16.0466 5.34714 15.8667 5.26028 15.5069L2 2L15.5069 5.26028C15.8667 5.34714 16.0466 5.39057 16.1908 5.4846C16.3183 5.56773 16.4252 5.67886 16.5032 5.80953C16.5915 5.95733 16.6278 6.13883 16.7004 6.50182L18 13M2 2L9.586 9.586M16.1314 20.8686L20.8686 16.1314C21.2646 15.7354 21.4627 15.5373 21.5368 15.309C21.6021 15.1082 21.6021 14.8918 21.5368 14.691C21.4627 14.4627 21.2646 14.2646 20.8686 13.8686L20.1314 13.1314C19.7354 12.7354 19.5373 12.5373 19.309 12.4632C19.1082 12.3979 18.8918 12.3979 18.691 12.4632C18.4627 12.5373 18.2646 12.7354 17.8686 13.1314L13.1314 17.8686C12.7354 18.2646 12.5373 18.4627 12.4632 18.691C12.3979 18.8918 12.3979 19.1082 12.4632 19.309C12.5373 19.5373 12.7354 19.7354 13.1314 20.1314L13.8686 20.8686C14.2646 21.2646 14.4627 21.4627 14.691 21.5368C14.8918 21.6021 15.1082 21.6021 15.309 21.5368C15.5373 21.4627 15.7354 21.2646 16.1314 20.8686ZM13 11C13 12.1046 12.1046 13 11 13C9.89543 13 9 12.1046 9 11C9 9.89543 9.89543 9 11 9C12.1046 9 13 9.89543 13 11Z"/>
- </svg>
- </span>
- </div>
- <h3 data-i18n="svc_4_t">Design</h3>
- <p class="stage-desc" data-i18n="svc_4_d">Visual identity, UI, dashboards, components. Where the structure turns into a product people open without thinking, and trust on second glance.</p>
- </article>
-
- <article class="stage-card r">
- <div class="stage-card-top">
- <span class="stage-num">05</span>
- <span class="stage-mark" aria-hidden="true">
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
- <path d="M3 9H21M9 9L9 21M7.8 3H16.2C17.8802 3 18.7202 3 19.362 3.32698C19.9265 3.6146 20.3854 4.07354 20.673 4.63803C21 5.27976 21 6.11984 21 7.8V16.2C21 17.8802 21 18.7202 20.673 19.362C20.3854 19.9265 19.9265 20.3854 19.362 20.673C18.7202 21 17.8802 21 16.2 21H7.8C6.11984 21 5.27976 21 4.63803 20.673C4.07354 20.3854 3.6146 19.9265 3.32698 19.362C3 18.7202 3 17.8802 3 16.2V7.8C3 6.11984 3 5.27976 3.32698 4.63803C3.6146 4.07354 4.07354 3.6146 4.63803 3.32698C5.27976 3 6.11984 3 7.8 3Z"/>
- </svg>
- </span>
- </div>
- <h3 data-i18n="svc_5_t">Ship</h3>
- <p class="stage-desc" data-i18n="svc_5_d">Embedded with engineering, specs, tokens, design system, documentation. Often augmented by AI workflows, so handoff feels like one continuous build.</p>
- </article>
- </div>
- </div>
- </section>
-
- <!-- CHAOS TO MOMENTUM (position 3, dark bg) -->
- <section class="ctc" id="ctc">
- <div class="wrap ctc-inner">
- <div class="ctc-left">
- <div class="section-header r">
- <div>
- <h2 data-i18n="ctc_h2">From chaos to <em>momentum.</em></h2>
- </div>
- </div>
- <p class="r ctc-p" data-i18n="ctc_p">I take the messy, complex, and overwhelming, and shape it into something people can navigate with confidence.</p>
- <a href="#work" class="btn btn-primary r" data-i18n="ctc_cta">See how I do it</a>
- </div>
- <div class="ctc-right r" aria-hidden="true">
- <canvas id="swarmCanvas"></canvas>
- </div>
- </div>
+ <a href="#work" class="hero-scroll-hint r" aria-label="Scroll to selected work">
+ <span data-i18n="hero_scroll_hint">Selected work</span>
+ <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v14M6 13l6 6 6-6"/></svg>
+ </a>
  </section>
 
  <!-- WORK -->
@@ -1403,6 +1157,35 @@
  </article>
  </a>
 
+ <a href="projects/supply-chain.html" class="case-card-link">
+ <article class="case-card r">
+ <div class="case-thumb case-thumb--hero">
+ <img src="projects/assets/supply-chain/card.jpg" alt="Supply chain flow map on a laptop, the cobalt route from artisanal mine sites in the DRC up through refiners and cathode makers to the battery pack manufacturer">
+ </div>
+ <div class="case-body">
+ <div class="case-meta"><span class="case-tag" data-i18n="c5_tag">Supply Chain Due Diligence</span></div>
+ <h3 data-i18n="c5_t">Continuous due diligence for commodity supply chains</h3>
+ <p data-i18n="c5_d">Supplier assessment as a living graph, ESG risk, audit performance and watchlist screening in one workspace.</p>
+ <span class="case-link"><span data-i18n="c5_l">Read case study</span> →</span>
+ </div>
+ </article>
+ </a>
+
+ <article class="case-card case-card--soon r" aria-disabled="true">
+ <div class="case-thumb case-thumb--hero case-thumb--kota">
+ <img src="projects/assets/kota-cover.jpg" alt="Kota, a counterparty business overview on a tablet: confidence score, risk distribution by severity, data reliability over twelve months and key risk indicators">
+ <span class="case-thumb-overlay" aria-hidden="true">
+ <span data-i18n="c4_overlay">Coming soon</span>
+ </span>
+ </div>
+ <div class="case-body">
+ <div class="case-meta"><span class="case-tag" data-i18n="c4_tag">Onboarding & Due Diligence</span></div>
+ <h3 data-i18n="c4_t">Kota, Counterparty due-diligence infrastructure</h3>
+ <p data-i18n="c4_d">One durable profile per counterparty, identity, documents and self-assessment compiled once, then reused across every institution and configured for bank or aggregator alike.</p>
+ <span class="case-link case-link--muted"><span data-i18n="c4_l">Coming soon</span></span>
+ </div>
+ </article>
+
  <article class="case-card case-card--soon r" aria-disabled="true">
  <div class="case-thumb case-thumb--hero case-thumb--safra">
  <img src="projects/assets/safra-hero.png" alt="Safra, a sunset-lit Brazilian crop field with a centred card showing a soy leaf texture and the 'safra' wordmark in yellow.">
@@ -1424,13 +1207,6 @@
  <div class="work-scroll-thumb" id="workScrollThumb"></div>
  </div>
  <span class="work-scroll-label" data-i18n="scroll_hint">Scroll to explore</span>
- </div>
- <div class="work-process r">
- <span data-i18n="p1">Research</span>
- <span class="work-process-arrow">→</span>
- <span data-i18n="p2">Definition</span>
- <span class="work-process-arrow">→</span>
- <span data-i18n="p3">Solution</span>
  </div>
  </div>
  </section>
@@ -1532,25 +1308,13 @@
  <script>
  const T = {
  en: {
- nav_work:"Work", nav_services:"Services", nav_about:"About", nav_contact:"Contact",
- hero_eyebrow:"Product Architect",
- hero_h1:"SaaS products that people<br><em>actually</em> understand.",
- hero_sub:"Helping companies turn complex products into interfaces that click. Strategy, design, and execution, embedded in your team.",
+ nav_work:"Work", nav_about:"About", nav_contact:"Contact",
+ hero_eyebrow:"Product Designer",
+ hero_h1:"I turn dense, regulated products<br>into <em>interfaces people trust</em>.",
  hero_cta_work:"See selected work",
  hero_cta_contact:"Get in touch",
+ hero_scroll_hint:"Selected work",
  m1:"UI/UX Design", m2:"Design Systems", m3:"Product Strategy", m4:"User Research", m5:"SaaS", m6:"B2B Platforms",
- services_label:"Services",
- services_heading:"Practice areas.",
- svc_1_t:"Listen",
- svc_1_d:"Desk research with citations, conversations with people in the field, ecosystem mapping. I figure out who holds what, before designing anything.",
- svc_2_t:"Map",
- svc_2_d:"Information architecture, sitemaps, role models. I draw the structure of the product before any pixel, so the team has something to argue with.",
- svc_3_t:"Blueprint",
- svc_3_d:"Swimlanes, service blueprints, user journeys. The map of how intent becomes action, across people, screens, and the platform behind them.",
- svc_4_t:"Design",
- svc_4_d:"Visual identity, UI, dashboards, components. Where the structure turns into a product people open without thinking, and trust on second glance.",
- svc_5_t:"Ship",
- svc_5_d:"Embedded with engineering, specs, tokens, design system, documentation. Often augmented by AI workflows, so handoff feels like one continuous build.",
  work_label:"Selected work",
  work_heading:"Problems solved, products shipped.",
  c1_tag:"Carbon Tech",
@@ -1566,7 +1330,16 @@
  c3_d:"From planting to liquidation in one platform, plot management, soil health and traceable low-carbon grain.",
  c3_l:"Coming soon",
  c3_overlay:"Coming soon",
- p1:"Research", p2:"Definition", p3:"Solution", scroll_hint:"Scroll to explore",
+ c5_tag:"Supply Chain Due Diligence",
+ c5_t:"Continuous due diligence for commodity supply chains",
+ c5_d:"Supplier assessment as a living graph, ESG risk, audit performance and watchlist screening in one workspace.",
+ c5_l:"Read case study",
+ c4_tag:"Onboarding & Due Diligence",
+ c4_t:"Kota, Counterparty due-diligence infrastructure",
+ c4_d:"One durable profile per counterparty, identity, documents and self-assessment compiled once, then reused across every institution and configured for bank or aggregator alike.",
+ c4_l:"Coming soon",
+ c4_overlay:"Coming soon",
+ scroll_hint:"Scroll to explore",
  about_label:"About",
  about_heading:"The story so far.",
  about_lead:"Hey! I'm Pietra, I design solutions that work across borders.",
@@ -1596,32 +1369,16 @@
  form_error:"Something went sideways. Try again, or email pietragottardo@gmail.com.",
  form_missing:"Please fill in name, email, and message.",
  footer_copy:"© 2026 · Pietra Gottardo",
- footer_top:"Back to top",
- ctc_label:"My design philosophy",
- ctc_h2:"From chaos to momentum.",
- ctc_p:"I take the messy, complex, and overwhelming, and shape it into something people can navigate with confidence.",
- ctc_cta:"See how I do it"
+ footer_top:"Back to top"
  },
  pt: {
- nav_work:"Projetos", nav_services:"Serviços", nav_about:"Sobre", nav_contact:"Contato",
- hero_eyebrow:"Product Architect",
- hero_h1:"Produtos SaaS que as pessoas<br><em>realmente</em> entendem.",
- hero_sub:"Ajudo empresas a transformar produtos complexos em interfaces que funcionam. Estratégia, design e execução, integrado ao seu time.",
+ nav_work:"Projetos", nav_about:"Sobre", nav_contact:"Contato",
+ hero_eyebrow:"Product Designer",
+ hero_h1:"Eu transformo produtos densos e regulados<br>em <em>interfaces em que as pessoas confiam</em>.",
  hero_cta_work:"Ver projetos",
  hero_cta_contact:"Entrar em contato",
+ hero_scroll_hint:"Projetos selecionados",
  m1:"UI/UX Design", m2:"Design Systems", m3:"Estratégia de Produto", m4:"Pesquisa com Usuários", m5:"SaaS", m6:"Plataformas B2B",
- services_label:"Serviços",
- services_heading:"Áreas de atuação.",
- svc_1_t:"Escutar",
- svc_1_d:"Desk research com citações, conversas com gente do campo, mapeamento de ecossistema. Descubro quem detém o quê antes de desenhar qualquer coisa.",
- svc_2_t:"Mapear",
- svc_2_d:"Arquitetura da informação, sitemaps, modelos de papéis. Desenho a estrutura do produto antes do pixel, pra o time ter algo concreto pra discutir.",
- svc_3_t:"Esquematizar",
- svc_3_d:"Swimlanes, service blueprints, jornadas. O mapa de como a intenção vira ação, entre pessoas, telas e a plataforma por trás.",
- svc_4_t:"Desenhar",
- svc_4_d:"Identidade visual, UI, dashboards, componentes. Onde a estrutura vira um produto que as pessoas abrem sem pensar, e confiam na segunda olhada.",
- svc_5_t:"Entregar",
- svc_5_d:"Embutida com engenharia, specs, tokens, design system, documentação. Frequentemente acelerada por workflows com IA, pro handoff ser uma construção contínua.",
  work_label:"Projetos selecionados",
  work_heading:"Problemas resolvidos, produtos entregues.",
  c1_tag:"Carbon Tech",
@@ -1637,7 +1394,16 @@
  c3_d:"Do plantio à liquidação em uma plataforma, gestão de talhões, saúde do solo e grãos rastreáveis de baixo carbono.",
  c3_l:"Em breve",
  c3_overlay:"Em breve",
- p1:"Pesquisa", p2:"Definição", p3:"Solução", scroll_hint:"Deslize para explorar",
+ c5_tag:"Due Diligence de Cadeia",
+ c5_t:"Due diligence contínua de cadeias de suprimentos",
+ c5_d:"Avaliação de fornecedores como um grafo vivo: risco ESG, desempenho de auditoria e triagem em watchlists num só lugar.",
+ c5_l:"Ler case study",
+ c4_tag:"Onboarding & Due Diligence",
+ c4_t:"Kota, Infraestrutura de due diligence de contrapartes",
+ c4_d:"Um perfil durável por contraparte, identidade, documentos e self-assessment compilados uma vez e reusados em cada instituição, configurado para banco ou agregador.",
+ c4_l:"Em breve",
+ c4_overlay:"Em breve",
+ scroll_hint:"Deslize para explorar",
  about_label:"Sobre",
  about_heading:"A história até aqui.",
  about_lead:"Oi! Eu sou a Pietra, desenho soluções que funcionam sem fronteiras.",
@@ -1667,11 +1433,7 @@
  form_error:"Algo deu errado. Tenta de novo, ou manda direto pra pietragottardo@gmail.com.",
  form_missing:"Preencha nome, email e mensagem.",
  footer_copy:"© 2026 · Pietra Gottardo",
- footer_top:"Voltar ao topo",
- ctc_label:"Minha filosofia de design",
- ctc_h2:"Do caos ao movimento.",
- ctc_p:"Pego o que é confuso, complexo e sobrecarregado, e transformo em algo que as pessoas navegam com confiança.",
- ctc_cta:"Veja como eu faço"
+ footer_top:"Voltar ao topo"
  }
  };
 
@@ -1693,7 +1455,9 @@
  if (nav.startsWith('pt')) return 'pt';
  return 'en';
  }
- let lang = detectInitialLang();
+ // The EN/PT control is gone, so the site is pinned to English instead of
+      // following the visitor's browser locale (which flipped it to PT-BR).
+      let lang = 'en';
 
  function setLang(l) {
  lang = l;
@@ -1707,17 +1471,31 @@
  else el.textContent = v;
  }
  });
- document.querySelectorAll('.lang-btn').forEach(b => {
- const on = b.dataset.lang === l;
+ }
+
+ // EN/PT was replaced by the theme toggle. The dictionary and setLang stay
+ // wired so copy still localizes on load and the control can come back.
+ setLang(lang);
+
+ // ===== Light / dark theme =====
+ function setTheme(t) {
+ document.documentElement.setAttribute('data-theme', t);
+ localStorage.setItem('theme', t);
+ document.querySelector('meta[name="theme-color"]')
+ ?.setAttribute('content', t === 'light' ? '#fcfcfc' : '#141414');
+ document.querySelectorAll('.theme-btn').forEach(b => {
+ const on = b.dataset.themeSet === t;
  b.classList.toggle('active', on);
  b.setAttribute('aria-pressed', on);
  });
+ // Decoupled on purpose: setTheme runs before the nav block's `const nav`
+ // is initialized, so calling updateNav() directly hit the TDZ.
+ window.dispatchEvent(new Event('themechange'));
  }
-
- document.querySelectorAll('.lang-btn').forEach(b =>
- b.addEventListener('click', () => setLang(b.dataset.lang))
+ document.querySelectorAll('.theme-btn').forEach(b =>
+ b.addEventListener('click', () => setTheme(b.dataset.themeSet))
  );
- setLang(lang);
+ setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
 
  // Contact form, POSTs to the Cloudflare Pages Function at /contact,
  // which relays via MailChannels. No mail client opens.
@@ -1770,14 +1548,18 @@
  });
  }
 
- // Nav scroll, page is entirely dark, so always run in over-dark mode.
+ // Nav scroll. The page is dark-native, so over-dark is the norm — but it
+ // has to come off when the light theme is on, or the nav keeps painting
+ // light text on a light ground.
  const nav = document.querySelector('.nav');
  function updateNav() {
  nav.classList.toggle('scrolled', scrollY > 10);
- nav.classList.add('over-dark');
+ nav.classList.toggle('over-dark',
+ document.documentElement.getAttribute('data-theme') !== 'light');
  }
  window.addEventListener('scroll', updateNav, { passive: true });
  window.addEventListener('resize', updateNav, { passive: true });
+ window.addEventListener('themechange', updateNav);
  updateNav();
 
  // Mobile menu
@@ -1811,8 +1593,7 @@
  }, { passive: true });
  }
 
- // Reveal, global observer; the services stage-cards are excluded because
- // they have their own wave-driven reveal (handled in the services block).
+ // Reveal, global observer
  const obs = new IntersectionObserver(es =>
  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
  , { threshold: 0.12 });
@@ -1829,7 +1610,7 @@
  my = e.clientY;
  });
  // Glass lens state on any clickable element
- const clickables = 'a, button, .btn, .case-card, .lang-btn, .nav-toggle';
+ const clickables = 'a, button, .btn, .case-card, .theme-btn, .nav-toggle';
  document.querySelectorAll(clickables).forEach(el => {
  el.addEventListener('pointerenter', () => cursor.classList.add('active'));
  el.addEventListener('pointerleave', () => cursor.classList.remove('active'));
@@ -1850,6 +1631,19 @@
  const ctx = canvas.getContext('2d');
  const COUNT = 220;
  let W, H, particles, running = false;
+
+ // Dot color follows the theme token. Cached per frame batch rather than
+ // read per particle — getComputedStyle on 220 dots a frame is not free.
+ let dotCache = '', dotTheme = null;
+ function dotRGB() {
+ const t = document.documentElement.getAttribute('data-theme');
+ if (t !== dotTheme) {
+ dotTheme = t;
+ dotCache = getComputedStyle(document.documentElement)
+ .getPropertyValue('--dot-rgb').trim() || '247,253,185';
+ }
+ return dotCache;
+ }
 
  function resize() {
  const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -1889,8 +1683,8 @@
  gridSize: 1.6,
  chaosVx: (Math.random() - 0.5) * 0.85,
  chaosVy: (Math.random() - 0.5) * 0.85,
- alpha: (Math.random() * 0.18 + 0.06) * alphaScale,
- gridAlpha: 0.35 * alphaScale,
+ alpha: (Math.random() * 0.26 + 0.10) * alphaScale,
+ gridAlpha: 0.52 * alphaScale,
  // Breathing wobble when aligned
  wobblePhase: Math.random() * Math.PI * 2,
  wobbleFreq: 0.0008 + Math.random() * 0.0008,
@@ -1973,15 +1767,15 @@
  for (const p of particles) {
  ctx.beginPath();
  ctx.arc(p.drawX, p.drawY, p.drawSize, 0, Math.PI * 2);
- ctx.fillStyle = `rgba(247,253,185,${p.drawAlpha})`;
+ ctx.fillStyle = `rgba(${dotRGB()},${p.drawAlpha})`;
  ctx.fill();
  }
 
  // Pass 3: connecting lines when ordered
  if (prog > 0.55) {
  const lineScale = W < 720 ? 0.45 : 1;
- const la = (prog - 0.55) / 0.45 * 0.05 * lineScale;
- ctx.strokeStyle = `rgba(247,253,185,${la})`;
+ const la = (prog - 0.55) / 0.45 * 0.08 * lineScale;
+ ctx.strokeStyle = `rgba(${dotRGB()},${la})`;
  ctx.lineWidth = 0.5;
  for (let i = 0; i < particles.length; i++) {
  for (let j = i + 1; j < particles.length; j++) {
@@ -2008,147 +1802,6 @@
  }
  }, { threshold: 0.05 });
  heroObs.observe(canvas.parentElement);
-
- init();
- window.addEventListener('resize', init, { passive: true });
- })();
-
- // ====== CTC CIRCLE canvas (chaos → circle, with hero-like behavior) ======
- (() => {
- const canvas = document.getElementById('swarmCanvas');
- if (!canvas) return;
- const ctx = canvas.getContext('2d');
- const N = 90;
- const DOT_SIZE = 2;
- let W, H, dots, running = false;
-
- function resize() {
- const dpr = Math.min(window.devicePixelRatio || 1, 2);
- const rect = canvas.parentElement.getBoundingClientRect();
- W = rect.width; H = rect.height;
- canvas.width = W * dpr; canvas.height = H * dpr;
- canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
- ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
- }
-
- function init() {
- resize();
- const circleCx = W * 0.5;
- const circleCy = H * 0.5;
- const radius = Math.min(W, H) * 0.4;
- dots = [];
- for (let i = 0; i < N; i++) {
- const baseAngle = (i / N) * Math.PI * 2;
- dots.push({
- baseAngle,
- circleCx, circleCy, radius,
- // Chaotic start position
- x: Math.random() * W,
- y: Math.random() * H,
- chaosVx: (Math.random() - 0.5) * 1.4,
- chaosVy: (Math.random() - 0.5) * 1.4,
- });
- }
- }
-
- const GATHER = 3000;
- const SPIN = 4000;
- const SCATTER = 3200;
- const HOLD2 = 0;
- const TOTAL = GATHER + SPIN + SCATTER + HOLD2;
-
- function smoothstep(x) {
- const c = Math.max(0, Math.min(1, x));
- return c * c * (3 - 2 * c);
- }
-
- // Mouse repulsion (canvas-local)
- let mouseX = -9999, mouseY = -9999;
- const REPEL_RADIUS = 100;
- const REPEL_FORCE = 25;
- canvas.addEventListener('pointermove', (e) => {
- const rect = canvas.getBoundingClientRect();
- mouseX = e.clientX - rect.left;
- mouseY = e.clientY - rect.top;
- });
- canvas.addEventListener('pointerleave', () => {
- mouseX = -9999; mouseY = -9999;
- });
- canvas.style.pointerEvents = 'auto';
-
- function draw(time) {
- if (!running) return;
- ctx.clearRect(0, 0, W, H);
- const phase = time % TOTAL;
-
- let formProg, spinAngle;
- if (phase < GATHER) {
- formProg = smoothstep(phase / GATHER);
- spinAngle = 0;
- } else if (phase < GATHER + SPIN) {
- formProg = 1;
- spinAngle = smoothstep((phase - GATHER) / SPIN) * Math.PI * 2;
- } else if (phase < GATHER + SPIN + SCATTER) {
- formProg = 1 - smoothstep((phase - GATHER - SPIN) / SCATTER);
- spinAngle = Math.PI * 2;
- } else {
- formProg = 0;
- spinAngle = 0;
- }
-
- // Pass 1: compute final positions
- for (const d of dots) {
- // Chaos drift
- d.x += d.chaosVx * (1 - formProg);
- d.y += d.chaosVy * (1 - formProg);
- if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
- if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
-
- // Circle target (with spin)
- const cAngle = d.baseAngle + spinAngle;
- const circX = d.circleCx + Math.cos(cAngle) * d.radius;
- const circY = d.circleCy + Math.sin(cAngle) * d.radius;
-
- let dx = d.x + (circX - d.x) * formProg;
- let dy = d.y + (circY - d.y) * formProg;
-
- // Mouse repulsion
- const mdx = dx - mouseX;
- const mdy = dy - mouseY;
- const distSq = mdx * mdx + mdy * mdy;
- if (distSq < REPEL_RADIUS * REPEL_RADIUS) {
- const dist = Math.sqrt(distSq) || 1;
- const falloff = 1 - dist / REPEL_RADIUS;
- const force = falloff * falloff * REPEL_FORCE;
- dx += (mdx / dist) * force;
- dy += (mdy / dist) * force;
- }
-
- d.drawX = dx;
- d.drawY = dy;
- d.drawAlpha = 0.12 + formProg * 0.38;
- }
-
- // Pass 2: draw dots
- for (const d of dots) {
- ctx.beginPath();
- ctx.arc(d.drawX, d.drawY, DOT_SIZE, 0, Math.PI * 2);
- ctx.fillStyle = `rgba(247,253,185,${d.drawAlpha})`;
- ctx.fill();
- }
-
- requestAnimationFrame(draw);
- }
-
- const ctcObs = new IntersectionObserver(([entry]) => {
- if (entry.isIntersecting && !running) {
- running = true;
- requestAnimationFrame(draw);
- } else if (!entry.isIntersecting) {
- running = false;
- }
- }, { threshold: 0.05 });
- ctcObs.observe(canvas.parentElement);
 
  init();
  window.addEventListener('resize', init, { passive: true });
