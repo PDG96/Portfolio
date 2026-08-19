@@ -1,0 +1,27 @@
+{
+  "columns": [
+    { "nodes": [
+      { "id": "m1", "title": "Member Org 01", "tone": "mint", "icon": "org" },
+      { "id": "m2", "title": "Member Org 02", "tone": "mint", "icon": "org" },
+      { "id": "m3", "title": "Member Org 03", "tone": "mint", "icon": "org" }
+    ]},
+    { "nodes": [
+      { "id": "agg", "title": "Aggregator X", "meta": "STK00000123", "tone": "teal", "icon": "agg" }
+    ]},
+    { "nodes": [
+      { "id": "p1", "title": "J. Smith", "tone": "pink", "icon": "person" },
+      { "id": "p2", "title": "A. Costa", "tone": "pink", "icon": "person" },
+      { "id": "p3", "title": "M. Keller", "tone": "pink", "icon": "person" },
+      { "id": "p4", "title": "D. Novak", "tone": "pink", "icon": "person" }
+    ]}
+  ],
+  "links": [
+    { "from": "m1", "to": "agg", "label": "2" },
+    { "from": "m2", "to": "agg" },
+    { "from": "m3", "to": "agg", "label": "1" },
+    { "from": "agg", "to": "p1", "label": "3" },
+    { "from": "agg", "to": "p2" },
+    { "from": "agg", "to": "p3" },
+    { "from": "agg", "to": "p4", "label": "1" }
+  ]
+}

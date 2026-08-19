@@ -1,0 +1,83 @@
+{
+  "search": true,
+  "searchPlaceholder": "Search",
+  "kebab": true,
+  "status": {
+    "ok": {
+      "label": "Compliant",
+      "desc": "This item meets all compliance requirements. No action is required."
+    },
+    "warn": {
+      "label": "Undetermined",
+      "desc": "Some information is missing. Please complete the form and provide the required details as recommended."
+    },
+    "bad": {
+      "label": "Not Compliant",
+      "desc": "This item does not meet compliance requirements. Review the recommendations and provide the necessary documents or corrections."
+    }
+  },
+  "columns": [
+    {
+      "key": "topic",
+      "label": "Topic"
+    },
+    {
+      "key": "determination",
+      "label": "Determination"
+    },
+    {
+      "key": "updated",
+      "label": "Last Update"
+    }
+  ],
+  "rows": [
+    {
+      "_status": "bad",
+      "topic": "Information completeness",
+      "determination": "Verified Compliance Gap",
+      "updated": "04 Feb 26"
+    },
+    {
+      "_status": "bad",
+      "topic": "Operating licence",
+      "determination": "Single-Source Compliance Gap",
+      "updated": "21 Dec 25"
+    },
+    {
+      "_status": "warn",
+      "topic": "Involvement in disputes or litigations",
+      "determination": "No Determination",
+      "updated": "-"
+    },
+    {
+      "_status": "ok",
+      "topic": "Polemical track-record (beneficiaries)",
+      "determination": "Unverified Compliance",
+      "updated": "19 Dec 25"
+    },
+    {
+      "_status": "ok",
+      "topic": "Government watchlist mentions (counterparty)",
+      "determination": "Verified Compliance",
+      "updated": "21 Nov 25"
+    },
+    {
+      "_status": "ok",
+      "topic": "Politically-exposed personnel",
+      "determination": "Verified Compliance",
+      "updated": "18 Nov 25"
+    },
+    {
+      "_status": "ok",
+      "topic": "Funding derived from criminal activities",
+      "determination": "Verified Compliance",
+      "updated": "12 Nov 25"
+    },
+    {
+      "_status": "ok",
+      "topic": "Cap on cash transactions",
+      "determination": "Verified Compliance",
+      "updated": "10 Nov 25"
+    }
+  ]
+}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>vertical-gauge — Component preview</title>
+  <style>
+    :root {
+      --bg: #fcfcfc;
+      --text: #141414;
+      --text-2: rgba(20,20,20,0.55);
+      --border: rgba(20,20,20,0.10);
+    }
+    * { box-sizing: border-box; }
+    html, body { background: var(--bg); }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', sans-serif;
+      padding: 4rem 1.5rem;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+    .crumb {
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin: 0 0 0.75rem;
+    }
+    .crumb a { color: var(--text-2); text-decoration: none; }
+    .crumb a:hover { color: var(--text); }
+    h1 {
+      font-weight: 300;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+    }
+    p.lead {
+      color: var(--text-2);
+      margin: 0 0 3rem;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    .gauge-mount {
+      width: 100%;
+      padding: 20px 0 8px;
+    }
+
+    .demo-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    @media (min-width: 700px) {
+      .demo-row { grid-template-columns: 400px 1fr; align-items: start; }
+    }
+
+    .replay {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      margin-bottom: 1.25rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .replay:hover { border-color: rgba(20,20,20,0.28); background: #fafafa; }
+
+    .spec {
+      margin-top: 3rem;
+      padding: 1.5rem;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: rgba(20,20,20,0.02);
+    }
+    .spec h3 {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin: 0 0 1rem;
+    }
+    .spec pre {
+      font-family: 'SF Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: rgba(20,20,20,0.78);
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="crumb"><a href="../index.html">← Components</a> · vertical-gauge</p>
+    <h1>Vertical gauge.</h1>
+    <p class="lead">Pill-shaped vertical scale with a configurable gradient, labels on the left, and a value pointer + readout on the right. Pointer rises from the bottom to its target on load, value counts in parallel.</p>
+
+    <button class="replay" type="button" id="replayBtn" aria-label="Replay animation">
+      <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M2 7a6 6 0 0 1 11.7-1.5M14 2v3.5H10.5"/>
+      </svg>
+      Replay
+    </button>
+
+    <div class="demo-row">
+      <chart-card title="Average Ph Level">
+        <div class="gauge-mount" data-chart="vertical-gauge" data-src="data.json" id="mountA"></div>
+      </chart-card>
+    </div>
+
+    <div class="spec">
+      <h3>Embed in a case study</h3>
+<pre>&lt;chart-card title="Average Ph Level"&gt;
+  &lt;div data-chart="vertical-gauge"
+       data-src="assets/straatos-charts/ph-level.json"&gt;&lt;/div&gt;
+&lt;/chart-card&gt;
+
+&lt;script src="../components/chart-card/chart-card.js" defer&gt;&lt;/script&gt;
+&lt;script src="../components/vertical-gauge/vertical-gauge.js" defer&gt;&lt;/script&gt;</pre>
+    </div>
+  </div>
+
+  <script src="../chart-card/chart-card.js" defer></script>
+  <script src="vertical-gauge.js" defer></script>
+  <script>
+    document.getElementById('replayBtn').addEventListener('click', () => {
+      if (window.VerticalGauge) window.VerticalGauge.remountAll();
+    });
+  </script>
+</body>
+</html>

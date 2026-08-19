@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operator dashboard (#300)</title>
+<style>
+  :root{
+    /* ===== DAF Primary palette (canonical). Lightest=10, darkest=100. Default accent = 70. ===== */
+    --daf-primary-10:#F9F0FF; --daf-primary-20:#EFDBFF; --daf-primary-30:#D3ADF7; --daf-primary-40:#B37FEB;
+    --daf-primary-50:#9254DE; --daf-primary-60:#722ED1; --daf-primary-70:#531DAB; --daf-primary-80:#391085;
+    --daf-primary-90:#22075E; --daf-primary-100:#120338;
+    --straatos-primary-40:var(--daf-primary-40); --straatos-primary-50:var(--daf-primary-70);
+    --straatos-primary-60:var(--daf-primary-80); --straatos-primary-70:var(--daf-primary-90);
+    --color-white:#ffffff;
+    --color-gray-10:#fcfcfd; --color-gray-20:#f9fafb; --color-gray-30:#f3f4f6; --color-gray-40:#e5e7eb;
+    --color-gray-50:#d2d6db; --color-gray-60:#9da4ae; --color-gray-70:#6c737f; --color-gray-80:#4d5761;
+    --color-gray-90:#384250; --color-gray-100:#2b3644; --color-gray-110:#1f2a37; --color-gray-120:#111927;
+    --font-family-base:'SF UI Display',sans-serif;
+    --font-size-12:12px; --font-size-14:14px; --font-size-16:16px; --font-size-18:18px;
+    --font-size-20:20px; --font-size-24:24px; --font-size-28:28px;
+    --font-weight-500:500; --font-weight-600:600; --font-weight-700:700;
+    --space:16px; --micro:8px; --radius:10px; --radius-sm:6px;
+    /* ===== Motion convention: one easing/duration system, applied everywhere ===== */
+    --ease-standard:cubic-bezier(.4,0,.2,1); --dur-fast:150ms; --dur-base:220ms; --dur-slow:320ms;
+    --badge-success-bg:#ecfdf3; --badge-success-bd:#a6f4c5; --badge-success-tx:#027a48; --badge-success-ic:#12b76a;
+    --node-accent:#4666ff;
+    --color-primary:var(--daf-primary-70);
+  }
+  *{box-sizing:border-box;}
+  @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  @media (prefers-reduced-motion:no-preference){
+    .enter{animation:fadeSlideIn var(--dur-slow) var(--ease-standard) both;}
+  }
+  a:focus-visible,button:focus-visible,.sb-item:focus-visible,.lang:focus-visible{
+    outline:2px solid var(--straatos-primary-50);outline-offset:2px;border-radius:3px;}
+  html,body{margin:0;}
+  body{font-family:var(--font-family-base);color:var(--color-gray-120);background:var(--color-gray-20);
+    font-size:var(--font-size-14);line-height:1.45;-webkit-font-smoothing:antialiased;display:flex;height:100vh;overflow:hidden;}
+
+  /* ================= AppLayout: sidebar ================= */
+  .sidebar{width:248px;flex-shrink:0;background:var(--color-gray-90);color:var(--color-gray-30);
+    display:flex;flex-direction:column;height:100vh;overflow-y:auto;}
+  .sb-logo{flex-shrink:0;display:flex;align-items:center;padding:20px var(--space) 0;}
+  .sb-role{display:flex;align-items:center;gap:var(--micro);padding:18px var(--space);color:var(--color-gray-30);
+    font-weight:var(--font-weight-600);font-size:var(--font-size-14);}
+  .sb-role .role-ic{width:20px;height:20px;display:grid;place-items:center;}
+  .sb-nav{padding:0 0;display:flex;flex-direction:column;}
+  .sb-item{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 var(--space);
+    color:var(--color-gray-30);text-decoration:none;font-size:var(--font-size-14);font-weight:var(--font-weight-500);}
+  .sb-item:hover{background:rgba(255,255,255,.06);color:var(--color-white);}
+  .sb-item.active{background:var(--daf-primary-60);color:var(--color-white);font-weight:var(--font-weight-600);}
+  .sb-item svg{width:18px;height:18px;flex-shrink:0;}
+  .sb-section{margin:0;padding:16px var(--space) 6px;font-size:var(--font-size-12);text-transform:uppercase;
+    letter-spacing:.04em;color:var(--color-gray-60);}
+  .sb-footer{margin-top:auto;}
+  .sb-footer svg{display:block;width:100%;height:auto;}
+  /* Store expandable section: JS-toggled (not native <details>) so the reveal animates
+     smoothly via grid-template-rows, instead of the instant open/close a native <details>
+     element gives you no way to transition. */
+  .sb-store-toggle{border:none;background:none;text-align:left;font:inherit;color:inherit;box-sizing:border-box;width:100%;cursor:pointer;}
+  .sb-caret{width:14px;height:14px;margin-left:auto;transition:transform var(--dur-fast) var(--ease-standard);color:var(--color-gray-40);flex-shrink:0;}
+  .sb-store.open .sb-caret{transform:rotate(180deg);}
+  .sb-sub-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows var(--dur-base) var(--ease-standard);}
+  .sb-store.open .sb-sub-wrap{grid-template-rows:1fr;}
+  .sb-sub{background:var(--color-gray-100);margin:0;padding:6px 0;overflow:hidden;min-height:0;}
+  .sb-subitem{display:flex;align-items:center;min-height:44px;padding:0 var(--space);color:var(--color-gray-30);text-decoration:none;
+    font-size:var(--font-size-14);font-weight:var(--font-weight-500);}
+  .sb-subitem:hover{background:rgba(255,255,255,.06);color:var(--color-white);}
+
+  /* ================= content column ================= */
+  .content{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+  .app-header{height:64px;flex-shrink:0;background:var(--color-gray-100);
+    display:flex;align-items:center;justify-content:space-between;padding:0 var(--space);}
+  .hamburger{width:36px;height:36px;border:none;background:none;cursor:pointer;color:var(--color-white);display:grid;place-items:center;}
+  .app-header-right{display:flex;align-items:center;gap:20px;}
+  .ah-icon{border:none;background:none;cursor:pointer;color:var(--color-white);display:inline-flex;padding:0;}
+  .lang{display:flex;align-items:center;gap:6px;color:var(--color-white);font-size:var(--font-size-14);font-weight:var(--font-weight-500);cursor:pointer;}
+  .lang .flag{font-size:18px;line-height:1;display:inline-flex;}
+  .acct-wrap{display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--color-white);}
+  .acct{width:40px;height:40px;border-radius:50%;background:var(--color-white);color:var(--color-gray-50);
+    display:grid;place-items:center;}
+
+  /* ================= DafHeader (Page Header): full-bleed ================= */
+  .daf-header{flex-shrink:0;background:var(--color-white);border-bottom:1px solid var(--color-gray-40);padding:var(--space);}
+  .daf-header-main{display:flex;align-items:center;justify-content:space-between;gap:var(--space);flex-wrap:nowrap;}
+  .daf-title{display:flex;align-items:center;gap:var(--micro);flex-wrap:wrap;}
+  .daf-title h1{margin:0;font-size:var(--font-size-24);font-weight:var(--font-weight-600);letter-spacing:-0.02em;}
+  .daf-actions{display:flex;align-items:center;gap:var(--micro);flex-shrink:0;}
+  .segment{display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--color-gray-30);
+    border:1px solid var(--color-gray-40);border-radius:var(--radius-sm);padding:3px;gap:2px;}
+  .segment button{font-family:inherit;font-size:var(--font-size-14);font-weight:var(--font-weight-600);border:none;background:transparent;
+    color:var(--color-gray-80);padding:4px 12px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;}
+  .segment button[aria-pressed="true"]{background:var(--color-white);color:var(--color-gray-120);box-shadow:0 1px 2px rgba(17,25,39,.08);}
+  .icon-btn{width:36px;height:36px;border:1px solid var(--color-gray-40);background:var(--color-white);border-radius:var(--radius-sm);
+    color:var(--color-gray-80);display:grid;place-items:center;cursor:pointer;}
+
+  /* Utility Button (Action Row) */
+  .ar-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:var(--space);}
+  .util-btn{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:space-between;gap:var(--micro);
+    padding:var(--space);border-radius:8px;font-family:inherit;font-size:var(--font-size-16);font-weight:var(--font-weight-600);
+    line-height:1;cursor:pointer;text-align:left;background:var(--color-white);border:1px solid var(--color-gray-40);color:var(--daf-primary-70);
+    box-shadow:0 1px 2px rgba(0,0,0,0.03),0 1px 6px rgba(0,0,0,0.02),0 2px 4px rgba(0,0,0,0.02);}
+  .util-btn svg{width:22px;height:22px;flex-shrink:0;}
+  .util-btn span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .util-btn:hover{border-color:var(--daf-primary-70);}
+  .util-btn:active{background:var(--daf-primary-10);}
+  .util-btn:focus-visible{outline:none;box-shadow:0 0 0 2px var(--daf-primary-10);}
+
+  /* ================= grid: 16px inset + gaps ================= */
+  .page-body{padding:var(--space);flex:1;overflow-y:auto;min-height:0;}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:var(--space);}
+  .card{background:var(--color-white);border:1px solid var(--color-gray-40);border-radius:var(--radius);}
+  .widget-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space);
+    height:64px;flex-shrink:0;padding:0 var(--space);border-bottom:1px solid var(--color-gray-30);}
+  .widget-head h2{margin:0;font-size:var(--font-size-16);font-weight:var(--font-weight-600);color:var(--color-gray-100);}
+  /* fixed-height paired cards (Application Updates + Information Provision): same 424px convention as
+     every other component, with the body filling the remaining height via flex (fixes the collapsed-height
+     bug the Information Provision chart had when its card had no definite height to size against) */
+  .pair-card{height:340px;display:flex;flex-direction:column;}
+  .col-4{grid-column:span 4;} .col-6{grid-column:span 6;} .col-8{grid-column:span 8;} .col-12{grid-column:span 12;}
+
+  /* Status: the Key Indicators component (single card, dividers) used vertically here instead of Monitor's
+     horizontal bar, so it can share the row with Application Updates + Information Provision, 1/3 each. */
+  .ki-col{flex:1;min-height:0;display:flex;flex-direction:column;overflow:auto;}
+  .stat-card{flex:1;min-width:0;position:relative;padding:var(--space);display:flex;flex-direction:column;gap:6px;justify-content:center;}
+  .stat-card::before{content:"";position:absolute;left:var(--space);right:var(--space);top:0;height:1px;background:var(--color-gray-40);}
+  .stat-card:first-child::before{display:none;}
+  .stat-label{font-size:var(--font-size-12);color:var(--color-gray-70);font-weight:var(--font-weight-500);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* shared 34px frame so a plain number and a progress bar sit at the same vertical position across all 4 cards */
+  .stat-value{height:34px;display:flex;align-items:baseline;font-size:var(--font-size-28);font-weight:var(--font-weight-600);
+    color:var(--color-gray-90);letter-spacing:-0.02em;}
+  .stat-value-of{font-size:var(--font-size-14);font-weight:var(--font-weight-500);color:var(--color-gray-70);letter-spacing:normal;margin-left:4px;}
+  .stat-progress{height:34px;display:flex;align-items:center;gap:10px;}
+  /* matches the real ProgressBar component: 10px track, gray-40, radius 8px, purple fill (green only when isSubmitted) */
+  .stat-progress .track{flex:1;height:10px;background:var(--color-gray-40);border-radius:8px;overflow:hidden;cursor:pointer;}
+  .stat-progress .fill{display:block;height:100%;background:var(--daf-primary-70);border-radius:8px;transition:filter .12s;}
+  .stat-progress .track:hover .fill{filter:brightness(1.1);}
+  .stat-progress .pct{font-size:var(--font-size-14);font-weight:var(--font-weight-600);color:var(--color-gray-90);flex-shrink:0;}
+
+  /* Application Updates: Timeline (LatestUpdateWidget) */
+  .tl{padding:var(--space);display:flex;flex-direction:column;gap:16px;flex:1;min-height:0;overflow:auto;}
+  .tl-item{position:relative;padding-left:16px;}
+  .tl-item::before{content:"";position:absolute;left:5px;top:17px;bottom:-33px;width:1px;background:var(--color-gray-40);}
+  .tl-item:last-child::before{display:none;}
+  .tl-dot{position:absolute;left:0;top:11px;width:12px;height:12px;border-radius:50%;border:2px solid var(--straatos-primary-50);background:var(--color-white);z-index:1;}
+  .tl-card{position:relative;border-radius:4px;padding:8px 10px;transition:background .12s;}
+  .tl-item:hover .tl-card{background:var(--color-gray-30);}
+  .tl-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+  .tl-date{font-size:9px;color:var(--color-gray-70);}
+  .tl-action{border:none;background:none;padding:0;cursor:pointer;color:var(--daf-primary-60);display:inline-flex;}
+  .tl-action svg{width:16px;height:16px;}
+  .tl-title{font-size:var(--font-size-14);font-weight:var(--font-weight-600);color:var(--color-gray-90);margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tl-desc{font-size:var(--font-size-12);color:var(--color-gray-70);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* Information Provision: ColumnChart, Y 0-100% by 10s, X = KYC / Documentation / Management Systems, 40px between columns */
+  .ip-chart{flex:1;min-height:0;padding:var(--space);display:grid;grid-template-columns:26px 1fr;grid-template-rows:1fr 16px;column-gap:8px;}
+  .ip-y{position:relative;grid-column:1;grid-row:1;}
+  .ip-y span{position:absolute;right:6px;transform:translateY(-50%);font-size:9px;color:var(--color-gray-70);white-space:nowrap;}
+  .ip-plot{grid-column:2;grid-row:1;position:relative;min-height:0;}
+  .ip-gh{position:absolute;left:0;right:0;height:1px;background:var(--color-gray-30);}
+  .ip-gh.base{background:var(--color-gray-40);}
+  /* flex (not grid) so each bar reliably gets 100% of the plot's real height: a grid's implicit
+     row has no height to stretch against once the container above it collapses to content */
+  /* space-evenly (not a fixed px gap) so the 3 columns always fit the card's real width, narrow or wide */
+  /* gap (not just justify-content) guarantees a minimum spacing that never collapses as the card narrows */
+  /* gridlines (.ip-gh) run edge to edge; the bars stay inset 16px from the left/right so they never touch that edge */
+  .ip-bars{position:absolute;inset:0 var(--space);display:flex;align-items:flex-end;justify-content:center;gap:var(--space);}
+  /* grows to use whatever room is available (no fixed cap); the 16px side inset comes from .ip-chart's own padding */
+  .ip-bar{flex:1;height:100%;display:flex;align-items:flex-end;position:relative;}
+  .ip-bar-fill{width:100%;background:var(--daf-primary-60);border-radius:4px 4px 0 0;cursor:pointer;transition:filter .12s;}
+  .ip-bar-fill:hover{filter:brightness(1.08);}
+  .ip-x{grid-column:2;grid-row:2;display:flex;justify-content:center;gap:var(--space);padding:0 var(--space);}
+  /* label isn't clipped to the bar's width -- it can overflow past the column and stay centered under it */
+  /* min-width:0 keeps all 3 labels at an equal 1/3 share (matching the bars exactly) instead of the
+     longest label forcing itself wider; ellipsis then only kicks in right at that shared boundary,
+     which is naturally the full 16px gap away from the next bar -- truncates only when it must */
+  .ip-x span{flex:1;min-width:0;font-size:9px;color:var(--color-gray-70);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /*
+   * Status of Applications — "DAFTable, Compact" variant.
+   * Grounded in the real `DAFTable` (@daf/core/components/Table, an antd <Table size="small"> wrapper)
+   * and its real search/filter pair: `SearchFilters` (@daf/core/components/Filters/searchFilters) +
+   * `SelectFilters` (@daf/core/components/Filters/selectFilters) — NOT the FloatingFilters component
+   * (that one belongs to Map/Graphs). Cell padding, header background, border-radius and the
+   * search/filter markup below all match those real components' CSS.
+   * The one deliberate difference, naming the variant: a dashboard widget shows N rows + scroll
+   * instead of the real component's full pager (`.ant-pagination`) — appropriate for a compact
+   * summary inside a dashboard, not a full-page table. Flagged to formalize as a named Storybook
+   * variant so this reasoning doesn't have to be rediscovered next time.
+   */
+  .table-wrap{grid-column:span 12;}
+  /* same treatment as the custody flow canvas: 16px inset, own border + radius, clipped corners */
+  .table-scroll{max-height:293px;overflow-y:auto;margin:var(--space);border:1px solid var(--color-gray-40);
+    border-radius:var(--radius-sm);}
+  .apptable thead th:first-child,.apptable tbody td:first-child{padding-left:var(--space);}
+  .apptable thead th:last-child,.apptable tbody td:last-child{padding-right:var(--space);}
+  .apptable{width:100%;border-collapse:collapse;table-layout:fixed;}
+  /* headers wrap instead of truncating (values in the body stay single-line/ellipsis) */
+  /* single line, no wrap and no truncation -- columns are sized wide enough to fit the header text (see colgroup) */
+  .apptable thead th{position:sticky;top:0;text-align:left;font-size:12px;font-weight:500;
+    color:var(--color-gray-90);padding:15px var(--space);border-bottom:1px solid var(--color-gray-40);background:#f2f4f7;z-index:1;
+    white-space:nowrap;}
+  .apptable thead th.col-action{text-align:center;}
+  .apptable tbody td{padding:15px var(--space);border-bottom:1px solid var(--color-gray-40);font-size:12px;font-weight:500;
+    color:var(--color-gray-90);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .apptable tbody tr:last-child td{border-bottom:none;}
+  .apptable tbody tr:hover td{background:var(--color-gray-20);}
+
+  /* Search (SearchFilters): icon sits on the RIGHT with a left divider, not on the left */
+  .table-tools-row{display:flex;align-items:center;gap:10px;}
+  .table-search{display:flex;align-items:center;width:220px;height:32px;border:1px solid var(--color-gray-40);
+    border-radius:6px;background:var(--color-white);box-shadow:0 2px 0 rgba(0,0,0,.02);}
+  .table-search input{border:none;outline:none;font-family:inherit;font-size:var(--font-size-14);color:var(--color-gray-90);
+    width:100%;background:transparent;padding:5px 9px;}
+  .table-search input::placeholder{color:var(--color-gray-60);}
+  .table-search .search-icon{display:flex;align-items:center;border-left:1px solid var(--color-gray-40);padding:0 8px;flex-shrink:0;}
+  .table-search .search-icon svg{width:14px;height:14px;color:var(--color-gray-80);}
+  .filter-btn{display:grid;place-items:center;width:32px;height:32px;border:1px solid var(--color-gray-40);
+    border-radius:6px;background:var(--color-white);color:var(--color-gray-80);cursor:pointer;padding:0;flex-shrink:0;}
+  .filter-btn svg{width:16px;height:16px;}
+  .filter-btn:hover{border-color:var(--daf-primary-70);color:var(--daf-primary-70);}
+  .table-wrap.filters-open .filter-btn{border-color:var(--daf-primary-70);color:var(--daf-primary-70);background:var(--daf-primary-10);}
+
+  /* Filters (SelectFilters): an inline row in normal flow below the header, pushing the table down
+     (not a floating dropdown). Wraps at narrow widths, same as the real component. */
+  .filter-row{display:none;align-items:flex-end;gap:12px;padding:var(--space);border-bottom:1px solid var(--color-gray-30);flex-wrap:wrap;}
+  .table-wrap.filters-open .filter-row{display:flex;}
+  .filter-field{display:flex;flex-direction:column;gap:4px;}
+  .filter-field label{font-size:12px;font-weight:600;color:var(--color-gray-90);white-space:nowrap;}
+  .filter-field select,.filter-field input[type="date"]{font-family:inherit;font-size:var(--font-size-14);color:var(--color-gray-90);
+    border:1px solid var(--color-gray-40);border-radius:6px;padding:5px 8px;background:var(--color-white);height:32px;}
+  .filter-range{display:flex;align-items:center;gap:6px;}
+  .filter-range span{color:var(--color-gray-60);font-size:var(--font-size-12);}
+  .filter-range input{width:130px;}
+  /* single smart Apply/Clear button, 32x32, icon swaps with pending-change state (matches the real component exactly) */
+  .filter-apply{display:grid;place-items:center;width:32px;height:32px;border:none;border-radius:6px;
+    background:var(--daf-primary-70);color:var(--color-white);cursor:pointer;flex-shrink:0;}
+  .filter-apply:hover{background:var(--daf-primary-60);}
+  .filter-apply svg{width:16px;height:16px;}
+  .status-tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:100px;font-size:var(--font-size-12);
+    font-weight:var(--font-weight-600);line-height:1.6;border:1px solid transparent;white-space:nowrap;}
+  .status-tag.blue{background:#e6f4ff;border-color:#91caff;color:#0958d9;}      /* antd 'processing' */
+  .status-tag.purple{background:var(--daf-primary-10);border-color:var(--daf-primary-30);color:var(--daf-primary-70);} /* antd 'purple' */
+  .status-tag.green{background:var(--badge-success-bg);border-color:var(--badge-success-bd);color:var(--badge-success-tx);} /* antd 'success' */
+  .nav-action{width:28px;height:28px;border:none;background:transparent;display:flex;align-items:center;justify-content:center;
+    cursor:pointer;color:var(--color-gray-70);margin:0 auto;padding:0;}
+  .nav-action:hover{color:var(--daf-primary-70);}
+  .nav-action svg{width:15px;height:15px;}
+
+  /* ===== Data sections: LineChart + BarChart + UpdatedPieChart (identical real components to Monitor) ===== */
+  .data-section{grid-column:span 12;background:var(--color-white);border:1px solid var(--color-gray-40);
+    border-radius:var(--radius);overflow:hidden;height:424px;display:flex;flex-direction:column;transition:height .2s ease;}
+  .data-section.collapsed{height:64px;}
+  .data-section.collapsed .ds-grid{display:none;}
+  .ds-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space);
+    height:64px;flex-shrink:0;padding:0 var(--space);border-bottom:1px solid var(--color-gray-30);}
+  .data-section.collapsed .ds-head{border-bottom:none;}
+  .ds-head h2{margin:0;font-size:var(--font-size-16);font-weight:var(--font-weight-600);color:var(--color-gray-90);}
+  .ds-actions{display:flex;align-items:center;gap:var(--micro);}
+  .ds-seg{display:inline-flex;background:var(--color-gray-30);border-radius:6px;padding:2px;}
+  .ds-seg button{width:32px;height:28px;border:none;background:transparent;border-radius:4px;display:grid;place-items:center;cursor:pointer;color:var(--color-gray-70);}
+  .ds-seg button[aria-pressed="true"]{background:var(--color-white);color:var(--daf-primary-70);box-shadow:0 1px 2px rgba(17,25,39,.1);}
+  .ds-seg button:not([aria-pressed="true"]):hover{color:var(--daf-primary-70);background:rgba(255,255,255,.55);}
+  .ds-seg svg{width:16px;height:16px;}
+  .icon-btn-default{width:32px;height:32px;border:1px solid var(--daf-primary-70);background:var(--color-white);border-radius:var(--radius-sm);
+    color:var(--daf-primary-60);display:grid;place-items:center;cursor:pointer;}
+  .icon-btn-default:hover{background:var(--daf-primary-10);}
+  .icon-btn-default svg{transition:transform .2s ease;}
+  .data-section.collapsed .icon-btn-default svg{transform:rotate(180deg);}
+  .data-section.collapsed .icon-btn-default{border-color:var(--color-gray-40);color:var(--color-gray-70);}
+  .data-section.collapsed .icon-btn-default:hover{background:var(--color-gray-30);}
+
+  .ds-grid{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr;align-items:stretch;
+    gap:var(--space);flex:1;min-height:0;background:var(--color-white);padding:var(--space);}
+  .chart-card{background:var(--color-white);border:1px solid var(--color-gray-40);border-radius:var(--radius-sm);
+    display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+  .cc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:64px;flex-shrink:0;
+    padding:0 var(--space);border-bottom:1px solid var(--color-gray-30);}
+  /* Accumulation's period filter: daily/weekly/monthly, monthly default. Icon-only trigger
+     (no label, no chevron) -- the current period only needs to show as the checked row
+     inside the dropdown, not spelled out on the closed button. */
+  .period-select{position:relative;flex-shrink:0;}
+  .period-trigger{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;
+    border:1px solid var(--color-gray-40);border-radius:var(--radius-sm);background:var(--color-white);
+    cursor:pointer;transition:border-color var(--dur-fast) var(--ease-standard);}
+  .period-trigger:hover{border-color:var(--daf-primary-70);}
+  .period-trigger .period-cal{width:15px;height:15px;color:var(--color-gray-70);flex-shrink:0;}
+  .period-select.open .period-trigger{border-color:var(--daf-primary-70);}
+  .period-dropdown{display:none;position:absolute;top:calc(100% + 6px);right:0;background:var(--color-white);
+    border:1px solid var(--color-gray-40);border-radius:8px;box-shadow:0 4px 12px rgba(17,25,39,.08);min-width:120px;padding:4px;z-index:5;}
+  .period-select.open .period-dropdown{display:block;}
+  .period-row{padding:6px 10px;border-radius:var(--radius-sm);font-size:13px;color:var(--color-gray-90);cursor:pointer;
+    transition:background var(--dur-fast) var(--ease-standard);}
+  .period-row:hover{background:var(--color-gray-20);}
+  .period-row.selected{color:var(--daf-primary-70);font-weight:var(--font-weight-600);}
+  .cc-head h3{margin:0;font-size:var(--font-size-16);font-weight:var(--font-weight-600);color:var(--color-gray-90);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .chart-area{padding:0;flex:1;min-height:0;display:flex;flex-direction:column;}
+
+  .lc{flex:1;min-height:0;padding:var(--space);display:grid;grid-template-columns:22px 1fr;grid-template-rows:1fr 14px;column-gap:6px;}
+  .lc-y{position:relative;grid-column:1;grid-row:1;}
+  .lc-y span{position:absolute;right:6px;transform:translateY(-50%);font-size:9px;color:var(--color-gray-70);white-space:nowrap;}
+  .lc-plot{grid-column:2;grid-row:1;position:relative;min-width:0;min-height:0;overflow:hidden;}
+  .lc-gh{position:absolute;left:0;right:0;height:1px;background:var(--color-gray-30);}
+  .lc-gh.base{background:var(--color-gray-40);}
+  .lc-gv{position:absolute;top:0;bottom:0;width:1px;background:var(--color-gray-30);}
+  .lc-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+  .lc-svg polyline{fill:none;stroke-width:2;vector-effect:non-scaling-stroke;}
+  .lc-dot{position:absolute;width:5px;height:5px;border-radius:50%;transform:translate(-50%,-50%);
+    border:1px solid var(--color-white);box-sizing:content-box;opacity:0;transition:opacity .1s;}
+  .lc-hit{position:absolute;top:0;bottom:0;}
+  .lc-hit:hover .lc-dot{opacity:1;}
+  .lc-x{grid-column:2;grid-row:2;position:relative;}
+  .lc-x span{position:absolute;transform:translateX(-50%);font-size:9px;color:var(--color-gray-70);white-space:nowrap;}
+
+  .cbars{display:flex;flex-direction:column;flex:1;min-height:0;padding:var(--space);--cb-lbl:92px;}
+  /* rows center-anchor in the available height and grow outward as sources are added, instead of top-aligning */
+  .cbars-body{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:4px;position:relative;}
+  .cbars-grid{position:absolute;top:0;bottom:0;left:var(--cb-lbl);right:0;display:flex;justify-content:space-between;pointer-events:none;}
+  .cbars-grid span{width:1px;background:var(--color-gray-30);}
+  .cbars-grid span:first-child{background:var(--color-gray-40);}
+  .cgroup{position:relative;display:flex;align-items:center;gap:0;padding:4px 0;}
+  .cgroup::before{content:"";position:absolute;top:0;bottom:0;left:var(--cb-lbl);right:0;border-radius:4px;background:transparent;transition:background .12s;}
+  .cgroup:hover::before{background:rgba(208,213,221,0.5);}
+  /* Column width is computed in JS from the widest label + a fixed 16px gap before the
+     bars, capped so a long name (e.g. "SBG Traders Ltd") doesn't blow the column out --
+     see the label-sizing IIFE in <script>. No padding-right here: the 16px is already
+     baked into the computed --cb-lbl width. */
+  .cg-lbl{position:relative;z-index:1;width:var(--cb-lbl);flex-shrink:0;font-size:9px;color:var(--color-gray-70);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .cg-bars{position:relative;z-index:1;flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;}
+  .cg-bar{height:6px;border-radius:2px;min-width:2px;transition:width var(--dur-slow) var(--ease-standard);}
+  .cg-bar.t1{background:var(--daf-primary-70);}
+  .cg-bar.t2{background:var(--daf-primary-50);}
+  .cg-bar.t3{background:var(--daf-primary-30);}
+  .cbars-axis{position:relative;margin-left:var(--cb-lbl);padding-top:6px;height:16px;}
+  .cbars-axis span{position:absolute;transform:translateX(-50%);font-size:9px;color:var(--color-gray-70);}
+
+  .pie-wrap{flex:1;min-height:0;display:flex;flex-direction:column;}
+  /* container-type:size lets the pie use cqw/cqh, so it always sizes to whichever axis (width or height)
+     is actually the limiting one -- aspect-ratio + max-width alone silently overflowed a narrow card
+     (a CSS grid item with an implicit auto track can't reliably resolve a percentage size against it) */
+  .pie-box{flex:1;min-height:0;display:grid;place-items:center;padding:var(--space);container-type:size;}
+  .pie{width:min(100cqw,100cqh);height:min(100cqw,100cqh);border-radius:50%;cursor:pointer;}
+
+  .daf-tip{position:fixed;z-index:200;background:var(--color-white);border-radius:3px;padding:16px;min-width:200px;
+    box-shadow:0 0 10px 0 #aeaeae;pointer-events:none;font-size:var(--font-size-12);
+    opacity:0;visibility:hidden;transition:opacity .1s;}
+  .daf-tip.show{opacity:1;visibility:visible;}
+  .daf-tip .tt-title{font-size:var(--font-size-12);font-weight:var(--font-weight-400);color:#595959;
+    padding-bottom:8px;margin-bottom:16px;border-bottom:1px solid #eaecf0;}
+  .daf-tip .tt-list{display:flex;flex-direction:column;gap:6px;}
+  .daf-tip .tt-row{display:flex;align-items:center;}
+  .daf-tip .tt-row .d{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:8px;}
+  .daf-tip .tt-row .tt-n{color:#6c737f;margin-right:16px;}
+  .daf-tip .tt-row .tt-v{margin-left:auto;color:#4d5761;font-weight:var(--font-weight-600);}
+
+  .custody-card{height:424px;display:flex;flex-direction:column;transition:height .2s ease;}
+  .custody-card.collapsed{height:64px;overflow:hidden;}
+  .custody-card.collapsed .widget-head{border-bottom:none;}
+  .custody-card.collapsed .icon-btn-default{border-color:var(--color-gray-40);color:var(--color-gray-70);}
+  .custody-card.collapsed .icon-btn-default:hover{background:var(--color-gray-30);}
+  .custody-card .icon-btn-default svg{transition:transform .2s ease;}
+  .custody-card.collapsed .icon-btn-default svg{transform:rotate(180deg);}
+  .flow{position:relative;margin:var(--space);flex:1;min-height:0;border:1px solid var(--color-gray-40);border-radius:var(--radius-sm);
+    background:var(--color-gray-20);overflow:hidden;}
+  .flow-scroll{height:100%;overflow:auto;display:flex;align-items:center;justify-content:center;}
+  .flow-row{margin:auto;flex-shrink:0;padding:0 var(--space);display:flex;align-items:center;}
+  .node{width:180px;background:var(--color-white);border:1px solid var(--color-gray-40);border-radius:var(--radius-sm);
+    box-shadow:0 1px 2px rgba(17,25,39,.06);padding:14px 16px 14px 20px;position:relative;overflow:hidden;}
+  .node::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--node-accent);}
+  .node .n-type{font-size:11px;color:var(--color-gray-70);}
+  .node .n-name{font-size:var(--font-size-16);font-weight:var(--font-weight-600);color:var(--color-gray-120);}
+  .edge{width:40px;height:1px;background:var(--color-gray-50);}
+  .flow-zoom{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;background:var(--color-white);
+    border:1px solid var(--color-gray-40);border-radius:var(--radius-sm);overflow:hidden;}
+  .flow-zoom button{width:28px;height:28px;border:none;border-bottom:1px solid var(--color-gray-30);background:var(--color-white);
+    color:var(--color-gray-70);cursor:pointer;font-size:14px;}
+  .flow-zoom button:last-child{border-bottom:none;}
+
+  .note{margin:var(--space);margin-top:0;padding:var(--space);border:1px dashed var(--color-gray-50);border-radius:var(--radius);
+    background:var(--color-gray-10);color:var(--color-gray-70);font-size:var(--font-size-12);}
+  .note b{color:var(--color-gray-90);}
+
+  @media (max-width:1000px){ .col-4,.col-6,.col-8{grid-column:span 12;} .sidebar{display:none;} }
+</style>
+</head>
+<body>
+
+  <!-- ============ Sidebar (AppLayout) ============ -->
+  <aside class="sidebar">
+    <div class="sb-logo">
+      <svg width="84" height="35" viewBox="0 0 101 42" fill="none"><path d="M13.5102 33.4449C19.9414 32.9308 25 27.5521 25 20.9925C25 14.0931 19.4036 8.5 12.5 8.5C5.59644 8.5 0 14.0931 0 20.9925C0 21.1319 0.00228307 21.2707 0.00681387 21.409V33.5H12.4104C12.779 33.498 13.1459 33.4795 13.5102 33.4449Z" fill="white"/><path d="M35.7058 8.33936H45.2078C52.6077 8.33936 56.9656 12.7485 56.9656 20.5757C56.9656 28.4028 52.6077 33 45.2078 33H35.7058V8.33936ZM40.8669 12.5947V28.7275H44.5925C49.2068 28.7275 51.7019 25.9248 51.7019 20.5928C51.7019 15.4316 49.1384 12.5947 44.5925 12.5947H40.8669ZM75.4055 33L73.5256 27.0186H64.8611L62.9812 33H57.6833L66.2454 8.33936H72.3123L80.8914 33H75.4055ZM69.1335 13.0562L65.9719 23.1562H72.4148L69.2532 13.0562H69.1335ZM88.5818 33H83.4207V8.33936H99.5706V12.5947H88.5818V19.2085H98.6135V23.293H88.5818V33Z" fill="white"/></svg>
+    </div>
+    <div class="sb-role"><span class="role-ic">
+      <svg viewBox="0 0 20 20" fill="none" stroke="#F08F65" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.6668 4.66667C10.6668 4.04669 10.6668 3.7367 10.5987 3.48236C10.4137 2.79218 9.87465 2.25308 9.18447 2.06815C8.93013 2 8.62014 2 8.00016 2C7.38018 2 7.07019 2 6.81586 2.06815C6.12567 2.25308 5.58658 2.79218 5.40164 3.48236C5.3335 3.7367 5.3335 4.04669 5.3335 4.66667M3.46683 14H12.5335C13.2802 14 13.6536 14 13.9388 13.8547C14.1897 13.7268 14.3937 13.5229 14.5215 13.272C14.6668 12.9868 14.6668 12.6134 14.6668 11.8667V6.8C14.6668 6.05326 14.6668 5.6799 14.5215 5.39468C14.3937 5.1438 14.1897 4.93982 13.9388 4.81199C13.6536 4.66667 13.2802 4.66667 12.5335 4.66667H3.46683C2.72009 4.66667 2.34672 4.66667 2.06151 4.81199C1.81063 4.93982 1.60665 5.1438 1.47882 5.39468C1.3335 5.6799 1.3335 6.05326 1.3335 6.8V11.8667C1.3335 12.6134 1.3335 12.9868 1.47882 13.272C1.60665 13.5229 1.81063 13.7268 2.06151 13.8547C2.34672 14 2.72009 14 3.46683 14Z"/></svg>
+    </span>Operator</div>
+    <nav class="sb-nav">
+      <a class="sb-item active" href="#"><svg viewBox="0 54 19 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.58325 69.6V63.4333C6.58325 62.9666 6.58325 62.7332 6.67408 62.555C6.75397 62.3982 6.88146 62.2707 7.03826 62.1908C7.21652 62.1 7.44987 62.1 7.91659 62.1H10.2499C10.7166 62.1 10.95 62.1 11.1282 62.1908C11.285 62.2707 11.4125 62.3982 11.4924 62.555C11.5833 62.7332 11.5833 62.9666 11.5833 63.4333V69.6M8.26466 54.4033L2.61274 58.7992C2.23494 59.0931 2.04603 59.24 1.90994 59.424C1.78939 59.587 1.69959 59.7706 1.64494 59.9659C1.58325 60.1862 1.58325 60.4256 1.58325 60.9042V66.9333C1.58325 67.8667 1.58325 68.3334 1.76491 68.6899C1.9247 69.0036 2.17966 69.2585 2.49327 69.4183C2.84979 69.6 3.3165 69.6 4.24992 69.6H13.9166C14.85 69.6 15.3167 69.6 15.6732 69.4183C15.9868 69.2585 16.2418 69.0036 16.4016 68.6899C16.5833 68.3334 16.5833 67.8667 16.5833 66.9333V60.9042C16.5833 60.4256 16.5833 60.1862 16.5216 59.9659C16.4669 59.7706 16.3771 59.587 16.2566 59.424C16.1205 59.24 15.9316 59.0931 15.5538 58.7992L9.90184 54.4033C9.60907 54.1756 9.46268 54.0617 9.30104 54.018C9.15842 53.9794 9.00809 53.9794 8.86546 54.018C8.70382 54.0617 8.55744 54.1756 8.26466 54.4033Z"/></svg>Dashboard</a>
+      <div class="sb-section">Analysis</div>
+      <a class="sb-item" href="#"><svg viewBox="0 130 19 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13.2499 135.6L8.72132 140.129C8.55632 140.294 8.47381 140.376 8.37868 140.407C8.29499 140.434 8.20485 140.434 8.12116 140.407C8.02602 140.376 7.94352 140.294 7.77851 140.129L6.22132 138.571C6.05632 138.406 5.97381 138.324 5.87868 138.293C5.79499 138.266 5.70485 138.266 5.62116 138.293C5.52602 138.324 5.44352 138.406 5.27851 138.571L1.58325 142.267M13.2499 138.933V135.6H9.91659M5.58325 145.6H12.5833C13.9834 145.6 14.6834 145.6 15.2182 145.327C15.6886 145.088 16.0711 144.705 16.3108 144.235C16.5833 143.7 16.5833 143 16.5833 141.6V134.6C16.5833 133.2 16.5833 132.5 16.3108 131.965C16.0711 131.495 15.6886 131.112 15.2182 130.872C14.6834 130.6 13.9834 130.6 12.5833 130.6H5.58325C4.18312 130.6 3.48306 130.6 2.94828 130.872C2.47787 131.112 2.09542 131.495 1.85574 131.965C1.58325 132.5 1.58325 133.2 1.58325 134.6V141.6C1.58325 143 1.58325 143.7 1.85574 144.235C2.09542 144.705 2.47787 145.088 2.94828 145.327C3.48306 145.6 4.18312 145.6 5.58325 145.6Z"/></svg>Analytics</a>
+      <div class="sb-section">Modules</div>
+      <a class="sb-item" href="#"><svg viewBox="0 205 19 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.7498 213.267H5.74984M7.4165 216.6H5.74984M12.4165 209.933H5.74984M15.7498 209.767V218.433C15.7498 219.833 15.7498 220.533 15.4774 221.068C15.2377 221.539 14.8552 221.921 14.3848 222.161C13.85 222.433 13.15 222.433 11.7498 222.433H6.4165C5.01637 222.433 4.31631 222.433 3.78153 222.161C3.31112 221.921 2.92867 221.539 2.68899 221.068C2.4165 220.533 2.4165 219.833 2.4165 218.433V209.767C2.4165 208.366 2.4165 207.666 2.68899 207.132C2.92867 206.661 3.31112 206.279 3.78153 206.039C4.31631 205.767 5.01637 205.767 6.4165 205.767H11.7498C13.15 205.767 13.85 205.767 14.3848 206.039C14.8552 206.279 15.2377 206.661 15.4774 207.132C15.7498 207.666 15.7498 208.366 15.7498 209.767Z"/></svg>Applications</a>
+      <div class="sb-section">Data</div>
+      <div class="sb-store open">
+        <button class="sb-item sb-store-toggle" aria-expanded="true"><svg viewBox="0 283 19 15" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15.75 288.017V286.1C15.75 285.167 15.75 284.7 15.5683 284.343C15.4086 284.03 15.1536 283.775 14.84 283.615C14.4835 283.433 14.0167 283.433 13.0833 283.433H3.41667C2.48325 283.433 2.01654 283.433 1.66002 283.615C1.34641 283.775 1.09145 284.03 0.931656 284.343C0.75 284.7 0.75 285.167 0.75 286.1V294.1C0.75 295.033 0.75 295.5 0.931656 295.857C1.09144 296.17 1.34641 296.425 1.66002 296.585C2.01654 296.767 2.48325 296.767 3.41667 296.767L13.0833 296.767C14.0168 296.767 14.4835 296.767 14.84 296.585C15.1536 296.425 15.4086 296.17 15.5683 295.857C15.75 295.5 15.75 295.033 15.75 294.1V292.183M11.5833 290.1C11.5833 289.713 11.5833 289.519 11.6154 289.358C11.7469 288.697 12.2637 288.18 12.9248 288.049C13.0858 288.017 13.2795 288.017 13.6667 288.017H15.3333C15.7205 288.017 15.9142 288.017 16.0752 288.049C16.7363 288.18 17.2531 288.697 17.3846 289.358C17.4167 289.519 17.4167 289.713 17.4167 290.1C17.4167 290.487 17.4167 290.681 17.3846 290.842C17.2531 291.503 16.7363 292.02 16.0752 292.151C15.9142 292.183 15.7205 292.183 15.3333 292.183H13.6667C13.2795 292.183 13.0858 292.183 12.9248 292.151C12.2637 292.02 11.7469 291.503 11.6154 290.842C11.5833 290.681 11.5833 290.487 11.5833 290.1Z"/></svg>Store<svg class="sb-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+        <div class="sb-sub-wrap"><div class="sb-sub">
+          <a class="sb-subitem" href="#">Documents</a>
+          <a class="sb-subitem" href="#">Applications</a>
+        </div></div>
+      </div>
+      <a class="sb-item" href="#"><svg viewBox="0 482 19 17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5833 497.6L11.5833 492.6M13.2499 488.433C13.2499 491.655 10.6382 494.267 7.41659 494.267C4.19492 494.267 1.58325 491.655 1.58325 488.433C1.58325 485.212 4.19492 482.6 7.41659 482.6C10.6382 482.6 13.2499 485.212 13.2499 488.433Z"/></svg>Query</a>
+    </nav>
+    <div class="sb-footer">
+      <svg viewBox="0 0 255 88" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 0V1H255V0V-1H0V0Z" style="fill:var(--color-gray-80)"/>
+        <text x="24" y="45" fill="white" font-family="Inter, sans-serif" font-size="13" font-weight="600">Powered by</text>
+        <text x="24" y="66" fill="white" font-family="Inter, sans-serif" font-size="16" font-weight="700">datastake</text>
+      </svg>
+    </div>
+  </aside>
+
+  <!-- ============ content column ============ -->
+  <div class="content">
+
+    <!-- app main header -->
+    <div class="app-header">
+      <button class="hamburger" aria-label="Toggle sidebar">
+        <svg width="22" height="20" viewBox="25 23 22 20" fill="currentColor"><path d="M33.5625 31.3594H44.8125C44.9156 31.3594 45 31.275 45 31.1719V29.8594C45 29.7562 44.9156 29.6719 44.8125 29.6719H33.5625C33.4594 29.6719 33.375 29.7562 33.375 29.8594V31.1719C33.375 31.275 33.4594 31.3594 33.5625 31.3594ZM33.375 36.1406C33.375 36.2438 33.4594 36.3281 33.5625 36.3281H44.8125C44.9156 36.3281 45 36.2438 45 36.1406V34.8281C45 34.725 44.9156 34.6406 44.8125 34.6406H33.5625C33.4594 34.6406 33.375 34.725 33.375 34.8281V36.1406ZM45.1875 24.75H26.8125C26.7094 24.75 26.625 24.8344 26.625 24.9375V26.25C26.625 26.3531 26.7094 26.4375 26.8125 26.4375H45.1875C45.2906 26.4375 45.375 26.3531 45.375 26.25V24.9375C45.375 24.8344 45.2906 24.75 45.1875 24.75ZM45.1875 39.5625H26.8125C26.7094 39.5625 26.625 39.6469 26.625 39.75V41.0625C26.625 41.1656 26.7094 41.25 26.8125 41.25H45.1875C45.2906 41.25 45.375 41.1656 45.375 41.0625V39.75C45.375 39.6469 45.2906 39.5625 45.1875 39.5625ZM27.3375 36.0492L31.0008 33.1641C31.0254 33.1447 31.0454 33.1199 31.0591 33.0917C31.0728 33.0635 31.0799 33.0325 31.0799 33.0012C31.0799 32.9698 31.0728 32.9388 31.0591 32.9106C31.0454 32.8824 31.0254 32.8577 31.0008 32.8383L27.3375 29.9508C27.2016 29.843 27 29.9391 27 30.1125V35.8852C27 35.9243 27.011 35.9627 27.0318 35.9958C27.0525 36.029 27.0822 36.0557 27.1174 36.0728C27.1526 36.0899 27.1919 36.0968 27.2308 36.0926C27.2698 36.0885 27.3067 36.0734 27.3375 36.0492Z"/></svg>
+      </button>
+      <div class="app-header-right">
+        <button class="ah-icon" aria-label="Notifications">
+          <svg width="20" height="20" viewBox="931 22 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M943.5 38.8333C943.5 40.214 942.38 41.3333 941 41.3333C939.619 41.3333 938.5 40.214 938.5 38.8333M942.497 28.1988C942.86 27.8239 943.083 27.313 943.083 26.75C943.083 25.5994 942.15 24.6667 941 24.6667C939.849 24.6667 938.916 25.5994 938.916 26.75C938.916 27.313 939.14 27.8239 939.503 28.1988M946 32.3333C946 31.1841 945.473 30.0819 944.535 29.2692C943.598 28.4565 942.326 28 941 28C939.674 28 938.402 28.4565 937.464 29.2692C936.527 30.0819 936 31.1841 936 32.3333C936 34.2348 935.528 35.6255 934.94 36.6206C934.269 37.7547 933.934 38.3217 933.947 38.4572C933.962 38.6122 933.99 38.6611 934.116 38.753C934.226 38.8333 934.778 38.8333 935.882 38.8333H946.118C947.222 38.8333 947.774 38.8333 947.884 38.753C948.009 38.6611 948.037 38.6122 948.052 38.4572C948.066 38.3217 947.73 37.7547 947.06 36.6206C946.471 35.6255 946 34.2348 946 32.3333Z"/></svg>
+        </button>
+        <span class="lang"><span class="flag" aria-hidden="true">&#127468;&#127463;</span>EN
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+        <span class="acct-wrap">
+          <span class="acct" title="Account"><svg width="20" height="20" viewBox="1095 22 20 20" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1097.12 41.2939H1112.88M1099.75 38.6689V31.6689M1103.25 38.6689V31.6689M1106.75 38.6689V31.6689M1110.25 38.6689V31.6689M1112 29.0439L1105.37 24.9008C1105.24 24.8167 1105.17 24.7746 1105.1 24.7582C1105.03 24.7437 1104.97 24.7437 1104.9 24.7582C1104.83 24.7746 1104.76 24.8167 1104.63 24.9008L1098 29.0439H1112Z"/></svg></span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </span>
+      </div>
+    </div>
+
+    <!-- DafHeader (Page Header): title rule (new, applies to every dashboard) = "<Organisation/Account Name> | Dashboard" -->
+    <header class="daf-header">
+      <div class="daf-header-main">
+        <div>
+          <div class="daf-title">
+            <h1>Rift Valley Traders | Dashboard</h1>
+          </div>
+        </div>
+        <div class="daf-actions">
+          <button class="icon-btn" aria-label="Download dashboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 12 5 5 5-5"/><path d="M5 21h14"/></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- page body: 16px inset grid -->
+    <div class="page-body">
+      <div class="grid">
+
+        <!-- Action Row: real order + labels from kota-app config/dashboards.config.ts Operator.panels[0].buttons -->
+        <section class="col-12 enter" style="animation-delay:0ms">
+          <div class="ar-buttons">
+            <button class="util-btn" type="button"><span>My Profile</span>
+              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.66685 19.9993C4.21921 20.1667 4.96528 20.1667 6.2335 20.1667H15.7668C17.035 20.1667 17.7811 20.1667 18.3335 19.9993M3.66685 19.9993C3.54842 19.9634 3.43888 19.9199 3.33502 19.8669C2.81758 19.6033 2.39688 19.1826 2.13323 18.6651C1.8335 18.0769 1.8335 17.3068 1.8335 15.7667V6.23334C1.8335 4.6932 1.8335 3.92313 2.13323 3.33487C2.39688 2.81742 2.81758 2.39673 3.33502 2.13308C3.92328 1.83334 4.69335 1.83334 6.2335 1.83334H15.7668C17.307 1.83334 18.077 1.83334 18.6653 2.13308C19.1827 2.39673 19.6034 2.81742 19.8671 3.33487C20.1668 3.92313 20.1668 4.6932 20.1668 6.23334V15.7667C20.1668 17.3068 20.1668 18.0769 19.8671 18.6651C19.6034 19.1826 19.1827 19.6033 18.6653 19.8669C18.5614 19.9199 18.4519 19.9634 18.3335 19.9993M3.66685 19.9993C3.66715 19.2574 3.6716 18.8649 3.73728 18.5347C4.02661 17.0801 5.16363 15.9431 6.61816 15.6538C6.97236 15.5833 7.39829 15.5833 8.25016 15.5833H13.7502C14.602 15.5833 15.028 15.5833 15.3822 15.6538C16.8367 15.9431 17.9737 17.0801 18.263 18.5347C18.3287 18.8649 18.3332 19.2574 18.3335 19.9993M14.6668 8.70834C14.6668 10.7334 13.0252 12.375 11.0002 12.375C8.97512 12.375 7.3335 10.7334 7.3335 8.70834C7.3335 6.6833 8.97512 5.04168 11.0002 5.04168C13.0252 5.04168 14.6668 6.6833 14.6668 8.70834Z"/></svg></button>
+            <button class="util-btn" type="button"><span>My Applications</span>
+              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5.50016 13.75L7.3335 15.5833L11.4585 11.4583M7.3335 7.33334V4.76668C7.3335 3.73991 7.3335 3.22653 7.53332 2.83436C7.70909 2.4894 7.98955 2.20893 8.33451 2.03316C8.72668 1.83334 9.24007 1.83334 10.2668 1.83334H17.2335C18.2603 1.83334 18.7736 1.83334 19.1658 2.03316C19.5108 2.20893 19.7912 2.4894 19.967 2.83436C20.1668 3.22653 20.1668 3.73991 20.1668 4.76668V11.7333C20.1668 12.7601 20.1668 13.2735 19.967 13.6657C19.7912 14.0106 19.5108 14.2911 19.1658 14.4669C18.7736 14.6667 18.2603 14.6667 17.2335 14.6667H14.6668M4.76683 20.1667H11.7335C12.7603 20.1667 13.2736 20.1667 13.6658 19.9669C14.0108 19.7911 14.2912 19.5106 14.467 19.1657C14.6668 18.7735 14.6668 18.2601 14.6668 17.2333V10.2667C14.6668 9.23991 14.6668 8.72653 14.467 8.33436C14.2912 7.9894 14.0108 7.70893 13.6658 7.53316C13.2736 7.33334 12.7603 7.33334 11.7335 7.33334H4.76683C3.74007 7.33334 3.22668 7.33334 2.83451 7.53316C2.48955 7.70893 2.20909 7.9894 2.03332 8.33436C1.8335 8.72653 1.8335 9.23991 1.8335 10.2667V17.2333C1.8335 18.2601 1.8335 18.7735 2.03332 19.1657C2.20909 19.5106 2.48955 19.7911 2.83451 19.9669C3.22668 20.1667 3.74007 20.1667 4.76683 20.1667Z"/></svg></button>
+            <button class="util-btn" type="button"><span>Upload Document</span>
+              <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11.9168 6.41667L10.8942 4.37151C10.5999 3.7829 10.4528 3.48859 10.2333 3.27357C10.0391 3.08342 9.80513 2.93881 9.54823 2.8502C9.25773 2.75 8.92869 2.75 8.2706 2.75H4.76683C3.74007 2.75 3.22668 2.75 2.83451 2.94982C2.48955 3.12559 2.20909 3.40605 2.03332 3.75102C1.8335 4.14319 1.8335 4.65657 1.8335 5.68333V6.41667M1.8335 6.41667H15.7668C17.307 6.41667 18.077 6.41667 18.6653 6.7164C19.1827 6.98005 19.6034 7.40075 19.8671 7.91819C20.1668 8.50645 20.1668 9.27652 20.1668 10.8167V14.85C20.1668 16.3901 20.1668 17.1602 19.8671 17.7485C19.6034 18.2659 19.1827 18.6866 18.6653 18.9503C18.077 19.25 17.307 19.25 15.7668 19.25H6.2335C4.69335 19.25 3.92328 19.25 3.33502 18.9503C2.81758 18.6866 2.39688 18.2659 2.13323 17.7485C1.8335 17.1602 1.8335 16.3901 1.8335 14.85V6.41667ZM8.25012 12.8334L11.0001 10.0834L13.7501 12.8334M11.0001 10.0834L11.0001 15.5834"/></svg></button>
+            <button class="util-btn" type="button"><span>Find Information</span>
+              <svg viewBox="928 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M948.05 19.25L944.062 15.2625M946.216 10.0833C946.216 14.1334 942.933 17.4167 938.883 17.4167C934.833 17.4167 931.55 14.1334 931.55 10.0833C931.55 6.03325 934.833 2.75 938.883 2.75C942.933 2.75 946.216 6.03325 946.216 10.0833Z"/></svg></button>
+          </div>
+        </section>
+
+        <!-- Key Indicators: real CardsWidget -> 4 separate StatCards (not a single merged bar like Monitor) -->
+        <section class="col-4 card pair-card enter" style="animation-delay:40ms">
+          <div class="widget-head"><h2>Status</h2></div>
+          <div class="ki-col">
+            <div class="stat-card">
+              <div class="stat-label">Submitted Applications</div>
+              <div class="stat-value">86<span class="stat-value-of"> of 128</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Self-Assessment Completion</div>
+              <div class="stat-progress"><span class="track" data-tip='{"title":"Self-Assessment Completion","rows":[["Completion","#531DAB","72%"]]}'><span class="fill" style="width:72%"></span></span><span class="pct">72%</span></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Management Systems Completion</div>
+              <div class="stat-progress"><span class="track" data-tip='{"title":"Management Systems Completion","rows":[["Completion","#531DAB","45%"]]}'><span class="fill" style="width:45%"></span></span><span class="pct">45%</span></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Application Updates (Timeline / LatestUpdateWidget) + Information Provision (ColumnChart) -->
+        <section class="col-4 card pair-card enter" style="animation-delay:60ms">
+          <div class="widget-head"><h2>Application Updates</h2></div>
+          <div class="tl">
+            <div class="tl-item"><span class="tl-dot"></span><div class="tl-card">
+              <div class="tl-top"><span class="tl-date">28 Jul 2026</span><button class="tl-action" aria-label="Open application"><svg viewBox="264 8 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M272.167 10.8001H275.2L275.2 13.8334M275.2 10.8001L270.65 15.35M269.639 10.8H268.527C267.677 10.8 267.253 10.8 266.928 10.9654C266.643 11.1108 266.411 11.3428 266.265 11.6282C266.1 11.9526 266.1 12.3773 266.1 13.2267V17.4734C266.1 18.3228 266.1 18.7475 266.265 19.0719C266.411 19.3573 266.643 19.5893 266.928 19.7347C267.253 19.9 267.677 19.9 268.527 19.9H272.773C273.623 19.9 274.047 19.9 274.372 19.7347C274.657 19.5893 274.889 19.3573 275.035 19.0719C275.2 18.7475 275.2 18.3228 275.2 17.4734V16.3612"/></svg></button></div>
+              <div class="tl-title">Application moved to Stage 02</div><div class="tl-desc">First National Bank review</div></div></div>
+            <div class="tl-item"><span class="tl-dot"></span><div class="tl-card">
+              <div class="tl-top"><span class="tl-date">27 Jul 2026</span><button class="tl-action" aria-label="Open application"><svg viewBox="264 8 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M272.167 10.8001H275.2L275.2 13.8334M275.2 10.8001L270.65 15.35M269.639 10.8H268.527C267.677 10.8 267.253 10.8 266.928 10.9654C266.643 11.1108 266.411 11.3428 266.265 11.6282C266.1 11.9526 266.1 12.3773 266.1 13.2267V17.4734C266.1 18.3228 266.1 18.7475 266.265 19.0719C266.411 19.3573 266.643 19.5893 266.928 19.7347C267.253 19.9 267.677 19.9 268.527 19.9H272.773C273.623 19.9 274.047 19.9 274.372 19.7347C274.657 19.5893 274.889 19.3573 275.035 19.0719C275.2 18.7475 275.2 18.3228 275.2 17.4734V16.3612"/></svg></button></div>
+              <div class="tl-title">Documentation uploaded</div><div class="tl-desc">Financial statements, 3 files</div></div></div>
+            <div class="tl-item"><span class="tl-dot"></span><div class="tl-card">
+              <div class="tl-top"><span class="tl-date">25 Jul 2026</span><button class="tl-action" aria-label="Open application"><svg viewBox="264 8 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M272.167 10.8001H275.2L275.2 13.8334M275.2 10.8001L270.65 15.35M269.639 10.8H268.527C267.677 10.8 267.253 10.8 266.928 10.9654C266.643 11.1108 266.411 11.3428 266.265 11.6282C266.1 11.9526 266.1 12.3773 266.1 13.2267V17.4734C266.1 18.3228 266.1 18.7475 266.265 19.0719C266.411 19.3573 266.643 19.5893 266.928 19.7347C267.253 19.9 267.677 19.9 268.527 19.9H272.773C273.623 19.9 274.047 19.9 274.372 19.7347C274.657 19.5893 274.889 19.3573 275.035 19.0719C275.2 18.7475 275.2 18.3228 275.2 17.4734V16.3612"/></svg></button></div>
+              <div class="tl-title">New application submitted</div><div class="tl-desc">Coastal Development Bank</div></div></div>
+            <div class="tl-item"><span class="tl-dot"></span><div class="tl-card">
+              <div class="tl-top"><span class="tl-date">22 Jul 2026</span><button class="tl-action" aria-label="Open application"><svg viewBox="264 8 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M272.167 10.8001H275.2L275.2 13.8334M275.2 10.8001L270.65 15.35M269.639 10.8H268.527C267.677 10.8 267.253 10.8 266.928 10.9654C266.643 11.1108 266.411 11.3428 266.265 11.6282C266.1 11.9526 266.1 12.3773 266.1 13.2267V17.4734C266.1 18.3228 266.1 18.7475 266.265 19.0719C266.411 19.3573 266.643 19.5893 266.928 19.7347C267.253 19.9 267.677 19.9 268.527 19.9H272.773C273.623 19.9 274.047 19.9 274.372 19.7347C274.657 19.5893 274.889 19.3573 275.035 19.0719C275.2 18.7475 275.2 18.3228 275.2 17.4734V16.3612"/></svg></button></div>
+              <div class="tl-title">Self-assessment updated</div><div class="tl-desc">Management systems section</div></div></div>
+          </div>
+        </section>
+        <section class="col-4 card pair-card enter" style="animation-delay:80ms">
+          <div class="widget-head"><h2>Information Provision</h2></div>
+          <div class="ip-chart">
+            <div class="ip-y">
+              <span style="top:0%">100</span><span style="top:10%">90</span><span style="top:20%">80</span>
+              <span style="top:30%">70</span><span style="top:40%">60</span><span style="top:50%">50</span>
+              <span style="top:60%">40</span><span style="top:70%">30</span><span style="top:80%">20</span>
+              <span style="top:90%">10</span><span style="top:100%">0</span>
+            </div>
+            <div class="ip-plot">
+              <div class="ip-gh" style="top:0%"></div><div class="ip-gh" style="top:10%"></div>
+              <div class="ip-gh" style="top:20%"></div><div class="ip-gh" style="top:30%"></div>
+              <div class="ip-gh" style="top:40%"></div><div class="ip-gh" style="top:50%"></div>
+              <div class="ip-gh" style="top:60%"></div><div class="ip-gh" style="top:70%"></div>
+              <div class="ip-gh" style="top:80%"></div><div class="ip-gh" style="top:90%"></div>
+              <div class="ip-gh base" style="top:100%"></div>
+              <div class="ip-bars">
+                <div class="ip-bar"><div class="ip-bar-fill" style="height:72%" data-tip='{"title":"KYC","rows":[["Completion","#531DAB","72%"]]}'></div></div>
+                <div class="ip-bar"><div class="ip-bar-fill" style="height:58%" data-tip='{"title":"Documentation","rows":[["Completion","#531DAB","58%"]]}'></div></div>
+                <div class="ip-bar"><div class="ip-bar-fill" style="height:45%" data-tip='{"title":"Management Systems","rows":[["Completion","#531DAB","45%"]]}'></div></div>
+              </div>
+            </div>
+            <div class="ip-x"><span>KYC</span><span>Documentation</span><span>Management Systems</span></div>
+          </div>
+        </section>
+
+        <!-- Status of Applications: full width table, 5 rows visible then scroll. Action column = real NavigationAction (link icon, gray-70, no border/bg) -->
+        <section class="table-wrap card enter" style="animation-delay:120ms">
+          <div class="widget-head">
+            <h2>Status of Applications</h2>
+            <div class="table-tools-row">
+              <div class="table-search">
+                <input type="text" placeholder="Search">
+                <span class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></span>
+              </div>
+              <button class="filter-btn" type="button" aria-label="Toggle filters">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3Z"/></svg>
+              </button>
+            </div>
+          </div>
+          <!-- inline filter row (real SelectFilters pattern): in normal flow, pushes the table down; not a floating dropdown -->
+          <div class="filter-row">
+            <div class="filter-field"><label>Application Stage</label>
+              <select><option>All</option><option>01</option><option>02</option></select>
+            </div>
+            <div class="filter-field"><label>Status</label>
+              <select><option>All</option><option>In Progress</option><option>Submitted</option><option>Completed</option></select>
+            </div>
+            <div class="filter-field"><label>Last Update</label>
+              <div class="filter-range"><input type="date"><span>&ndash;</span><input type="date"></div>
+            </div>
+            <div class="filter-field"><label>Submission Date</label>
+              <div class="filter-range"><input type="date"><span>&ndash;</span><input type="date"></div>
+            </div>
+            <!-- single smart button: Apply (Check icon) while a change is pending, Clear (X icon) once applied -->
+            <button class="filter-apply" type="button" title="Apply" aria-label="Apply filters">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </button>
+          </div>
+          <div class="table-scroll">
+            <table class="apptable">
+              <colgroup>
+                <col>
+                <col style="width:150px">
+                <col style="width:130px">
+                <col style="width:140px">
+                <col style="width:140px">
+                <col style="width:60px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>Bank</th><th>Application Stage</th><th>Status</th><th>Last Update</th><th>Submission Date</th><th class="col-action"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>First National Bank</td><td>02</td><td><span class="status-tag green">Completed</span></td><td>28 Jul 2026</td><td>14 Jun 2026</td><td><button class="nav-action" aria-label="Open application"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.00012 6.00004H10.0001V10M10.0001 6.00004L6.00012 9.99996M5.2 14H10.8C11.9201 14 12.4802 14 12.908 13.782C13.2843 13.5903 13.5903 13.2843 13.782 12.908C14 12.4802 14 11.9201 14 10.8V5.2C14 4.0799 14 3.51984 13.782 3.09202C13.5903 2.71569 13.2843 2.40973 12.908 2.21799C12.4802 2 11.9201 2 10.8 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.0799 14 5.2 14Z"/></svg></button></td></tr>
+                <tr><td>Meridian Trust Bank</td><td>02</td><td><span class="status-tag blue">In Progress</span></td><td>27 Jul 2026</td><td>02 Jul 2026</td><td><button class="nav-action" aria-label="Open application"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.00012 6.00004H10.0001V10M10.0001 6.00004L6.00012 9.99996M5.2 14H10.8C11.9201 14 12.4802 14 12.908 13.782C13.2843 13.5903 13.5903 13.2843 13.782 12.908C14 12.4802 14 11.9201 14 10.8V5.2C14 4.0799 14 3.51984 13.782 3.09202C13.5903 2.71569 13.2843 2.40973 12.908 2.21799C12.4802 2 11.9201 2 10.8 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.0799 14 5.2 14Z"/></svg></button></td></tr>
+                <tr><td>Coastal Development Bank</td><td>01</td><td><span class="status-tag purple">Submitted</span></td><td>25 Jul 2026</td><td>25 Jul 2026</td><td><button class="nav-action" aria-label="Open application"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.00012 6.00004H10.0001V10M10.0001 6.00004L6.00012 9.99996M5.2 14H10.8C11.9201 14 12.4802 14 12.908 13.782C13.2843 13.5903 13.5903 13.2843 13.782 12.908C14 12.4802 14 11.9201 14 10.8V5.2C14 4.0799 14 3.51984 13.782 3.09202C13.5903 2.71569 13.2843 2.40973 12.908 2.21799C12.4802 2 11.9201 2 10.8 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.0799 14 5.2 14Z"/></svg></button></td></tr>
+                <tr><td>Union Agri Bank</td><td>01</td><td><span class="status-tag blue">In Progress</span></td><td>22 Jul 2026</td><td>18 Jul 2026</td><td><button class="nav-action" aria-label="Open application"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.00012 6.00004H10.0001V10M10.0001 6.00004L6.00012 9.99996M5.2 14H10.8C11.9201 14 12.4802 14 12.908 13.782C13.2843 13.5903 13.5903 13.2843 13.782 12.908C14 12.4802 14 11.9201 14 10.8V5.2C14 4.0799 14 3.51984 13.782 3.09202C13.5903 2.71569 13.2843 2.40973 12.908 2.21799C12.4802 2 11.9201 2 10.8 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.0799 14 5.2 14Z"/></svg></button></td></tr>
+                <tr><td>Highlands Cooperative Bank</td><td>02</td><td><span class="status-tag green">Completed</span></td><td>20 Jul 2026</td><td>30 Jun 2026</td><td><button class="nav-action" aria-label="Open application"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.00012 6.00004H10.0001V10M10.0001 6.00004L6.00012 9.99996M5.2 14H10.8C11.9201 14 12.4802 14 12.908 13.782C13.2843 13.5903 13.5903 13.2843 13.782 12.908C14 12.4802 14 11.9201 14 10.8V5.2C14 4.0799 14 3.51984 13.782 3.09202C13.5903 2.71569 13.2843 2.40973 12.908 2.21799C12.4802 2 11.9201 2 10.8 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.0799 14 5.2 14Z"/></svg></button></td></tr>
+                <tr><td>Delta Finance Bank</td><td>01</td><td><span class="status-tag purple">Submitted</span></td><td>17 Jul 2026</td><td>17 Jul 2026</td><td><button class="nav-action" aria-label="Open application"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.00012 6.00004H10.0001V10M10.0001 6.00004L6.00012 9.99996M5.2 14H10.8C11.9201 14 12.4802 14 12.908 13.782C13.2843 13.5903 13.5903 13.2843 13.782 12.908C14 12.4802 14 11.9201 14 10.8V5.2C14 4.0799 14 3.51984 13.782 3.09202C13.5903 2.71569 13.2843 2.40973 12.908 2.21799C12.4802 2 11.9201 2 10.8 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.0799 14 5.2 14Z"/></svg></button></td></tr>
+                <tr><td>Prairie State Bank</td><td>02</td><td><span class="status-tag blue">In Progress</span></td><td>15 Jul 2026</td><td>05 Jul 2026</td><td><button class="nav-action" aria-label="Open application"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.00012 6.00004H10.0001V10M10.0001 6.00004L6.00012 9.99996M5.2 14H10.8C11.9201 14 12.4802 14 12.908 13.782C13.2843 13.5903 13.5903 13.2843 13.782 12.908C14 12.4802 14 11.9201 14 10.8V5.2C14 4.0799 14 3.51984 13.782 3.09202C13.5903 2.71569 13.2843 2.40973 12.908 2.21799C12.4802 2 11.9201 2 10.8 2H5.2C4.0799 2 3.51984 2 3.09202 2.21799C2.71569 2.40973 2.40973 2.71569 2.21799 3.09202C2 3.51984 2 4.0799 2 5.2V10.8C2 11.9201 2 12.4802 2.21799 12.908C2.40973 13.2843 2.71569 13.5903 3.09202 13.782C3.51984 14 4.0799 14 5.2 14Z"/></svg></button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Data Compilation: identical real component to Monitor (DataCompilation), expanded by default -->
+        <section class="data-section collapsed enter" style="animation-delay:160ms">
+          <div class="ds-head">
+            <h2>Data Compilation</h2>
+            <div class="ds-actions">
+              <div class="ds-seg" role="group" aria-label="Count mode">
+                <button aria-pressed="true" title="Information Subjects"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M11.3333 13.3334H11.2C10.0799 13.3334 9.51984 13.3334 9.09202 13.1154C8.71569 12.9236 8.40973 12.6177 8.21799 12.2414C8 11.8135 8 11.2535 8 10.1334V5.86671C8 4.7466 8 4.18655 8.21799 3.75873C8.40973 3.3824 8.71569 3.07644 9.09202 2.88469C9.51984 2.66671 10.0799 2.66671 11.2 2.66671H11.3333M11.3333 13.3334C11.3333 14.0698 11.9303 14.6667 12.6667 14.6667C13.403 14.6667 14 14.0698 14 13.3334C14 12.597 13.403 12 12.6667 12C11.9303 12 11.3333 12.597 11.3333 13.3334ZM11.3333 2.66671C11.3333 3.40309 11.9303 4.00004 12.6667 4.00004C13.403 4.00004 14 3.40309 14 2.66671C14 1.93033 13.403 1.33337 12.6667 1.33337C11.9303 1.33337 11.3333 1.93033 11.3333 2.66671ZM4.66667 8.00004L11.3333 8.00004M4.66667 8.00004C4.66667 8.73642 4.06971 9.33337 3.33333 9.33337C2.59695 9.33337 2 8.73642 2 8.00004C2 7.26366 2.59695 6.66671 3.33333 6.66671C4.06971 6.66671 4.66667 7.26366 4.66667 8.00004ZM11.3333 8.00004C11.3333 8.73642 11.9303 9.33337 12.6667 9.33337C13.403 9.33337 14 8.73642 14 8.00004C14 7.26366 13.403 6.66671 12.6667 6.66671C11.9303 6.66671 11.3333 7.26366 11.3333 8.00004Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button aria-pressed="false" title="Data Points"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14.1333 14.6667C14.3199 14.6667 14.4133 14.6667 14.4846 14.6304C14.5473 14.5984 14.5983 14.5474 14.6303 14.4847C14.6666 14.4134 14.6666 14.3201 14.6666 14.1334V7.20004C14.6666 7.01336 14.6666 6.92002 14.6303 6.84871C14.5983 6.78599 14.5473 6.735 14.4846 6.70304C14.4133 6.66671 14.3199 6.66671 14.1333 6.66671L12.5333 6.66671C12.3466 6.66671 12.2532 6.66671 12.1819 6.70304C12.1192 6.735 12.0682 6.78599 12.0362 6.84871C11.9999 6.92001 11.9999 7.01336 11.9999 7.20004V8.80004C11.9999 8.98672 11.9999 9.08007 11.9636 9.15137C11.9316 9.21409 11.8806 9.26508 11.8179 9.29704C11.7466 9.33337 11.6533 9.33337 11.4666 9.33337H9.86658C9.6799 9.33337 9.58656 9.33337 9.51525 9.3697C9.45253 9.40166 9.40154 9.45266 9.36958 9.51538C9.33325 9.58668 9.33325 9.68002 9.33325 9.86671V11.4667C9.33325 11.6534 9.33325 11.7467 9.29692 11.818C9.26496 11.8808 9.21397 11.9318 9.15125 11.9637C9.07994 12 8.9866 12 8.79992 12H7.19992C7.01323 12 6.91989 12 6.84859 12.0364C6.78587 12.0683 6.73487 12.1193 6.70292 12.182C6.66658 12.2533 6.66658 12.3467 6.66658 12.5334V14.1334C6.66658 14.3201 6.66658 14.4134 6.70292 14.4847C6.73487 14.5474 6.78587 14.5984 6.84859 14.6304C6.91989 14.6667 7.01323 14.6667 7.19992 14.6667L14.1333 14.6667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.66658 4.53337C6.66658 4.34669 6.66658 4.25335 6.70292 4.18204C6.73487 4.11932 6.78587 4.06833 6.84859 4.03637C6.91989 4.00004 7.01323 4.00004 7.19992 4.00004H8.79992C8.9866 4.00004 9.07994 4.00004 9.15125 4.03637C9.21397 4.06833 9.26496 4.11932 9.29692 4.18204C9.33325 4.25335 9.33325 4.34669 9.33325 4.53337V6.13337C9.33325 6.32006 9.33325 6.4134 9.29692 6.4847C9.26496 6.54742 9.21397 6.59842 9.15125 6.63038C9.07994 6.66671 8.9866 6.66671 8.79992 6.66671H7.19992C7.01323 6.66671 6.91989 6.66671 6.84859 6.63038C6.78587 6.59842 6.73487 6.54742 6.70292 6.4847C6.66658 6.4134 6.66658 6.32006 6.66658 6.13337V4.53337Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.99992 8.53337C1.99992 8.34669 1.99992 8.25335 2.03625 8.18204C2.06821 8.11932 2.1192 8.06833 2.18192 8.03637C2.25323 8.00004 2.34657 8.00004 2.53325 8.00004H4.13325C4.31994 8.00004 4.41328 8.00004 4.48458 8.03637C4.5473 8.06833 4.5983 8.11932 4.63025 8.18204C4.66659 8.25335 4.66659 8.34669 4.66659 8.53337V10.1334C4.66659 10.3201 4.66659 10.4134 4.63025 10.4847C4.5983 10.5474 4.5473 10.5984 4.48458 10.6304C4.41328 10.6667 4.31994 10.6667 4.13325 10.6667H2.53325C2.34657 10.6667 2.25323 10.6667 2.18192 10.6304C2.1192 10.5984 2.06821 10.5474 2.03625 10.4847C1.99992 10.4134 1.99992 10.3201 1.99992 10.1334V8.53337Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.33325 1.86671C1.33325 1.68002 1.33325 1.58668 1.36958 1.51538C1.40154 1.45266 1.45253 1.40166 1.51526 1.36971C1.58656 1.33337 1.6799 1.33337 1.86659 1.33337H3.46659C3.65327 1.33337 3.74661 1.33337 3.81792 1.36971C3.88064 1.40166 3.93163 1.45266 3.96359 1.51538C3.99992 1.58668 3.99992 1.68002 3.99992 1.86671V3.46671C3.99992 3.65339 3.99992 3.74673 3.96359 3.81804C3.93163 3.88076 3.88064 3.93175 3.81792 3.96371C3.74661 4.00004 3.65327 4.00004 3.46659 4.00004H1.86659C1.6799 4.00004 1.58656 4.00004 1.51526 3.96371C1.45253 3.93175 1.40154 3.88076 1.36958 3.81804C1.33325 3.74673 1.33325 3.65339 1.33325 3.46671V1.86671Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+              <button class="icon-btn-default" aria-label="Expand section"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+            </div>
+          </div>
+          <div class="ds-grid">
+            <div class="chart-card">
+              <div class="cc-head"><h3>Accumulation</h3>
+                <div class="period-select" data-period="monthly">
+                  <button class="period-trigger" aria-haspopup="true" aria-expanded="false">
+                    <svg class="period-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+                  </button>
+                  <div class="period-dropdown">
+                    <div class="period-row" data-value="daily">Daily</div>
+                    <div class="period-row" data-value="weekly">Weekly</div>
+                    <div class="period-row selected" data-value="monthly">Monthly</div>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-area">
+                <div class="lc">
+                  <div class="lc-y">
+                    <span style="top:0.0%">400</span><span style="top:25.0%">300</span><span style="top:50.0%">200</span>
+                    <span style="top:75.0%">100</span><span style="top:100.0%">0</span>
+                  </div>
+                  <div class="lc-plot">
+                    <div class="lc-gh" style="top:0.0%"></div><div class="lc-gh" style="top:25.0%"></div>
+                    <div class="lc-gh" style="top:50.0%"></div><div class="lc-gh" style="top:75.0%"></div>
+                    <div class="lc-gh base" style="top:100.0%"></div>
+                    <div class="lc-gv" style="left:0.0%"></div><div class="lc-gv" style="left:9.09%"></div>
+                    <div class="lc-gv" style="left:18.18%"></div><div class="lc-gv" style="left:27.27%"></div>
+                    <div class="lc-gv" style="left:36.36%"></div><div class="lc-gv" style="left:45.45%"></div>
+                    <div class="lc-gv" style="left:54.55%"></div><div class="lc-gv" style="left:63.64%"></div>
+                    <div class="lc-gv" style="left:72.73%"></div><div class="lc-gv" style="left:81.82%"></div>
+                    <div class="lc-gv" style="left:90.91%"></div><div class="lc-gv" style="left:100.0%"></div>
+                    <svg class="lc-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                      <polyline points="0.0,90.0 9.09,82.0 18.18,73.75 27.27,65.0 36.36,55.5 45.45,46.5 54.55,37.5 63.64,28.75 72.73,22.0 81.82,15.5 90.91,11.0 100.0,8.0" style="stroke:var(--daf-primary-70)"/>
+                      <polyline points="0.0,92.5 9.09,86.25 18.18,79.5 27.27,72.5 36.36,65.5 45.45,58.75 54.55,52.0 63.64,46.25 72.73,40.5 81.82,35.5 90.91,32.5 100.0,30.5" style="stroke:var(--daf-primary-50)"/>
+                      <polyline points="0.0,94.5 9.09,89.5 18.18,83.5 27.27,77.0 36.36,70.5 45.45,64.5 54.55,59.0 63.64,54.5 72.73,50.5 81.82,47.5 90.91,45.0 100.0,43.75" style="stroke:var(--daf-primary-30)"/>
+                    </svg>
+                    <div class="lc-hit" style="left:0%;width:4.55%" data-tip='{"title":"Jan","rows":[["Locations","#531DAB","40"],["Stakeholders","#9254DE","30"],["Events","#D3ADF7","22"]]}'><span class="lc-dot" style="left:0.0%;top:90.0%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:0.0%;top:92.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:0.0%;top:94.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:4.54%;width:9.09%" data-tip='{"title":"Feb","rows":[["Locations","#531DAB","72"],["Stakeholders","#9254DE","55"],["Events","#D3ADF7","42"]]}'><span class="lc-dot" style="left:50.0%;top:82.0%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:86.25%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:89.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:13.63%;width:9.09%" data-tip='{"title":"Mar","rows":[["Locations","#531DAB","105"],["Stakeholders","#9254DE","82"],["Events","#D3ADF7","66"]]}'><span class="lc-dot" style="left:50.0%;top:73.75%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:79.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:83.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:22.72%;width:9.09%" data-tip='{"title":"Apr","rows":[["Locations","#531DAB","140"],["Stakeholders","#9254DE","110"],["Events","#D3ADF7","92"]]}'><span class="lc-dot" style="left:50.0%;top:65.0%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:72.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:77.0%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:31.81%;width:9.09%" data-tip='{"title":"May","rows":[["Locations","#531DAB","178"],["Stakeholders","#9254DE","138"],["Events","#D3ADF7","118"]]}'><span class="lc-dot" style="left:50.0%;top:55.5%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:65.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:70.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:40.9%;width:9.09%" data-tip='{"title":"Jun","rows":[["Locations","#531DAB","214"],["Stakeholders","#9254DE","165"],["Events","#D3ADF7","142"]]}'><span class="lc-dot" style="left:50.0%;top:46.5%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:58.75%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:64.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:50.0%;width:9.09%" data-tip='{"title":"Jul","rows":[["Locations","#531DAB","250"],["Stakeholders","#9254DE","192"],["Events","#D3ADF7","164"]]}'><span class="lc-dot" style="left:50.0%;top:37.5%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:52.0%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:59.0%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:59.09%;width:9.09%" data-tip='{"title":"Aug","rows":[["Locations","#531DAB","285"],["Stakeholders","#9254DE","215"],["Events","#D3ADF7","182"]]}'><span class="lc-dot" style="left:50.0%;top:28.75%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:46.25%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:54.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:68.18%;width:9.09%" data-tip='{"title":"Sep","rows":[["Locations","#531DAB","312"],["Stakeholders","#9254DE","238"],["Events","#D3ADF7","198"]]}'><span class="lc-dot" style="left:50.0%;top:22.0%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:40.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:50.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:77.27%;width:9.09%" data-tip='{"title":"Oct","rows":[["Locations","#531DAB","338"],["Stakeholders","#9254DE","258"],["Events","#D3ADF7","210"]]}'><span class="lc-dot" style="left:50.0%;top:15.5%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:35.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:47.5%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:86.36%;width:9.09%" data-tip='{"title":"Nov","rows":[["Locations","#531DAB","356"],["Stakeholders","#9254DE","270"],["Events","#D3ADF7","220"]]}'><span class="lc-dot" style="left:50.0%;top:11.0%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:50.0%;top:32.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:50.0%;top:45.0%;background:var(--daf-primary-30)"></span></div>
+                    <div class="lc-hit" style="left:95.45%;width:4.55%" data-tip='{"title":"Dec","rows":[["Locations","#531DAB","368"],["Stakeholders","#9254DE","278"],["Events","#D3ADF7","225"]]}'><span class="lc-dot" style="left:100.0%;top:8.0%;background:var(--daf-primary-70)"></span><span class="lc-dot" style="left:100.0%;top:30.5%;background:var(--daf-primary-50)"></span><span class="lc-dot" style="left:100.0%;top:43.75%;background:var(--daf-primary-30)"></span></div>
+                  </div>
+                  <div class="lc-x">
+                    <span style="left:0.0%">Jan</span><span style="left:9.09%">Feb</span><span style="left:18.18%">Mar</span>
+                    <span style="left:27.27%">Apr</span><span style="left:36.36%">May</span><span style="left:45.45%">Jun</span>
+                    <span style="left:54.55%">Jul</span><span style="left:63.64%">Aug</span><span style="left:72.73%">Sep</span>
+                    <span style="left:81.82%">Oct</span><span style="left:90.91%">Nov</span><span style="left:100.0%">Dec</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="cc-head"><h3>Contributions</h3></div>
+              <div class="chart-area">
+                <div class="cbars">
+                  <div class="cbars-body">
+                    <div class="cbars-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="cgroup" data-tip='{"title":"Own","rows":[["Locations","#531DAB","128"],["Stakeholders","#9254DE","96"],["Events","#D3ADF7","74"]]}'><span class="cg-lbl">Own</span><div class="cg-bars"><span class="cg-bar t1" style="width:97.0%"></span><span class="cg-bar t2" style="width:72.7%"></span><span class="cg-bar t3" style="width:56.1%"></span></div></div>
+                  <div class="cgroup" data-tip='{"title":"KOTA Cooperative Union","rows":[["Locations","#531DAB","84"],["Stakeholders","#9254DE","61"],["Events","#D3ADF7","52"]]}'><span class="cg-lbl">KOTA Cooperative Union</span><div class="cg-bars"><span class="cg-bar t1" style="width:63.6%"></span><span class="cg-bar t2" style="width:46.2%"></span><span class="cg-bar t3" style="width:39.4%"></span></div></div>
+                  <div class="cgroup" data-tip='{"title":"SBG Traders Ltd","rows":[["Locations","#531DAB","63"],["Stakeholders","#9254DE","48"],["Events","#D3ADF7","39"]]}'><span class="cg-lbl">SBG Traders Ltd</span><div class="cg-bars"><span class="cg-bar t1" style="width:47.7%"></span><span class="cg-bar t2" style="width:36.4%"></span><span class="cg-bar t3" style="width:29.5%"></span></div></div>
+                  <div class="cgroup" data-tip='{"title":"Coastal Millers Co.","rows":[["Locations","#531DAB","41"],["Stakeholders","#9254DE","33"],["Events","#D3ADF7","27"]]}'><span class="cg-lbl">Coastal Millers Co.</span><div class="cg-bars"><span class="cg-bar t1" style="width:31.1%"></span><span class="cg-bar t2" style="width:25.0%"></span><span class="cg-bar t3" style="width:20.5%"></span></div></div>
+                  <div class="cgroup" data-tip='{"title":"Others","rows":[["Locations","#531DAB","52"],["Stakeholders","#9254DE","40"],["Events","#D3ADF7","33"]]}'><span class="cg-lbl">Others</span><div class="cg-bars"><span class="cg-bar t1" style="width:39.4%"></span><span class="cg-bar t2" style="width:30.3%"></span><span class="cg-bar t3" style="width:25.0%"></span></div></div>
+                  </div>
+                  <div class="cbars-axis"><span style="left:0.0%">0</span><span style="left:45.45%">60</span><span style="left:90.91%">120</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="cc-head"><h3>Information Sharing</h3></div>
+              <div class="chart-area">
+                <div class="pie-wrap">
+                  <div class="pie-box">
+                    <div class="pie" style="background:conic-gradient(var(--daf-primary-70) 0 58%, var(--daf-primary-30) 58% 100%)" role="img" aria-label="Information sharing split"
+                      data-tip='{"title":"Information Sharing","rows":[["Submitted","#531DAB","58%"],["Private","#D3ADF7","42%"]]}'></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Data Consolidation: identical real component, collapsed by default (UserDashboard/components/DataConsilidation defaultExpanded=false) -->
+        <section class="data-section collapsed enter" style="animation-delay:190ms">
+          <div class="ds-head">
+            <h2>Data Consolidation</h2>
+            <div class="ds-actions">
+              <div class="ds-seg" role="group" aria-label="Count mode">
+                <button aria-pressed="true" title="Information Subjects"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M11.3333 13.3334H11.2C10.0799 13.3334 9.51984 13.3334 9.09202 13.1154C8.71569 12.9236 8.40973 12.6177 8.21799 12.2414C8 11.8135 8 11.2535 8 10.1334V5.86671C8 4.7466 8 4.18655 8.21799 3.75873C8.40973 3.3824 8.71569 3.07644 9.09202 2.88469C9.51984 2.66671 10.0799 2.66671 11.2 2.66671H11.3333M11.3333 13.3334C11.3333 14.0698 11.9303 14.6667 12.6667 14.6667C13.403 14.6667 14 14.0698 14 13.3334C14 12.597 13.403 12 12.6667 12C11.9303 12 11.3333 12.597 11.3333 13.3334ZM11.3333 2.66671C11.3333 3.40309 11.9303 4.00004 12.6667 4.00004C13.403 4.00004 14 3.40309 14 2.66671C14 1.93033 13.403 1.33337 12.6667 1.33337C11.9303 1.33337 11.3333 1.93033 11.3333 2.66671ZM4.66667 8.00004L11.3333 8.00004M4.66667 8.00004C4.66667 8.73642 4.06971 9.33337 3.33333 9.33337C2.59695 9.33337 2 8.73642 2 8.00004C2 7.26366 2.59695 6.66671 3.33333 6.66671C4.06971 6.66671 4.66667 7.26366 4.66667 8.00004ZM11.3333 8.00004C11.3333 8.73642 11.9303 9.33337 12.6667 9.33337C13.403 9.33337 14 8.73642 14 8.00004C14 7.26366 13.403 6.66671 12.6667 6.66671C11.9303 6.66671 11.3333 7.26366 11.3333 8.00004Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button aria-pressed="false" title="Data Points"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14.1333 14.6667C14.3199 14.6667 14.4133 14.6667 14.4846 14.6304C14.5473 14.5984 14.5983 14.5474 14.6303 14.4847C14.6666 14.4134 14.6666 14.3201 14.6666 14.1334V7.20004C14.6666 7.01336 14.6666 6.92002 14.6303 6.84871C14.5983 6.78599 14.5473 6.735 14.4846 6.70304C14.4133 6.66671 14.3199 6.66671 14.1333 6.66671L12.5333 6.66671C12.3466 6.66671 12.2532 6.66671 12.1819 6.70304C12.1192 6.735 12.0682 6.78599 12.0362 6.84871C11.9999 6.92001 11.9999 7.01336 11.9999 7.20004V8.80004C11.9999 8.98672 11.9999 9.08007 11.9636 9.15137C11.9316 9.21409 11.8806 9.26508 11.8179 9.29704C11.7466 9.33337 11.6533 9.33337 11.4666 9.33337H9.86658C9.6799 9.33337 9.58656 9.33337 9.51525 9.3697C9.45253 9.40166 9.40154 9.45266 9.36958 9.51538C9.33325 9.58668 9.33325 9.68002 9.33325 9.86671V11.4667C9.33325 11.6534 9.33325 11.7467 9.29692 11.818C9.26496 11.8808 9.21397 11.9318 9.15125 11.9637C9.07994 12 8.9866 12 8.79992 12H7.19992C7.01323 12 6.91989 12 6.84859 12.0364C6.78587 12.0683 6.73487 12.1193 6.70292 12.182C6.66658 12.2533 6.66658 12.3467 6.66658 12.5334V14.1334C6.66658 14.3201 6.66658 14.4134 6.70292 14.4847C6.73487 14.5474 6.78587 14.5984 6.84859 14.6304C6.91989 14.6667 7.01323 14.6667 7.19992 14.6667L14.1333 14.6667Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M6.66658 4.53337C6.66658 4.34669 6.66658 4.25335 6.70292 4.18204C6.73487 4.11932 6.78587 4.06833 6.84859 4.03637C6.91989 4.00004 7.01323 4.00004 7.19992 4.00004H8.79992C8.9866 4.00004 9.07994 4.00004 9.15125 4.03637C9.21397 4.06833 9.26496 4.11932 9.29692 4.18204C9.33325 4.25335 9.33325 4.34669 9.33325 4.53337V6.13337C9.33325 6.32006 9.33325 6.4134 9.29692 6.4847C9.26496 6.54742 9.21397 6.59842 9.15125 6.63038C9.07994 6.66671 8.9866 6.66671 8.79992 6.66671H7.19992C7.01323 6.66671 6.91989 6.66671 6.84859 6.63038C6.78587 6.59842 6.73487 6.54742 6.70292 6.4847C6.66658 6.4134 6.66658 6.32006 6.66658 6.13337V4.53337Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.99992 8.53337C1.99992 8.34669 1.99992 8.25335 2.03625 8.18204C2.06821 8.11932 2.1192 8.06833 2.18192 8.03637C2.25323 8.00004 2.34657 8.00004 2.53325 8.00004H4.13325C4.31994 8.00004 4.41328 8.00004 4.48458 8.03637C4.5473 8.06833 4.5983 8.11932 4.63025 8.18204C4.66659 8.25335 4.66659 8.34669 4.66659 8.53337V10.1334C4.66659 10.3201 4.66659 10.4134 4.63025 10.4847C4.5983 10.5474 4.5473 10.5984 4.48458 10.6304C4.41328 10.6667 4.31994 10.6667 4.13325 10.6667H2.53325C2.34657 10.6667 2.25323 10.6667 2.18192 10.6304C2.1192 10.5984 2.06821 10.5474 2.03625 10.4847C1.99992 10.4134 1.99992 10.3201 1.99992 10.1334V8.53337Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M1.33325 1.86671C1.33325 1.68002 1.33325 1.58668 1.36958 1.51538C1.40154 1.45266 1.45253 1.40166 1.51526 1.36971C1.58656 1.33337 1.6799 1.33337 1.86659 1.33337H3.46659C3.65327 1.33337 3.74661 1.33337 3.81792 1.36971C3.88064 1.40166 3.93163 1.45266 3.96359 1.51538C3.99992 1.58668 3.99992 1.68002 3.99992 1.86671V3.46671C3.99992 3.65339 3.99992 3.74673 3.96359 3.81804C3.93163 3.88076 3.88064 3.93175 3.81792 3.96371C3.74661 4.00004 3.65327 4.00004 3.46659 4.00004H1.86659C1.6799 4.00004 1.58656 4.00004 1.51526 3.96371C1.45253 3.93175 1.40154 3.88076 1.36958 3.81804C1.33325 3.74673 1.33325 3.65339 1.33325 3.46671V1.86671Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+              <button class="icon-btn-default" aria-label="Expand section"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+            </div>
+          </div>
+          <div class="ds-grid">
+            <div class="chart-card">
+              <div class="cc-head"><h3>Accumulation</h3>
+                <div class="period-select" data-period="monthly">
+                  <button class="period-trigger" aria-haspopup="true" aria-expanded="false">
+                    <svg class="period-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>
+                  </button>
+                  <div class="period-dropdown">
+                    <div class="period-row" data-value="daily">Daily</div>
+                    <div class="period-row" data-value="weekly">Weekly</div>
+                    <div class="period-row selected" data-value="monthly">Monthly</div>
+                  </div>
+                </div>
+              </div>
+              <div class="chart-area">
+                <div class="lc">
+                  <div class="lc-y">
+                    <span style="top:0.0%">200</span><span style="top:25.0%">150</span><span style="top:50.0%">100</span>
+                    <span style="top:75.0%">50</span><span style="top:100.0%">0</span>
+                  </div>
+                  <div class="lc-plot">
+                    <div class="lc-gh" style="top:0.0%"></div><div class="lc-gh" style="top:25.0%"></div>
+                    <div class="lc-gh" style="top:50.0%"></div><div class="lc-gh" style="top:75.0%"></div>
+                    <div class="lc-gh base" style="top:100.0%"></div>
+                    <div class="lc-gv" style="left:0.0%"></div><div class="lc-gv" style="left:9.09%"></div>
+                    <div class="lc-gv" style="left:18.18%"></div><div class="lc-gv" style="left:27.27%"></div>
+                    <div class="lc-gv" style="left:36.36%"></div><div class="lc-gv" style="left:45.45%"></div>
+                    <div class="lc-gv" style="left:54.55%"></div><div class="lc-gv" style="left:63.64%"></div>
+                    <div class="lc-gv" style="left:72.73%"></div><div class="lc-gv" style="left:81.82%"></div>
+                    <div class="lc-gv" style="left:90.91%"></div><div class="lc-gv" style="left:100.0%"></div>
+                    <svg class="lc-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+                      <polyline points="0.0,140.0 9.09,136.0 18.18,130.0 27.27,120.0 36.36,106.0 45.45,92.0 54.55,74.0 63.64,58.0 72.73,45.0 81.82,35.5 90.91,29.0 100.0,25.0" style="stroke:var(--daf-primary-70)"/>
+                    </svg>
+                    <div class="lc-hit" style="left:0%;width:4.55%" data-tip='{"title":"Jan","rows":[["Locations","#531DAB","12"],["Stakeholders","#9254DE","8"],["Events","#D3ADF7","5"]]}'></div>
+                    <div class="lc-hit" style="left:95.45%;width:4.55%" data-tip='{"title":"Dec","rows":[["Locations","#531DAB","163"],["Stakeholders","#9254DE","125"],["Events","#D3ADF7","99"]]}'></div>
+                  </div>
+                  <div class="lc-x">
+                    <span style="left:0.0%">Jan</span><span style="left:9.09%">Feb</span><span style="left:18.18%">Mar</span>
+                    <span style="left:27.27%">Apr</span><span style="left:36.36%">May</span><span style="left:45.45%">Jun</span>
+                    <span style="left:54.55%">Jul</span><span style="left:63.64%">Aug</span><span style="left:72.73%">Sep</span>
+                    <span style="left:81.82%">Oct</span><span style="left:90.91%">Nov</span><span style="left:100.0%">Dec</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="cc-head"><h3>Contributions</h3></div>
+              <div class="chart-area">
+                <!-- Data Consolidation excludes Own data; label column width is computed
+                     from content (see the label-sizing IIFE in <script>), so the single-
+                     source case here sizes correctly without a hardcoded override -->
+                <div class="cbars">
+                  <div class="cbars-body">
+                    <div class="cbars-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    <div class="cgroup" data-tip='{"title":"SBG Traders Ltd","rows":[["Locations","#531DAB","29"],["Stakeholders","#9254DE","22"],["Events","#D3ADF7","18"]]}'><span class="cg-lbl">SBG Traders Ltd</span><div class="cg-bars"><span class="cg-bar t1" style="width:52.7%"></span><span class="cg-bar t2" style="width:40.0%"></span><span class="cg-bar t3" style="width:32.7%"></span></div></div>
+                  </div>
+                  <div class="cbars-axis"><span style="left:0.0%">0</span><span style="left:45.45%">25</span><span style="left:90.91%">50</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="chart-card">
+              <div class="cc-head"><h3>Triangulation</h3></div>
+              <div class="chart-area">
+                <div class="pie-wrap">
+                  <div class="pie-box">
+                    <div class="pie" style="background:conic-gradient(var(--daf-primary-70) 0 63%, var(--daf-primary-30) 63% 100%)" role="img" aria-label="Triangulation split"
+                      data-tip='{"title":"Triangulation","rows":[["Multiple sources","#531DAB","63%"],["Single source","#D3ADF7","37%"]]}'></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Data Chain of Custody (full width, identical real component, expandable) -->
+        <section class="col-12 card custody-card collapsed enter" style="animation-delay:220ms">
+          <div class="widget-head"><h2>Data Chain of Custody</h2>
+            <button class="icon-btn-default" aria-label="Expand section"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+          </div>
+          <div class="flow">
+            <div class="flow-scroll"><div class="flow-row">
+              <div class="node"><div class="n-type">Operator</div><div class="n-name">Rift Valley Traders</div></div>
+              <div class="edge"></div>
+              <div class="node"><div class="n-type">Bank</div><div class="n-name">First National Bank</div></div>
+            </div></div>
+            <div class="flow-zoom"><button>+</button><button>&minus;</button><button>&#9633;</button></div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="note">
+      <b>Operator dashboard, grounded in the real Operator role config (`kota-app/config/dashboards.config.ts` + `OperatorDashboard/config.js`).</b>
+      Action Row order/labels, the Information Provision categories (KYC / Documentation / Management Systems), and the Status of Applications columns + action icon (real <b>NavigationAction</b> component) all match the live source. Status / Application Updates / Information Provision share one row, 1/3 each; Status is the Key Indicators component used vertically (not Monitor's horizontal bar) and now shows only Submitted Applications (as "N of total"), Self-Assessment Completion and Management Systems Completion &mdash; Total Applications was dropped as a separate row. Data Compilation, Data Consolidation and Data Chain of Custody all start <b>collapsed</b> by default in this dashboard (a deliberate compact-first-screen choice; Data Compilation's own real default is expanded, Data Consolidation's is already collapsed). <b>WIP:</b> Data Compilation / Data Consolidation only have data wired for the "Information Subjects" segment; the "Data points" segment is not yet populated (needs the other data tab) &mdash; same kind of known-incomplete flag as the Monitoring map on the Monitor dashboard (SB-05).
+    </div>
+
+  </div>
+<script>
+  /* ---- Filters (Status of Applications table): inline row, real SelectFilters apply/clear behaviour ---- */
+  (function(){
+    var wrap = document.querySelector('.table-wrap');
+    if(!wrap) return;
+    var toggleBtn = wrap.querySelector('.filter-btn');
+    var row = wrap.querySelector('.filter-row');
+    var applyBtn = wrap.querySelector('.filter-apply');
+    var fields = row.querySelectorAll('select, input[type="date"]');
+    var checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+    var clearIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+    var hasChanges = false;
+
+    toggleBtn.addEventListener('click', function(){ wrap.classList.toggle('filters-open'); });
+
+    function setHasChanges(v){
+      hasChanges = v;
+      applyBtn.innerHTML = hasChanges ? checkIcon : clearIcon;
+      applyBtn.title = hasChanges ? 'Apply' : 'Clear';
+      applyBtn.setAttribute('aria-label', hasChanges ? 'Apply filters' : 'Clear filters');
+    }
+    setHasChanges(false); // no active filters by default -> Clear icon, matching the real component
+
+    fields.forEach(function(f){ f.addEventListener('input', function(){ setHasChanges(true); }); });
+
+    applyBtn.addEventListener('click', function(){
+      if(hasChanges){
+        setHasChanges(false); // filters applied; row stays open so they can be reviewed/changed
+      } else {
+        fields.forEach(function(f){ f.value = f.tagName === 'SELECT' ? f.options[0].value : ''; });
+        wrap.classList.remove('filters-open'); // nothing active -> collapse, same as the real component
+      }
+    });
+  })();
+
+  /* ---- section collapse: hide everything but the section header (Data sections + Data chain of custody) ---- */
+  document.querySelectorAll('.data-section .icon-btn-default, .custody-card .icon-btn-default').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var sec = btn.closest('.data-section, .custody-card');
+      var collapsed = sec.classList.toggle('collapsed');
+      btn.setAttribute('aria-label', collapsed ? 'Expand section' : 'Collapse section');
+    });
+  });
+
+  /* ---- DAF tooltip (white, standard), shared by contributions bars, pie, line and column chart ---- */
+  (function(){
+    var tip = document.createElement('div');
+    tip.className = 'daf-tip';
+    document.body.appendChild(tip);
+    function render(data){
+      var html = '<div class="tt-title">'+data.title+'</div><div class="tt-list">';
+      (data.rows||[]).forEach(function(r){
+        html += '<div class="tt-row"><span class="d" style="background:'+r[1]+'"></span><span class="tt-n">'+r[0]+'</span><span class="tt-v">'+r[2]+'</span></div>';
+      });
+      html += '</div>';
+      tip.innerHTML = html;
+    }
+    function place(e){
+      var pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+      var x = e.clientX + pad, y = e.clientY - h - pad;
+      if(x + w > window.innerWidth - 8) x = e.clientX - w - pad;
+      if(y < 8) y = e.clientY + pad;
+      tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    }
+    document.querySelectorAll('[data-tip]').forEach(function(el){
+      // Parsed live on hover (not cached at load) so the Data points toggle below can
+      // rewrite data-tip and have the tooltip reflect it on the next hover.
+      el.addEventListener('mouseenter', function(e){
+        var data;
+        try { data = JSON.parse(el.getAttribute('data-tip')); } catch(err){ return; }
+        render(data); tip.classList.add('show'); place(e);
+      });
+      el.addEventListener('mousemove', place);
+      el.addEventListener('mouseleave', function(){ tip.classList.remove('show'); });
+    });
+  })();
+
+  /* ---- sidebar Store: smooth expand/collapse (replaces native <details> snap) ---- */
+  document.querySelectorAll('.sb-store-toggle').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var store = btn.closest('.sb-store');
+      var open = store.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+    });
+  });
+
+  /* ---- Contributions label column: size to the widest name + a fixed 16px gap,
+     capped so a long name doesn't blow the column out ---- */
+  (function(){
+    var GAP = 16, MAX = 160;
+    document.querySelectorAll('.cbars').forEach(function(cbars){
+      var labels = cbars.querySelectorAll('.cg-lbl');
+      if (!labels.length) return;
+      var probe = document.createElement('span');
+      var cs = getComputedStyle(labels[0]);
+      probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font-size:'+cs.fontSize+';font-family:'+cs.fontFamily+';font-weight:'+cs.fontWeight+';';
+      document.body.appendChild(probe);
+      var maxText = 0;
+      labels.forEach(function(l){
+        probe.textContent = l.textContent;
+        maxText = Math.max(maxText, probe.getBoundingClientRect().width);
+      });
+      probe.remove();
+      cbars.style.setProperty('--cb-lbl', Math.min(maxText + GAP, MAX) + 'px');
+    });
+  })();
+
+  /* ---- Accumulation period filter (daily/weekly/monthly, monthly default) ---- */
+  document.querySelectorAll('.period-select').forEach(function(sel){
+    var trigger = sel.querySelector('.period-trigger');
+    trigger.setAttribute('aria-label', 'Time period');
+    trigger.addEventListener('click', function(e){
+      e.stopPropagation();
+      var isOpen = sel.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', isOpen);
+    });
+    sel.querySelectorAll('.period-row').forEach(function(row){
+      row.addEventListener('click', function(){
+        sel.querySelectorAll('.period-row').forEach(function(r){ r.classList.remove('selected'); });
+        row.classList.add('selected');
+        sel.dataset.period = row.dataset.value;
+        sel.classList.remove('open');
+      });
+    });
+  });
+  document.addEventListener('click', function(){
+    document.querySelectorAll('.period-select.open').forEach(function(s){ s.classList.remove('open'); });
+  });
+
+  /* ---- Information Subjects / Data points toggle ----
+     Each subject contains several data points, so Data points is always a bigger number
+     than Information Subjects for the same underlying trend/shape -- not a different
+     shape. Scaling every count by one constant factor keeps the chart geometry (dot
+     positions, bar widths -- all already relative %) pixel-identical and only rewrites
+     the numbers shown (axis labels + tooltip values), which is the correct behaviour:
+     same distribution, bigger units. */
+  (function(){
+    var DATA_POINTS_FACTOR = 4.2;
+    function fmtNum(n){ return Math.round(n).toLocaleString('en-US'); }
+    function scaleTip(el, factor){
+      if(!el.dataset.baseTip) el.dataset.baseTip = el.getAttribute('data-tip');
+      var tip;
+      try { tip = JSON.parse(el.dataset.baseTip); } catch(err){ return; }
+      tip.rows = (tip.rows || []).map(function(r){
+        var val = parseFloat(r[2]);
+        if (isNaN(val) || /%$/.test(String(r[2]))) return r; // leave ratios/percentages (pies) untouched
+        return [r[0], r[1], fmtNum(val * factor)];
+      });
+      el.setAttribute('data-tip', JSON.stringify(tip));
+    }
+    function scaleText(el, factor){
+      if(!el.dataset.base) el.dataset.base = el.textContent;
+      var val = parseFloat(el.dataset.base);
+      if (isNaN(val)) return;
+      el.textContent = fmtNum(val * factor);
+    }
+    /* Replayed on every toggle (either direction) so switching modes always reads as
+       something happened, even though the end shape is identical -- lines draw in,
+       bars grow from zero, pies sweep from zero. Matches --dur-slow (320ms). */
+    var REPLAY_MS = 320;
+    function replayLines(sec){
+      sec.querySelectorAll('.lc-svg polyline').forEach(function(line){
+        var len = line.getTotalLength();
+        line.style.transition = 'none';
+        line.style.strokeDasharray = len + ' ' + len;
+        line.style.strokeDashoffset = len;
+        line.getBoundingClientRect(); // force reflow before re-enabling the transition
+        line.style.transition = 'stroke-dashoffset ' + REPLAY_MS + 'ms var(--ease-standard)';
+        requestAnimationFrame(function(){ line.style.strokeDashoffset = '0'; });
+      });
+    }
+    function replayBars(sec){
+      var bars = sec.querySelectorAll('.cg-bar');
+      var targets = Array.from(bars).map(function(b){ return b.style.width; });
+      bars.forEach(function(b){ b.style.transition = 'none'; b.style.width = '0%'; });
+      void sec.offsetHeight; // force reflow
+      bars.forEach(function(b){ b.style.transition = ''; }); // fall back to the CSS transition
+      requestAnimationFrame(function(){
+        bars.forEach(function(b, i){ b.style.width = targets[i]; });
+      });
+    }
+    function replayPies(sec){
+      sec.querySelectorAll('.pie[style*="conic-gradient"]').forEach(function(pie){
+        var m = pie.getAttribute('style').match(/conic-gradient\((var\(--[\w-]+\))\s+0\s+([\d.]+)%,\s*(var\(--[\w-]+\))\s+[\d.]+%\s+100%\)/);
+        if (!m) return;
+        var c1 = m[1], targetPct = parseFloat(m[2]), c2 = m[3];
+        var start = null;
+        function step(ts){
+          if (!start) start = ts;
+          var t = Math.min((ts - start) / REPLAY_MS, 1);
+          var eased = 1 - Math.pow(1 - t, 3);
+          var pct = targetPct * eased;
+          pie.style.background = 'conic-gradient(' + c1 + ' 0 ' + pct + '%, ' + c2 + ' ' + pct + '% 100%)';
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      });
+    }
+    function applyMode(sec, mode){
+      var factor = mode === 'points' ? DATA_POINTS_FACTOR : 1;
+      sec.querySelectorAll('.lc-y span').forEach(function(el){ scaleText(el, factor); });
+      sec.querySelectorAll('.cbars-axis span').forEach(function(el){ scaleText(el, factor); });
+      sec.querySelectorAll('.lc-hit[data-tip], .cgroup[data-tip]').forEach(function(el){ scaleTip(el, factor); });
+      replayLines(sec);
+      replayBars(sec);
+      replayPies(sec);
+    }
+    document.querySelectorAll('.data-section').forEach(function(sec){
+      var segButtons = sec.querySelectorAll('.ds-seg button');
+      if (!segButtons.length) return;
+      segButtons.forEach(function(btn, i){
+        btn.addEventListener('click', function(){
+          segButtons.forEach(function(b){ b.setAttribute('aria-pressed', 'false'); });
+          btn.setAttribute('aria-pressed', 'true');
+          applyMode(sec, i === 0 ? 'subjects' : 'points');
+        });
+      });
+    });
+  })();
+</script>
+</body>
+</html>

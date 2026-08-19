@@ -1,0 +1,80 @@
+{
+  "title": "Stakeholder Engagement",
+  "subtitle": "Monthly counts, Jan 2026 to Jan 2027",
+  "opacity": 0.55,
+  "showTotal": true,
+  "yMin": 0,
+  "yMax": 100,
+  "series": [
+    { "name": "Meetings Held",   "color": "#20A9AB" },
+    { "name": "Consultations",   "color": "#57CACB" },
+    { "name": "Agreements",      "color": "#A2E9E9" },
+    { "name": "Grievance Cases", "color": "#FF7A45" }
+  ],
+  "data": [
+    { "date": "2026-01", "series": "Meetings Held",   "value":  8 },
+    { "date": "2026-01", "series": "Consultations",   "value": 15 },
+    { "date": "2026-01", "series": "Agreements",      "value":  1 },
+    { "date": "2026-01", "series": "Grievance Cases", "value":  5 },
+
+    { "date": "2026-02", "series": "Meetings Held",   "value": 10 },
+    { "date": "2026-02", "series": "Consultations",   "value": 17 },
+    { "date": "2026-02", "series": "Agreements",      "value":  2 },
+    { "date": "2026-02", "series": "Grievance Cases", "value":  5 },
+
+    { "date": "2026-03", "series": "Meetings Held",   "value": 12 },
+    { "date": "2026-03", "series": "Consultations",   "value": 19 },
+    { "date": "2026-03", "series": "Agreements",      "value":  4 },
+    { "date": "2026-03", "series": "Grievance Cases", "value":  4 },
+
+    { "date": "2026-04", "series": "Meetings Held",   "value": 14 },
+    { "date": "2026-04", "series": "Consultations",   "value": 21 },
+    { "date": "2026-04", "series": "Agreements",      "value":  6 },
+    { "date": "2026-04", "series": "Grievance Cases", "value":  4 },
+
+    { "date": "2026-05", "series": "Meetings Held",   "value": 16 },
+    { "date": "2026-05", "series": "Consultations",   "value": 23 },
+    { "date": "2026-05", "series": "Agreements",      "value":  8 },
+    { "date": "2026-05", "series": "Grievance Cases", "value":  4 },
+
+    { "date": "2026-06", "series": "Meetings Held",   "value": 18 },
+    { "date": "2026-06", "series": "Consultations",   "value": 25 },
+    { "date": "2026-06", "series": "Agreements",      "value": 10 },
+    { "date": "2026-06", "series": "Grievance Cases", "value":  3 },
+
+    { "date": "2026-07", "series": "Meetings Held",   "value": 20 },
+    { "date": "2026-07", "series": "Consultations",   "value": 27 },
+    { "date": "2026-07", "series": "Agreements",      "value": 12 },
+    { "date": "2026-07", "series": "Grievance Cases", "value":  3 },
+
+    { "date": "2026-08", "series": "Meetings Held",   "value": 22 },
+    { "date": "2026-08", "series": "Consultations",   "value": 29 },
+    { "date": "2026-08", "series": "Agreements",      "value": 14 },
+    { "date": "2026-08", "series": "Grievance Cases", "value":  3 },
+
+    { "date": "2026-09", "series": "Meetings Held",   "value": 23 },
+    { "date": "2026-09", "series": "Consultations",   "value": 31 },
+    { "date": "2026-09", "series": "Agreements",      "value": 16 },
+    { "date": "2026-09", "series": "Grievance Cases", "value":  2 },
+
+    { "date": "2026-10", "series": "Meetings Held",   "value": 25 },
+    { "date": "2026-10", "series": "Consultations",   "value": 32 },
+    { "date": "2026-10", "series": "Agreements",      "value": 18 },
+    { "date": "2026-10", "series": "Grievance Cases", "value":  2 },
+
+    { "date": "2026-11", "series": "Meetings Held",   "value": 26 },
+    { "date": "2026-11", "series": "Consultations",   "value": 33 },
+    { "date": "2026-11", "series": "Agreements",      "value": 19 },
+    { "date": "2026-11", "series": "Grievance Cases", "value":  2 },
+
+    { "date": "2026-12", "series": "Meetings Held",   "value": 27 },
+    { "date": "2026-12", "series": "Consultations",   "value": 34 },
+    { "date": "2026-12", "series": "Agreements",      "value": 20 },
+    { "date": "2026-12", "series": "Grievance Cases", "value":  2 },
+
+    { "date": "2027-01", "series": "Meetings Held",   "value": 28 },
+    { "date": "2027-01", "series": "Consultations",   "value": 35 },
+    { "date": "2027-01", "series": "Agreements",      "value": 20 },
+    { "date": "2027-01", "series": "Grievance Cases", "value":  2 }
+  ]
+}

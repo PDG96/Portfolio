@@ -1,0 +1,27 @@
+{
+  "title": "People focused",
+  "items": [
+    {
+      "label": "Monitored Area",
+      "value": 129421.12,
+      "valueDecimals": 2,
+      "thousandsSeparator": ",",
+      "decimalSeparator": ".",
+      "unit": "ha",
+      "image": "/projects/assets/straatos-charts/people-focused/Group 1597880446.png",
+      "delta": { "value": 421, "direction": "up" }
+    },
+    {
+      "label": "Fauna Sightings",
+      "value": 852,
+      "image": "/projects/assets/straatos-charts/people-focused/Group 1597880445.png",
+      "delta": { "value": 14, "direction": "down" }
+    },
+    {
+      "label": "Daily Jobs Created",
+      "value": 142,
+      "image": "/projects/assets/straatos-charts/people-focused/Group 1597880447.png",
+      "delta": { "value": 21, "direction": "up" }
+    }
+  ]
+}

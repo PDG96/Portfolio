@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>chart-card — Component preview</title>
+  <style>
+    :root {
+      --bg: #fcfcfc;
+      --text: #141414;
+      --text-2: rgba(20,20,20,0.55);
+      --border: rgba(20,20,20,0.10);
+    }
+    * { box-sizing: border-box; }
+    html, body { background: var(--bg); }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', sans-serif;
+      padding: 4rem 1.5rem;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+
+    .crumb {
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin: 0 0 0.75rem;
+    }
+    .crumb a { color: var(--text-2); text-decoration: none; }
+    .crumb a:hover { color: var(--text); }
+    h1 {
+      font-weight: 300;
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.5rem;
+    }
+    p.lead {
+      color: var(--text-2);
+      margin: 0 0 3rem;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    /* Section heading between examples */
+    .sect {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin: 2.5rem 0 0.75rem;
+    }
+
+    /* Placeholder body, so the card shape reads without needing real charts */
+    .placeholder {
+      width: 100%;
+      height: 220px;
+      background:
+        linear-gradient(135deg, rgba(20,20,20,0.025), rgba(20,20,20,0.045));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-2);
+      font-size: 0.8125rem;
+    }
+
+    /* Code spec block */
+    .spec {
+      margin-top: 0.75rem;
+      padding: 1rem 1.25rem;
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      background: rgba(20,20,20,0.02);
+    }
+    .spec pre {
+      font-family: 'SF Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: rgba(20,20,20,0.78);
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="crumb"><a href="../index.html">← Components</a> · chart-card</p>
+    <h1>chart-card.</h1>
+    <p class="lead">Reusable card chrome for any chart in the library. White card with rounded corners, SF Pro title on the left, optional action buttons on the right, full-width rule separating header from body. Update once, all charts in the library follow.</p>
+
+    <!-- 1. Title only -->
+    <p class="sect">Title only</p>
+    <chart-card title="Salinity levels">
+      <div class="placeholder">chart goes here</div>
+    </chart-card>
+    <div class="spec">
+<pre>&lt;chart-card title="Salinity levels"&gt;
+  &lt;!-- chart mount here --&gt;
+&lt;/chart-card&gt;</pre>
+    </div>
+
+    <!-- 2. Title + single icon action -->
+    <p class="sect">Title with an icon action</p>
+    <chart-card title="Stakeholder Engagement">
+      <button slot="actions" class="chart-card-action" aria-label="Pick date range" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="2"/>
+          <path d="M8 3v4M16 3v4M3 10h18"/>
+        </svg>
+      </button>
+      <div class="placeholder">chart goes here</div>
+    </chart-card>
+    <div class="spec">
+<pre>&lt;chart-card title="Stakeholder Engagement"&gt;
+  &lt;button slot="actions" class="chart-card-action" aria-label="Pick date range"&gt;
+    &lt;svg ...&gt;&lt;/svg&gt;
+  &lt;/button&gt;
+  &lt;!-- chart mount here --&gt;
+&lt;/chart-card&gt;</pre>
+    </div>
+
+    <!-- 3. Title + labelled action -->
+    <p class="sect">Title with a labelled action</p>
+    <chart-card title="Yield forecast">
+      <a slot="actions" href="#" class="chart-card-action">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/>
+        </svg>
+        Export CSV
+      </a>
+      <div class="placeholder">chart goes here</div>
+    </chart-card>
+    <div class="spec">
+<pre>&lt;chart-card title="Yield forecast"&gt;
+  &lt;a slot="actions" href="#" class="chart-card-action"&gt;
+    &lt;svg ...&gt;&lt;/svg&gt;
+    Export CSV
+  &lt;/a&gt;
+&lt;/chart-card&gt;</pre>
+    </div>
+
+    <!-- 4. Title + multiple actions -->
+    <p class="sect">Title with multiple actions</p>
+    <chart-card title="Salinity by talhão">
+      <button slot="actions" class="chart-card-action" type="button" aria-label="Filter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 5h18l-7 9v5l-4 2v-7z"/>
+        </svg>
+      </button>
+      <button slot="actions" class="chart-card-action" type="button" aria-label="Pick date range">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="5" width="18" height="16" rx="2"/>
+          <path d="M8 3v4M16 3v4M3 10h18"/>
+        </svg>
+      </button>
+      <div class="placeholder">chart goes here</div>
+    </chart-card>
+    <div class="spec">
+<pre>&lt;chart-card title="Salinity by talhão"&gt;
+  &lt;button slot="actions" class="chart-card-action" aria-label="Filter"&gt;...&lt;/button&gt;
+  &lt;button slot="actions" class="chart-card-action" aria-label="Pick date range"&gt;...&lt;/button&gt;
+&lt;/chart-card&gt;</pre>
+    </div>
+  </div>
+
+  <script src="chart-card.js" defer></script>
+</body>
+</html>

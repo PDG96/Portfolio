@@ -11,6 +11,17 @@
 
  <link rel="stylesheet" href="../assets/fonts/lausanne.css">
 
+ <!-- Stamped before first paint so a dark-theme reload doesn't flash white. -->
+ <script>
+ (function () {
+ var saved = null;
+ try { saved = localStorage.getItem('theme'); } catch (e) {}
+ // Dark is the default landing state, same as the main site — the OS
+ // preference no longer decides it.
+ document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
+ })();
+ </script>
+
  <style>
  :root {
  /* Gray True palette */
@@ -27,19 +38,35 @@
  --gray-true-900: #141414;
 
  /* Semantic */
- --bg: var(--gray-true-25);
- --bg-alt: var(--gray-true-100);
+ --bg: #fbfaf8;
+ --bg-alt: #f1efea;
  --surface: #ffffff;
  --text: var(--gray-true-900);
- --text-2: var(--gray-true-500);
- --text-3: var(--gray-true-400);
+ --text-2: #6b6b6b; /* gray-500 only reached 4.16:1 on the #f0f0ee gutter */
+ --text-3: var(--gray-true-500);
  --border: var(--gray-true-200);
+ /* Shell layer: the gutter behind the panes, and the pane surface itself.
+ Tokenized so light/dark can swap them — they used to be hardcoded
+ #f0f0ee and #ffffff in the shell rules. */
+ --shell-bg: #ebe9e4;
+ --sheet: #fbfaf8;
+ /* One side spacing for everything inside the sheet. Components used to
+    offset themselves by the old page gutter (4vw) while the wrap padded
+    at a flat 2rem, so every bled element sat a different distance from
+    the edge and the wide ones spilled. */
+ --sheet-gutter: clamp(1.25rem, 2.5vw, 2rem);
 
  --accent: #3d5a3e;
  --accent-light: #e8ede8;
  --accent-yellow: #f7fdb9;
  --accent-blue: #c5e9ff;
  --accent-pink: #eee1ea;
+ /* Teal used for links/meta. #1B989B only reaches 3.5:1 on white, so the
+ light theme uses the palette's deeper teal (5.3:1) and the dark theme
+ uses the ice tint. */
+ --link: #197778;
+ /* Terracotta "Challenge" label, per theme: 5.3:1 light, 5.9:1 dark. */
+ --label-warn: #a04e2f;
 
  --font: 'TWKLausanne', system-ui, sans-serif;
  --mono: 'TWKLausanne', system-ui, sans-serif;
@@ -49,7 +76,30 @@
  --section-gap: clamp(2.5rem, 5vw, 3.5rem);
  }
 
- *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  /* Dark theme. Only the semantic layer is redefined — the gray ramp keeps
+ its meaning, the roles swap ends of it. Ratios against the pane
+ (#1a1a1a): text 16.7:1, text-2 6.9:1, text-3 5.4:1, link 8.9:1. */
+ [data-theme="dark"] {
+ --bg: #141414;
+ --bg-alt: #232323;
+ --surface: #1a1a1a;
+ --text: #fafafa;
+ --text-2: #a3a3a3;
+ --text-3: #8f8f8f;
+ --border: #333333;
+
+ --shell-bg: #0f0f0f;
+ --sheet: #1a1a1a;
+
+ /* Sage reads as near-black on a dark pane, so focus rings and accents
+ move to the light end. */
+ --accent: #7fae80;
+ --accent-light: #24302a;
+ --link: #57CACB;
+ --label-warn: #d98b68;
+ }
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
  html { scroll-behavior: smooth; }
  body {
  font-family: var(--font);
@@ -60,6 +110,25 @@
  -webkit-font-smoothing: antialiased;
  overflow-x: hidden;
  }
+ /* Grain texture overlay, same one the landing wears: a fine fractal-noise
+  film over the whole viewport so neither theme reads as a flat wash. */
+  body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998; /* under the lightbox (9999) and the cursor (10000) */
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  background-size: 200px;
+  }
+  /* On a light ground the same overlay lightens instead of textures, so the
+  grain multiplies into the paper and runs a little stronger to survive
+  the brighter surface. */
+  [data-theme="light"] body::after {
+  opacity: 0.42;
+  mix-blend-mode: multiply;
+  }
  a { color: inherit; text-decoration: none; }
  a:focus-visible, button:focus-visible {
  outline: 2px solid var(--accent);
@@ -118,7 +187,7 @@
  width: 100%;
  max-width: clamp(72rem, 90vw, 110rem);
  margin: 0 auto;
- padding: 0 clamp(1.25rem, 4vw, 3rem);
+ padding: 0 var(--sheet-gutter);
  }
 
  .mono-label {
@@ -204,23 +273,329 @@
  transition: color 0.3s;
  }
  .nav-links a:hover { color: var(--text); }
-
- .lang-toggle {
+ .theme-toggle {
  display: flex; gap: 0;
  border: 1px solid var(--border); border-radius: 6px;
  overflow: hidden;
  }
- .lang-btn {
+ .theme-btn svg { width: 14px; height: 14px; display: block; }
+ .theme-btn {
+ display: flex; align-items: center; justify-content: center;
  font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
  padding: 5px 10px; border: none; cursor: pointer;
- background: transparent; color: var(--text-3);
- transition: all 0.3s;
+ background: transparent; color: var(--text-2);
+ transition: background 0.3s, color 0.3s;
  }
- .lang-btn.active { background: var(--text); color: var(--bg); }
+ .theme-btn.active { background: var(--text); color: var(--sheet); }
 
  @media (min-width: 768px) {
  .nav-links { display: flex; }
  }
+
+  /* ====== SIDEBAR SHELL ====== */
+ /* White mode: light gutter, white sidebar + sheet cards. Same structure
+ as the dark version, colors flipped to the site's default light tokens. */
+ .shell-page { background: var(--shell-bg); }
+
+ /* Header matches the page background instead of the usual white frosted bar */
+ .shell-page .nav { background: var(--shell-bg); }
+ .shell-page .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
+ .shell-page .nav-logo { color: var(--text); }
+ .shell-page .nav-links a { color: var(--text-2); }
+ .shell-page .nav-links a:hover { color: var(--text); }
+ .shell-page .nav .theme-toggle { border-color: var(--border); }
+ .shell-page .nav .theme-btn { color: var(--text-2); }
+ .shell-page .nav .theme-btn.active { background: var(--text); color: var(--sheet); }
+ /* Nav uses the site-wide .wrap grid (max-width clamp + 4vw padding), the
+ shell spans the full viewport with flat 1.5rem gutters. Match them so the
+ logo/theme-toggle line up with the sidebar/sheet edges below. */
+ .shell-page .nav .wrap {
+ max-width: none;
+ padding: 0 1.5rem;
+ }
+ @media (max-width: 900px) {
+ .shell-page .nav .wrap { padding: 0 1rem; }
+ }
+ /* App-shell pane pattern (desktop): the window itself doesn't scroll,
+ .shell is pinned at exactly the viewport height below the nav, and its
+ two children stretch (default flex align-items) to that same height —
+ growing or shrinking together, leaving blank space in whichever pane is
+ shorter, instead of one trailing off past the other. Each pane scrolls
+ its own content internally, so neither card ever slides up and hides
+ behind the fixed nav. */
+ html, body.shell-page { height: 100%; }
+ body.shell-page { overflow: hidden; }
+ .shell {
+ /* No max-width: the two panes fill whatever the window gives them and
+ grow together, so the layout never becomes a narrow island floating in
+ the middle of a wide display. */
+ /* Pinned frame rather than a flowed block with a 60px top margin. That
+ margin escaped to the root and left the document 60px scrollable, so
+ the panes crept up under the nav (no gap at the top) while the gap at
+ the bottom grew by the same amount. Insets subtract the nav height
+ directly, which also drops the dependency on 100svh: the 1.5rem
+ padding is then identical on all four sides at every window size. */
+ position: fixed;
+ inset: 60px 0 0 0;
+ display: flex;
+ gap: 1.5rem;
+ padding: 1.5rem;
+ box-sizing: border-box;
+ }
+ @media (max-width: 900px) {
+ /* Nested independent-scroll panes only make sense side by side. Stacked
+ on mobile, revert to one continuous page scroll like any other case
+ study, sidebar-content first, then the project content below it. */
+ html, body.shell-page { height: auto; }
+ body.shell-page { overflow: visible; }
+ .shell { position: static; inset: auto; flex-direction: column; align-items: stretch; height: auto; margin: 0; padding: calc(60px + 1.25rem) 1rem 1rem; gap: 1rem; }
+ }
+
+ .sidebar {
+ /* Pure proportional width — a fixed share of the window at every size,
+ with only a floor to keep it usable just above the 900px stack
+ breakpoint. No ceiling, so on a wide display it keeps growing with the
+ sheet instead of freezing while the other pane runs away. */
+ flex: 0 0 max(260px, 23vw);
+ width: max(260px, 23vw);
+ display: flex;
+ flex-direction: column;
+ background: var(--sheet);
+ border: 1px solid var(--border);
+ border-radius: 16px;
+ padding: 2rem;
+ overflow-y: auto;
+ scrollbar-width: thin;
+ }
+ @media (max-width: 900px) {
+ .sidebar { width: 100%; height: auto; overflow-y: visible; }
+ }
+
+ .sidebar-topbar {
+ display: flex;
+ align-items: center;
+ margin-bottom: 1.75rem;
+ }
+ .sidebar .back-link { margin: 0; color: var(--text-2); }
+ .sidebar .back-link:hover { color: var(--text); }
+ .sidebar .theme-toggle { border-color: var(--border); }
+ .sidebar .theme-btn { color: var(--text-2); }
+ .sidebar .theme-btn.active { background: var(--text); color: var(--sheet); }
+
+ .sidebar .case-tag {
+ margin: 1.5rem 0 0;
+ }
+ .sidebar h1 {
+ /* +15% on every stop of the old clamp(1.875rem, 2.4vw, 2.375rem), and one
+ step up from the 300 the headings share. */
+ font-size: clamp(2.156rem, 2.76vw, 2.731rem);
+ font-weight: 400;
+ color: var(--text);
+ margin-bottom: 1rem;
+ }
+ .sidebar .case-lead {
+ font-size: 0.9375rem;
+ line-height: 1.65;
+ color: var(--text-2);
+ margin-bottom: 0;
+ }
+
+ .sidebar-meta {
+ display: flex;
+ flex-direction: column;
+ gap: 1.25rem;
+ margin: 1.75rem 0;
+ padding: 1.5rem 0;
+ border-top: 1px solid var(--border);
+ border-bottom: 1px solid var(--border);
+ }
+ .sidebar-meta-item { display: flex; flex-direction: column; gap: 0.375rem; }
+ .sidebar-meta-item .case-meta-label { color: var(--text-3); }
+ .sidebar-meta-item .case-meta-value { color: var(--text); font-size: 0.9375rem; }
+ .sidebar-meta-item a.case-meta-value { color: var(--link); }
+
+ /* Flows right after the meta block like everything else in the sidebar —
+ no margin-top:auto, which used to shove it against the bottom edge and
+ leave a dead gap in the middle on tall windows. */
+ .sidebar-next { padding-top: 0.5rem; }
+ .sidebar-next-label {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ margin-bottom: 0.75rem;
+ display: block;
+ }
+ .sidebar-next-list {
+ /* Vertical stack instead of the old horizontal carousel: every project
+ is visible at full card width and the sidebar's own overflow-y carries
+ the scroll, so nothing is hidden off to the side. */
+ display: flex;
+ flex-direction: column;
+ gap: 0.75rem;
+ }
+ .sidebar-card {
+ flex: 0 0 auto;
+ width: 100%;
+ border-radius: 8px;
+ overflow: hidden;
+ background: var(--bg-alt);
+ transition: opacity 0.3s var(--ease);
+ }
+ /* Coming-soon variant, same treatment as the case-next cards on the other
+ pages: the thumb stays at full strength and only reveals a dark overlay
+ on hover, instead of sitting permanently dimmed. */
+ .sidebar-card--soon { cursor: default; }
+ .sidebar-card--soon .sidebar-card-thumb { position: relative; cursor: default; }
+ .sidebar-card-overlay {
+ position: absolute; inset: 0;
+ background: rgba(15, 22, 18, 0.55);
+ backdrop-filter: blur(2px);
+ -webkit-backdrop-filter: blur(2px);
+ display: flex; align-items: center; justify-content: center;
+ color: #fcfcfc;
+ font-family: var(--mono);
+ /* A notch smaller than the full-width version — the sidebar card is
+ roughly a third of its width. */
+ font-size: 0.625rem;
+ font-weight: 500;
+ letter-spacing: 0.14em;
+ text-transform: uppercase;
+ opacity: 0;
+ pointer-events: none;
+ transition: opacity 0.35s var(--ease);
+ }
+ .sidebar-card--soon:hover .sidebar-card-overlay { opacity: 1; }
+ /* Every thumb lands on the same 16:10 box regardless of the source file's
+ own proportions (they run 1.31 to 1.78), so the carousel reads as one
+ even row instead of three different heights. Cover crops the excess —
+ which also trims the rounded corners baked into some of the PNGs, so
+ the 8px radius below is the only corner the card actually shows. */
+ .sidebar-card-thumb {
+ width: 100%;
+ aspect-ratio: 16 / 10;
+ overflow: hidden;
+ border-radius: 8px;
+ }
+ .sidebar-card-thumb img {
+ width: 100%;
+ height: 100%;
+ object-fit: cover;
+ display: block;
+ /* Nudged past the transparent rounded corners in the source art. */
+ transform: scale(1.02);
+ }
+
+ .main-sheet {
+ /* White mode: the site's default tokens are already light-theme (dark
+ text on white/light-gray), so no token overrides needed here, just the
+ white card surface matching the sidebar. */
+ flex: 1 1 0%;
+ min-width: 0;
+ background: var(--sheet);
+ border: 1px solid var(--border);
+ border-radius: 16px;
+ overflow-y: auto;
+ overflow-x: hidden;
+ scrollbar-width: thin;
+ }
+ @media (max-width: 900px) {
+ .main-sheet { height: auto; overflow-y: visible; }
+/* Stacked, the "Next up" cards landed between the case title and the
+ case itself, so the reader met the other projects before this one. On
+ mobile the sidebar stops being a box and hands its children straight to
+ .shell, which is what lets the list be ordered after the content.
+ .sidebar-intro keeps the card treatment the sidebar used to carry. */
+ .sidebar { display: contents; }
+ .sidebar-intro {
+ background: var(--sheet);
+ border: 1px solid var(--border);
+ border-radius: 16px;
+ padding: 1.75rem;
+ }
+ .main-sheet { order: 1; }
+ .sidebar-next { order: 2; }
+ /* The meta block closed with a rule because "Next up" used to sit right
+ under it. With the list moved to the end of the page that line, and the
+ space under it, separate nothing -- so the card ends on the last value. */
+ .sidebar-meta { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+ }
+ .main-sheet .case-hero { padding: 2rem 0; }
+ .main-sheet .case-hero .wrap,
+ .main-sheet .case-section .wrap { max-width: 100%; padding-left: var(--sheet-gutter); padding-right: var(--sheet-gutter); }
+
+ /* Hero shot + big diagrams expand edge-to-edge inside the sheet, breaking
+ out of .wrap's side padding, matching masid.design's full-bleed panels. */
+ .main-sheet .bleed {
+ /* width:auto is the fix: some bled elements (case-hero-mockup) carry
+ their own hardcoded width:100%, which fixes the box size independently
+ of margin. Negative margins only ever shift a fixed-width box, they
+ don't grow it, that's why the right edge fell short. auto lets the
+ negative margins pull both edges and the width fill what's left. */
+ width: auto;
+ margin-left: calc(-1 * var(--sheet-gutter));
+ margin-right: calc(-1 * var(--sheet-gutter));
+ border-radius: 0;
+ }
+ .main-sheet .bleed img { border-radius: 0; }
+
+ /* app-shot--bg-full's 100vw/50vw breakout trick assumed .wrap sits centered
+ in the full browser viewport (true on the plain case study page). Nested
+ inside the sidebar layout it isn't, so it blew out past the sheet's own
+ edges instead of framing the image. Neutralize the breakout and let it
+ sit as a normal padded block, sized like every other figure in .wrap. */
+ .main-sheet .app-shot--bg-full {
+ width: auto;
+ margin-left: 0;
+ margin-right: 0;
+ border-radius: 14px;
+ }
+ .main-sheet .app-shot--bg-full > img {
+ max-width: 100%;
+ }
+
+ /* Insight cards ride on --surface, so their text follows the theme too —
+ pinning it to gray-900 left dark text on a dark card once the surface
+ token started flipping. */
+ .main-sheet .insight-content h3 { color: var(--text); }
+ .main-sheet .insight-content p { color: var(--text-2); }
+
+ /* Headline/body scale, tuned down from the site's full-viewport clamps:
+ the sheet is a ~65vw column now, not the full page, so vw-based sizing
+ read oversized next to the sidebar. Brought in line with the sidebar's
+ title/lead so both columns read at the same visual weight. */
+ .main-sheet h2,
+ .main-sheet .cs-block h3 {
+ font-size: clamp(1.625rem, 2.6vw, 2.125rem);
+ }
+ .main-sheet .cs-block p,
+ .main-sheet .explore-intro {
+ font-size: 0.9375rem;
+ }
+
+ /* Bento iframes render at their natural desktop width always (JS below
+ sets width/height from data-w/data-h and scales the whole thing down to
+ fit), so the embedded page never crosses its own internal mobile
+ breakpoint just because the sidebar narrowed this column. Without this,
+ the iframe "thinks" it's on a narrow phone and reflows into a stacked
+ layout that then gets squashed into the wide aspect-ratio frame. */
+ .embed-iframe--scaled {
+ position: absolute;
+ top: 0;
+ left: 0;
+ transform-origin: top left;
+ }
+
+/* Blanket guard: every picture, video and frame in the sheet stays inside
+ its column and keeps its own proportions. Individual components used to
+ set this themselves, or not at all, which is where the crops came from. */
+ .main-sheet img,
+ .main-sheet video,
+ .main-sheet iframe { max-width: 100%; }
+ .main-sheet img,
+ .main-sheet video { height: auto; }
 
  /* ====== CASE HERO ====== */
  .case-hero {
@@ -389,68 +764,8 @@
 
  /* Research & Process, horizontal scroll-snap carousel of the 3 artefacts.
  Each card lifts and gains a soft border on hover; siblings dim a touch. */
- .rp-car {
- position: relative;
- margin-top: clamp(2rem, 4vw, 3rem);
- /* Bleed the carousel slightly past the wrap so cards approach the viewport edge */
- margin-left: calc(-1 * clamp(1.25rem, 4vw, 3rem));
- margin-right: calc(-1 * clamp(1.25rem, 4vw, 3rem));
- padding-block: 0.5rem;
- }
- .rp-car-track {
- display: flex;
- gap: clamp(1rem, 2vw, 1.5rem);
- overflow-x: auto;
- scroll-snap-type: x mandatory;
- padding: 1rem clamp(1.25rem, 4vw, 3rem) 1.5rem;
- -webkit-overflow-scrolling: touch;
- scrollbar-width: thin;
- }
- .rp-card {
- flex: 0 0 min(86vw, 880px);
- scroll-snap-align: start;
- margin: 0;
- background: #fafafa;
- border: 1px solid var(--border);
- border-radius: 16px;
- overflow: hidden;
- transition: transform 0.45s var(--ease),
- border-color 0.45s var(--ease),
- box-shadow 0.45s var(--ease),
- opacity 0.45s var(--ease);
- cursor: pointer;
- }
- .rp-card img {
- display: block;
- width: 100%;
- height: auto;
- object-fit: contain;
- }
- .rp-card figcaption {
- font-family: var(--mono);
- font-size: 0.6875rem;
- font-weight: 500;
- letter-spacing: 0.14em;
- text-transform: uppercase;
- color: var(--text-3);
- padding: 1rem 1.25rem 1.25rem;
- background: var(--surface);
- border-top: 1px solid var(--border);
- }
  /* Hover state, siblings dim, hovered card lifts + accent border */
- .rp-car-track:hover .rp-card { opacity: 0.5; }
- .rp-car-track:hover .rp-card:hover {
- opacity: 1;
- transform: translateY(-6px);
- border-color: var(--text);
- box-shadow: 0 28px 60px -24px rgba(15, 23, 42, 0.22),
- 0 8px 20px -10px rgba(15, 23, 42, 0.12);
- }
- .rp-car-track:hover .rp-card:hover figcaption {
- color: var(--text);
- }
  @media (min-width: 1024px) {
- .rp-card { flex: 0 0 min(60vw, 1100px); }
  }
 
  .case-section--dark {
@@ -496,11 +811,6 @@
  @media (max-width: 640px) {
  .network-shot { gap: 0.625rem; }
  .network-shot figcaption,
- .rp-card figcaption {
- font-size: 0.5625rem;
- letter-spacing: 0.1em;
- line-height: 1.4;
- }
  }
 
  /* Graph figure, interactive iframe rendered as a card, same grid as siblings */
@@ -1510,25 +1820,6 @@
  .case-live-link:hover { gap: 0.75rem; }
 
  /* Generic scroll-hint indicator for horizontal carousels */
- .h-scroll-hint {
- display: flex; align-items: center; gap: 0.75rem;
- margin-top: 1.25rem;
- }
- .h-scroll-track {
- flex: 1; height: 2px;
- background: var(--border); border-radius: 1px;
- position: relative; overflow: hidden;
- }
- .h-scroll-thumb {
- position: absolute; top: 0; left: 0; height: 100%; width: 33%;
- background: var(--accent-yellow, #f7fdb9);
- border-radius: 1px; transition: left 0.15s ease-out;
- }
- .h-scroll-label {
- font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
- text-transform: uppercase; letter-spacing: 0.12em;
- color: var(--text-3); white-space: nowrap;
- }
 
  /* ====== NEXT / OTHER WORK ====== */
  .case-next { padding-block: var(--section-py); }
@@ -1609,10 +1900,28 @@
  transition: opacity 0.35s var(--ease);
  }
  .case-next-card--soon:hover .case-next-overlay { opacity: 1; }
- </style>
+  /* ====== EXTRA-WIDE ======
+ Sits at the end of the sheet on purpose: these override component rules
+ defined much further up, and source order decides between selectors of
+ equal weight. */
+ @media (min-width: 1800px) {
+ /* At 16/10 a full-width column made this panel nearly 2000px tall, and
+ the force layout keeps its cluster the same size no matter how much
+ room it gets — so the graph ended up marooned in the middle of a dark
+ field. Height is capped instead, letterboxing the panel. */
+ /* The supplier-assessment video figure carries both --graph and --gold,
+    so the plain --graph selector was capping its height too and the
+    recording got cropped to a slice. Only the panel that actually
+    holds the force graph is meant to be letterboxed. */
+ .network-shot--graph:not(.network-shot--gold) .network-embed {
+ aspect-ratio: auto;
+ height: clamp(620px, 44vh, 820px);
+ }
+ }
+</style>
 </head>
 
-<body>
+<body class="shell-page">
 
  <!-- Custom cursor -->
  <div class="cursor" aria-hidden="true"></div>
@@ -1624,54 +1933,77 @@
  <div class="nav-right">
  <ul class="nav-links">
  <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
- <li><a href="../index.html#services" data-i18n="nav_services">Services</a></li>
  <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
  </ul>
- <div class="lang-toggle" role="group" aria-label="Language selector">
- <button class="lang-btn active" data-lang="en" aria-pressed="true">EN</button>
- <button class="lang-btn" data-lang="pt" aria-pressed="false">PT</button>
+ <div class="theme-toggle" role="group" aria-label="Color theme">
+   <button class="theme-btn" data-theme-set="dark" aria-pressed="false" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
+   <button class="theme-btn active" data-theme-set="light" aria-pressed="true" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
  </div>
  </div>
  </nav>
 
- <!-- CASE HERO -->
- <section class="case-hero">
- <div class="wrap">
- <a href="../index.html#work" class="back-link r">
- <span class="back-arrow">←</span>
- <span data-i18n="back_to_projects">Back to projects</span>
- </a>
+ <!-- Shell: fixed sidebar (project info + other cases) + scrolling main sheet -->
+ <div class="shell">
 
- <span class="case-tag r" data-i18n="case_tag">Responsible Sourcing · Digital Gold</span>
-
+ <aside class="sidebar">
+ <div class="sidebar-intro">
  <h1 class="r" data-i18n="case_title">WAZI, The Digital Backbone for Ethical Gold</h1>
+ <p class="case-lead r" data-i18n="case_lead">A platform that brings trust and transparency to artisanal and small-scale gold mining, from miner to buyer.</p>
 
- <p class="case-lead r" data-i18n="case_lead">A platform that brings trust and transparency to artisanal and small-scale gold mining. Every miner, aggregator, monitor and buyer contributes to a shared evidence base, while keeping sovereignty over their own data.</p>
-
- <div class="case-meta r-stagger">
- <div class="case-meta-item r">
+ <div class="sidebar-meta r-stagger">
+ <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_role">Role</span>
  <span class="case-meta-value" data-i18n="meta_role_val">Senior Product Designer</span>
  </div>
- <div class="case-meta-item r">
- <span class="case-meta-label" data-i18n="meta_timeline">Timeline</span>
- <span class="case-meta-value" data-i18n="meta_timeline_val">8 months · 2024–2025</span>
- </div>
- <div class="case-meta-item r">
+ <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_deliverables">Deliverables</span>
  <span class="case-meta-value" data-i18n="meta_deliverables_val">Web Platform, Marketing Site</span>
  </div>
- <div class="case-meta-item r">
+ <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_team">Team</span>
  <span class="case-meta-value" data-i18n="meta_team_val">Datastake product team</span>
  </div>
- <div class="case-meta-item r">
+ <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_live">Live site</span>
  <a href="https://wazi.datastake.io/" target="_blank" rel="noopener" class="case-meta-value" data-i18n="meta_live_val">wazi.datastake.io</a>
  </div>
  </div>
 
+ </div><!-- /.sidebar-intro -->
+
+ <div class="sidebar-next">
+ <span class="sidebar-next-label" data-i18n="next_label">Next up</span>
+ <div class="sidebar-next-list">
+  <!-- Image-only cards: the alt text carries the project name for
+       screen readers and the link label. -->
+  <a href="straatos.html" class="sidebar-card">
+   <div class="sidebar-card-thumb"><img src="assets/straatos-hero.png" alt="Straatos, Digital infrastructure for climate action"></div>
+  </a>
+  <a href="supply-chain.html" class="sidebar-card">
+   <div class="sidebar-card-thumb"><img src="assets/supply-chain/card.jpg" alt="Continuous due diligence for commodity supply chains"></div>
+  </a>
+  <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
+   <div class="sidebar-card-thumb">
+   <img src="assets/kota-cover.jpg" alt="Kota, Counterparty due-diligence infrastructure">
+   <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
+   </div>
+  </div>
+  <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
+   <div class="sidebar-card-thumb">
+   <img src="assets/safra-hero.png" alt="Safra, Operating system for sustainable Brazilian agriculture">
+   <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
+   </div>
+  </div>
+ </div>
+ </div>
+ </aside>
+
+ <div class="main-sheet">
+
+ <!-- CASE HERO (image only, sidebar carries title/meta) -->
+ <section class="case-hero">
+ <div class="wrap">
  <div class="case-hero-mockup case-hero-mockup--image r" style="aspect-ratio:auto;padding:0;background:transparent;border:none;">
  <img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI Shipments view on a tablet held in two hands, sidebar with Aggregator modules, Timeline + Origin Distribution + Counterparties donuts in gold, and an Inbound shipments table with EVT000000123 marked Completed">
  </div>
@@ -1752,39 +2084,6 @@
  </div>
  </section>
 
- <!-- ====== RESEARCH & PROCESS (single section, 3 image carousel) ====== -->
- <section class="case-section">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="rp_label">Research &amp; Process</p>
- <h2 data-i18n="rp_title">From the field, to the architecture, to the screen.</h2>
- <p class="explore-intro" data-i18n="rp_intro">Three artefacts shaped the work, an ecosystem map of who holds the gold (and the paperwork), the sidebar architecture that survives six different roles, and the service blueprint that turns user intent into auditable evidence. Each one carries its own title, so scroll the carousel below.</p>
- </div>
- <div class="rp-car r">
- <div class="rp-car-track" id="rpCarTrack">
- <figure class="rp-card">
- <img src="assets/wazi/wazi-ecosystem.svg" alt="Stakeholder ecosystem map for the WAZI use case, upstream (mine operator, cooperative, community), midstream (aggregator, exporter, refiner), and downstream (bullion bank, jewellery brand, consumer), with witnesses (CSO monitors, customs, verifiers, banks, standard-setters, journalists) feeding evidence into the chain.">
- <figcaption data-i18n="rp_cap_eco">Stakeholder ecosystem · Research</figcaption>
- </figure>
- <figure class="rp-card">
- <img src="assets/wazi/wazi-sitemap.svg" alt="WAZI sitemap, Dashboard, Analysis, Modules and Data sections of the sidebar shared by every role, plus the frameworks the architecture respects.">
- <figcaption data-i18n="rp_cap_ia">Information architecture · Sidebar</figcaption>
- </figure>
- <figure class="rp-card">
- <img src="assets/wazi/wazi-blueprint.svg" alt="WAZI service blueprint, Front-stage user actions, back-stage platform orchestration and the evidence trail written along the way, across six phases following the sidebar order.">
- <figcaption data-i18n="rp_cap_bp">Service blueprint · Process</figcaption>
- </figure>
- </div>
- <div class="h-scroll-hint">
- <div class="h-scroll-track">
- <div class="h-scroll-thumb" id="rpCarThumb"></div>
- </div>
- <span class="h-scroll-label" data-i18n="scroll_hint">Scroll to explore</span>
- </div>
- </div>
- </div>
- </section>
-
  <!-- ====== ONBOARDING ====== -->
  <section class="case-section case-section--alt">
  <div class="wrap">
@@ -1813,7 +2112,7 @@
  <div class="network-stack r-stagger">
  <figure class="network-shot network-shot--graph r">
  <div class="network-embed">
- <iframe class="network-iframe" src="assets/wazi-network.html"
+ <iframe class="network-iframe" src="assets/wazi-network.html?v=2"
  title="Interactive stakeholder network, events, locations and stakeholders connected by relationships in the WAZI evidence base"
  loading="lazy" scrolling="no"></iframe>
  <div class="network-legend" aria-hidden="true">
@@ -1895,73 +2194,22 @@
  </div>
  </section>
 
- <!-- ====== IN THE FIELD (laptop on rock outcrop) ====== -->
- <section class="case-section case-section--alt case-section--showcase">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="field_label">In the field</p>
- <h2 data-i18n="field_title">The same evidence base, anywhere.</h2>
- <p class="explore-intro" data-i18n="field_intro">Stationed at a refinery desk or perched on a mining outcrop, WAZI carries the same chain of custody, same data model, same identities, same auditable trail.</p>
- </div>
- <figure class="showcase-shot r">
- <img src="assets/wazi/dashboard-globe.png" alt="A laptop perched on a rocky outcrop displaying the WAZI dashboard, sidebar with Aggregator modules, a 3D globe with stakeholder pins across Africa, the Middle East and Asia, and a warm gold backdrop">
- </figure>
- </div>
- </section>
 
- <!-- ====== NEXT / OTHER WORK ====== -->
- <section class="case-section case-section--alt case-next">
- <div class="wrap">
- <div class="case-next-header r">
- <p class="case-section-label" data-i18n="next_label">Next up</p>
- <h2 data-i18n="next_title">Other work.</h2>
- </div>
- <div class="case-next-grid r-stagger">
- <a href="straatos.html" class="case-next-card r">
- <div class="case-next-thumb">
- <img src="assets/straatos-hero.png" alt="Straatos hero, platform overview">
- </div>
- <div class="case-next-body">
- <span class="case-tag" data-i18n="next_eco_tag">Environmental Tech</span>
- <h3 data-i18n="next_eco_t">Straatos, Digital infrastructure for climate action</h3>
- <span class="case-link" data-i18n="next_cta">Read case study →</span>
- </div>
- </a>
- <div class="case-next-card case-next-card--soon r" aria-disabled="true">
- <div class="case-next-thumb">
- <img src="assets/safra-hero.png" alt="Safra, a sunset-lit Brazilian crop field with a centred card showing a soy leaf texture and the 'safra' wordmark in yellow.">
- <span class="case-next-overlay" aria-hidden="true">
-   <span data-i18n="next_soon">Coming soon</span>
- </span>
- </div>
- <div class="case-next-body">
- <span class="case-tag" data-i18n="next_safra_tag">Sustainable Agribusiness</span>
- <h3 data-i18n="next_safra_t">Safra, Operating system for sustainable Brazilian agriculture</h3>
- <span class="case-link" data-i18n="next_soon">Coming soon</span>
- </div>
- </div>
- </div>
- </div>
- </section>
-
-
- <!-- ====== STAGE 3 sections go here ======-->
+ </div><!-- /.main-sheet -->
+ </div><!-- /.shell -->
 
  <script>
  /* ------- i18n (EN / PT-BR) ------- */
  const T = {
  en: {
  nav_work: "Work",
- nav_services: "Services",
  nav_contact: "Contact",
  back_to_projects: "Back to projects",
  case_tag: "Responsible Sourcing · Digital Gold",
  case_title: "WAZI, The Digital Backbone for Ethical Gold",
- case_lead: "A platform that brings trust and transparency to artisanal and small-scale gold mining. Every miner, aggregator, monitor and buyer contributes to a shared evidence base, while keeping sovereignty over their own data.",
+ case_lead: "A platform that brings trust and transparency to artisanal and small-scale gold mining, from miner to buyer.",
  meta_role: "Role",
  meta_role_val: "Senior Product Designer",
- meta_timeline: "Timeline",
- meta_timeline_val: "8 months · 2024–2025",
  meta_deliverables: "Deliverables",
  meta_deliverables_val: "Web Platform, Marketing Site",
  meta_team: "Team",
@@ -1976,12 +2224,6 @@
  solution_title: "A shared evidence base, with sovereignty by design.",
  solution_p1: "A role-based digital platform where every stakeholder in the gold value chain contributes to a shared, traceable evidence base while retaining control over their own data. Mine operators own their self-assessments. Aggregators consolidate ESG, risk, and shipment data. Monitors upload field observations without losing authorship.",
  solution_p2: "The platform produces audit-ready dossiers aligned to LBMA, RMI and OECD frameworks, and is built on the Datastake Application Framework, so it plugs into tools like KoboToolbox instead of replacing them.",
- rp_label: "Research &amp; Process",
- rp_title: "From the field, to the architecture, to the screen.",
- rp_intro: "Three artefacts shaped the work, an ecosystem map of who holds the gold (and the paperwork), the sidebar architecture that survives six different roles, and the service blueprint that turns user intent into auditable evidence. Each one carries its own title, so scroll the carousel below.",
- rp_cap_eco: "Stakeholder ecosystem · Research",
- rp_cap_ia: "Information architecture · Sidebar",
- rp_cap_bp: "Service blueprint · Process",
  onb_label: "Onboarding",
  onb_title: "Meets every stakeholder where they are.",
  onb_intro: "From cooperatives to state actors and civil society, the registration flow adapts to the role, asks only what's relevant, and runs on whatever device the user brought to the table.",
@@ -1997,20 +2239,19 @@
  sup_label: "Supplier Assessment",
  sup_title: "Inputs roll up to a score.",
  sup_intro: "A short walk-through of the supplier review: every input, onboarding evidence, sourcing history, declared sites, is rolled up into a single risk and readiness score the verifier can act on.",
- inc_label: "Incidents &amp; Testimonials",
+ inc_label: "Incidents & Testimonials",
  inc_title: "The human side of compliance.",
  inc_intro: "Numbers don't audit themselves. Each incident has a story, each corrective action has a person closing it, each testimonial is someone who chose to be on the record.",
  self_label: "Self Assessment",
  self_title: "Operators see where they stand.",
  self_intro: "Self Assessment puts the framework in the operator's hands. Ratings, gaps and readiness, readable before any verifier opens a dossier, so improvement is a choice, not a surprise.",
  self_cap: "Supplier assessment, animated evaluation flow showing how operator inputs roll up to risk and readiness scores.",
- field_label: "In the field",
- field_title: "The same evidence base, anywhere.",
- field_intro: "Stationed at a refinery desk or perched on a mining outcrop, WAZI carries the same chain of custody, same data model, same identities, same auditable trail.",
  next_label: "Next up",
  next_title: "Other work.",
  next_eco_tag: "Environmental Tech",
  next_eco_t: "Straatos, Digital infrastructure for climate action",
+ next_kota_tag: "Onboarding & Due Diligence",
+ next_kota_t: "Kota, Counterparty due-diligence infrastructure",
  next_cta: "Read case study →",
  next_safra_tag: "Sustainable Agribusiness",
  next_safra_t: "Safra, Operating system for sustainable Brazilian agriculture",
@@ -2020,16 +2261,13 @@
  },
  pt: {
  nav_work: "Projetos",
- nav_services: "Serviços",
  nav_contact: "Contato",
  back_to_projects: "Voltar para projetos",
  case_tag: "Sourcing Responsável · Ouro Digital",
  case_title: "WAZI, A Espinha Dorsal Digital do Ouro Ético",
- case_lead: "Uma plataforma que traz confiança e transparência para a mineração artesanal e de pequena escala de ouro. Cada minerador, agregador, monitor e comprador contribui para uma base de evidências compartilhada, mantendo soberania sobre seus próprios dados.",
+ case_lead: "Uma plataforma que traz confiança e transparência para a mineração artesanal e de pequena escala de ouro, do minerador ao comprador.",
  meta_role: "Função",
  meta_role_val: "Senior Product Designer",
- meta_timeline: "Período",
- meta_timeline_val: "8 meses · 2024–2025",
  meta_deliverables: "Entregas",
  meta_deliverables_val: "Plataforma Web, Site Institucional",
  meta_team: "Time",
@@ -2044,12 +2282,6 @@
  solution_title: "Uma base de evidências compartilhada, com soberania por design.",
  solution_p1: "Uma plataforma digital baseada em papéis onde todo stakeholder da cadeia de valor do ouro contribui para uma base de evidências compartilhada e rastreável, mantendo controle sobre seus próprios dados. Operadores de minas são donos das suas autoavaliações. Agregadores consolidam dados de ESG, risco e shipment. Monitores fazem upload de observações de campo sem perder a autoria.",
  solution_p2: "A plataforma gera dossiês prontos para auditoria alinhados aos frameworks LBMA, RMI e OECD, e é construída sobre o Datastake Application Framework, então se conecta a ferramentas como o KoboToolbox em vez de substituí-las.",
- rp_label: "Pesquisa &amp; Processo",
- rp_title: "Do campo, à arquitetura, à tela.",
- rp_intro: "Três artefatos moldaram o trabalho, um mapa do ecossistema de quem detém o ouro (e o papel), a arquitetura de sidebar que sobrevive a seis papéis diferentes, e o service blueprint que transforma a intenção do usuário em evidência auditável. Cada um carrega seu próprio título, basta rolar o carrossel abaixo.",
- rp_cap_eco: "Ecossistema de stakeholders · Pesquisa",
- rp_cap_ia: "Arquitetura da informação · Sidebar",
- rp_cap_bp: "Service blueprint · Processo",
  onb_label: "Onboarding",
  onb_title: "Encontra cada stakeholder onde ele está.",
  onb_intro: "De cooperativas a atores estatais e sociedade civil, o fluxo de cadastro se adapta ao papel, pede só o que é relevante e roda em qualquer dispositivo que o usuário levar à mesa.",
@@ -2065,20 +2297,19 @@
  sup_label: "Avaliação de Fornecedor",
  sup_title: "Os inputs sobem para um score.",
  sup_intro: "Um walk-through da revisão de fornecedor: cada input, evidência de onboarding, histórico de sourcing, sites declarados, é consolidado em um único score de risco e prontidão que o verificador pode acionar.",
- inc_label: "Incidentes &amp; Depoimentos",
+ inc_label: "Incidentes & Depoimentos",
  inc_title: "O lado humano da conformidade.",
  inc_intro: "Números não se auditam sozinhos. Cada incidente tem uma história, cada ação corretiva tem uma pessoa fechando-a, cada depoimento é alguém que escolheu estar no registro.",
  self_label: "Autoavaliação",
  self_title: "Operadores veem onde estão.",
  self_intro: "A Autoavaliação coloca o framework nas mãos do operador. Ratings, gaps e prontidão, legíveis antes de qualquer verificador abrir um dossiê, para que melhorar seja uma escolha, não uma surpresa.",
  self_cap: "Avaliação de fornecedor, fluxo animado que mostra como os inputs do operador agregam em scores de risco e prontidão.",
- field_label: "Em campo",
- field_title: "A mesma base de evidências, em qualquer lugar.",
- field_intro: "Numa mesa de refinaria ou empoleirado num afloramento mineral, o WAZI carrega a mesma cadeia de custódia, mesmo modelo de dados, mesmas identidades, mesma trilha auditável.",
  next_label: "A seguir",
  next_title: "Outros projetos.",
  next_eco_tag: "Tecnologia Ambiental",
  next_eco_t: "Straatos, Infraestrutura digital para ação climática",
+ next_kota_tag: "Onboarding & Due Diligence",
+ next_kota_t: "Kota, Infraestrutura de due diligence de contrapartes",
  next_cta: "Ler case study →",
  next_safra_tag: "Agronegócio Sustentável",
  next_safra_t: "Safra, Sistema operacional da agricultura sustentável brasileira",
@@ -2101,7 +2332,9 @@
  if (nav.startsWith('pt')) return 'pt';
  return 'en';
  }
- let lang = detectInitialLang();
+ // The EN/PT control is gone, so the site is pinned to English instead of
+// following the visitor's browser locale (which flipped it to PT-BR).
+let lang = 'en';
  function setLang(l) {
  lang = l;
  localStorage.setItem('lang', l);
@@ -2114,30 +2347,27 @@
  else el.textContent = v;
  }
  });
- document.querySelectorAll('.lang-btn').forEach(b => {
- const on = b.dataset.lang === l;
+}
+/* The EN/PT buttons were replaced by the theme toggle. The dictionary and
+ setLang stay wired so the copy still localizes on load and the control
+ can come back without rebuilding any of it. */
+setLang(lang);
+ /* ============ Light / dark theme ============ */
+ function setTheme(t) {
+ document.documentElement.setAttribute('data-theme', t);
+ localStorage.setItem('theme', t);
+ document.querySelector('meta[name="theme-color"]')
+ ?.setAttribute('content', t === 'dark' ? '#0f0f0f' : '#f0f0ee');
+ document.querySelectorAll('.theme-btn').forEach(b => {
+ const on = b.dataset.themeSet === t;
  b.classList.toggle('active', on);
  b.setAttribute('aria-pressed', on);
  });
  }
- document.querySelectorAll('.lang-btn').forEach(b =>
- b.addEventListener('click', () => setLang(b.dataset.lang))
+ document.querySelectorAll('.theme-btn').forEach(b =>
+ b.addEventListener('click', () => setTheme(b.dataset.themeSet))
  );
- setLang(lang);
-
- /* Horizontal scroll-hint thumb tracker for the research carousel */
- [['rpCarTrack', 'rpCarThumb']].forEach(([trackId, thumbId]) => {
- const track = document.getElementById(trackId);
- const thumb = document.getElementById(thumbId);
- if (!track || !thumb) return;
- track.addEventListener('scroll', () => {
- const max = track.scrollWidth - track.clientWidth;
- if (max > 0) {
- const pct = track.scrollLeft / max;
- thumb.style.left = (pct * 67) + '%';
- }
- }, { passive: true });
- });
+ setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
 
  const nav = document.querySelector('.nav');
  window.addEventListener('scroll', () => {
@@ -2145,6 +2375,28 @@
  }, { passive: true });
 
  // Reveal
+ // The network graph holds its entrance until it's actually on screen.
+ (() => {
+ const frames = document.querySelectorAll('.network-iframe');
+ if (!frames.length || !('IntersectionObserver' in window)) return;
+ const sent = new WeakSet();
+ const notify = (f) => {
+ if (sent.has(f) || !f.contentWindow) return;
+ sent.add(f);
+ try { f.contentWindow.postMessage({ type: 'bento:visible' }, '*'); } catch (e) {}
+ };
+ const io = new IntersectionObserver((entries) => {
+ for (const e of entries) if (e.isIntersecting) notify(e.target);
+ }, { rootMargin: '0px 0px -20% 0px' });
+ frames.forEach((f) => {
+ io.observe(f);
+ f.addEventListener('load', () => {
+ const r = f.getBoundingClientRect();
+ if (r.top < innerHeight && r.bottom > 0) notify(f);
+ });
+ });
+ })();
+
  const obs = new IntersectionObserver(es =>
  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
  , { threshold: 0.12 });
@@ -2157,7 +2409,7 @@
  if (!cursor) return;
  let mx = -100, my = -100, cx = -100, cy = -100;
  document.addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; });
- document.querySelectorAll('a, button, .btn, .lang-btn').forEach(el => {
+ document.querySelectorAll('a, button, .btn, .theme-btn').forEach(el => {
  el.addEventListener('pointerenter', () => cursor.classList.add('active'));
  el.addEventListener('pointerleave', () => cursor.classList.remove('active'));
  });

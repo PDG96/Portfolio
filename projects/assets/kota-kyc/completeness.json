@@ -1,0 +1,8 @@
+{
+  "mode": "rings",
+  "rings": [
+    { "name": "Consolidated", "value": 90, "color": "#E25E25" },
+    { "name": "Own Data", "value": 82, "color": "#F2A87E" }
+  ],
+  "legend": true
+}

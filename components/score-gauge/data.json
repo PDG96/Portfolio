@@ -1,0 +1,8 @@
+{
+  "value": 90,
+  "min": 0,
+  "max": 100,
+  "suffix": "%",
+  "gradient": ["#E2574A", "#F0A864", "#C8CF63", "#6FCC8C"],
+  "marker": { "items": ["Watchlist 01", "Watchlist 02"] }
+}

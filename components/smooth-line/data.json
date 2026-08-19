@@ -1,0 +1,77 @@
+{
+  "title": "Salinity levels",
+  "yMin": 0,
+  "yMax": 16,
+  "yTickInterval": 2,
+  "lineWidth": 2,
+  "unit": "dS/m",
+  "valueDecimals": 1,
+  "decimalSeparator": ",",
+  "series": [
+    { "name": "Mixed Soil", "color": "#20A9AB" },
+    { "name": "Sandy Soil", "color": "#57CACB" },
+    { "name": "Clay Soil",  "color": "#A2E9E9" },
+    { "name": "Muddy Soil", "color": "#C5FBFB" }
+  ],
+  "data": [
+    { "date": "2024-10", "series": "Mixed Soil", "value": 4.6 },
+    { "date": "2024-10", "series": "Sandy Soil", "value": 3.6 },
+    { "date": "2024-10", "series": "Clay Soil",  "value": 3.9 },
+    { "date": "2024-10", "series": "Muddy Soil", "value": 2.5 },
+
+    { "date": "2024-11", "series": "Mixed Soil", "value": 5.4 },
+    { "date": "2024-11", "series": "Sandy Soil", "value": 4.1 },
+    { "date": "2024-11", "series": "Clay Soil",  "value": 4.0 },
+    { "date": "2024-11", "series": "Muddy Soil", "value": 3.0 },
+
+    { "date": "2024-12", "series": "Mixed Soil", "value": 6.4 },
+    { "date": "2024-12", "series": "Sandy Soil", "value": 5.1 },
+    { "date": "2024-12", "series": "Clay Soil",  "value": 4.5 },
+    { "date": "2024-12", "series": "Muddy Soil", "value": 3.3 },
+
+    { "date": "2025-01", "series": "Mixed Soil", "value": 7.8 },
+    { "date": "2025-01", "series": "Sandy Soil", "value": 6.1 },
+    { "date": "2025-01", "series": "Clay Soil",  "value": 5.0 },
+    { "date": "2025-01", "series": "Muddy Soil", "value": 3.8 },
+
+    { "date": "2025-02", "series": "Mixed Soil", "value": 7.0 },
+    { "date": "2025-02", "series": "Sandy Soil", "value": 5.5 },
+    { "date": "2025-02", "series": "Clay Soil",  "value": 5.2 },
+    { "date": "2025-02", "series": "Muddy Soil", "value": 3.5 },
+
+    { "date": "2025-03", "series": "Mixed Soil", "value": 7.2 },
+    { "date": "2025-03", "series": "Sandy Soil", "value": 5.7 },
+    { "date": "2025-03", "series": "Clay Soil",  "value": 5.3 },
+    { "date": "2025-03", "series": "Muddy Soil", "value": 3.5 },
+
+    { "date": "2025-04", "series": "Mixed Soil", "value": 7.3 },
+    { "date": "2025-04", "series": "Sandy Soil", "value": 5.8 },
+    { "date": "2025-04", "series": "Clay Soil",  "value": 5.3 },
+    { "date": "2025-04", "series": "Muddy Soil", "value": 3.6 },
+
+    { "date": "2025-05", "series": "Mixed Soil", "value": 7.5 },
+    { "date": "2025-05", "series": "Sandy Soil", "value": 6.0 },
+    { "date": "2025-05", "series": "Clay Soil",  "value": 5.4 },
+    { "date": "2025-05", "series": "Muddy Soil", "value": 3.5 },
+
+    { "date": "2025-06", "series": "Mixed Soil", "value": 7.8 },
+    { "date": "2025-06", "series": "Sandy Soil", "value": 6.2 },
+    { "date": "2025-06", "series": "Clay Soil",  "value": 5.5 },
+    { "date": "2025-06", "series": "Muddy Soil", "value": 3.5 },
+
+    { "date": "2025-07", "series": "Mixed Soil", "value": 8.0 },
+    { "date": "2025-07", "series": "Sandy Soil", "value": 6.4 },
+    { "date": "2025-07", "series": "Clay Soil",  "value": 5.5 },
+    { "date": "2025-07", "series": "Muddy Soil", "value": 3.7 },
+
+    { "date": "2025-08", "series": "Mixed Soil", "value": 8.3 },
+    { "date": "2025-08", "series": "Sandy Soil", "value": 6.5 },
+    { "date": "2025-08", "series": "Clay Soil",  "value": 5.6 },
+    { "date": "2025-08", "series": "Muddy Soil", "value": 3.8 },
+
+    { "date": "2025-09", "series": "Mixed Soil", "value": 8.5 },
+    { "date": "2025-09", "series": "Sandy Soil", "value": 6.7 },
+    { "date": "2025-09", "series": "Clay Soil",  "value": 5.6 },
+    { "date": "2025-09", "series": "Muddy Soil", "value": 3.8 }
+  ]
+}

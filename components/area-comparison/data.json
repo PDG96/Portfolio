@@ -1,0 +1,56 @@
+{
+  "title": "Emission reductions: design vs actual",
+  "yMin": 0,
+  "yMax": 10000,
+  "yTickInterval": 1000,
+  "lineWidth": 2,
+  "unit": "tCO₂e",
+  "thousandsSeparator": ",",
+  "valueDecimals": 0,
+  "decimalSeparator": ".",
+  "series": [
+    {
+      "name": "Design",
+      "color": "#FF7A45",
+      "dashed": true,
+      "fillOpacity": 0
+    },
+    {
+      "name": "Actual",
+      "color": "#57CACB",
+      "dashed": false,
+      "fillOpacity": 0.32
+    },
+    {
+      "name": "Projected",
+      "color": "#57CACB",
+      "dashed": true,
+      "fillOpacity": 0
+    }
+  ],
+  "data": [
+    { "year": "2020", "series": "Design",    "value":    0 },
+    { "year": "2020", "series": "Actual",    "value":    0 },
+    { "year": "2021", "series": "Design",    "value":  850 },
+    { "year": "2021", "series": "Actual",    "value":  600 },
+    { "year": "2022", "series": "Design",    "value": 1700 },
+    { "year": "2022", "series": "Actual",    "value": 1200 },
+    { "year": "2023", "series": "Design",    "value": 2550 },
+    { "year": "2023", "series": "Actual",    "value": 1850 },
+    { "year": "2024", "series": "Design",    "value": 3400 },
+    { "year": "2024", "series": "Actual",    "value": 2500 },
+    { "year": "2025", "series": "Design",    "value": 4200 },
+    { "year": "2025", "series": "Actual",    "value": 3200 },
+    { "year": "2026", "series": "Design",    "value": 4983 },
+    { "year": "2026", "series": "Actual",    "value": 3792 },
+    { "year": "2026", "series": "Projected", "value": 3792 },
+    { "year": "2027", "series": "Design",    "value": 5600 },
+    { "year": "2027", "series": "Projected", "value": 4400 },
+    { "year": "2028", "series": "Design",    "value": 6200 },
+    { "year": "2028", "series": "Projected", "value": 5000 },
+    { "year": "2029", "series": "Design",    "value": 7100 },
+    { "year": "2029", "series": "Projected", "value": 5700 },
+    { "year": "2030", "series": "Design",    "value": 8400 },
+    { "year": "2030", "series": "Projected", "value": 6500 }
+  ]
+}

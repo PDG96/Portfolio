@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Straatos — Simulation bento</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', sans-serif;
+  }
+
+  /* Stage locks itself to the 1282/700 aspect of the mockup so all gaps
+     resolve to equal pixels regardless of host. */
+  .stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1282 / 700;
+    height: auto;
+    max-height: 100%;
+  }
+
+  .tile {
+    position: absolute;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease;
+    will-change: transform, filter;
+    overflow: hidden;
+    border-radius: 12px;
+  }
+  /* The gauge splits its width 1fr | bar | 1fr, which leaves ~60px for the
+     readout in this tile while the row (dash + "pH" + value) wanted ~87px,
+     so the number clipped against the card edge. Trim the bar, the gaps and
+     the type until the row fits the column it's given. */
+  .tile.ph {
+    --vg-bar-width: 44px;
+    --vg-col-gap: 10px;
+    --vg-dash-width: 12px;
+    --vg-affix-size: 11px;
+    --vg-value-size: 20px;
+  }
+
+  .tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .tile.mangrove:hover,
+  .tile.sos:hover {
+    transform: translateY(-6px) scale(1.01);
+    filter: drop-shadow(0 18px 36px rgba(15, 23, 42, 0.14));
+    z-index: 5;
+  }
+
+  /* Mockup proportions (1282 × 700, 24 px uniform gap):
+       horizontal 24 / 1282 = 1.87%
+       vertical   24 / 700  = 3.43% (same pixels when aspect is preserved)
+     SOS Mangrove sits top-right, Emission reductions sits bottom-wide. */
+  .mangrove     { left: 0;      top: 0;       width: 38.77%; height: 100%;    }
+  .ph           { left: 40.64%; top: 0;       width: 17.98%; height: 51%;     }
+  .sos          { left: 60.49%; top: 0;       width: 39.51%; height: 51%;     }
+  .emissions    { left: 40.64%; top: 54.43%;  width: 59.36%; height: 45.57%;  }
+
+  /* Live components fill their tile entirely. */
+  .tile.ph > chart-card,
+  .tile.emissions > chart-card {
+    width: 100%;
+    height: 100%;
+  }
+  .tile.ph .chart-mount,
+  .tile.emissions .chart-mount {
+    width: 100%;
+    height: 100%;
+  }
+  /* Gauge tile is narrow, shrink everything inside accordingly. The
+     caption ("Safe Range") is hidden here, it does not fit cleanly at
+     this size and the chart-card title already provides context. */
+  .tile.ph .chart-mount {
+    --vg-bar-width: 44px;
+    --vg-col-gap: 8px;
+    --vg-value-size: 20px;
+    --vg-affix-size: 11px;
+    --vg-max-width: none;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .tile.ph .vg-root {
+    flex: 1;
+    min-height: 0;
+  }
+  .tile.ph .vg-caption { display: none; }
+
+  /* Below 900 px the bento switches to a stacked vertical layout. */
+  @media (max-width: 900px) {
+    .stage {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      aspect-ratio: auto;
+      height: auto;
+    }
+    .tile {
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      width: 100% !important;
+      height: auto !important;
+    }
+    .tile.mangrove    { min-height: 520px; }
+    .tile.ph          { min-height: 360px; }
+    .tile.sos         { min-height: 280px; }
+    .tile.emissions   { min-height: 320px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="tile mangrove">
+    <img src="straatos-charts/simulation/2 Mangrove tree.png"
+         alt="Mangrove tree botanical illustration with simulation annotations: survival rate 86%, average height 24.5 cm, average diameter 6.2 mm">
+  </div>
+
+  <div class="tile ph">
+    <chart-card title="Average Ph Level">
+      <div class="chart-mount" data-chart="vertical-gauge"
+           data-src="/projects/assets/straatos-charts/simulation/ph-level.json"></div>
+    </chart-card>
+  </div>
+
+  <div class="tile sos">
+    <img src="straatos-charts/simulation/2 SOS mangrove.png"
+         alt="SOS Mangrove project card, Senegal, Sectoral Scope AFOLU, Methodology VM0033">
+  </div>
+
+  <div class="tile emissions">
+    <chart-card title="Emission reductions: design vs actual">
+      <div class="chart-mount" data-chart="area-comparison"
+           data-src="/projects/assets/straatos-charts/simulation/emission-reductions.json"></div>
+    </chart-card>
+  </div>
+</div>
+
+<script src="/components/chart-tooltip/chart-tooltip.js?v=2" defer></script>
+<script src="/components/chart-card/chart-card.js?v=2" defer></script>
+<script src="/components/area-comparison/area-comparison.js?v=2" defer></script>
+<script src="/components/vertical-gauge/vertical-gauge.js?v=2" defer></script>
+
+<script>
+  /* Type inside this composition is sized in px against the 1282 px the bento was
+     drawn at, while the tiles themselves are laid out in %. Left alone, a wide
+     column grows the tiles and leaves the headers and the indicator figures
+     behind, reading as tiny. Zoom scales layout and text together and, unlike a
+     transform, re-renders at the new size rather than stretching pixels.
+
+     The width arrives from the host: reading it here instead would feed back
+     into itself, since zoom changes what the document thinks its width is. */
+  (() => {
+    const BASE = 1282;
+    addEventListener('message', (e) => {
+      const w = e.data && e.data.type === 'bento:width' && e.data.w;
+      if (!w) return;
+      document.documentElement.style.zoom = (w / BASE).toFixed(4);
+    });
+  })();
+</script>
+
+</body>
+</html>

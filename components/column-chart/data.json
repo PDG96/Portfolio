@@ -1,0 +1,8 @@
+{
+  "categories": ["Own", "Source 1", "Source 2", "Others"],
+  "values": [15, 10, 6, 3],
+  "color": "#E25E25",
+  "yMax": 20,
+  "yTicks": 4,
+  "name": "Subjects"
+}

@@ -1,0 +1,89 @@
+{
+  "search": true,
+  "searchPlaceholder": "Search",
+  "kebab": true,
+  "columns": [
+    {
+      "key": "title",
+      "label": "Title"
+    },
+    {
+      "key": "name",
+      "label": "Name"
+    },
+    {
+      "key": "category",
+      "label": "Category"
+    },
+    {
+      "key": "subcategory",
+      "label": "Subcategory"
+    },
+    {
+      "key": "country",
+      "label": "Country"
+    },
+    {
+      "key": "updated",
+      "label": "Last Update"
+    }
+  ],
+  "rows": [
+    {
+      "title": "STK00000123",
+      "name": "Acme Holdings Ltd",
+      "category": "Organisation",
+      "subcategory": "Private Company",
+      "country": "Tanzania",
+      "updated": "04 Feb 26"
+    },
+    {
+      "title": "STK00000124",
+      "name": "Northbridge Trading Co",
+      "category": "Organisation",
+      "subcategory": "Private Company",
+      "country": "Tanzania",
+      "updated": "28 Jan 26"
+    },
+    {
+      "title": "STK00000125",
+      "name": "Meridian Partners",
+      "category": "Organisation",
+      "subcategory": "Partnership",
+      "country": "Tanzania",
+      "updated": "21 Jan 26"
+    },
+    {
+      "title": "STK00000126",
+      "name": "Halcyon Group Ltd",
+      "category": "Organisation",
+      "subcategory": "Private Company",
+      "country": "Tanzania",
+      "updated": "14 Jan 26"
+    },
+    {
+      "title": "STK00000127",
+      "name": "Beacon Standards Board",
+      "category": "Institution",
+      "subcategory": "Public Body",
+      "country": "Tanzania",
+      "updated": "09 Jan 26"
+    },
+    {
+      "title": "STK00000128",
+      "name": "Crestline Ventures",
+      "category": "Organisation",
+      "subcategory": "Private Company",
+      "country": "Tanzania",
+      "updated": "18 Dec 25"
+    },
+    {
+      "title": "STK00000129",
+      "name": "Summit Oversight Org",
+      "category": "Institution",
+      "subcategory": "NGO",
+      "country": "Tanzania",
+      "updated": "02 Dec 25"
+    }
+  ]
+}

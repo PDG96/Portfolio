@@ -3,9 +3,9 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <meta name="description" content="Straatos Application, Digital infrastructure for environmental and outdoor projects, from field data collection to credit issuance.">
+ <meta name="description" content="Kota, onboarding and due-diligence infrastructure that treats the counterparty as a durable object. Compile once, verify once, reuse everywhere.">
  <meta name="theme-color" content="#fcfcfc">
- <title>Straatos Application, Case Study · Pietra Gottardo</title>
+ <title>Kota, Case Study · Pietra Gottardo</title>
  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
  <link rel="apple-touch-icon" href="../favicon.svg">
 
@@ -45,7 +45,6 @@
  --text-2: #6b6b6b; /* gray-500 only reached 4.16:1 on the #f0f0ee gutter */
  --text-3: var(--gray-true-500);
  --border: var(--gray-true-200);
-
  /* Shell layer: the gutter behind the panes, and the pane surface itself.
  Tokenized so light/dark can swap them — they used to be hardcoded
  #f0f0ee and #ffffff in the shell rules. */
@@ -57,8 +56,10 @@
     the edge and the wide ones spilled. */
  --sheet-gutter: clamp(1.25rem, 2.5vw, 2rem);
 
- --accent: #3d5a3e;
- --accent-light: #e8ede8;
+ /* Kota accent, deep orange (per-page brand override) */
+ --accent: #E25E25;
+ --accent-deep: #B5491C;
+ --accent-light: #fbe7dd;
  --accent-yellow: #f7fdb9;
  --accent-blue: #c5e9ff;
  --accent-pink: #eee1ea;
@@ -77,7 +78,7 @@
  --section-gap: clamp(2.5rem, 5vw, 3.5rem);
  }
 
- /* Dark theme. Only the semantic layer is redefined — the gray ramp keeps
+  /* Dark theme. Only the semantic layer is redefined — the gray ramp keeps
  its meaning, the roles swap ends of it. Ratios against the pane
  (#1a1a1a): text 16.7:1, text-2 6.9:1, text-3 5.4:1, link 8.9:1. */
  [data-theme="dark"] {
@@ -100,7 +101,7 @@
  --label-warn: #d98b68;
  }
 
- *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
  html { scroll-behavior: smooth; }
  body {
  font-family: var(--font);
@@ -275,7 +276,6 @@
  transition: color 0.3s;
  }
  .nav-links a:hover { color: var(--text); }
-
  .theme-toggle {
  display: flex; gap: 0;
  border: 1px solid var(--border); border-radius: 6px;
@@ -295,7 +295,7 @@
  .nav-links { display: flex; }
  }
 
- /* ====== SIDEBAR SHELL ====== */
+  /* ====== SIDEBAR SHELL ====== */
  /* White mode: light gutter, white sidebar + sheet cards. Same structure
  as the dark version, colors flipped to the site's default light tokens. */
  .shell-page { background: var(--shell-bg); }
@@ -584,14 +584,14 @@
  breakpoint just because the sidebar narrowed this column. Without this,
  the iframe "thinks" it's on a narrow phone and reflows into a stacked
  layout that then gets squashed into the wide aspect-ratio frame. */
- .embed-iframe--scaled {
+ .embed-iframe--app, .embed-iframe--scaled {
  position: absolute;
  top: 0;
  left: 0;
  transform-origin: top left;
  }
 
- /* Blanket guard: every picture, video and frame in the sheet stays inside
+/* Blanket guard: every picture, video and frame in the sheet stays inside
  its column and keeps its own proportions. Individual components used to
  set this themselves, or not at all, which is where the crops came from. */
  .main-sheet img,
@@ -702,23 +702,12 @@
  width: 100%;
  display: flex;
  justify-content: center;
- /* The 8px corner lives on the container, not the img: the hero PNGs ship
- with their own ~98px corner radius baked in (transparent pixels), which
- read as ~20px on screen and swallowed any smaller radius set on the
- image itself. Clipping here + the scale below crops past that baked
- corner so 8px is the corner that actually renders. */
- overflow: hidden;
- border-radius: 8px;
  }
  .case-hero-mockup img {
  width: 100%;
  height: auto;
  max-width: 100%;
  display: block;
- border-radius: 0;
- /* 30px of crop per edge is what it takes to clear the baked arc; on the
- shorter axis that's a 1.023 scale, rounded up for anti-aliasing. */
- transform: scale(1.025);
  }
  .case-hero-mockup--placeholder {
  border: 1px solid var(--border);
@@ -830,7 +819,7 @@
  margin-bottom: 0.75rem;
  display: block;
  }
- .cs-block--challenge .cs-block-label { color: var(--label-warn); }
+ .cs-block--challenge .cs-block-label { color: #b85c3f; }
  .cs-block--solution .cs-block-label { color: var(--accent); }
  .cs-block--phases .cs-block-label { color: var(--accent); }
 
@@ -1183,53 +1172,19 @@
  height: 1880px; /* fits 5 stacked tiles: 4×320 + 1×500 + 4 gaps */
  }
  }
- /* Browser chrome around the live dashboard, so it reads as a running app
- instead of another block of the page. Everything is tokenized, so the
- frame follows the light/dark theme like the rest of the case study. */
- .browser-frame {
+ /* KYC screen recreation: a full app page lives inside the frame, so it
+ keeps its own internal scroll and a fixed laptop-ish aspect. */
+ .app-shot--kyc .embed-frame {
+ border: 1px solid var(--border);
  border-radius: 14px;
- overflow: hidden;
- border: 1px solid var(--border);
- background: var(--surface);
- box-shadow: 0 24px 60px rgba(0, 0, 0, 0.18);
+ background: #f3f4f6;
  }
- .browser-bar {
- display: flex;
- align-items: center;
- gap: 0.75rem;
- padding: 0.625rem 0.875rem;
- background: var(--bg-alt);
- border-bottom: 1px solid var(--border);
+ @media (max-width: 900px) {
+ .app-shot--kyc .embed-frame {
+ aspect-ratio: auto !important;
+ height: 78vh;
  }
- .browser-dots { display: flex; gap: 6px; flex-shrink: 0; }
- .browser-dots i {
- width: 10px; height: 10px; border-radius: 50%;
- background: var(--border);
  }
- .browser-url {
- font-family: var(--mono);
- font-size: 0.6875rem;
- letter-spacing: 0.04em;
- color: var(--text-3);
- background: var(--surface);
- border: 1px solid var(--border);
- border-radius: 999px;
- padding: 0.25rem 0.75rem;
- }
- /* The chrome already frames it, so the iframe box itself stays square.
-    Unlike the bento compositions this one is an app window: it fills the
-    frame instead of capping and centring, which was leaving dark bands
-    either side of the dashboard on a wide display. The height is a
-    variable so the breakpoint below can give it more room. */
- .app-shot--browser .embed-frame {
- border-radius: 0;
- max-width: none;
- --dash-h: 780px;
- }
- /* No aspect-ratio here: the JS below owns the height so it can stay put
- while the width follows the column. */
- .app-shot--browser .embed-iframe--app { transform-origin: top left; }
-
  /* Gray background variant, matches the section-alt color used elsewhere */
  .app-shot--bg .embed-frame {
  background: var(--bg-alt);
@@ -1455,6 +1410,18 @@
  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF UI Display", "Helvetica Neue", Arial, sans-serif;
  display: flex;
  flex-direction: column;
+ }
+
+ /* top-left editorial tag, sits over the video */
+ .id-car-slide__type-tag {
+ align-self: flex-start;
+ font-family: var(--mono);
+ font-size: clamp(.6875rem, 1vw, .8125rem);
+ font-weight: 500;
+ letter-spacing: 0.18em;
+ text-transform: uppercase;
+ color: rgba(255, 255, 255, .85);
+ mix-blend-mode: difference;
  }
 
  /* bottom-right meta line, typeface name + tiny caption */
@@ -1915,7 +1882,7 @@
  position: relative;
  display: flex;
  flex-direction: column;
- background: var(--surface);
+ background: #ffffff;
  border: 1px solid var(--border);
  border-radius: 16px;
  padding: clamp(1.75rem, 2.75vw, 2.5rem);
@@ -2776,22 +2743,545 @@
  transition: opacity 0.35s var(--ease);
  }
  .case-next-card--soon:hover .case-next-overlay { opacity: 1; }
-  /* ====== EXTRA-WIDE ======
- Past this width the caps start to read as components shrinking away from
- the page rather than sitting on it, so everything goes back to the same
- measure the text blocks use. */
- @media (min-width: 1800px) {
- /* Compositions stop capping and run the full column, like the images
- and the copy above and below them. */
- .app-shot--embed .embed-frame { max-width: none; }
- /* Proportionally more height, so a wider window shows more of the
- dashboard rather than the same slice stretched wider. */
- .app-shot--browser .embed-frame { --dash-h: 940px; }
- /* The pair was locked at 560px tall while its cells kept widening, so
- object-fit cropped the phones top and bottom. */
- .app-pair { grid-auto-rows: clamp(560px, 26vw, 860px); }
+
+ /* ====== PROCESS STEPS (3 numbered cards, reuses .insights-grid layout) ====== */
+ .step-num {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--accent);
+ margin-bottom: 0.9rem;
+ display: block;
  }
-</style>
+
+ /* ====== DEPLOYMENT MATRIX (Kota-only) ====== */
+ .dep-matrix-note {
+ font-size: 1rem;
+ color: var(--text-2);
+ line-height: 1.7;
+ max-width: none;
+ margin-top: 0.75rem;
+ }
+ .dep-matrix-scroll {
+ margin-top: 2rem;
+ overflow-x: auto;
+ -webkit-overflow-scrolling: touch;
+ border-radius: 18px;
+ border: 1px solid var(--border);
+ box-shadow: 0 24px 48px -36px rgba(40, 18, 8, 0.30);
+ }
+ .dep-matrix {
+ width: 100%;
+ min-width: 720px;
+ border-collapse: collapse;
+ background: var(--surface);
+ font-size: 0.9375rem;
+ }
+ .dep-matrix thead th {
+ text-align: left;
+ vertical-align: bottom;
+ padding: 1.25rem 1.5rem;
+ border-bottom: 1px solid var(--border);
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ }
+ .dep-matrix thead th:first-child { width: 26%; }
+ .dep-matrix thead th .dep-actor {
+ display: flex;
+ align-items: center;
+ gap: 0.5rem;
+ font-family: var(--font);
+ font-size: 1.0625rem;
+ font-weight: 600;
+ letter-spacing: -0.005em;
+ text-transform: none;
+ color: var(--text);
+ margin-bottom: 4px;
+ }
+ .dep-matrix thead th .dep-actor::before {
+ content: "";
+ flex: 0 0 auto;
+ width: 10px;
+ height: 10px;
+ border-radius: 50%;
+ }
+ .dep-matrix thead th:nth-child(2) .dep-actor::before { background: #6fb5e3; box-shadow: 0 0 0 4px rgba(197, 233, 255, 0.55); }
+ .dep-matrix thead th:nth-child(3) .dep-actor::before { background: #cf9dbd; box-shadow: 0 0 0 4px rgba(238, 225, 234, 0.7); }
+ /* Column identity, tints matching the persona tones (bank = blue, aggregator = pink) */
+ .dep-matrix thead th:nth-child(2),
+ .dep-matrix tbody td:nth-of-type(1) { background-image: linear-gradient(rgba(197, 233, 255, 0.16), rgba(197, 233, 255, 0.16)); }
+ .dep-matrix thead th:nth-child(3),
+ .dep-matrix tbody td:nth-of-type(2) { background-image: linear-gradient(rgba(238, 225, 234, 0.22), rgba(238, 225, 234, 0.22)); }
+ .dep-matrix tbody td,
+ .dep-matrix tbody th {
+ text-align: left;
+ vertical-align: top;
+ padding: 1.4rem 1.5rem;
+ border-bottom: 1px solid var(--border);
+ line-height: 1.55;
+ color: var(--text-2);
+ }
+ .dep-matrix tbody tr:last-child td,
+ .dep-matrix tbody tr:last-child th { border-bottom: none; }
+ .dep-matrix tbody th {
+ font-size: 1rem;
+ font-weight: 500;
+ color: var(--text);
+ line-height: 1.35;
+ }
+ .dep-matrix tbody th .dep-row-sub {
+ display: inline-flex;
+ font-family: var(--mono);
+ font-size: 0.5625rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.08em;
+ color: var(--gray-true-700);
+ background: var(--bg-alt);
+ border: 1px solid var(--border);
+ border-radius: 999px;
+ padding: 3px 10px;
+ margin-top: 0.55rem;
+ }
+ /* Operator-led paths wear the operator's yellow */
+ .dep-matrix tbody tr:nth-child(1) th .dep-row-sub,
+ .dep-matrix tbody tr:nth-child(2) th .dep-row-sub {
+ background: var(--accent-yellow);
+ border-color: transparent;
+ color: var(--gray-true-800);
+ }
+ .dep-matrix .dep-form {
+ display: inline-block;
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.08em;
+ color: var(--accent-deep);
+ background: var(--accent-light);
+ padding: 4px 10px;
+ border-radius: 999px;
+ margin-bottom: 0.65rem;
+ }
+ .dep-matrix .dep-na {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.1em;
+ color: var(--text-3);
+ }
+ /* Not-applicable cells, hatched so the gap reads as deliberate */
+ .dep-matrix tbody td:has(.dep-na) {
+ background-image: repeating-linear-gradient(-45deg, rgba(20, 20, 20, 0.028) 0 6px, transparent 6px 14px);
+ }
+ .dep-matrix tbody td:nth-of-type(2):has(.dep-na) {
+ background-image:
+ repeating-linear-gradient(-45deg, rgba(20, 20, 20, 0.028) 0 6px, transparent 6px 14px),
+ linear-gradient(rgba(238, 225, 234, 0.22), rgba(238, 225, 234, 0.22));
+ }
+
+ /* ====== OUTCOME (durable-object closing statement) ====== */
+ .outcome-statement {
+ font-size: clamp(1.375rem, 2.6vw, 2rem);
+ font-weight: 300;
+ line-height: 1.3;
+ letter-spacing: -0.015em;
+ color: var(--text);
+ max-width: 22ch;
+ }
+ .outcome-statement em {
+ font-style: normal;
+ color: var(--accent);
+ }
+
+ /* Kota dark Design-Principles treatment, no shared video, orange glow instead */
+ .case-section--insights {
+ background:
+ radial-gradient(120% 90% at 82% -10%, rgba(226, 94, 37, 0.30), transparent 55%),
+ radial-gradient(90% 70% at 8% 110%, rgba(181, 73, 28, 0.22), transparent 60%),
+ #100b09;
+ }
+ .case-section--insights::after {
+ content: "";
+ position: absolute;
+ inset: 0;
+ background-image:
+ linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+ linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+ background-size: 44px 44px;
+ mask-image: radial-gradient(120% 100% at 50% 0%, #000 30%, transparent 75%);
+ -webkit-mask-image: radial-gradient(120% 100% at 50% 0%, #000 30%, transparent 75%);
+ z-index: 0;
+ pointer-events: none;
+ }
+
+ /* Product gallery placeholder tiles (bento), captioned for screens to come */
+ .screen-ph {
+ flex: 1;
+ min-height: 200px;
+ display: flex;
+ align-items: flex-end;
+ }
+ .screen-ph--tall { min-height: 300px; }
+ .process-item .screen-ph .ph-caption { max-width: 100%; }
+ .screen-soon {
+ font-family: var(--mono);
+ font-size: 0.5625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.14em;
+ color: var(--accent-deep);
+ background: var(--accent-light);
+ border-radius: 999px;
+ padding: 3px 9px;
+ position: absolute;
+ top: 0.9rem;
+ left: 0.9rem;
+ z-index: 1;
+ }
+ .screens-group-label {
+ display: block;
+ margin-bottom: 1.25rem;
+ margin-top: 2rem;
+ color: var(--accent-deep);
+ }
+ /* "Room for more screens" tile, dashed and empty by design */
+ .screen-ph--add {
+ background: transparent;
+ border: 1px dashed var(--gray-true-300);
+ align-items: center;
+ justify-content: center;
+ min-height: 180px;
+ }
+ .screen-ph--add::before { content: none; }
+ .screen-add {
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-3);
+ }
+
+ /* ====== KOTA SITEMAP (vertical flow diagram) ======
+ One aligned column: every tier spans the same 880px track.
+ Color system: yellow = operator/counterparty, blue = bank,
+ pink = aggregator (same tones as the personas + matrix);
+ orange is reserved for product flow (connectors, stages). */
+ .kota-sitemap {
+ max-width: 880px;
+ margin: 3rem auto 0;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ }
+ .sm-step {
+ width: 100%;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ }
+ .sm-step-tag {
+ display: inline-flex;
+ align-items: center;
+ gap: 0.55rem;
+ font-family: var(--mono);
+ font-size: 0.6875rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--text-2);
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: 999px;
+ padding: 5px 14px 5px 5px;
+ margin-bottom: 1.4rem;
+ }
+ .sm-step-n {
+ font-size: 0.625rem;
+ color: #fff;
+ background: var(--accent);
+ border-radius: 999px;
+ padding: 3px 8px;
+ letter-spacing: 0.06em;
+ }
+
+ /* Tier 1, the record — the operator's yellow */
+ .sm-record {
+ width: 100%;
+ background: var(--accent-yellow);
+ border: 1px solid rgba(20, 20, 20, 0.05);
+ border-radius: 20px;
+ padding: clamp(1.6rem, 3.2vw, 2.25rem);
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ text-align: center;
+ gap: 0.4rem;
+ }
+ .sm-record-kicker {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.14em;
+ color: var(--gray-true-600);
+ }
+ .sm-record-name {
+ color: var(--gray-true-900);
+ font-size: clamp(1.25rem, 2.2vw, 1.5rem);
+ font-weight: 500;
+ letter-spacing: -0.01em;
+ line-height: 1.2;
+ }
+ .sm-attrs {
+ list-style: none;
+ margin: 0.9rem 0 0;
+ padding: 0;
+ display: flex;
+ flex-wrap: wrap;
+ justify-content: center;
+ gap: 0.5rem;
+ }
+ .sm-attrs li {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.08em;
+ color: var(--gray-true-800);
+ background: rgba(255, 255, 255, 0.75);
+ border: 1px solid rgba(20, 20, 20, 0.05);
+ border-radius: 999px;
+ padding: 5px 12px;
+ }
+
+ /* Connectors between tiers */
+ .sm-link {
+ width: 2px;
+ height: 48px;
+ margin: 0.5rem 0;
+ background: linear-gradient(180deg, var(--accent), var(--gray-true-300));
+ border-radius: 2px;
+ position: relative;
+ }
+ .sm-link::after {
+ content: "";
+ position: absolute;
+ bottom: -3px;
+ left: 50%;
+ transform: translateX(-50%);
+ width: 8px;
+ height: 8px;
+ border-radius: 50%;
+ background: var(--accent);
+ box-shadow: 0 0 0 4px rgba(226, 94, 37, 0.14);
+ }
+
+ /* Tier 2, the cycle */
+ .sm-cycle { display: flex; align-items: stretch; flex-wrap: wrap; width: 100%; }
+ .sm-stage {
+ flex: 1;
+ min-width: 180px;
+ background: #fff;
+ border: 1px solid var(--border);
+ border-radius: 16px;
+ padding: 1.1rem 1.4rem;
+ display: flex;
+ flex-direction: column;
+ gap: 0.3rem;
+ box-shadow: 0 16px 32px -24px rgba(40, 18, 8, 0.35);
+ }
+ .sm-stage-k {
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.12em;
+ color: var(--accent-deep);
+ }
+ .sm-stage-t { font-size: 0.9375rem; font-weight: 500; line-height: 1.3; color: var(--text); }
+ .sm-arrow {
+ align-self: center;
+ flex: 0 0 auto;
+ width: 32px; height: 32px;
+ margin: 0 -10px;
+ z-index: 2;
+ border-radius: 50%;
+ background: linear-gradient(140deg, var(--accent), var(--accent-deep));
+ color: #fff;
+ display: flex; align-items: center; justify-content: center;
+ font-size: 0.9rem;
+ box-shadow: 0 8px 16px -5px rgba(226, 94, 37, 0.6);
+ }
+
+ /* Tier 3, the views */
+ .sm-views { display: grid; grid-template-columns: 1fr; gap: 1rem; width: 100%; }
+ @media (min-width: 560px) { .sm-views { grid-template-columns: 1fr 1fr; } }
+ .sm-view {
+ background: #fff;
+ border: 1px solid var(--border);
+ border-radius: 20px;
+ padding: 1.25rem 1.4rem;
+ box-shadow: 0 16px 32px -26px rgba(40, 18, 8, 0.18);
+ }
+ .sm-view-head {
+ display: flex;
+ align-items: center;
+ flex-wrap: wrap;
+ gap: 0.55rem;
+ font-size: 0.9375rem;
+ font-weight: 600;
+ color: var(--text);
+ padding-bottom: 0.7rem;
+ margin-bottom: 0.5rem;
+ border-bottom: 1px solid var(--border);
+ }
+ /* Actor chips, same tones as the personas */
+ .sm-chips { margin-left: auto; display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+ .sm-chip {
+ font-family: var(--mono);
+ font-size: 0.5625rem;
+ font-weight: 600;
+ text-transform: uppercase;
+ letter-spacing: 0.08em;
+ color: var(--gray-true-800);
+ border-radius: 999px;
+ padding: 3px 9px;
+ }
+ .sm-chip--yellow { background: var(--accent-yellow); }
+ .sm-chip--blue { background: var(--accent-blue); }
+ .sm-chip--pink { background: var(--accent-pink); }
+ .sm-list { list-style: none; margin: 0; padding: 0; }
+ .sm-list li {
+ position: relative;
+ font-size: 0.9375rem;
+ color: var(--text);
+ padding: 0.5rem 0 0.5rem 1.15rem;
+ }
+ .sm-list li + li { border-top: 1px solid var(--gray-true-100); }
+ .sm-list li::before {
+ content: "";
+ position: absolute;
+ left: 0; top: 0.95em;
+ width: 5px; height: 5px;
+ border-radius: 50%;
+ background: var(--gray-true-300);
+ }
+ .sm-roles-line {
+ margin-top: 0.85rem;
+ padding-top: 0.7rem;
+ border-top: 1px dashed var(--border);
+ font-family: var(--mono);
+ font-size: 0.625rem;
+ font-weight: 500;
+ text-transform: uppercase;
+ letter-spacing: 0.05em;
+ color: var(--text-3);
+ line-height: 1.5;
+ }
+ @media (max-width: 559px) {
+ .sm-cycle { flex-direction: column; }
+ .sm-arrow { margin: -10px auto; transform: rotate(90deg); }
+ }
+
+ /* ====== PERSONAS (tinted header bands, one tone per actor) ====== */
+ .personas-grid {
+ display: grid;
+ grid-template-columns: 1fr;
+ gap: 1.25rem;
+ margin-top: 2rem;
+ }
+ @media (min-width: 880px) { .personas-grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; } }
+ .persona {
+ display: flex;
+ flex-direction: column;
+ background: var(--surface);
+ border: 1px solid var(--border);
+ border-radius: 20px;
+ padding: 0;
+ overflow: hidden;
+ box-shadow: 0 1px 0 rgba(15, 23, 42, 0.02);
+ transition: transform .35s var(--ease), border-color .35s ease, box-shadow .35s ease;
+ }
+ .persona:hover {
+ transform: translateY(-4px);
+ border-color: var(--gray-true-300);
+ box-shadow: 0 22px 44px -24px rgba(40, 18, 8, 0.22);
+ }
+ /* Tones map to the landing's case-card thumbs */
+ .persona[data-tone="yellow"] { --p-tint: var(--accent-yellow); }
+ .persona[data-tone="blue"] { --p-tint: var(--accent-blue); }
+ .persona[data-tone="pink"] { --p-tint: var(--accent-pink); }
+ .persona-head {
+ display: flex;
+ align-items: center;
+ gap: 0.9rem;
+ margin-bottom: 0;
+ padding: 1.25rem 1.5rem;
+ background: var(--p-tint, var(--bg-alt));
+ }
+ .persona-avatar {
+ flex: 0 0 auto;
+ width: 48px; height: 48px;
+ border-radius: 14px;
+ display: flex; align-items: center; justify-content: center;
+ color: var(--gray-true-900);
+ background: rgba(255, 255, 255, 0.92);
+ box-shadow: 0 10px 20px -12px rgba(20, 20, 20, 0.35);
+ }
+ .persona-avatar svg { width: 23px; height: 23px; }
+ .persona-id { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+ .persona-role { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; color: var(--gray-true-900); line-height: 1.2; }
+ .persona-chip {
+ align-self: flex-start;
+ font-family: var(--mono);
+ font-size: 0.5625rem; font-weight: 600;
+ text-transform: uppercase; letter-spacing: 0.1em;
+ color: var(--gray-true-800);
+ background: rgba(255, 255, 255, 0.65);
+ border-radius: 999px; padding: 3px 9px;
+ }
+ .persona-who {
+ font-size: 0.9375rem; color: var(--text-2); line-height: 1.6;
+ padding: 1.25rem 1.5rem 1.1rem; margin-bottom: 0;
+ border-bottom: 1px solid var(--gray-true-100);
+ }
+ .persona-dl { display: flex; flex-direction: column; gap: 1rem; margin: 0; padding: 1.1rem 1.5rem 1.5rem; }
+ .persona-dl > div { display: flex; flex-direction: column; gap: 0.3rem; }
+ .persona-dl dt {
+ font-family: var(--mono);
+ font-size: 0.5625rem; font-weight: 600;
+ text-transform: uppercase; letter-spacing: 0.12em;
+ color: var(--text-3);
+ }
+ .persona-dl dd { margin: 0; font-size: 0.9375rem; color: var(--text); line-height: 1.55; }
+ .persona-pain dt { color: var(--accent-deep); }
+ /* Bank's internal team, sub-roles inside one account */
+ .persona-team { margin: auto 1.5rem 1.5rem; padding-top: 1.1rem; border-top: 1px dashed var(--border); }
+ .persona-team-label {
+ font-family: var(--mono);
+ font-size: 0.5625rem; font-weight: 600;
+ text-transform: uppercase; letter-spacing: 0.12em;
+ color: var(--text-3);
+ }
+ .persona-subroles { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.6rem; }
+ .persona-subrole {
+ font-family: var(--mono);
+ font-size: 0.5625rem; font-weight: 600;
+ text-transform: uppercase; letter-spacing: 0.05em;
+ color: var(--gray-true-800);
+ background: var(--accent-blue);
+ border-radius: 999px; padding: 4px 10px;
+ }
+ </style>
 </head>
 
 <body class="shell-page">
@@ -2820,9 +3310,11 @@
  <div class="shell">
 
  <aside class="sidebar">
+
  <div class="sidebar-intro">
- <h1 class="r" data-i18n="case_title">Straatos Application</h1>
- <p class="case-lead r" data-i18n="case_lead">Straatos is a digital infrastructure for environmental projects, from field data collection to credit issuance.</p>
+ <h1 class="r" data-i18n="case_title">Kota</h1>
+
+ <p class="case-lead r" data-i18n="case_lead">Counterparty due-diligence infrastructure for banks in the DRC, where the compliance record belongs to the people it describes.</p>
 
  <div class="sidebar-meta r-stagger">
  <div class="sidebar-meta-item r">
@@ -2831,15 +3323,15 @@
  </div>
  <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_deliverables">Deliverables</span>
- <span class="case-meta-value" data-i18n="meta_deliverables_val">Web App, Mobile App</span>
+ <span class="case-meta-value" data-i18n="meta_deliverables_val">Flows, screens &amp; navigation patterns</span>
  </div>
  <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_team">Team</span>
- <span class="case-meta-value" data-i18n="meta_team_val">Me + 6 Engineers</span>
+ <span class="case-meta-value" data-i18n="meta_team_val">Sole designer · Datastake (founder + engineering)</span>
  </div>
  <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_live">Live site</span>
- <a href="https://www.straatos.io/" target="_blank" rel="noopener" class="case-meta-value" data-i18n="meta_live_val">straatos.io</a>
+ <span class="case-meta-value" data-i18n="meta_live_val">—</span>
  </div>
  </div>
 
@@ -2850,18 +3342,15 @@
  <div class="sidebar-next-list">
   <!-- Image-only cards: the alt text carries the project name for
        screen readers and the link label. -->
+  <a href="straatos.html" class="sidebar-card">
+   <div class="sidebar-card-thumb"><img src="assets/straatos-hero.png" alt="Straatos, Digital infrastructure for climate action"></div>
+  </a>
   <a href="wazi.html" class="sidebar-card">
    <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
   </a>
   <a href="supply-chain.html" class="sidebar-card">
    <div class="sidebar-card-thumb"><img src="assets/supply-chain/card.jpg" alt="Continuous due diligence for commodity supply chains"></div>
   </a>
-  <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
-   <div class="sidebar-card-thumb">
-   <img src="assets/kota-cover.jpg" alt="Kota, Counterparty due-diligence infrastructure">
-   <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
-   </div>
-  </div>
   <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
    <div class="sidebar-card-thumb">
    <img src="assets/safra-hero.png" alt="Safra, Operating system for sustainable Brazilian agriculture">
@@ -2878,7 +3367,7 @@
  <section class="case-hero">
  <div class="wrap">
  <div class="case-hero-mockup r">
- <img src="assets/straatos-hero.png" alt="Straatos hero, platform overview">
+ <img src="assets/kota-cover.jpg" alt="Kota counterparty business overview on a tablet: confidence score, risk distribution by severity, data reliability over twelve months and key risk indicators">
  </div>
  </div>
  </section>
@@ -2889,129 +3378,365 @@
  <div class="cs-grid">
  <div class="cs-block cs-block--challenge r">
  <span class="cs-block-label" data-i18n="challenge_label">The Challenge</span>
- <h3 data-i18n="challenge_title">Restoration projects ran on spreadsheets, paper, and hope.</h3>
- <p data-i18n="challenge_p1">Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.</p>
- <p data-i18n="challenge_p2">Compliance with Verra methodologies like VM0033 required meticulous audit trails, weeks of manual reconciliation per project cycle, prone to errors, delaying critical verification milestones.</p>
+ <h3 data-i18n="challenge_title">Paper, filled in by the wrong hands.</h3>
+ <p data-i18n="challenge_p1">The DRC produces over 70% of the world's cobalt. Up to a third of it is dug by hand, in a sector that sustains an estimated 10 million people. Almost none of them can open a bank account: surveys put banking access among artisanal miners at 1 to 3%. The gap is filled by informal lenders on predatory terms, which is part of why the sector stays dangerous and informal.</p>
+ <p data-i18n="challenge_p2">The blockage isn't the miner. It's the paperwork. Banks need to verify identity, source of funds and due diligence before they can say yes, and that record doesn't exist where there is no filing system, no shared registry, no compliance function. The process ran on paper forms, usually filled in by a bank agent on the operator's behalf. The person answering wasn't the person who knew. The bank inherited data it couldn't defend, and the easiest decision was always no.</p>
+ <p data-i18n="challenge_p3">So the operator is judged by what is missing, and the informality that makes compliance impossible becomes the evidence against them.</p>
  </div>
 
  <div class="cs-block cs-block--solution r">
  <span class="cs-block-label" data-i18n="solution_label">The Solution</span>
- <h3 data-i18n="solution_title">One platform. Every data point traceable.</h3>
- <p data-i18n="solution_p1">Straatos unifies field capture, project management, and verifier-ready reporting in a single digital workspace. Technicians record offline on tablet or mobile; once back online, data flows into structured, methodology-aware records.</p>
- <p data-i18n="solution_p2">Audit trails build themselves. Every entry carries provenance, timestamps, and the operator's identity, so verification becomes a review of what's already documented, not a forensic reconstruction.</p>
+ <h3 data-i18n="solution_title">Change who holds the pen.</h3>
+ <p data-i18n="solution_p1">KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally. The bank receives a structured application instead of a stack of handwritten cards — and the operator gets a score that shows the path forward, not just the verdict.</p>
+ <p data-i18n="solution_p2">One engine serves two institutions — a commercial bank and a government-mandated commodity aggregator — wearing different vocabulary. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can use.</p>
  </div>
  </div>
  </div>
  </section>
 
-
- <!-- ====== VISUAL SYSTEM (bento: palette + typography + icons) ====== -->
+ <!-- ====== WHO IT SERVES ====== -->
  <section class="case-section">
  <div class="wrap">
  <div class="case-section-header r">
- <p class="case-section-label" data-i18n="visual_label">Visual System</p>
- <h2 data-i18n="visual_title">Visual identity.</h2>
+ <p class="case-section-label" data-i18n="actors_label">The People</p>
+ <h2 data-i18n="actors_title">Three actors, one compliance pipeline.</h2>
+ <p class="explore-intro" data-i18n="actors_intro">KOTA is not a single-user product. Three distinct roles touch the same data, at different moments, with different needs — and the platform has to serve all of them without asking any one to work like another.</p>
  </div>
+ <div class="insights-grid r-stagger" style="margin-top: 2rem;">
 
- <div class="id-car r">
- <div class="id-car-track" id="idCarTrack">
- <div class="id-car-slide id-car-slide--palette">
- <img src="assets/straatos-palette.png?v=5" alt="Color palette with hex codes: #1B989B teal primary, #197778/#095D5E deep teals, #E4FCFD/#C5F5F5/#A2E9E9/#57CACB ice and mint tints, #F85531 coral, #FE9065 peach">
- </div>
-
- <div class="id-car-slide id-car-slide--overlay">
- <video src="assets/straatos-flamingos.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Looping video of flamingos in the field"></video>
- <div class="id-car-slide__type" aria-hidden="true">
- <div class="id-car-slide__type-spec">
- <span class="id-car-slide__type-row id-car-slide__type-row--caps">ABCDEFGHIJKLMN</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--caps">OPQRSTUVWXYZ</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--lower">abcdefghijklmno</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--lower">pqrstuvwxyz</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--num">0 1 2 3 4 5 6 7 8 9</span>
- </div>
- <div class="id-car-slide__type-meta">
- <b>SF UI Display</b>
- Apple system · 200–700
- </div>
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="actor_1_role">The Operator</span>
+ <h3 data-i18n="actor_1_t">Gains agency over their own approval.</h3>
+ <p data-i18n="actor_1_d">Cooperatives and small producers in extractive industries — the people KOTA is built for — go through due diligence without a compliance team or a filing system. KOTA gives them the tools to register themselves, track their application, and understand exactly what's holding them back. The score makes the process legible: not just a verdict, but a map.</p>
  </div>
  </div>
 
- <div class="id-car-slide id-car-slide--bare">
- <img src="assets/straatos-icons.png" alt="Icon set, fauna, flora and field markers in teal stroke style">
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="actor_2_role">The Commercial Bank</span>
+ <h3 data-i18n="actor_2_t">Replaces a manual pipeline with a structured one.</h3>
+ <p data-i18n="actor_2_d">Banks receive applications they can actually evaluate — organized forms, uploaded documents, stage-gated workflows — instead of handwritten cards filled by an agent on the client's behalf. Registration and evaluation are separated because they belong to different roles inside the bank: what KOTA makes explicit, the bank has always needed.</p>
  </div>
  </div>
- <div class="h-scroll-hint">
- <div class="h-scroll-track">
- <div class="h-scroll-thumb" id="idCarThumb"></div>
+
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="actor_3_role">The Commodity Aggregator</span>
+ <h3 data-i18n="actor_3_t">Onboards its supply chain into a compliance framework.</h3>
+ <p data-i18n="actor_3_d">An aggregator that buys from cooperatives and sells to international markets has direct exposure to supply chain regulation — EU conflict minerals rules, OECD guidance, ESG requirements from buyers. KOTA lets them run that process using the same platform as the bank, adapted through configuration rather than a separate product.</p>
  </div>
- <span class="h-scroll-label" data-i18n="scroll_hint">Scroll to explore</span>
  </div>
+
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== THE STAKES (market + constraints) ====== -->
+ <section class="case-section case-section--alt">
+ <div class="wrap">
+ <div class="cs-grid">
+ <div class="cs-block cs-block--solution r">
+ <span class="cs-block-label" data-i18n="opp_label">The Opportunity</span>
+ <h3 data-i18n="opp_title">Financial inclusion meets regulatory pressure.</h3>
+ <p data-i18n="opp_p1">The informal economy in sub-Saharan extractive industries is large, underserved, and increasingly visible to regulators. Banks want to grow this client segment but can't afford the manual overhead. Aggregators face compliance demands from buyers in Europe and North America that they can't fulfill at scale. And operators — who have assets, production, and real relationships — lack the documentation infrastructure to be taken seriously by formal institutions.</p>
+ <p data-i18n="opp_p2">KOTA's engine runs one product across multiple institution types, adapted through configuration — not separate builds. Each new institution that deploys it is a high-margin contract, not a new development project. And the data the platform accumulates — operator profiles, verified documents, compliance histories — is the foundation of a future information layer the team is already mapping.</p>
+ </div>
+
+ <div class="cs-block cs-block--challenge r">
+ <span class="cs-block-label" data-i18n="con_label">The Constraints</span>
+ <h3 data-i18n="con_title">Connectivity, trust, regulation, language.</h3>
+ <p data-i18n="con_p1">The operator using KOTA may be on a slow mobile connection, encountering formal due diligence for the first time, in a context where documented records barely exist. Every friction point in the operator-facing flow is a reason to abandon. The product has to be simple at a level business software rarely is.</p>
+ <p data-i18n="con_p2">Beyond usability: the product operates across DRC regulation, OECD guidance, and EU conflict minerals rules — each with different vocabulary. It runs in English and French. And the trust deficit is structural: operators have good reasons to distrust a system that collects sensitive data about their business. The two-copy data model — the bank inherits a copy when it edits, never mutating the operator's record — is one answer. The design is another.</p>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
+ <h2 data-i18n="ia_title">The question that split the architecture.</h2>
+ <p class="explore-intro" data-i18n="ia_intro">The brief had the bank side as a single landing: one view, every operator, registration and evaluation in the same place. What it didn't define was how responsibilities were organized inside it. Exploring the flow, I hit a question I couldn't answer: <strong>is the person who approves a registration the same one who runs the full evaluation later?</strong> I took it to the domain expert. The answer was no — different people, different moments in the bank's workflow. So I separated Registration and Evaluation into distinct areas, each scoped to its own task: its own forms, its own indicators, its own actions. One question, asked before any screen was final, reshaped the product's information architecture.</p>
+ </div>
+ <!-- Inline IA sitemap diagram, vertical flow -->
+ <div class="kota-sitemap r">
+
+ <!-- Tier 1, the record -->
+ <div class="sm-step">
+ <div class="sm-step-tag"><span class="sm-step-n">01</span><span data-i18n="sm_tier1">The record</span></div>
+ <div class="sm-record">
+ <span class="sm-record-kicker" data-i18n="sm_kicker">One durable Subject · the operator's record</span>
+ <span class="sm-record-name" data-i18n="sm_root">The Counterparty</span>
+ <ul class="sm-attrs">
+ <li data-i18n="sm_a_id">Identity</li>
+ <li data-i18n="sm_a_legal">Legal form</li>
+ <li data-i18n="sm_a_docs">Documents</li>
+ <li data-i18n="sm_a_self">Self-assessment</li>
+ </ul>
+ </div>
+ </div>
+
+ <div class="sm-link" aria-hidden="true"></div>
+
+ <!-- Tier 2, the cycle -->
+ <div class="sm-step">
+ <div class="sm-step-tag"><span class="sm-step-n">02</span><span data-i18n="sm_tier2">The cycle</span></div>
+ <div class="sm-cycle">
+ <div class="sm-stage">
+ <span class="sm-stage-k">Stage 1</span>
+ <span class="sm-stage-t" data-i18n="sm_s1">Registration &amp; identity review</span>
+ </div>
+ <span class="sm-arrow" aria-hidden="true">→</span>
+ <div class="sm-stage">
+ <span class="sm-stage-k">Stage 2</span>
+ <span class="sm-stage-t" data-i18n="sm_s2">Evaluation &amp; monitoring</span>
+ </div>
+ </div>
+ </div>
+
+ <div class="sm-link" aria-hidden="true"></div>
+
+ <!-- Tier 3, the views -->
+ <div class="sm-step">
+ <div class="sm-step-tag"><span class="sm-step-n">03</span><span data-i18n="sm_tier3">The views</span></div>
+ <div class="sm-views">
+ <div class="sm-view">
+ <div class="sm-view-head"><span data-i18n="sm_inst">Institution</span><span class="sm-chips"><span class="sm-chip sm-chip--blue" data-i18n="bk_role">The Bank</span><span class="sm-chip sm-chip--pink" data-i18n="ag_role">The Aggregator</span></span></div>
+ <ul class="sm-list">
+ <li data-i18n="sm_n_dash">Portfolio dashboard</li>
+ <li data-i18n="sm_n_reg">Registration record</li>
+ <li data-i18n="sm_n_sum">Customer summary</li>
+ </ul>
+ <p class="sm-roles-line" data-i18n="sm_roles_line">Editor populates · Custodian submits · Reviewer decides</p>
+ </div>
+ <div class="sm-view sm-view--mirror">
+ <div class="sm-view-head"><span data-i18n="sm_op">Operator · the mirror</span><span class="sm-chips"><span class="sm-chip sm-chip--yellow" data-i18n="op_ctx">Counterparty</span></span></div>
+ <ul class="sm-list">
+ <li data-i18n="sm_n_prof">Own profile</li>
+ <li data-i18n="sm_n_apps">Applications</li>
+ <li data-i18n="sm_n_self">Self-assessment</li>
+ </ul>
+ </div>
+ </div>
+ </div>
+
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== THE INPUTS ====== -->
+ <section class="case-section case-section--alt">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="inputs_label">The Inputs</p>
+ <h2 data-i18n="inputs_title">Nothing arrived as a design.</h2>
+ <p class="explore-intro" data-i18n="inputs_intro">Three kinds of input shaped every decision — and each one required a different way of closing the gap between what was specified and what someone would actually see on screen.</p>
+ </div>
+ <div class="insights-grid r-stagger" style="margin-top: 2rem;">
+
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="input_1_step">01 · The document</span>
+ <h3 data-i18n="input_1_t">A specification.</h3>
+ <p data-i18n="input_1_d">Workflows, rules, requirements. Precise about what the system does; silent about what anyone sees.</p>
+ </div>
+ </div>
+
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="input_2_step">02 · The sentence</span>
+ <h3 data-i18n="input_2_t">One-line briefings.</h3>
+ <p data-i18n="input_2_d">"There will be stages; at each one, a form and documents; then waiting; then an answer." That sentence was the entire brief for the application flow.</p>
+ </div>
+ </div>
+
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="input_3_step">03 · The voice</span>
+ <h3 data-i18n="input_3_t">Spoken visions.</h3>
+ <p data-i18n="input_3_d">Features that lived in the founder's head, told in conversation, never written down.</p>
+ </div>
+ </div>
+
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== THE METHOD (two loops) ====== -->
+ <section class="case-section case-section--insights">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="method_label">The Method</p>
+ <h2 data-i18n="method_title">Two loops closed every gap.</h2>
+ </div>
+ <div class="insights-grid r-stagger">
+
+ <div class="insight-item r">
+ <span class="insight-num">01</span>
+ <div class="insight-content">
+ <h3 data-i18n="loop_1_t">The question loop — for documents.</h3>
+ <p data-i18n="loop_1_d">Read the spec, find what it doesn't say, formulate the question precisely, bring it to the domain expert — and listen for what the answer reveals beyond the answer. The questions were the research instrument; each one was a design tool, not a clarification.</p>
+ </div>
+ </div>
+
+ <div class="insight-item r">
+ <span class="insight-num">02</span>
+ <div class="insight-content">
+ <h3 data-i18n="loop_2_t">The translation loop — for spoken visions.</h3>
+ <p data-i18n="loop_2_d">Listen, write it down, propose a complete form, iterate together. Find Data — a capability the founder had wanted for years — reached me as a conversation. I proposed its entire form: the search surface, the sources, the acquisition flow. Then I scoped it down to what could realistically ship.</p>
+ </div>
+ </div>
+
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== NAVIGATION GRAMMAR ====== -->
+ <section class="case-section case-section--alt">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="gram_label">Navigation Grammar</p>
+ <h2 data-i18n="gram_title">One pattern carries every app.</h2>
+ <p class="explore-intro" data-i18n="gram_intro">The structure that made the split work isn't KOTA-specific. It's a grammar I created and refined across all of the platform's apps — and it held while I was away: engineering kept building inside it, and two years later the structure was still carrying the product.</p>
+ </div>
+ <div class="insights-grid r-stagger" style="margin-top: 2rem;">
+
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="gram_1_step">Rule 01</span>
+ <h3 data-i18n="gram_1_t">The landing is always a table.</h3>
+ <p data-i18n="gram_1_d">Every module opens on a list of subjects. No dashboards standing in for navigation, no guesswork about where things live.</p>
+ </div>
+ </div>
+
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="gram_2_step">Rule 02</span>
+ <h3 data-i18n="gram_2_t">Every subject opens into a hub.</h3>
+ <p data-i18n="gram_2_d">A page I call Details: everything you can do with a subject at its current stage — forms, indicators, settings, paths to other stages — in one place.</p>
+ </div>
+ </div>
+
+ <div class="insight-item r">
+ <div class="insight-content">
+ <span class="step-num" data-i18n="gram_3_step">Rule 03</span>
+ <h3 data-i18n="gram_3_t">Actions are stage-scoped.</h3>
+ <p data-i18n="gram_3_d">What you can do follows where the subject lives. Inviting an operator or opening their summary only appears at evaluation, because that's where it makes sense.</p>
+ </div>
+ </div>
+
  </div>
  </div>
  </section>
 
  <!-- ====== APPLICATION (all product mockups in one section) ====== -->
- <section class="case-section">
+ <section class="case-section case-section--alt">
  <div class="wrap">
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="product_label">The Product</p>
- <h2 data-i18n="product_title">Application.</h2>
- <p class="explore-intro" data-i18n="product_intro">Five surfaces, one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.</p>
+ <h2 data-i18n="product_title">The screens, carrying the decisions.</h2>
+ <p class="explore-intro" data-i18n="product_intro">Each surface below makes one of the decisions above concrete. The gallery fills in as screens are exported.</p>
  </div>
 
- <div class="app-stack r-stagger">
-  <!-- The live dashboard prototype sits in assets/straatos-dashboard/ and
-       opens this section once its Mapbox token is swapped for a
-       URL-restricted one. GitHub push protection rejects the folder as it
-       stands, so the markup is held in the scratchpad rather than here. -->
-
- <figure class="app-shot app-shot--embed r">
- <div class="embed-frame" style="aspect-ratio: 1265 / 640;">
- <iframe class="embed-iframe embed-iframe--scaled" src="assets/straatos-bento.html" data-w="1265" data-h="640"
- title="Straatos analysis composition, Salinity levels, Key indicators, Awareness Raising, Species composition with video background, and Stakeholder Engagement"
- loading="lazy" scrolling="no" allow="autoplay"></iframe>
+ <!-- Interactive recreation of the operator's KYC Summary (fictional data) -->
+ <figure class="app-shot app-shot--embed app-shot--kyc r" style="margin-top: 2rem;">
+ <div class="embed-frame" style="height: 780px;">
+ <iframe class="embed-iframe embed-iframe--app" src="assets/kota-kyc-summary.html" data-min-w="920" data-h="780"
+ title="KOTA, the operator's KYC Summary as the bank sees it: score gauge, governance graph and table, compliance table, trade relationships and information access charts. Interactive recreation with fictional data."
+ loading="lazy"></iframe>
  </div>
- <figcaption data-i18n="fig_analysis">Analysis, charts, KPIs and field telemetry composed for verifier review</figcaption>
+ <figcaption data-i18n="fig_kyc">The operator's KYC Summary, as the bank sees it — interactive recreation with fictional data.</figcaption>
  </figure>
 
- <figure class="app-shot app-shot--pair r">
- <div class="app-pair">
- <div class="app-pair__cell app-pair__cell--phone">
- <img src="assets/straatos-phone.png?v=2" alt="Two iPhones showing the Daily Planting form, details, species data, photo evidence, and submit/save draft actions">
- </div>
- <div class="app-pair__cell app-pair__cell--polygon">
- <video src="assets/polygon-draw.mp4" autoplay muted loop playsinline preload="metadata"
- aria-label="Pen tool drawing a polygon around a mangrove area on satellite imagery, then closing and filling the shape"></video>
- </div>
- </div>
- <figcaption data-i18n="fig_field">Field capture, daily planting forms on mobile + boundary drawing on satellite</figcaption>
- </figure>
+ <div class="process-gallery r-stagger" style="margin-top: 2rem;">
 
- <figure class="app-shot app-shot--video-bg r">
- <div class="video-bg-frame">
- <video class="video-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true"
- src="assets/calculations-bg.mp4"></video>
- <div class="video-bg-overlay" aria-hidden="true"></div>
- <div class="video-bg-fg ipad-fg">
- <div class="fg-video-card">
- <video autoplay muted loop playsinline preload="auto"
- src="assets/calculations.mov"
- aria-label="Straatos calculations module, biomass, carbon stock and uncertainty figures derived from field measurements"></video>
+ <div class="process-item r">
+ <div class="ph ph--grid ph--green screen-ph screen-ph--tall">
+ <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
  </div>
+ <span class="process-item-label" data-i18n="scr1_l">Operator · Application flow</span>
+ <span class="process-item-title" data-i18n="scr1_t">The one-sentence brief, made navigable: stages, forms, documents, waiting and response</span>
  </div>
- </div>
- <figcaption data-i18n="fig_calc">Calculations, biomass, carbon stock and uncertainty derived from field data</figcaption>
- </figure>
 
- <figure class="app-shot app-shot--embed r">
- <div class="embed-frame" style="aspect-ratio: 1282 / 700;">
- <iframe class="embed-iframe embed-iframe--scaled" src="assets/straatos-simulation-bento.html" data-w="1282" data-h="700"
- title="Simulation composition, mangrove botanical with field measurements, canopy density gauge, carbon sequestration design vs actual chart, and SOS Mangrove project card"
- loading="lazy" scrolling="no" allow="autoplay"></iframe>
+ <div class="process-item r">
+ <div class="ph ph--grid ph--green screen-ph screen-ph--tall">
+ <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
  </div>
- <figcaption data-i18n="fig_sim">Simulation, forecast canopy and sequestration before lock-in</figcaption>
- </figure>
+ <span class="process-item-label" data-i18n="scr2_l">Bank · Registration</span>
+ <span class="process-item-title" data-i18n="scr2_t">Table landing scoped to registration work</span>
+ </div>
 
+ <div class="process-item r">
+ <div class="ph ph--grid ph--green screen-ph">
+ <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
+ </div>
+ <span class="process-item-label" data-i18n="scr3_l">Bank · Evaluation</span>
+ <span class="process-item-title" data-i18n="scr3_t">Same grammar, different stage: its own forms, indicators and stage-gated actions</span>
+ </div>
+
+ <div class="process-item r">
+ <div class="ph ph--grid ph--green screen-ph">
+ <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
+ </div>
+ <span class="process-item-label" data-i18n="scr4_l">Bank · Details hub</span>
+ <span class="process-item-title" data-i18n="scr4_t">Everything possible for one subject at its current stage, in one place</span>
+ </div>
+
+ <div class="process-item r">
+ <div class="ph ph--grid ph--green screen-ph">
+ <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
+ </div>
+ <span class="process-item-label" data-i18n="scr5_l">Bank · Customer Review, empty state</span>
+ <span class="process-item-title" data-i18n="scr5_t">The redesign: a skeleton of the analysis to come, not a dead end</span>
+ </div>
+
+ <div class="process-item r">
+ <div class="ph ph--grid ph--green screen-ph">
+ <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
+ </div>
+ <span class="process-item-label" data-i18n="scr6_l">Bank · Find Data</span>
+ <span class="process-item-title" data-i18n="scr6_t">A spoken vision given form: search, sources, acquisition</span>
+ </div>
+
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== OWNERSHIP ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="mine_label">Ownership</p>
+ <h2 class="outcome-statement" data-i18n="mine_statement">What was mine, and what <em>wasn't</em>.</h2>
+ </div>
+ <div class="cs-grid">
+ <div class="cs-block cs-block--challenge r">
+ <span class="cs-block-label" data-i18n="mine_1_label">Not mine</span>
+ <p data-i18n="mine_1_p">The conceptual bets — operators registering themselves, the data model that keeps the bank's copy and the operator's copy separate, one engine serving two institutions, the scoring system — belong to the product's founders. I won't claim them.</p>
+ </div>
+ <div class="cs-block cs-block--solution r">
+ <span class="cs-block-label" data-i18n="mine_2_label">Mine</span>
+ <p data-i18n="mine_2_p">Everything between those bets and a usable screen: the navigation grammar, the question that split the bank's workflow, the application flow built from one sentence, the form of Find Data, the discipline of states. That's the designer's layer — and on this product, it was mine.</p>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <!-- ====== REFLECTION ====== -->
+ <section class="case-section case-section--dark">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="refl_label">Reflection</p>
+ <h2 data-i18n="refl_title">Rigor doesn't disappear without users. It relocates.</h2>
+ </div>
+ <div class="cs-grid cs-grid--stack">
+ <div class="cs-block r">
+ <p data-i18n="refl_p1">Working without user access doesn't excuse you from rigor; it moves the rigor into your questions — what you ask, who you ask, and how honestly you track what's still an assumption.</p>
+ <p data-i18n="refl_p2">It also taught me what a domain expert can and can't give you. Mine could answer how a bank divides its work; he couldn't tell me how a first-time operator reads a progress bar. I designed those parts on judgment and pattern — and if I started today, I'd negotiate one round of user contact into the scope before the first screen. Not because the work is weak without it, but because one conversation closes gaps that two years of documents leave open.</p>
+ </div>
  </div>
  </div>
  </section>
@@ -3026,115 +3751,279 @@
  nav_work: "Work",
  nav_contact: "Contact",
  back_to_projects: "Back to projects",
- case_tag: "Environmental Tech · Climate Action Infrastructure",
- case_title: "Straatos Application",
- case_lead: "Straatos is a digital infrastructure for environmental projects, from field data collection to credit issuance.",
+ case_tag: "Fintech · Onboarding & Due-Diligence Infrastructure",
+ case_title: "Kota",
+ case_lead: "Counterparty due-diligence infrastructure for banks in the DRC, where the compliance record belongs to the people it describes.",
  meta_role: "Role",
  meta_role_val: "Lead Product Designer",
  meta_deliverables: "Deliverables",
- meta_deliverables_val: "Web App, Mobile App",
+ meta_deliverables_val: "Flows, screens & navigation patterns",
  meta_team: "Team",
- meta_team_val: "Me + 6 Engineers",
+ meta_team_val: "Sole designer · Datastake (founder + engineering)",
  meta_live: "Live site",
- meta_live_val: "straatos.io",
+ meta_live_val: "—",
+ actors_label: "The People",
+ actors_title: "Three actors, one compliance pipeline.",
+ actors_intro: "KOTA is not a single-user product. Three distinct roles touch the same data, at different moments, with different needs — and the platform has to serve all of them without asking any one to work like another.",
+ actor_1_role: "The Operator",
+ actor_1_t: "Gains agency over their own approval.",
+ actor_1_d: "Cooperatives and small producers in extractive industries — the people KOTA is built for — go through due diligence without a compliance team or a filing system. KOTA gives them the tools to register themselves, track their application, and understand exactly what's holding them back. The score makes the process legible: not just a verdict, but a map.",
+ actor_2_role: "The Commercial Bank",
+ actor_2_t: "Replaces a manual pipeline with a structured one.",
+ actor_2_d: "Banks receive applications they can actually evaluate — organized forms, uploaded documents, stage-gated workflows — instead of handwritten cards filled by an agent on the client's behalf. Registration and evaluation are separated because they belong to different roles inside the bank: what KOTA makes explicit, the bank has always needed.",
+ actor_3_role: "The Commodity Aggregator",
+ actor_3_t: "Onboards its supply chain into a compliance framework.",
+ actor_3_d: "An aggregator that buys from cooperatives and sells to international markets has direct exposure to supply chain regulation — EU conflict minerals rules, OECD guidance, ESG requirements from buyers. KOTA lets them run that process using the same platform as the bank, adapted through configuration rather than a separate product.",
+ opp_label: "The Opportunity",
+ opp_title: "Financial inclusion meets regulatory pressure.",
+ opp_p1: "The informal economy in sub-Saharan extractive industries is large, underserved, and increasingly visible to regulators. Banks want to grow this client segment but can't afford the manual overhead. Aggregators face compliance demands from buyers in Europe and North America that they can't fulfill at scale. And operators — who have assets, production, and real relationships — lack the documentation infrastructure to be taken seriously by formal institutions.",
+ opp_p2: "KOTA's engine runs one product across multiple institution types, adapted through configuration — not separate builds. Each new institution that deploys it is a high-margin contract, not a new development project. And the data the platform accumulates — operator profiles, verified documents, compliance histories — is the foundation of a future information layer the team is already mapping.",
+ con_label: "The Constraints",
+ con_title: "Connectivity, trust, regulation, language.",
+ con_p1: "The operator using KOTA may be on a slow mobile connection, encountering formal due diligence for the first time, in a context where documented records barely exist. Every friction point in the operator-facing flow is a reason to abandon. The product has to be simple at a level business software rarely is.",
+ con_p2: "Beyond usability: the product operates across DRC regulation, OECD guidance, and EU conflict minerals rules — each with different vocabulary. It runs in English and French. And the trust deficit is structural: operators have good reasons to distrust a system that collects sensitive data about their business. The two-copy data model — the bank inherits a copy when it edits, never mutating the operator's record — is one answer. The design is another.",
  challenge_label: "The Challenge",
- challenge_title: "Restoration projects ran on spreadsheets, paper, and hope.",
- challenge_p1: "Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.",
- challenge_p2: "Compliance with Verra methodologies like VM0033 required meticulous audit trails, weeks of manual reconciliation per project cycle, prone to errors, delaying critical verification milestones.",
+ challenge_title: "Paper, filled in by the wrong hands.",
+ challenge_p1: "The DRC produces over 70% of the world's cobalt. Up to a third of it is dug by hand, in a sector that sustains an estimated 10 million people. Almost none of them can open a bank account: surveys put banking access among artisanal miners at 1 to 3%. The gap is filled by informal lenders on predatory terms, which is part of why the sector stays dangerous and informal.",
+ challenge_p2: "The blockage isn't the miner. It's the paperwork. Banks need to verify identity, source of funds and due diligence before they can say yes, and that record doesn't exist where there is no filing system, no shared registry, no compliance function. The process ran on paper forms, usually filled in by a bank agent on the operator's behalf. The person answering wasn't the person who knew. The bank inherited data it couldn't defend, and the easiest decision was always no.",
+ challenge_p3: "So the operator is judged by what is missing, and the informality that makes compliance impossible becomes the evidence against them.",
  solution_label: "The Solution",
- solution_title: "One platform. Every data point traceable.",
- solution_p1: "Straatos unifies field capture, project management, and verifier-ready reporting in a single digital workspace. Technicians record offline on tablet or mobile; once back online, data flows into structured, methodology-aware records.",
- solution_p2: "Audit trails build themselves. Every entry carries provenance, timestamps, and the operator's identity, so verification becomes a review of what's already documented, not a forensic reconstruction.",
+ solution_title: "Change who holds the pen.",
+ solution_p1: "KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally. The bank receives a structured application instead of a stack of handwritten cards — and the operator gets a score that shows the path forward, not just the verdict.",
+ solution_p2: "One engine serves two institutions — a commercial bank and a government-mandated commodity aggregator — wearing different vocabulary. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can use.",
+ ph_hero_cap: "Kota platform overview, institution dashboard with a counterparty profile in focus.",
  ia_label: "Information Architecture",
- ia_title: "Two scopes, one navigation grammar.",
- ia_intro: "The platform lives in two modes. <strong>Application</strong> is the cross-project shell, analysis, modules and data that sit above any single project. <strong>Project</strong> is the working file, profile, preparation, plots, cycles, monitoring. Same sidebar, same hierarchy, different scope. The user never has to relearn where things are.",
- insights_label: "Design Principles",
- insights_title: "What the research made impossible to ignore.",
- insight_1_t: "Compliance is a by-product, not a goal.",
- insight_1_d: "Users don't wake up thinking about VM0033. They need the platform to quietly translate their field data into compliant outputs, without requiring them to memorize the methodology's internals.",
- insight_2_t: "Local voices are undervalued by existing tools.",
- insight_2_d: "Testimonials from community members, often gathered in local languages, carried real weight in reports, yet most carbon tools treated them as an afterthought. I gave them first-class status.",
- insight_3_t: "Data must be structured, but able to flow.",
- insight_3_d: "The data gathered on the platform must be structured so every source, from Brazil to Japan, compiles the same way, online or offline, then flows into different methodologies and analyses.",
- visual_label: "Visual System",
- visual_title: "Visual identity.",
+ ia_title: "The question that split the architecture.",
+ ia_intro: "The brief had the bank side as a single landing: one view, every operator, registration and evaluation in the same place. What it didn't define was how responsibilities were organized inside it. Exploring the flow, I hit a question I couldn't answer: <strong>is the person who approves a registration the same one who runs the full evaluation later?</strong> I took it to the domain expert. The answer was no — different people, different moments in the bank's workflow. So I separated Registration and Evaluation into distinct areas, each scoped to its own task: its own forms, its own indicators, its own actions. One question, asked before any screen was final, reshaped the product's information architecture.",
+ sm_tier1: "The record",
+ sm_root: "The Counterparty",
+ sm_kicker: "One durable Subject · the operator's record",
+ sm_a_id: "Identity",
+ sm_a_legal: "Legal form",
+ sm_a_docs: "Documents",
+ sm_a_self: "Self-assessment",
+ sm_tier2: "The cycle",
+ sm_s1: "Registration & identity review",
+ sm_s2: "Evaluation & monitoring",
+ sm_tier3: "The views",
+ sm_inst: "Institution",
+ sm_n_dash: "Portfolio dashboard",
+ sm_n_reg: "Registration record",
+ sm_n_sum: "Customer summary",
+ sm_roles_line: "Editor populates · Custodian submits · Reviewer decides",
+ sm_op: "Operator · the mirror",
+ sm_n_prof: "Own profile",
+ sm_n_apps: "Applications",
+ sm_n_self: "Self-assessment",
+ op_ctx: "Counterparty",
+ bk_role: "The Bank",
+ ag_role: "The Aggregator",
+ inputs_label: "The Inputs",
+ inputs_title: "Nothing arrived as a design.",
+ inputs_intro: "Three kinds of input shaped every decision — and each one required a different way of closing the gap between what was specified and what someone would actually see on screen.",
+ input_1_step: "01 · The document",
+ input_1_t: "A specification.",
+ input_1_d: "Workflows, rules, requirements. Precise about what the system does; silent about what anyone sees.",
+ input_2_step: "02 · The sentence",
+ input_2_t: "One-line briefings.",
+ input_2_d: "\"There will be stages; at each one, a form and documents; then waiting; then an answer.\" That sentence was the entire brief for the application flow.",
+ input_3_step: "03 · The voice",
+ input_3_t: "Spoken visions.",
+ input_3_d: "Features that lived in the founder's head, told in conversation, never written down.",
+ method_label: "The Method",
+ method_title: "Two loops closed every gap.",
+ loop_1_t: "The question loop — for documents.",
+ loop_1_d: "Read the spec, find what it doesn't say, formulate the question precisely, bring it to the domain expert — and listen for what the answer reveals beyond the answer. The questions were the research instrument; each one was a design tool, not a clarification.",
+ loop_2_t: "The translation loop — for spoken visions.",
+ loop_2_d: "Listen, write it down, propose a complete form, iterate together. Find Data — a capability the founder had wanted for years — reached me as a conversation. I proposed its entire form: the search surface, the sources, the acquisition flow. Then I scoped it down to what could realistically ship.",
+ gram_label: "Navigation Grammar",
+ gram_title: "One pattern carries every app.",
+ gram_intro: "The structure that made the split work isn't KOTA-specific. It's a grammar I created and refined across all of the platform's apps — and it held while I was away: engineering kept building inside it, and two years later the structure was still carrying the product.",
+ gram_1_step: "Rule 01",
+ gram_1_t: "The landing is always a table.",
+ gram_1_d: "Every module opens on a list of subjects. No dashboards standing in for navigation, no guesswork about where things live.",
+ gram_2_step: "Rule 02",
+ gram_2_t: "Every subject opens into a hub.",
+ gram_2_d: "A page I call Details: everything you can do with a subject at its current stage — forms, indicators, settings, paths to other stages — in one place.",
+ gram_3_step: "Rule 03",
+ gram_3_t: "Actions are stage-scoped.",
+ gram_3_d: "What you can do follows where the subject lives. Inviting an operator or opening their summary only appears at evaluation, because that's where it makes sense.",
  product_label: "The Product",
- product_title: "Application.",
- product_intro: "Five surfaces, one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.",
- fig_dashboard: "Dashboard, every project pinned on the globe, portfolio metrics and performance in one view",
- fig_analysis: "Analysis, charts, KPIs and field telemetry composed for verifier review",
- fig_field: "Field capture, daily planting forms on mobile + boundary drawing on satellite",
- fig_calc: "Calculations, biomass, carbon stock and uncertainty derived from field data",
- fig_sim: "Simulation, forecast canopy and sequestration before lock-in",
+ product_title: "The screens, carrying the decisions.",
+ product_intro: "Each surface below makes one of the decisions above concrete. The gallery fills in as screens are exported.",
+ screen_ph: "Placeholder",
+ scr1_l: "Operator · Application flow",
+ scr1_t: "The one-sentence brief, made navigable: stages, forms, documents, waiting and response",
+ scr2_l: "Bank · Registration",
+ scr2_t: "Table landing scoped to registration work",
+ scr3_l: "Bank · Evaluation",
+ scr3_t: "Same grammar, different stage: its own forms, indicators and stage-gated actions",
+ scr4_l: "Bank · Details hub",
+ scr4_t: "Everything possible for one subject at its current stage, in one place",
+ scr5_l: "Bank · Customer Review, empty state",
+ scr5_t: "The redesign: a skeleton of the analysis to come, not a dead end",
+ scr6_l: "Bank · Find Data",
+ scr6_t: "A spoken vision given form: search, sources, acquisition",
+ fig_kyc: "The operator's KYC Summary, as the bank sees it — interactive recreation with fictional data.",
+ mine_label: "Ownership",
+ mine_statement: "What was mine, and what <em>wasn't</em>.",
+ mine_1_label: "Not mine",
+ mine_1_p: "The conceptual bets — operators registering themselves, the data model that keeps the bank's copy and the operator's copy separate, one engine serving two institutions, the scoring system — belong to the product's founders. I won't claim them.",
+ mine_2_label: "Mine",
+ mine_2_p: "Everything between those bets and a usable screen: the navigation grammar, the question that split the bank's workflow, the application flow built from one sentence, the form of Find Data, the discipline of states. That's the designer's layer — and on this product, it was mine.",
+ refl_label: "Reflection",
+ refl_title: "Rigor doesn't disappear without users. It relocates.",
+ refl_p1: "Working without user access doesn't excuse you from rigor; it moves the rigor into your questions — what you ask, who you ask, and how honestly you track what's still an assumption.",
+ refl_p2: "It also taught me what a domain expert can and can't give you. Mine could answer how a bank divides its work; he couldn't tell me how a first-time operator reads a progress bar. I designed those parts on judgment and pattern — and if I started today, I'd negotiate one round of user contact into the scope before the first screen. Not because the work is weak without it, but because one conversation closes gaps that two years of documents leave open.",
  next_label: "Next up",
  next_title: "Other work.",
  next_wazi_tag: "Responsible Sourcing",
  next_wazi_t: "WAZI, The Digital Backbone for Ethical Gold",
- next_kota_tag: "Onboarding & Due Diligence",
- next_kota_t: "Kota, Counterparty due-diligence infrastructure",
- next_cta: "Read case study →",
+ next_eco_tag: "Environmental Tech",
+ next_eco_t: "Straatos, Digital infrastructure for climate action",
  next_safra_tag: "Sustainable Agribusiness",
  next_safra_t: "Safra, Operating system for sustainable Brazilian agriculture",
- next_soon: "Coming soon",
- live_link: "Visit live site",
- scroll_hint: "Scroll to explore"
+ next_cta: "Read case study →",
+ next_soon: "Coming soon"
  },
  pt: {
  nav_work: "Projetos",
  nav_contact: "Contato",
  back_to_projects: "Voltar para projetos",
- case_tag: "Tecnologia Ambiental · Infraestrutura para Ação Climática",
- case_title: "Straatos Application",
- case_lead: "Straatos é uma infraestrutura digital para projetos ambientais, da coleta de dados em campo à emissão de créditos.",
+ case_tag: "Fintech · Infraestrutura de Onboarding & Due Diligence",
+ case_title: "Kota",
+ case_lead: "Infraestrutura de due diligence de contrapartes para bancos na RDC, onde o registro de compliance pertence às pessoas que ele descreve.",
  meta_role: "Função",
  meta_role_val: "Lead Product Designer",
  meta_deliverables: "Entregas",
- meta_deliverables_val: "Web App, App Mobile",
+ meta_deliverables_val: "Fluxos, telas & padrões de navegação",
  meta_team: "Time",
- meta_team_val: "Eu + 6 Engenheiros",
+ meta_team_val: "Designer única · Datastake (founder + engenharia)",
  meta_live: "Site no ar",
- meta_live_val: "straatos.io",
+ meta_live_val: "—",
+ actors_label: "As Pessoas",
+ actors_title: "Três atores, um pipeline de compliance.",
+ actors_intro: "O KOTA não é um produto de usuário único. Três papéis distintos tocam os mesmos dados, em momentos diferentes, com necessidades diferentes — e a plataforma precisa servir a todos sem pedir que um trabalhe como o outro.",
+ actor_1_role: "O Operador",
+ actor_1_t: "Ganha agência sobre a própria aprovação.",
+ actor_1_d: "Cooperativas e pequenos produtores em indústrias extrativas — as pessoas para quem o KOTA foi construído — passam por due diligence sem equipe de compliance nem sistema de arquivamento. O KOTA dá a eles as ferramentas para se cadastrar, acompanhar a própria aplicação e entender exatamente o que os está travando. O score torna o processo legível: não só um veredito, mas um mapa.",
+ actor_2_role: "O Banco Comercial",
+ actor_2_t: "Substitui um pipeline manual por um estruturado.",
+ actor_2_d: "Os bancos recebem aplicações que conseguem de fato avaliar — formulários organizados, documentos enviados, workflows com etapas definidas — em vez de fichas manuscritas preenchidas por um agente em nome do cliente. Registro e avaliação são separados porque pertencem a papéis diferentes dentro do banco: o que o KOTA torna explícito, o banco sempre precisou.",
+ actor_3_role: "O Agregador de Commodity",
+ actor_3_t: "Integra sua cadeia de fornecimento em um framework de compliance.",
+ actor_3_d: "Um agregador que compra de cooperativas e vende para mercados internacionais tem exposição direta à regulação de cadeia de fornecimento — regras europeias de minerais de conflito, diretrizes da OCDE, exigências de ESG dos compradores. O KOTA permite que ele conduza esse processo usando a mesma plataforma do banco, adaptada por configuração e não como um produto separado.",
+ opp_label: "A Oportunidade",
+ opp_title: "Inclusão financeira encontra pressão regulatória.",
+ opp_p1: "A economia informal nas indústrias extrativas da África Subsaariana é grande, mal atendida e cada vez mais visível para os reguladores. Os bancos querem crescer nesse segmento, mas não conseguem arcar com o custo manual. Os agregadores enfrentam exigências de compliance de compradores na Europa e na América do Norte que não conseguem cumprir em escala. E os operadores — que têm ativos, produção e relacionamentos reais — não têm a infraestrutura documental para serem levados a sério pelas instituições formais.",
+ opp_p2: "O motor do KOTA roda um único produto para múltiplos tipos de instituição, adaptado por configuração — sem builds separados. Cada nova instituição que o adota é um contrato de alta margem, não um novo projeto de desenvolvimento. E os dados que a plataforma acumula — perfis de operadores, documentos verificados, históricos de compliance — são a base de uma camada de informação futura que o time já está mapeando.",
+ con_label: "As Restrições",
+ con_title: "Conectividade, confiança, regulação, língua.",
+ con_p1: "O operador que usa o KOTA pode estar em uma conexão móvel lenta, enfrentando um due diligence formal pela primeira vez, em um contexto onde registros documentados mal existem. Cada ponto de fricção no fluxo do operador é um motivo para abandonar. O produto precisa ser simples em um nível que o software de negócios raramente alcança.",
+ con_p2: "Além da usabilidade: o produto opera sob a regulação da RDC, as diretrizes da OCDE e as regras europeias de minerais de conflito — cada uma com vocabulário diferente. Roda em inglês e francês. E o déficit de confiança é estrutural: os operadores têm boas razões para desconfiar de um sistema que coleta dados sensíveis sobre seus negócios. O modelo de dados de cópia dupla — o banco herda uma cópia ao editar, sem nunca mutar o registro do operador — é uma resposta. O design é outra.",
  challenge_label: "O Desafio",
- challenge_title: "Projetos de restauração rodavam em planilhas, papel e esperança.",
- challenge_p1: "Times gerenciando projetos de carbono baseados em natureza malabarismo de dados entre planilhas, anotações de campo em papel, imagens de satélite e sistemas legados desconectados. Técnicos em locais remotos não tinham ferramentas que funcionassem offline e acompanhassem o fluxo de trabalho do dia a dia.",
- challenge_p2: "Conformidade com metodologias Verra como a VM0033 exigia trilhas de auditoria meticulosas, semanas de reconciliação manual por ciclo de projeto, sujeitas a erros, atrasando marcos críticos de verificação.",
+ challenge_title: "Papel, preenchido pelas mãos erradas.",
+ challenge_p1: "A RDC produz mais de 70% do cobalto do mundo. Até um terço é extraído à mão, num setor que sustenta cerca de 10 milhões de pessoas. Quase nenhuma delas consegue abrir uma conta bancária: pesquisas colocam o acesso bancário entre mineradores artesanais em 1 a 3%. A lacuna é preenchida por agiotas informais em termos predatórios — parte do motivo pelo qual o setor continua perigoso e informal.",
+ challenge_p2: "O bloqueio não é o minerador. É a papelada. Bancos precisam verificar identidade, origem de fundos e due diligence antes de dizer sim — e esse registro não existe onde não há sistema de arquivo, nem registro compartilhado, nem função de compliance. O processo rodava em formulários de papel, geralmente preenchidos por um agente do banco em nome do operador. Quem respondia não era quem sabia. O banco herdava dados que não conseguia defender, e a decisão mais fácil era sempre não.",
+ challenge_p3: "Então o operador é julgado pelo que falta, e a informalidade que torna o compliance impossível vira a evidência contra ele.",
  solution_label: "A Solução",
- solution_title: "Uma plataforma. Cada dado rastreável.",
- solution_p1: "A Straatos unifica captura em campo, gestão de projetos e relatórios prontos para verificação em um único workspace digital. Os técnicos registram offline em tablet ou celular; ao voltar online, os dados fluem para registros estruturados e cientes da metodologia.",
- solution_p2: "Trilhas de auditoria se constroem sozinhas. Cada entrada carrega proveniência, timestamps e a identidade do operador, então a verificação vira uma revisão do que já está documentado, não uma reconstrução forense.",
+ solution_title: "Mudar quem segura a caneta.",
+ solution_p1: "O KOTA muda o ponto de partida: o operador se cadastra sozinho, responde às questões básicas e submete digitalmente. O banco recebe uma aplicação estruturada em vez de uma pilha de fichas manuscritas — e o operador recebe um score que mostra o caminho, não só o veredito.",
+ solution_p2: "Um motor serve duas instituições — um banco comercial e um agregador de commodities mandatado pelo governo — vestindo vocabulários diferentes. Essas decisões de produto são do time; meu trabalho aconteceu um nível abaixo: dar a cada uma delas uma forma que pessoas conseguem usar.",
+ ph_hero_cap: "Visão geral da plataforma Kota, dashboard da instituição com um perfil de contraparte em foco.",
  ia_label: "Arquitetura da Informação",
- ia_title: "Dois escopos, uma única gramática de navegação.",
- ia_intro: "A plataforma vive em dois modos. <strong>Application</strong> é a camada que atravessa projetos, análises, módulos e dados que ficam acima de qualquer projeto isolado. <strong>Project</strong> é o arquivo de trabalho, perfil, preparação, parcelas, ciclos, monitoramento. Mesma sidebar, mesma hierarquia, escopo diferente. O usuário nunca precisa reaprender onde as coisas estão.",
- insights_label: "Princípios de Design",
- insights_title: "O que a pesquisa tornou impossível ignorar.",
- insight_1_t: "Conformidade é subproduto, não objetivo.",
- insight_1_d: "Usuários não acordam pensando em VM0033. Eles precisam que a plataforma traduza silenciosamente os dados de campo em outputs em conformidade, sem precisar memorizar os detalhes da metodologia.",
- insight_2_t: "Vozes locais são subvalorizadas pelas ferramentas existentes.",
- insight_2_d: "Depoimentos de membros da comunidade, muitas vezes coletados em idiomas locais, pesavam de verdade nos relatórios, mas a maioria das ferramentas de carbono os tratava como detalhe secundário. Eu os elevei a status de primeira classe.",
- insight_3_t: "Os dados precisam ser estruturados, mas com fluidez.",
- insight_3_d: "Os dados coletados na plataforma têm que ser estruturados para que toda fonte, do Brasil ao Japão, se compile da mesma forma, online ou offline, e então flua para diferentes metodologias e análises.",
- visual_label: "Sistema Visual",
- visual_title: "Identidade visual.",
+ ia_title: "A pergunta que dividiu a arquitetura.",
+ ia_intro: "O briefing tinha o lado do banco como uma landing única: uma view, todos os operadores, registro e avaliação no mesmo lugar. O que ele não definia era como as responsabilidades se organizavam ali dentro. Explorando o fluxo, esbarrei numa pergunta que eu não sabia responder: <strong>quem aprova um cadastro é a mesma pessoa que conduz a avaliação completa depois?</strong> Levei ao domain expert. A resposta era não — pessoas diferentes, momentos diferentes do workflow do banco. Então separei Registration e Evaluation em áreas distintas, cada uma com escopo na própria tarefa: seus formulários, seus indicadores, suas ações. Uma pergunta, feita antes de qualquer tela ser final, redesenhou a arquitetura de informação do produto.",
+ sm_tier1: "O registro",
+ sm_root: "A Contraparte",
+ sm_kicker: "Um Subject durável · o registro do operador",
+ sm_a_id: "Identidade",
+ sm_a_legal: "Forma jurídica",
+ sm_a_docs: "Documentos",
+ sm_a_self: "Self-assessment",
+ sm_tier2: "O ciclo",
+ sm_s1: "Registro e revisão de identidade",
+ sm_s2: "Avaliação e monitoramento",
+ sm_tier3: "As visões",
+ sm_inst: "Instituição",
+ sm_n_dash: "Dashboard de portfólio",
+ sm_n_reg: "Ficha de registro",
+ sm_n_sum: "Customer summary",
+ sm_roles_line: "Editor popula · Custodian submete · Reviewer decide",
+ sm_op: "Operador · o espelho",
+ sm_n_prof: "Perfil próprio",
+ sm_n_apps: "Aplicações",
+ sm_n_self: "Self-assessment",
+ op_ctx: "Contraparte",
+ bk_role: "O Banco",
+ ag_role: "O Agregador",
+ inputs_label: "Os Inputs",
+ inputs_title: "Nada chegou como design.",
+ inputs_intro: "Três tipos de input moldaram cada decisão — e cada um exigiu uma forma diferente de fechar a lacuna entre o que estava especificado e o que alguém veria de fato na tela.",
+ input_1_step: "01 · O documento",
+ input_1_t: "Uma especificação.",
+ input_1_d: "Workflows, regras, requisitos. Precisa sobre o que o sistema faz; muda sobre o que alguém vê.",
+ input_2_step: "02 · A frase",
+ input_2_t: "Briefings de uma linha.",
+ input_2_d: "\"Vai ter etapas; em cada uma, um formulário e documentos; depois espera; depois uma resposta.\" Essa frase foi o briefing inteiro do application flow.",
+ input_3_step: "03 · A voz",
+ input_3_t: "Visões faladas.",
+ input_3_d: "Funcionalidades que viviam na cabeça do founder, contadas em conversa, nunca escritas.",
+ method_label: "O Método",
+ method_title: "Dois loops fecharam todas as lacunas.",
+ loop_1_t: "O loop de perguntas — para documentos.",
+ loop_1_d: "Ler o spec, achar o que ele não diz, formular a pergunta com precisão, levar ao domain expert — e escutar o que a resposta revela além da resposta. As perguntas eram o instrumento de pesquisa; cada uma era uma ferramenta de design, não uma clarificação.",
+ loop_2_t: "O loop de tradução — para visões faladas.",
+ loop_2_d: "Escutar, anotar, propor uma forma completa, iterar juntos. O Find Data — uma capacidade que o founder queria há anos — chegou até mim como conversa. Propus a forma inteira: a superfície de busca, as fontes, o fluxo de aquisição. Depois reduzi ao que dava pra entregar de verdade.",
+ gram_label: "Gramática de Navegação",
+ gram_title: "Um padrão carrega todos os apps.",
+ gram_intro: "A estrutura que fez a separação funcionar não é específica do KOTA. É uma gramática que criei e refinei em todos os apps da plataforma — e que segurou na minha ausência: a engenharia continuou construindo dentro dela, e dois anos depois a estrutura ainda carregava o produto.",
+ gram_1_step: "Regra 01",
+ gram_1_t: "A landing é sempre uma tabela.",
+ gram_1_d: "Todo módulo abre numa lista de subjects. Sem dashboards fazendo papel de navegação, sem adivinhação sobre onde as coisas vivem.",
+ gram_2_step: "Regra 02",
+ gram_2_t: "Todo subject abre num hub.",
+ gram_2_d: "Uma página que chamo de Details: tudo que dá pra fazer com um subject no estágio atual — formulários, indicadores, settings, caminhos pra outros estágios — num lugar só.",
+ gram_3_step: "Regra 03",
+ gram_3_t: "Ações têm escopo de estágio.",
+ gram_3_d: "O que você pode fazer segue onde o subject vive. Convidar um operador ou abrir o summary só aparece na avaliação, porque é onde faz sentido.",
  product_label: "O Produto",
- product_title: "Application.",
- product_intro: "Cinco superfícies, um único modelo mental. O dashboard se ancora num globo 3D, cada projeto fixado em seu lugar. Dali, project developers entram em ciclos e campanhas, vistas de parcelas via satélite, e por fim simulações que projetam os mesmos números que o verificador vai ler no final. Sem tradução entre telas; os dados fluem por uma estrutura só.",
- fig_dashboard: "Dashboard, cada projeto fixado no globo, métricas do portfólio e desempenho em uma só visão",
- fig_analysis: "Análise, gráficos, KPIs e telemetria de campo compostos para revisão do verificador",
- fig_field: "Captura em campo, formulários diários de plantio no mobile + desenho de polígono no satélite",
- fig_calc: "Cálculos, biomassa, estoque de carbono e incerteza derivados dos dados de campo",
- fig_sim: "Simulação, projeção de copa e sequestro antes do lock-in",
+ product_title: "As telas, carregando as decisões.",
+ product_intro: "Cada superfície abaixo torna concreta uma das decisões acima. A galeria se preenche conforme as telas são exportadas.",
+ screen_ph: "Placeholder",
+ scr1_l: "Operador · Application flow",
+ scr1_t: "O briefing de uma frase, navegável: etapas, formulários, documentos, espera e resposta",
+ scr2_l: "Banco · Registration",
+ scr2_t: "Landing em tabela com escopo no trabalho de registro",
+ scr3_l: "Banco · Evaluation",
+ scr3_t: "Mesma gramática, outro estágio: seus formulários, indicadores e ações com escopo de estágio",
+ scr4_l: "Banco · Details hub",
+ scr4_t: "Tudo que é possível pra um subject no estágio atual, num lugar só",
+ scr5_l: "Banco · Customer Review, empty state",
+ scr5_t: "O redesign: um skeleton da análise por vir, não um beco sem saída",
+ scr6_l: "Banco · Find Data",
+ scr6_t: "Uma visão falada ganhando forma: busca, fontes, aquisição",
+ fig_kyc: "KYC Summary do operador, na visão do banco — recriação interativa com dados fictícios.",
+ mine_label: "Autoria",
+ mine_statement: "O que foi meu, e o que <em>não foi</em>.",
+ mine_1_label: "Não foi meu",
+ mine_1_p: "As apostas conceituais — operadores se cadastrando sozinhos, o modelo de dados que mantém a cópia do banco e a do operador separadas, um motor servindo duas instituições, o sistema de score — pertencem aos founders do produto. Não vou reivindicá-las.",
+ mine_2_label: "Foi meu",
+ mine_2_p: "Tudo entre essas apostas e uma tela usável: a gramática de navegação, a pergunta que dividiu o workflow do banco, o application flow construído de uma frase, a forma do Find Data, a disciplina de estados. Essa é a camada do designer — e neste produto, ela foi minha.",
+ refl_label: "Reflexão",
+ refl_title: "O rigor não desaparece sem usuários. Ele muda de lugar.",
+ refl_p1: "Trabalhar sem acesso a usuário não te dispensa do rigor; ele se move pras suas perguntas — o que você pergunta, pra quem, e com que honestidade você rastreia o que ainda é suposição.",
+ refl_p2: "Também me ensinou o que um domain expert pode e não pode te dar. O meu sabia responder como um banco divide o trabalho; não sabia me dizer como um operador de primeira viagem lê uma barra de progresso. Essas partes eu desenhei com julgamento e repertório — e se começasse hoje, negociaria uma rodada de contato com usuários no escopo antes da primeira tela. Não porque o trabalho é fraco sem isso, mas porque uma conversa fecha lacunas que dois anos de documentos deixam abertas.",
  next_label: "A seguir",
  next_title: "Outros projetos.",
  next_wazi_tag: "Sourcing Responsável",
  next_wazi_t: "WAZI, A Espinha Dorsal Digital do Ouro Ético",
- next_kota_tag: "Onboarding & Due Diligence",
- next_kota_t: "Kota, Infraestrutura de due diligence de contrapartes",
- next_cta: "Ler case study →",
+ next_eco_tag: "Tecnologia Ambiental",
+ next_eco_t: "Straatos, Infraestrutura digital para ação climática",
  next_safra_tag: "Agronegócio Sustentável",
  next_safra_t: "Safra, Sistema operacional da agricultura sustentável brasileira",
- next_soon: "Em breve",
- live_link: "Visitar site",
- scroll_hint: "Deslize para explorar"
+ next_cta: "Ler case study →",
+ next_soon: "Em breve"
  }
  };
 
@@ -3152,8 +4041,8 @@
  return 'en';
  }
  // The EN/PT control is gone, so the site is pinned to English instead of
-      // following the visitor's browser locale (which flipped it to PT-BR).
-      let lang = 'en';
+// following the visitor's browser locale (which flipped it to PT-BR).
+let lang = 'en';
  function setLang(l) {
  lang = l;
  localStorage.setItem('lang', l);
@@ -3166,12 +4055,11 @@
  else el.textContent = v;
  }
  });
- }
- /* The EN/PT buttons were replaced by the theme toggle. The dictionary and
+}
+/* The EN/PT buttons were replaced by the theme toggle. The dictionary and
  setLang stay wired so the copy still localizes on load and the control
  can come back without rebuilding any of it. */
- setLang(lang);
-
+setLang(lang);
  /* ============ Light / dark theme ============ */
  function setTheme(t) {
  document.documentElement.setAttribute('data-theme', t);
@@ -3191,8 +4079,6 @@
 
  /* Horizontal scroll-hint thumbs, track each carousel and move the
  yellow indicator across the rail proportionally to the scroll. */
- /* Sidebar list dropped out of here when it went vertical — only the
- identity carousel still scrolls horizontally. */
  [['idCarTrack', 'idCarThumb']].forEach(([trackId, thumbId]) => {
  const track = document.getElementById(trackId);
  const thumb = document.getElementById(thumbId);
@@ -3206,6 +4092,7 @@
  }, { passive: true });
  });
 
+ // Minimal JS for Stage 1, full version comes in Stage 3
  const nav = document.querySelector('.nav');
  window.addEventListener('scroll', () => {
  nav.classList.toggle('scrolled', scrollY > 10);
@@ -3327,90 +4214,6 @@
  carObs.observe(carousel);
  })();
 
- // The dashboard is an app window, not a fixed composition, so it gets its
- // own rule: take the column's width at 1:1 and keep the height put. The
- // shared bento scaler below would grow it in both directions, and on a wide
- // display that produced a block taller than the viewport, blown up past
- // legibility. Only when the column is narrower than the layout the
- // prototype needs does this scale down, height included.
- (() => {
- const frames = document.querySelectorAll('.embed-iframe--app');
- if (!frames.length || !('ResizeObserver' in window)) return;
- frames.forEach((iframe) => {
- const MIN_W = parseFloat(iframe.dataset.minW);
- const box = iframe.parentElement;
- // Height comes from CSS (--dash-h) so a media query can drive it; the
- // data attribute stays as the fallback if the variable goes missing.
- const heightNow = () =>
- parseFloat(getComputedStyle(box).getPropertyValue('--dash-h')) ||
- parseFloat(iframe.dataset.h);
- let lastW = -1, lastH = -1;
- const ro = new ResizeObserver((entries) => {
- const cw = entries[0].contentRect.width;
- const H = heightNow();
- // The callback also fires for the height we set below; bail unless
- // something actually moved, or the two chase each other.
- if (cw <= 0 || (cw === lastW && H === lastH)) return;
- lastW = cw; lastH = H;
- const w = Math.max(MIN_W, cw);
- const scale = Math.min(1, cw / w);
- iframe.style.width = w + 'px';
- iframe.style.height = H + 'px';
- iframe.style.transform = 'scale(' + scale + ')';
- box.style.height = (H * scale) + 'px';
- });
- ro.observe(box);
- });
- })();
-
- // Bento iframes, keep them at natural desktop width and scale the whole
- // thing down to fit the frame, instead of letting the iframe's own
- // mobile breakpoint fire just because this column is narrower.
- (() => {
- const iframes = document.querySelectorAll('.embed-iframe--scaled');
- if (!iframes.length || !('ResizeObserver' in window)) return;
- iframes.forEach((iframe) => {
- const w = parseFloat(iframe.dataset.w);
- const h = parseFloat(iframe.dataset.h);
- const frame = iframe.parentElement;
- let lastW = -1;
- const ro = new ResizeObserver((entries) => {
- const cw = entries[0].contentRect.width;
- // Also fires for the height set below; bail unless the width moved.
- if (cw <= 0 || cw === lastW) return;
- lastW = cw;
- // The bento tiles are all positioned in %, so the composition is happy
- // at any width -- give it the column's real width and let it render
- // there instead of stretching a 1265px texture, which is what made the
- // axis numbers mushy. Floor keeps it above the embedded page's own
- // 900px breakpoint; ceiling stops the tiles outgrowing the fixed-px
- // type inside them on a very wide display.
- // The frame's own max-width and auto margins handle the ceiling and the
- // centring now, so this only has one job left: when the column is
- // narrower than the layout the embedded page needs, render at that floor
- // and scale the whole thing down rather than let it hit its own mobile
- // breakpoint. At any comfortable width the scale is exactly 1.
- const iw = Math.max(920, cw);
- const ih = Math.round(iw * (h / w));
- const scale = Math.min(1, cw / iw);
- iframe.style.width = iw + 'px';
- iframe.style.height = ih + 'px';
- iframe.style.transform = 'scale(' + scale + ')';
- frame.style.aspectRatio = 'auto';
- frame.style.height = Math.round(ih * scale) + 'px';
- // The composition sizes its own type against the width it was drawn at,
- // so hand it the width it actually got. Reading it from inside would
- // feed back on itself once it zooms.
- const tell = () => {
- try { iframe.contentWindow.postMessage({ type: 'bento:width', w: iw }, '*'); } catch (e) {}
- };
- tell();
- iframe.addEventListener('load', tell, { once: true });
- });
- ro.observe(frame);
- });
- })();
-
  // Custom cursor
  (() => {
  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -3480,6 +4283,33 @@
  <script>
  // When an embedded bento iframe scrolls into view, tell its scripts so
  // the in-iframe animations fire at the right moment, not on iframe load.
+ // The KYC recreation is an app frame, not a fixed composition: give it the
+ // column's width at 1:1 and keep the height put, so it stays sharp and
+ // doesn't grow taller as the display gets wider. Only scales down when the
+ // column is narrower than the layout the page itself needs.
+ (() => {
+ const frames = document.querySelectorAll('.embed-iframe--app');
+ if (!frames.length || !('ResizeObserver' in window)) return;
+ frames.forEach((iframe) => {
+ const H = parseFloat(iframe.dataset.h);
+ const MIN_W = parseFloat(iframe.dataset.minW);
+ const box = iframe.parentElement;
+ let lastW = -1;
+ const ro = new ResizeObserver((entries) => {
+ const cw = entries[0].contentRect.width;
+ if (cw <= 0 || cw === lastW) return;
+ lastW = cw;
+ const w = Math.max(MIN_W, cw);
+ const scale = Math.min(1, cw / w);
+ iframe.style.width = w + 'px';
+ iframe.style.height = H + 'px';
+ iframe.style.transform = 'scale(' + scale + ')';
+ box.style.height = (H * scale) + 'px';
+ });
+ ro.observe(box);
+ });
+ })();
+
  (() => {
  const iframes = document.querySelectorAll('.embed-iframe');
  if (!iframes.length || !('IntersectionObserver' in window)) return;

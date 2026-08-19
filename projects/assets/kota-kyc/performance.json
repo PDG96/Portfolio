@@ -1,0 +1,18 @@
+{
+  "series": [
+    { "name": "Gaps", "color": "#F2A29A" },
+    { "name": "Pending", "color": "#F2DC8C" },
+    { "name": "Compliant", "color": "#9FD9AE" }
+  ],
+  "opacity": 0.55,
+  "showTotal": false,
+  "data": [
+    { "date": "2024-02", "series": "Compliant", "value": 3.2 }, { "date": "2024-02", "series": "Pending", "value": 3.0 }, { "date": "2024-02", "series": "Gaps", "value": 4.2 },
+    { "date": "2024-04", "series": "Compliant", "value": 3.4 }, { "date": "2024-04", "series": "Pending", "value": 3.1 }, { "date": "2024-04", "series": "Gaps", "value": 4.0 },
+    { "date": "2024-06", "series": "Compliant", "value": 3.9 }, { "date": "2024-06", "series": "Pending", "value": 3.0 }, { "date": "2024-06", "series": "Gaps", "value": 3.8 },
+    { "date": "2024-08", "series": "Compliant", "value": 4.1 }, { "date": "2024-08", "series": "Pending", "value": 3.2 }, { "date": "2024-08", "series": "Gaps", "value": 3.6 },
+    { "date": "2024-10", "series": "Compliant", "value": 4.0 }, { "date": "2024-10", "series": "Pending", "value": 3.4 }, { "date": "2024-10", "series": "Gaps", "value": 3.5 },
+    { "date": "2024-12", "series": "Compliant", "value": 4.4 }, { "date": "2024-12", "series": "Pending", "value": 3.3 }, { "date": "2024-12", "series": "Gaps", "value": 3.4 },
+    { "date": "2025-02", "series": "Compliant", "value": 4.6 }, { "date": "2025-02", "series": "Pending", "value": 3.2 }, { "date": "2025-02", "series": "Gaps", "value": 3.2 }
+  ]
+}

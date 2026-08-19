@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KOTA — Operator KYC Summary (interactive recreation, fictional data)</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #141414;
+    --ink-2: rgba(20,20,20,0.55);
+    --ink-3: rgba(20,20,20,0.40);
+    --line: rgba(20,20,20,0.10);
+    --bg: #f3f4f6;
+    --card: #ffffff;
+    --navy: #2e3a46;
+    --navy-2: #27313c;
+    --orange: #E25E25;
+    --orange-soft: rgba(226,94,37,0.12);
+    --green: #3E9B5F;
+    --green-soft: rgba(111,204,140,0.18);
+    --red: #C0392B;
+    --red-soft: rgba(226,87,74,0.16);
+  }
+
+  html, body { width: 100%; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', system-ui, sans-serif;
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+    /* app shell: viewport-locked, only the dashboard area scrolls */
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* ===== Sidebar ===== */
+  .side {
+    flex: none;
+    width: 196px;
+    background: #384250;
+    color: rgba(255,255,255,0.78);
+    display: flex;
+    flex-direction: column;
+    padding: 18px 0 18px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  .side-logo { padding: 0 18px 14px; }
+  .side-logo img { display: block; height: 26px; width: auto; }
+  .side-acct {
+    display: flex; align-items: center; gap: 10px;
+    padding: 4px 18px 16px;
+    color: #fff; font-size: 13px; font-weight: 700;
+  }
+  .side-acct svg { width: 15px; height: 15px; opacity: 0.9; }
+  .side-group {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: rgba(255,255,255,0.35); padding: 14px 18px 6px;
+  }
+  .side a {
+    display: flex; align-items: center; gap: 10px;
+    color: inherit; text-decoration: none;
+    font-size: 12.5px; padding: 9px 18px;
+    border-left: 3px solid transparent;
+  }
+  .side a svg { width: 15px; height: 15px; flex: none; opacity: 0.85; }
+  .side .nav-ico { width: 16px; height: 16px; flex: none; display: block; }
+  .side a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+  .side a.on {
+    color: #fff; background: var(--orange); border-left-color: #b5491c; font-weight: 600;
+  }
+  .side a .chev { margin-left: auto; opacity: 0.5; }
+  .side a.sub { padding-left: 24px; font-size: 12px; }
+  .side a.sub--dim { background: rgba(0,0,0,0.16); color: rgba(255,255,255,0.85); }
+
+  /* ===== Main ===== */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+  .topbar-img {
+    flex: none;
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--navy-2);
+  }
+
+  .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; width: 100%; }
+
+  /* page header bar, white background under the dark topbar — fixed in the shell */
+  .pagebar {
+    flex: none;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+    padding: 12px 24px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .crumbs { font-size: 11px; color: var(--ink-3); }
+  .crumbs b { color: var(--ink-2); font-weight: 500; }
+  .pagehead { display: flex; align-items: center; gap: 10px; }
+  .pagehead h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+  .pagehead .back { color: var(--ink-3); font-size: 15px; }
+  .pagehead .acts { margin-left: auto; display: flex; gap: 8px; }
+  .pill-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--line); background: var(--card);
+    border-radius: 8px; height: 30px; padding: 0 9px;
+    color: var(--ink-2); font-size: 12px; cursor: pointer;
+  }
+  .pill-btn .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
+  .pill-btn svg { width: 14px; height: 14px; }
+
+  /* cards */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card-pad { padding: 16px; }
+  .card-title-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 14px 16px; border-bottom: 1px solid var(--line);
+    font-size: 12.5px; font-weight: 600;
+  }
+  .card-title-row .sp { flex: 1; }
+
+  /* KPI strip */
+  .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .kpi { padding: 13px 14px; display: flex; flex-direction: column; gap: 8px; min-height: 76px; }
+  .kpi-head { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--ink-2); }
+  .kpi-head svg { width: 13px; height: 13px; margin-left: auto; color: var(--ink-3); }
+  .kpi-val { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+  .chip {
+    align-self: flex-start;
+    display: inline-flex; align-items: center; gap: 5px;
+    border-radius: 6px; padding: 3px 8px;
+    font-size: 12px; font-weight: 600;
+  }
+  .chip svg { width: 12px; height: 12px; }
+  .chip--green { background: var(--green-soft); color: var(--green); }
+  .chip--red { background: var(--red-soft); color: var(--red); }
+
+  /* locations + key info */
+  .duo { display: grid; grid-template-columns: 1.45fr 1fr; gap: 24px; align-items: stretch; }
+  .duo > .card { display: flex; flex-direction: column; }
+  .duo > .card .card-pad { flex: 1; display: flex; flex-direction: column; }
+  @media (max-width: 760px) { .duo { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr 1fr; } }
+
+  /* abstract map (no real geography) */
+  .map { position: relative; border-radius: 10px; overflow: hidden; flex: 1; min-height: 250px; background: #dcebd8; }
+  .map .map-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .map .map-link { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .pin {
+    /* Locations.svg carries drop-shadow padding, so the visual tip sits at
+       ~74% of the file height — anchor accordingly. */
+    position: absolute; width: 34px; height: 36px; transform: translate(-50%, -74%);
+    cursor: pointer; z-index: 2; background: none; border: 0; padding: 0;
+  }
+  .pin img { width: 100%; height: 100%; display: block; }
+  .pin--assoc { width: 22px; height: 23px; }
+  .map-tip {
+    position: absolute; z-index: 3;
+    background: #fff; border-radius: 10px; box-shadow: 0 10px 26px rgba(0,0,0,0.18);
+    padding: 10px 12px; font-size: 10.5px; min-width: 168px;
+    opacity: 0; pointer-events: none; transition: opacity 0.18s;
+  }
+  .pin:hover + .map-tip, .map-tip:hover { opacity: 1; pointer-events: auto; }
+  .map-tip h4 { font-size: 11px; margin-bottom: 6px; display: flex; }
+  .map-tip h4 i { margin-left: auto; color: var(--ink-3); font-style: normal; cursor: pointer; }
+  .map-tip dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; }
+  .map-tip dt { color: var(--ink-3); }
+  .map-tip dd { color: var(--ink); text-align: right; }
+
+  .ki-rows { display: flex; flex-direction: column; flex: 1; }
+  .ki-row {
+    flex: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 2px; border-bottom: 1px solid var(--line);
+    font-size: 12px; color: var(--ink-2);
+  }
+  .ki-row:last-child { border-bottom: 0; }
+  .ki-row b { color: var(--ink); font-weight: 600; }
+  .flag-dot { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(#9aa6b2 0 50%, #cfd6dd 50% 100%); border: 1px solid var(--line); }
+
+  /* governance tabs */
+  .tabs { display: flex; gap: 18px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+  .tab {
+    background: none; border: 0; cursor: pointer;
+    font: inherit; font-size: 12px; font-weight: 600; color: var(--ink-3);
+    padding: 11px 2px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab.on { color: var(--orange); border-bottom-color: var(--orange); }
+  .pane { padding: 16px; }
+  .pane[hidden] { display: none; }
+
+  /* assessment details */
+  .ad { display: grid; grid-template-columns: 230px 1fr; gap: 24px; align-items: stretch; }
+  @media (max-width: 760px) { .ad { grid-template-columns: 1fr; } }
+  .ad-stats { display: flex; flex-direction: column; gap: 24px; }
+  .ad-stat {
+    flex: 1;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .ad-stat .txt { display: flex; flex-direction: column; gap: 4px; }
+  .ad-stat .txt .lbl { font-size: 10.5px; color: var(--ink-2); }
+  .ad-stat .v { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .ad-stat .ico {
+    flex: none;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ad-stat .ico svg { width: 17px; height: 17px; }
+  .ico--green { background: var(--green-soft); color: var(--green); }
+  .ico--orange { background: var(--orange-soft); color: var(--orange); }
+
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .grid4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .grid4 { grid-template-columns: 1fr; } }
+
+  /* chart-card harmonisation inside this screen */
+  chart-card { border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+</style>
+
+<!-- Component library (chart-card first so card chrome upgrades before mounts) -->
+<script defer src="../../components/chart-card/chart-card.js"></script>
+<script defer src="../../components/chart-tooltip/chart-tooltip.js"></script>
+<script defer src="../../components/stacked-area/stacked-area.js"></script>
+<script defer src="../../components/smooth-line/smooth-line.js"></script>
+<script defer src="../../components/score-gauge/score-gauge.js"></script>
+<script defer src="../../components/ring-chart/ring-chart.js"></script>
+<script defer src="../../components/column-chart/column-chart.js"></script>
+<script defer src="../../components/node-graph/node-graph.js"></script>
+<script defer src="../../components/status-table/status-table.js"></script>
+</head>
+<body>
+
+  <!-- ===== Sidebar ===== -->
+  <aside class="side" aria-label="App navigation">
+    <div class="side-logo"><img src="kota-kyc/kota-logo.svg" alt="KOTA"></div>
+    <div class="side-acct">
+      <img class="nav-ico" src="kota-kyc/icons/ic-bank.svg" alt="">
+      Bank
+    </div>
+    <a href="#" onclick="return false">
+      <img class="nav-ico" src="kota-kyc/icons/ic-dashboard.svg" alt="">
+      Dashboard
+    </a>
+    <div class="side-group">Analysis</div>
+    <a href="#" onclick="return false">
+      <img class="nav-ico" src="kota-kyc/icons/ic-review.svg" alt="">
+      Customer Review
+    </a>
+    <div class="side-group">Modules</div>
+    <a href="#" onclick="return false">
+      <img class="nav-ico" src="kota-kyc/icons/ic-operators.svg" alt="">
+      Operators <span class="chev">⌄</span>
+    </a>
+    <a href="#" class="sub sub--dim" onclick="return false">Registration</a>
+    <a href="#" class="sub on" onclick="return false">Evaluation</a>
+    <a href="#" onclick="return false">
+      <img class="nav-ico" src="kota-kyc/icons/ic-individuals.svg" alt="">
+      Individuals
+    </a>
+    <div class="side-group">Data</div>
+    <a href="#" onclick="return false">
+      <img class="nav-ico" src="kota-kyc/icons/ic-store.svg" alt="">
+      Store <span class="chev">›</span>
+    </a>
+    <a href="#" onclick="return false">
+      <img class="nav-ico" src="kota-kyc/icons/ic-query.svg" alt="">
+      Query
+    </a>
+    <a href="#" onclick="return false">
+      <img class="nav-ico" src="kota-kyc/icons/ic-channels.svg" alt="">
+      Channels
+    </a>
+  </aside>
+
+  <!-- ===== Main ===== -->
+  <div class="main">
+    <img class="topbar-img" src="kota-kyc/Header.svg" alt="" aria-hidden="true">
+
+    <div class="pagebar">
+      <p class="crumbs">Modules › Operators › Evaluation › Westbrook Cooperative Ltd › <b>KYC Summary</b></p>
+      <div class="pagehead">
+        <span class="back">←</span>
+        <h1>Westbrook Cooperative Ltd</h1>
+        <div class="acts">
+          <img src="kota-kyc/Sources-Analysis.svg" alt="Sources" style="height: 30px; display: block;">
+          <button class="pill-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6"/></svg></button>
+          <button class="pill-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- KPI strip -->
+      <div class="kpis">
+        <div class="card kpi">
+          <span class="kpi-head">Engagement Status
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="4"/></svg></span>
+          <span class="kpi-val">Applicant</span>
+        </div>
+        <div class="card kpi">
+          <span class="kpi-head">Stage
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h6v6H4zM14 14h6v6h-6z"/><path d="M10 7h7v7"/></svg></span>
+          <span class="kpi-val">Evaluation</span>
+        </div>
+        <div class="card kpi">
+          <span class="kpi-head">Score
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 12 17 7"/></svg></span>
+          <div data-chart="score-gauge" data-src="kota-kyc/score.json"></div>
+        </div>
+        <div class="card kpi">
+          <span class="kpi-head">Watchlist Mentions
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14l-2 6 2 6H5"/><path d="M5 4v16"/></svg></span>
+          <span class="chip chip--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>0</span>
+        </div>
+        <div class="card kpi">
+          <span class="kpi-head">Red Flags
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h13l-2.5 4L18 12H5"/></svg></span>
+          <span class="chip chip--red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4M12 16.8v.4"/></svg>1</span>
+        </div>
+        <div class="card kpi">
+          <span class="kpi-head">Identified UBOs
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20c1.2-3.2 3.6-4.8 6.5-4.8s5.3 1.6 6.5 4.8"/></svg></span>
+          <span class="chip chip--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>2</span>
+        </div>
+      </div>
+
+      <!-- Locations + Key Information -->
+      <div class="duo">
+        <div class="card">
+          <div class="card-title-row">Locations</div>
+          <div class="card-pad">
+            <div class="map" role="img" aria-label="Map with two location pins">
+              <img class="map-bg" src="kota-kyc/mapa.png" alt="" aria-hidden="true">
+              <svg class="map-link" viewBox="0 0 560 250" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M151 165 L 280 128" stroke="#E25E25" stroke-width="1.5" stroke-dasharray="4 4" fill="none"/>
+              </svg>
+              <button class="pin" style="left: 27%; top: 66%;" aria-label="Primary location pin">
+                <img src="kota-kyc/Locations.svg" alt="">
+              </button>
+              <div class="map-tip" style="left: 30%; top: 38%;">
+                <h4>Primary Location <i>×</i></h4>
+                <dl><dt>Name</dt><dd>Northbank Facility</dd></dl>
+              </div>
+              <button class="pin pin--assoc" style="left: 50%; top: 51%;" aria-label="Associated location pin">
+                <img src="kota-kyc/pin-outline.svg" alt="">
+              </button>
+              <div class="map-tip" style="left: 53%; top: 12%;">
+                <h4>Associated Location <i>×</i></h4>
+                <dl>
+                  <dt>Name</dt><dd>Eastfield Depot</dd>
+                  <dt>Type</dt><dd>Facility</dd>
+                  <dt>Link</dt><dd>Operator</dd>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title-row">Key Information</div>
+          <div class="card-pad ki-rows">
+            <div class="ki-row">Country <img src="kota-kyc/TZ.svg" alt="Country flag" style="width:18px;height:18px;border-radius:50%;display:block;"></div>
+            <div class="ki-row">Legal Form <b>Private Company</b></div>
+            <div class="ki-row">Primary Location <b>Northbank Facility</b></div>
+            <div class="ki-row">Associated Locations <b>214</b></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Governance -->
+      <div class="card">
+        <div class="card-title-row">Governance</div>
+        <div class="tabs" role="tablist" aria-label="Governance views">
+          <button class="tab on" id="tab-graph" role="tab" aria-selected="true" aria-controls="pane-graph">Graph</button>
+          <button class="tab" id="tab-table" role="tab" aria-selected="false" aria-controls="pane-table">Table</button>
+        </div>
+        <div class="pane" id="pane-graph" role="tabpanel" aria-labelledby="tab-graph" style="overflow-x: auto;">
+          <div data-chart="node-graph" data-src="kota-kyc/governance-graph.json" style="min-height: 280px; min-width: 620px;"></div>
+        </div>
+        <div class="pane" id="pane-table" role="tabpanel" aria-labelledby="tab-table" hidden>
+          <div data-chart="status-table" data-src="kota-kyc/governance-table.json"></div>
+        </div>
+      </div>
+
+      <!-- Assessment Details -->
+      <div class="card">
+        <div class="card-title-row">Assessment Details</div>
+        <div class="card-pad ad">
+          <div class="ad-stats">
+            <div class="card ad-stat">
+              <span class="txt"><span class="lbl">Total Checks</span><span class="v">22</span></span>
+              <span class="ico ico--green">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.4 2.4L15.5 9"/></svg></span>
+            </div>
+            <div class="card ad-stat">
+              <span class="txt"><span class="lbl">Red Flags</span><span class="v">0</span></span>
+              <span class="ico ico--orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h13l-2.5 4L18 12H5"/></svg></span>
+            </div>
+            <div class="card ad-stat">
+              <span class="txt"><span class="lbl">Triangulation</span><span class="v">70%</span></span>
+              <span class="ico ico--orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 4 18h16z"/><circle cx="12" cy="4" r="1.6" fill="currentColor"/><circle cx="4" cy="18" r="1.6" fill="currentColor"/><circle cx="20" cy="18" r="1.6" fill="currentColor"/></svg></span>
+            </div>
+          </div>
+          <chart-card title="Performance">
+            <div data-chart="stacked-area" data-src="kota-kyc/performance.json" style="height: 250px;"></div>
+          </chart-card>
+        </div>
+      </div>
+
+      <!-- Compliance -->
+      <div class="card">
+        <div class="card-title-row">Compliance</div>
+        <div class="card-pad">
+          <div data-chart="status-table" data-src="kota-kyc/compliance.json"></div>
+        </div>
+      </div>
+
+      <!-- Trade Relationships -->
+      <div class="card">
+        <div class="card-title-row">Trade Relationships
+          <span class="sp"></span>
+          <button class="pill-btn">Filter
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></button>
+        </div>
+        <div class="card-pad" style="overflow-x: auto; min-height: 312px; display: flex; align-items: center;">
+          <div data-chart="node-graph" data-src="kota-kyc/trade-chain.json" style="min-width: 560px; flex: 1;"></div>
+        </div>
+      </div>
+
+      <!-- Information Access Performance -->
+      <div class="card">
+        <div class="card-title-row">Information Access Performance</div>
+        <div class="card-pad grid4">
+          <chart-card title="Completeness">
+            <div data-chart="ring-chart" data-src="kota-kyc/completeness.json"></div>
+          </chart-card>
+          <chart-card title="Accumulation">
+            <div data-chart="smooth-line" data-src="kota-kyc/accumulation.json" style="height: 215px;"></div>
+          </chart-card>
+          <chart-card title="Contributions">
+            <div data-chart="column-chart" data-src="kota-kyc/contributions.json"></div>
+          </chart-card>
+          <chart-card title="Triangulation">
+            <div data-chart="ring-chart" data-src="kota-kyc/triangulation.json"></div>
+          </chart-card>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Governance Graph | Table toggle — page-level behaviour, components do the rendering
+    (function () {
+      const tabs = { 'tab-graph': 'pane-graph', 'tab-table': 'pane-table' };
+      Object.keys(tabs).forEach((id) => {
+        document.getElementById(id).addEventListener('click', () => {
+          Object.entries(tabs).forEach(([tid, pid]) => {
+            const on = tid === id;
+            document.getElementById(tid).classList.toggle('on', on);
+            document.getElementById(tid).setAttribute('aria-selected', on);
+            document.getElementById(pid).hidden = !on;
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

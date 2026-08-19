@@ -1,0 +1,9 @@
+{
+  "mode": "pie",
+  "inner": 0.45,
+  "segments": [
+    { "name": "Single Source", "value": 63, "color": "#E25E25" },
+    { "name": "Multiple Sources", "value": 37, "color": "#F4C4A8" }
+  ],
+  "legend": true
+}

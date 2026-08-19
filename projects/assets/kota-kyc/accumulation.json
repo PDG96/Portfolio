@@ -1,0 +1,17 @@
+{
+  "yMin": 0, "yMax": 120, "lineWidth": 2, "unit": "", "valueDecimals": 0,
+  "series": [ { "name": "Subjects", "color": "#E25E25" } ],
+  "data": [
+    { "date": "2024-02", "series": "Subjects", "value": 4 },
+    { "date": "2024-03", "series": "Subjects", "value": 9 },
+    { "date": "2024-04", "series": "Subjects", "value": 16 },
+    { "date": "2024-05", "series": "Subjects", "value": 24 },
+    { "date": "2024-06", "series": "Subjects", "value": 33 },
+    { "date": "2024-07", "series": "Subjects", "value": 41 },
+    { "date": "2024-08", "series": "Subjects", "value": 52 },
+    { "date": "2024-09", "series": "Subjects", "value": 64 },
+    { "date": "2024-10", "series": "Subjects", "value": 75 },
+    { "date": "2024-11", "series": "Subjects", "value": 89 },
+    { "date": "2024-12", "series": "Subjects", "value": 103 }
+  ]
+}

@@ -10,41 +10,31 @@
     width: 100%;
     height: 100%;
     background: transparent;
-    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', sans-serif;
   }
 
-  /* Stage fills the iframe completely; aspect-ratio of the iframe matches 5171/2840
-     so the stage retains the original composition shape with no letterboxing. */
+  /* The stage locks itself to the 1265/640 aspect ratio regardless of host
+     (standalone or iframe). Width fills the viewport, height is derived. */
   .stage {
     position: relative;
     width: 100%;
-    height: 100%;
+    aspect-ratio: 1265 / 640;
+    height: auto;
+    max-height: 100%;
   }
 
-  /* Every tile is positioned as a % of the stage — fully responsive,
-     identical proportions to analysis 03 reference (5171 × 2840). */
   .tile {
     position: absolute;
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                filter 0.45s ease;
+    overflow: hidden;
+    border-radius: 12px;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease;
     will-change: transform, filter;
   }
   .tile img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     display: block;
-  }
-  /* Hover — gentle lift + shadow boost (same as bento2) */
-  .tile:hover {
-    transform: translateY(-8px) scale(1.02);
-    filter: drop-shadow(0 24px 48px rgba(15, 23, 42, 0.16));
-    z-index: 5;
-  }
-  /* Species has overflow:hidden + inner card, so target its inner card instead */
-  .tile.species {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-                filter 0.45s ease;
   }
   .tile.species:hover {
     transform: translateY(-8px) scale(1.02);
@@ -52,21 +42,89 @@
     z-index: 5;
   }
 
-  /* salinity     2022×1400 at 0,0       */ .salinity    { left: 0;      top: 0;       width: 39.105%; height: 49.296%; }
-  /* indicators   1311×1394 at 2062,0    */ .indicators  { left: 39.876%; top: 0;       width: 25.353%; height: 49.085%; }
-  /* awareness    1756×2840 at 3415,0    */ .awareness   { left: 66.041%; top: 0;       width: 33.958%; height: 100%; }
-  /* species      1306×1400 at 0,1440    */ .species     { left: 0;       top: 50.704%; width: 25.256%; height: 49.296%; overflow: hidden; }
-  /* stakeholder  2029×1400 at 1346,1440 */ .stakeholder { left: 26.029%; top: 50.704%; width: 39.238%; height: 49.296%; }
+  /* Desktop layout, bento is 1265 × 640 (aspect 1.977). All gaps uniform
+     at 12 px:
+       horizontal 12 px = 0.95% of 1265
+       vertical   12 px = 1.875% of 640 (resolves to same pixels when the
+                                         stage keeps its aspect-ratio). */
+  .salinity     { left: 0;       top: 0;         width: 39.21%; height: 49.0625%; }
+  .indicators   { left: 40.16%;  top: 0;         width: 25.30%; height: 49.0625%; }
+  .awareness    { left: 66.41%;  top: 0;         width: 33.59%; height: 100%;     }
+  .species      { left: 0;       top: 50.9375%;  width: 25.14%; height: 49.0625%; overflow: hidden; }
+  .stakeholder  { left: 26.09%;  top: 50.9375%;  width: 39.37%; height: 49.0625%; }
 
-  /* Species composed card — video bg + donut overlay */
+  /* Below 900 px the bento abandons the absolute grid and stacks the tiles
+     vertically. Each tile gets a min-height that keeps the charts inside
+     readable, and the iframe's height stops being driven by an aspect
+     ratio (the host page removes that constraint at the same breakpoint,
+     see straatos.html). */
+  @media (max-width: 900px) {
+    .stage {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0;
+      /* Drop the aspect-ratio so stacked tiles can grow to their min-heights */
+      aspect-ratio: auto;
+      height: auto;
+    }
+    .tile {
+      position: static !important;
+      left: auto !important;
+      top: auto !important;
+      width: 100% !important;
+      height: auto !important;
+    }
+    .tile.salinity,
+    .tile.stakeholder { min-height: 320px; }
+    .tile.indicators  { min-height: 320px; }
+    .tile.species     { min-height: 320px; }
+    .tile.awareness   { min-height: 500px; }
+  }
+
+  /* Live components fill their tile entirely. */
+  .tile.salinity > chart-card,
+  .tile.stakeholder > chart-card {
+    width: 100%;
+    height: 100%;
+  }
+  .tile.salinity .chart-mount,
+  .tile.stakeholder .chart-mount {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Indicators tile, 3 internal cards with gap visually matching the bento
+     grid gap (18.4px in mockup units → 5.40% of tile height). */
+  .tile.indicators {
+    display: flex;
+    align-items: stretch;
+  }
+  .tile.indicators > [data-chart="indicator-stack"] {
+    width: 100%;
+    height: 100%;
+    /* Internal card gap matches the 12px bento gap, expressed as % of the
+       tile height (49.0625% of bento height = 314 px at native 640, so
+       12 px ≈ 3.82%). */
+    --is-gap: 3.82%;
+    /* In the bento each card flex-fills the column, the content inside
+       scales up to match so the cards do not feel half-empty. Value size
+       kept moderate so long numbers (e.g. "129,421.12 ha") don't bleed
+       under the delta chip. */
+    --is-thumb-size: 64px;
+    --is-card-padding-y: 18px;
+    --is-card-padding-x: 18px;
+    --is-label-size: 14px;
+    --is-value-size: 22px;
+  }
+
+  /* Species composed card — video bg + donut overlay. The outer .tile
+     handles the rounded corners + overflow clipping, this layer just
+     hosts the video. */
   .species-inner {
     position: absolute;
-    /* 20px outer padding ≈ 1.5% of card width (1306) — keeps the visible card edge
-       aligned with the shadow-padding baked into the PNG cards */
-    inset: 1.5%;
-    border-radius: clamp(8px, 1.6%, 22px);
+    inset: 0;
     overflow: hidden;
-    box-shadow: 0 6px 22px -6px rgba(15, 23, 42, 0.18);
   }
   .species-inner .bg-video {
     position: absolute;
@@ -86,8 +144,7 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    /* donut Species.png native 1109×767, kept proportional to the inner area */
-    width: 87.6%;       /* 1109 / 1266 (inner width) */
+    width: 87.6%;
     aspect-ratio: 1109 / 767;
   }
   .species-inner .donut img {
@@ -102,14 +159,19 @@
 
 <div class="stage">
   <div class="tile salinity">
-    <img src="straatos-bento/Salinity levels.png" alt="Salinity levels chart">
+    <chart-card title="Salinity levels">
+      <div class="chart-mount" data-chart="smooth-line" data-src="/projects/assets/straatos-charts/salinity-levels.json"></div>
+    </chart-card>
   </div>
+
   <div class="tile indicators">
-    <img src="straatos-bento/indicators.png" alt="Key indicators">
+    <div data-chart="indicator-stack" data-src="/projects/assets/straatos-charts/people-focused/people-focused.json"></div>
   </div>
+
   <div class="tile awareness">
     <img src="straatos-bento/Awareness Raising.png" alt="Awareness Raising">
   </div>
+
   <div class="tile species">
     <div class="species-inner">
       <video class="bg-video" autoplay muted loop playsinline preload="auto"
@@ -120,10 +182,38 @@
       </div>
     </div>
   </div>
+
   <div class="tile stakeholder">
-    <img src="straatos-bento/Stakeholder Engagement.png" alt="Stakeholder Engagement">
+    <chart-card title="Stakeholder Engagement">
+      <div class="chart-mount" data-chart="stacked-area" data-src="/projects/assets/straatos-charts/stakeholder-engagement.json"></div>
+    </chart-card>
   </div>
 </div>
+
+<script src="/components/chart-tooltip/chart-tooltip.js?v=2" defer></script>
+<script src="/components/chart-card/chart-card.js?v=2" defer></script>
+<script src="/components/smooth-line/smooth-line.js?v=2" defer></script>
+<script src="/components/stacked-area/stacked-area.js?v=2" defer></script>
+<script src="/components/indicator-stack/indicator-stack.js?v=2" defer></script>
+
+<script>
+  /* Type inside this composition is sized in px against the 1265 px the bento was
+     drawn at, while the tiles themselves are laid out in %. Left alone, a wide
+     column grows the tiles and leaves the headers and the indicator figures
+     behind, reading as tiny. Zoom scales layout and text together and, unlike a
+     transform, re-renders at the new size rather than stretching pixels.
+
+     The width arrives from the host: reading it here instead would feed back
+     into itself, since zoom changes what the document thinks its width is. */
+  (() => {
+    const BASE = 1265;
+    addEventListener('message', (e) => {
+      const w = e.data && e.data.type === 'bento:width' && e.data.w;
+      if (!w) return;
+      document.documentElement.style.zoom = (w / BASE).toFixed(4);
+    });
+  })();
+</script>
 
 </body>
 </html>

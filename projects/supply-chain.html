@@ -588,6 +588,54 @@
     transform-origin: top left;
     }
 
+   /* ====== PRODUCT SHOTS ======
+      This page borrowed .app-stack / .app-shot from the other case studies
+      without their CSS, so the screens rendered at natural size and hugged
+      the left edge. Sized and centred here, capped so a 2200px source is
+      never blown up past the point where it stops looking crisp. */
+   .app-stack {
+     margin-top: 2rem;
+     display: flex;
+     flex-direction: column;
+     gap: clamp(2.5rem, 5vw, 4rem);
+   }
+   .app-shot {
+     margin: 0;
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     gap: 0.875rem;
+   }
+   .main-sheet .app-shot img {
+     display: block;
+     width: 100%;
+     max-width: 1500px;
+     height: auto;
+     margin-inline: auto;
+     border-radius: 14px;
+   }
+   .main-sheet .app-shot figcaption {
+     font-family: var(--mono);
+     font-size: 0.6875rem;
+     font-weight: 500;
+     letter-spacing: 0.14em;
+     text-transform: uppercase;
+     color: var(--text-3);
+     margin: 0;
+     max-width: 1500px;
+     width: 100%;
+   }
+   /* The hero shot follows the same measure, so the page opens on the same
+      left and right edges the sections below it keep. */
+   .main-sheet .case-hero-mockup img {
+     display: block;
+     width: 100%;
+     max-width: 1500px;
+     height: auto;
+     margin-inline: auto;
+     border-radius: 14px;
+   }
+
    /* Blanket guard: every picture, video and frame in the sheet stays inside
  its column and keeps its own proportions. Individual components used to
  set this themselves, or not at all, which is where the crops came from. */
@@ -1598,7 +1646,17 @@
     .mock-confidence-fill--high { background: #28a745; }
     .mock-confidence-fill--med { background: #ffc107; }
     .mock-confidence-fill--low { background: #e74c3c; }
-  </style>
+     /* ====== EXTRA-WIDE ======
+      At the end of the sheet on purpose: these override rules defined further
+      up, and source order decides between selectors of equal weight. */
+   @media (min-width: 1800px) {
+     /* The screens stop capping and run the full column, the same measure the
+        copy above them uses. The sources are 2400px wide, so there is room. */
+     .main-sheet .app-shot img,
+     .main-sheet .app-shot figcaption,
+     .main-sheet .case-hero-mockup img { max-width: none; }
+   }
+</style>
 </head>
 
 <body class="shell-page">

@@ -140,6 +140,24 @@
     0%   { opacity: 0.6; r: 7; }
     100% { opacity: 0;   r: 22; }
   }
+  /* ==================== ENTRANCE ====================
+     Armed only when the graph runs inside the case study, which posts
+     "bento:visible" as the frame reaches the viewport. Opened on its own
+     it draws straight away, so the prototype still works standalone. */
+  .graph.is-armed .link,
+  .graph.is-armed .node { opacity: 0; }
+  .graph.is-armed.is-in .link {
+    opacity: 1;
+    transition: opacity 0.9s ease-out;
+  }
+  .graph.is-armed.is-in .node {
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .graph.is-armed .link,
+    .graph.is-armed .node { opacity: 1; transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -409,6 +427,55 @@
   }
   fit();
   window.addEventListener('resize', fit);
+
+  /* ==================== ENTRANCE ====================
+     The graph reads as a still picture until something moves in it. On
+     arrival the nodes ripple in from the middle, the layout visibly settles,
+     and then one incident opens on its own and closes again -- the real
+     click behaviour, run once, so it's obvious the thing can be clicked. */
+  (() => {
+    const embedded = window.self !== window.top;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!embedded || reduced) return;
+
+    graphEl.classList.add('is-armed');
+
+    // Ripple order: distance from the centre of the frame at rest.
+    const cx = width / 2, cy = height / 2;
+    const delay = (d) => {
+      const dx = (d.x ?? cx) - cx, dy = (d.y ?? cy) - cy;
+      return Math.min(900, Math.hypot(dx, dy) * 2.2);
+    };
+
+    let played = false;
+    function play() {
+      if (played) return;
+      played = true;
+
+      nodeSel.style('transition-delay', (d) => delay(d) + 'ms');
+      linkSel.style('transition-delay', '420ms');
+      graphEl.classList.add('is-in');
+
+      // A visible settle, so the layout looks alive rather than printed.
+      simulation.alpha(0.85).restart();
+
+      // Then demonstrate the interaction on a node that actually has a card.
+      setTimeout(() => {
+        const demo = nodes.find((n) => n.info && n.role === 'event') ||
+                     nodes.find((n) => n.info);
+        if (!demo) return;
+        showIncident(demo);
+        setTimeout(() => { if (activeId === demo.id) closeIncident(); }, 2600);
+      }, 2200);
+    }
+
+    addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'bento:visible') play();
+    });
+    // Safety net: never leave the graph invisible if the host stays quiet.
+    setTimeout(play, 4000);
+  })();
+
 </script>
 
 </body>

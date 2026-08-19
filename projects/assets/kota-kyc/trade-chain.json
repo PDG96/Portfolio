@@ -1,0 +1,58 @@
+{
+  "columns": [
+    {
+      "nodes": [
+        {
+          "id": "sup",
+          "title": "Organisation Name",
+          "type": "Supplier",
+          "idLabel": "ID000000123",
+          "flag": "kota-kyc/TZ.svg",
+          "count": 4,
+          "tone": "pink",
+          "icon": "pin"
+        }
+      ]
+    },
+    {
+      "nodes": [
+        {
+          "id": "agg",
+          "title": "Organisation Name",
+          "type": "Aggregator",
+          "idLabel": "ID000000124",
+          "flag": "kota-kyc/TZ.svg",
+          "count": 4,
+          "tone": "teal",
+          "icon": "agg"
+        }
+      ]
+    },
+    {
+      "nodes": [
+        {
+          "id": "buy",
+          "title": "Organisation Name",
+          "type": "Buyer",
+          "idLabel": "ID000000125",
+          "flag": "kota-kyc/GB.svg",
+          "count": 4,
+          "tone": "blue",
+          "icon": "org"
+        }
+      ]
+    }
+  ],
+  "links": [
+    {
+      "from": "sup",
+      "to": "agg",
+      "label": "4"
+    },
+    {
+      "from": "agg",
+      "to": "buy",
+      "label": "4"
+    }
+  ]
+}

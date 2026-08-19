@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Component library — Pietra Gottardo</title>
+  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #141414;
+      --surface: rgba(255,255,255,0.04);
+      --text: #fcfcfc;
+      --text-2: rgba(252,252,252,0.55);
+      --border: rgba(255,255,255,0.12);
+      --accent: #f7fdb9;
+      --mono: 'DM Mono', monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    * { box-sizing: border-box; }
+    html, body { background: var(--bg); }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: 'Urbanist', system-ui, sans-serif;
+      padding: 5rem 1.5rem;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; }
+
+    .crumb {
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin: 0 0 0.75rem;
+    }
+    .crumb a { color: var(--text-2); text-decoration: none; }
+    .crumb a:hover { color: var(--text); }
+
+    h1 {
+      font-weight: 300;
+      font-size: clamp(2rem, 5vw, 3rem);
+      letter-spacing: -0.02em;
+      margin: 0 0 0.75rem;
+    }
+    p.lead {
+      color: var(--text-2);
+      margin: 0 0 3.5rem;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      text-decoration: none;
+      color: var(--text);
+      transition: transform .4s var(--ease), border-color .4s var(--ease), background .4s var(--ease);
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.06);
+    }
+    .card .tag {
+      font-family: var(--mono);
+      font-size: 0.625rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-2);
+      margin: 0 0 0.6rem;
+    }
+    .card h3 {
+      font-weight: 500;
+      font-size: 1.125rem;
+      margin: 0 0 0.5rem;
+    }
+    .card p {
+      color: var(--text-2);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      margin: 0 0 1.5rem;
+      flex: 1;
+    }
+    .card .arrow {
+      color: var(--accent);
+      font-family: var(--mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .card--soon {
+      cursor: default;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .card--soon .arrow { color: var(--text-2); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <p class="crumb"><a href="../index.html">← Portfolio</a> · Components</p>
+    <h1>Component library.</h1>
+    <p class="lead">Interactive pieces built and refined here in isolation, then plugged into the case studies once they're ready. Each card opens a standalone preview.</p>
+
+    <div class="grid">
+      <a class="card" href="chart-card/index.html">
+        <p class="tag">Building block</p>
+        <h3>chart-card</h3>
+        <p>Reusable card chrome, SF Pro title on the left, optional action buttons on the right. Wraps any chart in the library.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <div class="card card--soon" aria-disabled="true">
+        <p class="tag">Building block</p>
+        <h3>chart-tooltip</h3>
+        <p>Shared tooltip markup + styles for every chart in the library. Locks down typography, spacing and the optional Total row.</p>
+        <span class="arrow">Used by every chart</span>
+      </div>
+
+      <a class="card" href="stacked-area/index.html">
+        <p class="tag">Chart · 4 series</p>
+        <h3>Smooth stacked area</h3>
+        <p>Monthly counts on a stacked smooth area. Tooltip is shared across all series, legend toggles a series in and out.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="smooth-line/index.html">
+        <p class="tag">Chart · multi-series</p>
+        <h3>Line chart, multiple series</h3>
+        <p>Smooth lines, shared crosshair tooltip with markers, light theme tuned for Straatos.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="indicator-stack/index.html">
+        <p class="tag">KPI · 3 items</p>
+        <h3>Indicator stack</h3>
+        <p>Vertical list of KPI cards. Round thumbnail, label + animated counter, optional delta chip. Cascades in on load.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="area-comparison/index.html">
+        <p class="tag">Chart · multi-style</p>
+        <h3>Area comparison</h3>
+        <p>Multi-series chart, per-series solid/dashed lines and per-series fill opacity. For "design vs actual vs projected" patterns.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="vertical-gauge/index.html">
+        <p class="tag">Gauge · scalar</p>
+        <h3>Vertical gauge</h3>
+        <p>Pill-shaped scale with gradient fill, configurable labels and a value pointer that rises into place on load. Reads pH, salinity, any 0-to-max.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="score-gauge/index.html">
+        <p class="tag">Gauge · scalar</p>
+        <h3>Score gauge</h3>
+        <p>Horizontal gradient track with a hoverable marker pinned at the score. Built for the KOTA KYC screen, reads any 0-to-max score.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="ring-chart/index.html">
+        <p class="tag">Chart · rings / pie</p>
+        <h3>Ring chart</h3>
+        <p>One component, two modes: concentric progress rings (double donut) or a segmented donut/pie. Arcs sweep in, hover tooltips per series.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="column-chart/index.html">
+        <p class="tag">Chart · bars</p>
+        <h3>Column chart</h3>
+        <p>Compact SVG bar chart with dashed grid, staggered grow-in and per-bar tooltips. No chart lib needed.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="node-graph/index.html">
+        <p class="tag">Diagram · entities</p>
+        <h3>Node graph</h3>
+        <p>Columns of entity cards joined by curved connectors with count chips. Configures as a hub graph or a linear chain.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <a class="card" href="status-table/index.html">
+        <p class="tag">Table · status</p>
+        <h3>Status table</h3>
+        <p>Data table with optional status icons + hover explanations, live search filter and row hover. Powers compliance-style listings.</p>
+        <span class="arrow">Open preview →</span>
+      </a>
+
+      <div class="card card--soon" aria-disabled="true">
+        <p class="tag">Map · WIP</p>
+        <h3>Interactive globe</h3>
+        <p>Spinable 3D globe with project pins, the DataStake gesture, evolved for the portfolio.</p>
+        <span class="arrow">Coming soon</span>
+      </div>
+
+      <div class="card card--soon" aria-disabled="true">
+        <p class="tag">Pattern · WIP</p>
+        <h3>Role switcher</h3>
+        <p>Demo of how a sidebar collapses and re-renders when the active role changes, from the WAZI case study.</p>
+        <span class="arrow">Coming soon</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
