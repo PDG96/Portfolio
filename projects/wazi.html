@@ -2112,9 +2112,13 @@
  <div class="network-stack r-stagger">
  <figure class="network-shot network-shot--graph r">
  <div class="network-embed">
+ <!-- Not lazy on purpose: this one pulls D3 off a CDN and runs a force
+      simulation before it can show anything, so deferring the load until it
+      is in view stacked a fetch, a parse and a layout pass on top of the
+      entrance, which on a phone read as the graph arriving late. -->
  <iframe class="network-iframe" src="assets/wazi-network.html?v=2"
  title="Interactive stakeholder network, events, locations and stakeholders connected by relationships in the WAZI evidence base"
- loading="lazy" scrolling="no"></iframe>
+ scrolling="no"></iframe>
  <div class="network-legend" aria-hidden="true">
  <span class="network-legend__item"><span class="dot" style="background:#D8A472"></span><span data-i18n="legend_event">Incident / event</span></span>
  <span class="network-legend__item"><span class="dot" style="background:#B796C9"></span><span data-i18n="legend_location">Location</span></span>
@@ -2387,7 +2391,7 @@ setLang(lang);
  };
  const io = new IntersectionObserver((entries) => {
  for (const e of entries) if (e.isIntersecting) notify(e.target);
- }, { rootMargin: '0px 0px -20% 0px' });
+ }, { rootMargin: '0px 0px 300px 0px' });
  frames.forEach((f) => {
  io.observe(f);
  f.addEventListener('load', () => {

@@ -1226,6 +1226,13 @@
  max-width: none;
  --dash-h: 780px;
  }
+ @media (max-width: 900px) {
+ /* The dashboard has no layout of its own below ~1000px, so on a phone
+    it is rendered at that floor and scaled down. At the desktop height
+    that left a 300px slit; a taller frame means the same scale shows
+    the metrics and the globe instead of a sliver of the top bar. */
+ .app-shot--browser .embed-frame { --dash-h: 1500px; }
+ }
  /* No aspect-ratio here: the JS below owns the height so it can stay put
  while the width follows the column. */
  .app-shot--browser .embed-iframe--app { transform-origin: top left; }
@@ -3400,20 +3407,36 @@
  // narrower than the layout the embedded page needs, render at that floor
  // and scale the whole thing down rather than let it hit its own mobile
  // breakpoint. At any comfortable width the scale is exactly 1.
- const iw = Math.max(920, cw);
- const ih = Math.round(iw * (h / w));
- const scale = Math.min(1, cw / iw);
- iframe.style.width = iw + 'px';
- iframe.style.height = ih + 'px';
- iframe.style.transform = 'scale(' + scale + ')';
- frame.style.aspectRatio = 'auto';
- frame.style.height = Math.round(ih * scale) + 'px';
  // The composition sizes its own type against the width it was drawn at,
  // so hand it the width it actually got. Reading it from inside would
  // feed back on itself once it zooms.
+ let told = w;
  const tell = () => {
- try { iframe.contentWindow.postMessage({ type: 'bento:width', w: iw }, '*'); } catch (e) {}
+ try { iframe.contentWindow.postMessage({ type: 'bento:width', w: told }, '*'); } catch (e) {}
  };
+
+ if (cw < 900) {
+ // Below its own breakpoint the bento has a stacked layout built for
+ // exactly this, which is the right thing to show on a phone. Hand it
+ // the real width and get out of the way: no floor, no transform, and
+ // a zoom of 1 (told === w), so the CSS height rule stands. Scaling a
+ // 920px desktop composition down to a third and zooming it as well
+ // was shrinking it twice over.
+ iframe.style.width = '';
+ iframe.style.height = '';
+ iframe.style.transform = '';
+ frame.style.aspectRatio = '';
+ frame.style.height = '';
+ } else {
+ const iw = cw;
+ const ih = Math.round(iw * (h / w));
+ iframe.style.width = iw + 'px';
+ iframe.style.height = ih + 'px';
+ iframe.style.transform = '';
+ frame.style.aspectRatio = 'auto';
+ frame.style.height = ih + 'px';
+ told = iw;
+ }
  tell();
  iframe.addEventListener('load', tell, { once: true });
  });
