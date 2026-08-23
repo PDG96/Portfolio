@@ -740,6 +740,12 @@
  right: 20%;
  filter: blur(30px);
  }
+ /* Those two blobs are decoration for the empty placeholder state. They are
+    absolutely positioned while the image is not, so once a real screenshot
+    went in they painted over it -- the sage one barely shows, the yellow one
+    read as a stain in the bottom-right corner of the shot. */
+ .case-hero-mockup:has(img)::before,
+ .case-hero-mockup:has(img)::after { content: none; }
  .mockup-caption {
  position: relative;
  z-index: 1;
