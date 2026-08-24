@@ -993,8 +993,12 @@ try {
 		const cs = getComputedStyle(wrap);
 		const inner = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
 		const W = Math.max(300, Math.round(inner || 340));
-		const H = 250;
-		const M = { top: 12, right: 12, bottom: 32, left: 52 };
+		/* Trimmed with the label move below: the x labels used to be painted 18px
+		   above the svg's bottom edge, and that dead band sat on top of the 24px
+		   card padding — about 15px more air under these charts than under the
+		   bento ones, which is what made the padding look inconsistent. */
+		const H = 240;
+		const M = { top: 12, right: 12, bottom: 28, left: 52 };
 		const plotW = W - M.left - M.right;
 		const plotH = H - M.top - M.bottom;
 
@@ -1032,7 +1036,7 @@ try {
 		// X axis labels (two-digit years, matching the design)
 		YEARS.forEach((yr, i) => {
 			svg += `<line class="axis-line" x1="${x(i)}" y1="${M.top + plotH}" x2="${x(i)}" y2="${M.top + plotH + 5}" />`;
-			svg += `<text class="axis-label" x="${x(i)}" y="${H - 18}" text-anchor="middle">${String(yr).slice(2)}</text>`;
+			svg += `<text class="axis-label" x="${x(i)}" y="${H - 8}" text-anchor="middle">${String(yr).slice(2)}</text>`;
 		});
 
 		// Hover chrome, hidden until the pointer is over the plot
