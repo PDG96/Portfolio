@@ -135,6 +135,45 @@
  outline-offset: 3px;
  }
 
+ /* Mobile menu */
+
+ (() => {
+
+   const tog = document.querySelector('.nav-toggle');
+
+   const mob = document.querySelector('.mobile-menu');
+
+   if (!tog || !mob) return;
+
+   const close = () => {
+
+     mob.classList.remove('open');
+
+     tog.classList.remove('open');
+
+     tog.setAttribute('aria-expanded', 'false');
+
+     document.body.style.overflow = '';
+
+   };
+
+   tog.addEventListener('click', () => {
+
+     const open = mob.classList.toggle('open');
+
+     tog.classList.toggle('open', open);
+
+     tog.setAttribute('aria-expanded', open);
+
+     document.body.style.overflow = open ? 'hidden' : '';
+
+   });
+
+   mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+
+ })();
+
+
  /* Custom cursor */
  .cursor {
  display: none;
@@ -502,7 +541,10 @@
  scrollbar-width: thin;
  }
  @media (max-width: 900px) {
- .main-sheet { height: auto; overflow-y: visible; }
+ /* Both axes, not just one: overflow-y: visible next to an inherited
+    overflow-x: hidden computes to auto, quietly making the sheet a
+    scroll container and a containing block for anything sticky. */
+ .main-sheet { height: auto; overflow: visible; }
 /* Stacked, the "Next up" cards landed between the case title and the
  case itself, so the reader met the other projects before this one. On
  mobile the sidebar stops being a box and hands its children straight to
@@ -594,6 +636,13 @@
  .main-sheet img,
  .main-sheet video,
  .main-sheet iframe { max-width: 100%; }
+ /* The embeds are the exception: their scaler sets a deliberate pixel
+    width above the column and then scales the whole box down to fit.
+    Clamping that width to 100% first made the transform shrink a box
+    that was already the right size — a 1000px view landing at 98px in
+    a 313px frame. They sit in an overflow:hidden frame, so nothing
+    can leak out of the column anyway. */
+ .main-sheet .embed-iframe { max-width: none; }
  .main-sheet img,
  .main-sheet video { height: auto; }
 
@@ -891,7 +940,7 @@
  background: transparent;
  color: var(--text-2);
  gap: 0.875rem 1.25rem;
- font-size: 0.5625rem;
+ font-size: 0.6875rem;
  letter-spacing: 0.1em;
  }
  .network-legend .dot {
@@ -1437,7 +1486,7 @@
  /* Sidebar */
  .mock-side {
  background: #0d2b2e; color: rgba(255,255,255,0.65);
- padding: 12px 0; font-size: 0.5625rem;
+ padding: 12px 0; font-size: 0.6875rem;
  display: flex; flex-direction: column;
  }
  .mock-side-logo {
@@ -1452,7 +1501,7 @@
  letter-spacing: 0.1em; color: rgba(255,255,255,0.3);
  }
  .mock-side-item {
- padding: 5px 14px; font-size: 0.5625rem;
+ padding: 5px 14px; font-size: 0.6875rem;
  display: flex; align-items: center; gap: 6px;
  }
  .mock-side-item--on {
@@ -1467,7 +1516,7 @@
  /* Content area */
  .mock-body {
  padding: 14px 16px; background: #f8f9fa;
- overflow: hidden; font-size: 0.5625rem; color: var(--text);
+ overflow: hidden; font-size: 0.6875rem; color: var(--text);
  }
  .mock-breadcrumb {
  font-size: 0.4375rem; color: var(--text-3);
@@ -1651,7 +1700,7 @@
  display: flex; flex-direction: column;
  }
  .mock-wire-title {
- font-size: 0.5625rem; font-weight: 700; color: #444;
+ font-size: 0.6875rem; font-weight: 700; color: #444;
  margin-bottom: 10px; padding-bottom: 6px;
  border-bottom: 1px dashed #ddd;
  }
@@ -1924,6 +1973,39 @@
  height: clamp(620px, 44vh, 820px);
  }
  }
+
+ /* Touch targets: the reachable area reaches the 44px minimum without
+    changing how anything looks. */
+ @media (hover: none) and (pointer: coarse) {
+   .theme-btn { min-height: 44px; padding-block: 0; }
+   .nav-logo, .case-meta-value[href] { display: inline-flex; align-items: center; min-height: 44px; }
+ }
+ /* Mobile navigation, ported from the landing. Without it these pages lose
+    Work and Contact entirely below 768px — the header keeps only the logo
+    and the theme toggle, and the only way out is the logo. */
+ .nav-toggle {
+   display: flex; flex-direction: column; gap: 5px;
+   background: none; border: none; cursor: pointer; padding: 10px;
+ }
+ .nav-toggle span {
+   display: block; width: 20px; height: 1.5px;
+   background: var(--text); border-radius: 1px;
+   transition: all 0.3s var(--ease);
+ }
+ .nav-toggle.open span:nth-child(1) { transform: rotate(45deg) translate(4.5px, 4.5px); }
+ .nav-toggle.open span:nth-child(2) { opacity: 0; }
+ .nav-toggle.open span:nth-child(3) { transform: rotate(-45deg) translate(4.5px, -4.5px); }
+ .mobile-menu {
+   display: none; position: fixed;
+   top: 60px; left: 0; right: 0; bottom: 0;
+   background: var(--shell-bg); z-index: 99;
+   padding: 2rem 1.25rem;
+ }
+ .mobile-menu.open { display: flex; flex-direction: column; gap: 1.5rem; }
+ .mobile-menu a { font-size: 1.5rem; font-weight: 500; color: var(--text); }
+ @media (min-width: 768px) {
+   .nav-toggle, .mobile-menu { display: none; }
+ }
 </style>
 </head>
 
@@ -1945,9 +2027,17 @@
    <button class="theme-btn" data-theme-set="dark" aria-pressed="false" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
    <button class="theme-btn active" data-theme-set="light" aria-pressed="true" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
+ <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+   <span></span><span></span><span></span>
+ </button>
  </div>
  </div>
  </nav>
+
+ <div class="mobile-menu" role="dialog" aria-label="Mobile navigation">
+   <a href="../index.html#work" data-i18n="nav_work">Work</a>
+   <a href="../index.html#contact" data-i18n="nav_contact">Contact</a>
+ </div>
 
  <!-- Shell: fixed sidebar (project info + other cases) + scrolling main sheet -->
  <div class="shell">

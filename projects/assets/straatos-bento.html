@@ -80,6 +80,26 @@
     .tile.indicators  { min-height: 320px; }
     .tile.species     { min-height: 320px; }
     .tile.awareness   { min-height: 500px; }
+  
+
+    /* The indicator cards flex-fill a fixed-height tile on desktop. Stacked,
+       the tile's height becomes auto, so flex-basis: 0 collapses each card to
+       its padding (~38px) while the thumb stays pinned at 64px — the circles
+       then overlapped each other and pushed out past the tile's top edge.
+       Cards size to their content here, and the thumb comes down with them. */
+    /* Same selector the desktop sizes are set on, or its 64px thumb wins on
+       specificity and the custom property here never lands. */
+    .tile.indicators > [data-chart="indicator-stack"] {
+      --is-thumb-size: 44px;
+      --is-value-size: 19px;
+      --is-label-size: 13px;
+      --is-gap: 12px;
+      height: auto;
+    }
+    .tile.indicators > [data-chart="indicator-stack"] > .is-card {
+      flex: 0 0 auto;
+      min-height: 0;
+    }
   }
 
   /* Live components fill their tile entirely. */

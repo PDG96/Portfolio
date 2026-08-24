@@ -963,7 +963,7 @@
  .form-group input,
  .form-group textarea {
  font-family: var(--font);
- font-size: 0.9375rem;
+ font-size: 1rem; /* 16px floor: iOS Safari zooms the viewport on focus below it */
  color: var(--text);
  /* Was a white-on-white wash in light mode — the field boundary vanished.
  Tokenized so the inputs read on either ground. */
@@ -1063,7 +1063,15 @@
  transition: color 0.3s;
  }
  .footer-links a:hover { color: var(--cta); }
- </style>
+ 
+ /* Touch targets. The visual size stays as drawn; the reachable area grows
+    to the 44px minimum underneath it, so nothing shifts on screen. */
+ @media (hover: none) and (pointer: coarse) {
+   .theme-btn { min-height: 44px; padding-block: 0; }
+   .nav-toggle { min-width: 44px; min-height: 44px; }
+   .footer-links a, .nav-logo { display: inline-flex; align-items: center; min-height: 44px; }
+ }
+</style>
 </head>
 
 <body>
