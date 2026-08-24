@@ -330,17 +330,22 @@
 	   proportions. The SVGs are width:100%, so that 14% scaled the whole third
 	   chart up -- bigger type, taller plot, less breathing room inside its own
 	   card than the other two. Equal columns, equal charts. */
+	/* Matched to the chart-card component the bentos use, so the two chart
+	   systems on the page read as one: same title size and weight, same 24px
+	   frame, same rule under the header. It was 16px/600 here against 12px/500
+	   there, which is what made them look like different products. */
 	.chart-card-header {
-		height: 80px;
+		height: 64px;
 		display: flex;
 		align-items: center;
 		padding: 0 24px;
-		border-bottom: 1px solid #E5E7EB;
+		border-bottom: 1px solid rgba(20, 20, 20, 0.10);
 	}
 	.chart-card-header h3 {
-		font-size: 16px;
-		font-weight: 600;
-		color: #384250;
+		font-size: 12px;
+		font-weight: 500;
+		letter-spacing: -0.005em;
+		color: #141414;
 		margin: 0;
 	}
 	.chart-wrap {
@@ -350,9 +355,11 @@
 	/* No width:100% here: renderChart sizes the svg in real pixels so the
 	   axis type and the margins keep the size they were written at. */
 	.chart-wrap svg { display: block; max-width: 100%; }
-	.axis-label { font-size: 9px; fill: #6C737F; }
-	.grid-line { stroke: #F3F4F6; }
-	.axis-line { stroke: #E5E7EB; }
+	/* Same axis treatment as the component: 11px, the same muted ink, and a
+	   dashed grid rather than a solid one. */
+	.axis-label { font-size: 11px; fill: rgba(20, 20, 20, 0.55); }
+	.grid-line { stroke: rgba(20, 20, 20, 0.08); stroke-dasharray: 3 4; }
+	.axis-line { stroke: rgba(20, 20, 20, 0.12); }
 
 	.chart-tip {
 		position: absolute;
@@ -987,7 +994,7 @@ try {
 		const inner = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
 		const W = Math.max(300, Math.round(inner || 340));
 		const H = 250;
-		const M = { top: 12, right: 16, bottom: 30, left: 44 };
+		const M = { top: 12, right: 12, bottom: 32, left: 52 };
 		const plotW = W - M.left - M.right;
 		const plotH = H - M.top - M.bottom;
 
@@ -1109,15 +1116,22 @@ try {
 	/* Sized in real pixels now, so a width change means a redraw rather than a
 	   stretch. Debounced because the observer fires through the whole drag. */
 	if ('ResizeObserver' in window) {
-		let t = null, last = -1;
-		const ro = new ResizeObserver((entries) => {
-			const w = Math.round(entries[0].contentRect.width);
-			if (w <= 0 || w === last) return;
-			last = w;
-			clearTimeout(t);
-			t = setTimeout(drawAll, 120);
+		/* Each chart watches its own box. Watching only the first meant the
+		   other two kept whatever width they happened to be measured at on
+		   first paint, which is why one plot stopped short of its card. */
+		CHARTS.forEach(([id, cfg]) => {
+			let t = null, last = -1;
+			const wrap = document.getElementById(id);
+			if (!wrap) return;
+			const ro = new ResizeObserver((entries) => {
+				const w = Math.round(entries[0].contentRect.width);
+				if (w <= 0 || w === last) return;
+				last = w;
+				clearTimeout(t);
+				t = setTimeout(() => renderChart(id, cfg), 120);
+			});
+			ro.observe(wrap);
 		});
-		ro.observe(document.getElementById("chartHectares"));
 	}
 </script>
 
