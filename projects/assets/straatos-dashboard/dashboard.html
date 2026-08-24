@@ -377,6 +377,29 @@
 		.anim-armed .card.is-in { opacity: 1; transform: none; transition: none; }
 		.anim-armed .chart-wrap svg { clip-path: none; }
 	}
+
+	/* ==================== PHONE ====================
+	   Below 700px this stops pretending to be a desktop window. The case study
+	   used to scale the whole 1000px app down to fit a phone column, which
+	   produced a legible-at-arms-length miniature and nothing more. Here it
+	   lays out as an app instead: the rail collapses to a strip of icons, the
+	   cards stack, and the map takes a height a thumb can live with. */
+	@media (max-width: 700px) {
+		.sidebar { width: 56px; }
+		.sidebar svg { width: 56px; margin-left: -8px; }
+		.header { height: 52px; padding: 0 14px; }
+		.page-title { height: 56px; padding: 0 14px; }
+		.page-title h1 { font-size: 17px; }
+		.content { padding: 14px; gap: 14px; }
+		.card-header { height: 52px; padding: 0 14px; }
+		.metrics { flex-wrap: wrap; }
+		.metric { flex: 1 0 45%; padding: 12px 14px; border-right: none; }
+		.map-body { height: 320px; }
+		#map { height: 320px; }
+		.charts-row { flex-direction: column; padding: 14px; gap: 14px; }
+		.chart-card { height: 260px; }
+		.nav-strip { transform: scale(0.85); transform-origin: top right; }
+	}
 </style>
 </head>
 <body>

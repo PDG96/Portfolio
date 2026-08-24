@@ -135,44 +135,6 @@
  outline-offset: 3px;
  }
 
- /* Mobile menu */
-
- (() => {
-
-   const tog = document.querySelector('.nav-toggle');
-
-   const mob = document.querySelector('.mobile-menu');
-
-   if (!tog || !mob) return;
-
-   const close = () => {
-
-     mob.classList.remove('open');
-
-     tog.classList.remove('open');
-
-     tog.setAttribute('aria-expanded', 'false');
-
-     document.body.style.overflow = '';
-
-   };
-
-   tog.addEventListener('click', () => {
-
-     const open = mob.classList.toggle('open');
-
-     tog.classList.toggle('open', open);
-
-     tog.setAttribute('aria-expanded', open);
-
-     document.body.style.overflow = open ? 'hidden' : '';
-
-   });
-
-   mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
-
- })();
-
 
  /* Custom cursor */
  .cursor {
@@ -930,7 +892,10 @@
  /* Mobile, give the graph more height and move the legend out of the canvas
  so the D3 nodes don't overlap the legend pills. */
  @media (max-width: 640px) {
- .network-shot--graph .network-embed {
+ /* :not(--gold) for the same reason as the extra-wide rule: the supplier
+    assessment figure carries both classes, and forcing a 4/5 box around a
+    16/9 recording left a tall band of empty card under the video. */
+ .network-shot--graph:not(.network-shot--gold) .network-embed {
  aspect-ratio: 4 / 5;
  }
  .network-legend {
@@ -1977,7 +1942,14 @@
  /* Touch targets: the reachable area reaches the 44px minimum without
     changing how anything looks. */
  @media (hover: none) and (pointer: coarse) {
-   .theme-btn { min-height: 44px; padding-block: 0; }
+   /* Hit area only. min-height turned the control itself into a slab in
+     the header; a pseudo-element reaches the 44px target while the
+     button keeps the size it was drawn at. */
+  .theme-btn { position: relative; }
+  .theme-btn::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: 44px; transform: translateY(-50%);
+  }
    .nav-logo, .case-meta-value[href] { display: inline-flex; align-items: center; min-height: 44px; }
  }
  /* Mobile navigation, ported from the landing. Without it these pages lose
@@ -2074,7 +2046,7 @@
   <!-- Image-only cards: the alt text carries the project name for
        screen readers and the link label. -->
   <a href="straatos.html" class="sidebar-card">
-   <div class="sidebar-card-thumb"><img src="assets/straatos-hero.png" alt="Straatos, Digital infrastructure for climate action"></div>
+   <div class="sidebar-card-thumb"><img src="assets/straatos-hero.jpg" alt="Straatos, Digital infrastructure for climate action"></div>
   </a>
   <a href="supply-chain.html" class="sidebar-card">
    <div class="sidebar-card-thumb"><img src="assets/supply-chain/card.jpg" alt="Continuous due diligence for commodity supply chains"></div>
@@ -2084,7 +2056,7 @@
   </a>
   <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
    <div class="sidebar-card-thumb">
-   <img src="assets/safra-hero.png" alt="Safra, Operating system for sustainable Brazilian agriculture">
+   <img src="assets/safra-hero.jpg" alt="Safra, Operating system for sustainable Brazilian agriculture">
    <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
    </div>
   </div>
@@ -2098,7 +2070,7 @@
  <section class="case-hero">
  <div class="wrap">
  <div class="case-hero-mockup case-hero-mockup--image r" style="aspect-ratio:auto;padding:0;background:transparent;border:none;">
- <img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI Shipments view on a tablet held in two hands, sidebar with Aggregator modules, Timeline + Origin Distribution + Counterparties donuts in gold, and an Inbound shipments table with EVT000000123 marked Completed">
+ <img src="assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI Shipments view on a tablet held in two hands, sidebar with Aggregator modules, Timeline + Origin Distribution + Counterparties donuts in gold, and an Inbound shipments table with EVT000000123 marked Completed">
  </div>
  <!-- legacy HTML mockup hidden, keep markup for reference -->
  <div class="case-hero-mockup r" style="display:none;">
@@ -2498,6 +2470,45 @@ setLang(lang);
  es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('v'); obs.unobserve(e.target); } })
  , { threshold: 0.12 });
  document.querySelectorAll('.r').forEach(el => obs.observe(el));
+
+
+ /* Mobile menu */
+
+ (() => {
+
+   const tog = document.querySelector('.nav-toggle');
+
+   const mob = document.querySelector('.mobile-menu');
+
+   if (!tog || !mob) return;
+
+   const close = () => {
+
+     mob.classList.remove('open');
+
+     tog.classList.remove('open');
+
+     tog.setAttribute('aria-expanded', 'false');
+
+     document.body.style.overflow = '';
+
+   };
+
+   tog.addEventListener('click', () => {
+
+     const open = mob.classList.toggle('open');
+
+     tog.classList.toggle('open', open);
+
+     tog.setAttribute('aria-expanded', open);
+
+     document.body.style.overflow = open ? 'hidden' : '';
+
+   });
+
+   mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+
+ })();
 
  // Custom cursor
  (() => {

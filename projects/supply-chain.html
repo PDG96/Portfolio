@@ -135,44 +135,6 @@
       outline-offset: 3px;
     }
 
-    /* Mobile menu */
-
-    (() => {
-
-      const tog = document.querySelector('.nav-toggle');
-
-      const mob = document.querySelector('.mobile-menu');
-
-      if (!tog || !mob) return;
-
-      const close = () => {
-
-        mob.classList.remove('open');
-
-        tog.classList.remove('open');
-
-        tog.setAttribute('aria-expanded', 'false');
-
-        document.body.style.overflow = '';
-
-      };
-
-      tog.addEventListener('click', () => {
-
-        const open = mob.classList.toggle('open');
-
-        tog.classList.toggle('open', open);
-
-        tog.setAttribute('aria-expanded', open);
-
-        document.body.style.overflow = open ? 'hidden' : '';
-
-      });
-
-      mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
-
-    })();
-
 
     /* Custom cursor */
     .cursor {
@@ -1715,7 +1677,14 @@
    /* Touch targets: the reachable area reaches the 44px minimum without
       changing how anything looks. */
    @media (hover: none) and (pointer: coarse) {
-     .theme-btn { min-height: 44px; padding-block: 0; }
+     /* Hit area only. min-height turned the control itself into a slab in
+     the header; a pseudo-element reaches the 44px target while the
+     button keeps the size it was drawn at. */
+  .theme-btn { position: relative; }
+  .theme-btn::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: 44px; transform: translateY(-50%);
+  }
      .nav-logo, .case-meta-value[href] { display: inline-flex; align-items: center; min-height: 44px; }
    }
    /* Mobile navigation, ported from the landing. Without it these pages lose
@@ -1808,17 +1777,17 @@
          <!-- Image-only cards: the alt text carries the project name for
               screen readers and the link label. -->
          <a href="straatos.html" class="sidebar-card">
-          <div class="sidebar-card-thumb"><img src="assets/straatos-hero.png" alt="Straatos, Digital infrastructure for climate action"></div>
+          <div class="sidebar-card-thumb"><img src="assets/straatos-hero.jpg" alt="Straatos, Digital infrastructure for climate action"></div>
          </a>
          <a href="wazi.html" class="sidebar-card">
-          <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
+          <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
          </a>
          <a href="kota.html" class="sidebar-card">
           <div class="sidebar-card-thumb"><img src="assets/kota-cover.jpg" alt="Kota, Counterparty due-diligence infrastructure"></div>
          </a>
          <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
           <div class="sidebar-card-thumb">
-          <img src="assets/safra-hero.png" alt="Safra, Operating system for sustainable Brazilian agriculture">
+          <img src="assets/safra-hero.jpg" alt="Safra, Operating system for sustainable Brazilian agriculture">
           <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
           </div>
          </div>
@@ -1906,6 +1875,45 @@
     b.addEventListener('click', () => setTheme(b.dataset.themeSet))
     );
     setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+
+
+    /* Mobile menu */
+
+    (() => {
+
+      const tog = document.querySelector('.nav-toggle');
+
+      const mob = document.querySelector('.mobile-menu');
+
+      if (!tog || !mob) return;
+
+      const close = () => {
+
+        mob.classList.remove('open');
+
+        tog.classList.remove('open');
+
+        tog.setAttribute('aria-expanded', 'false');
+
+        document.body.style.overflow = '';
+
+      };
+
+      tog.addEventListener('click', () => {
+
+        const open = mob.classList.toggle('open');
+
+        tog.classList.toggle('open', open);
+
+        tog.setAttribute('aria-expanded', open);
+
+        document.body.style.overflow = open ? 'hidden' : '';
+
+      });
+
+      mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+
+    })();
 
     // Custom cursor
     (() => {

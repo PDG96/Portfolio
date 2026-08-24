@@ -61,11 +61,18 @@
  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
  /* Dot color for the hero canvas, read by the animation at draw time. */
- --dot-rgb: 238, 250, 138;
+ /* Pulled toward --accent (#3d5a3e), the brand sage, rather than sitting in
+    the pale yellow. Lightened enough to still read against the dark band. */
+ --dot-rgb: 142, 196, 138;
  /* Card CTA. Pale yellow only works on the dark card. */
  --cta: var(--accent-yellow);
 
  /* Vertical rhythm */
+ /* One side spacing for the whole site. The case studies moved to this
+    token when their components each drifted to a different inset; the
+    landing was still on the old 4vw gutter, so the two did not line up. */
+ --sheet-gutter: clamp(1.25rem, 2.5vw, 2rem);
+
  --section-py: clamp(4.5rem, 9vw, 7rem);
  --section-gap: clamp(2.5rem, 5vw, 3.5rem);
  }
@@ -91,7 +98,9 @@
  /* Pale yellow disappears on a light ground, so the dots go sage. */
  /* Dots are decorative, so they can stay lighter than the text accent —
         soft olive, same yellow family, ~2.8:1 so the pattern is visible. */
-        --dot-rgb: 134, 143, 46;
+        /* Same move on the light ground: the sage itself, a shade deeper so it
+           holds against the warm off-white. */
+        --dot-rgb: 74, 110, 76;
  /* Same hue as the brand yellow (65deg), darkened until it reads on a
         light ground: 4.7:1 even on the tinted card. The literal #f7fdb9 sits at 1.04:1 there. */
         --cta: #6b7310;
@@ -176,7 +185,7 @@
  width: 100%;
  max-width: clamp(72rem, 90vw, 110rem); /* 1152 → 90vw → 1760, grows on wide screens, capped before getting silly */
  margin: 0 auto;
- padding: 0 clamp(1.25rem, 4vw, 3rem);
+ padding: 0 var(--sheet-gutter);
  }
 
  /* ====== NAV ====== */
@@ -262,7 +271,7 @@
  display: none; position: fixed;
  top: 60px; left: 0; right: 0; bottom: 0;
  background: var(--bg); z-index: 99;
- padding: 2rem clamp(1.25rem, 4vw, 3rem);
+ padding: 2rem var(--sheet-gutter);
  }
  .mobile-menu.open { display: flex; flex-direction: column; gap: 1.5rem; }
  .mobile-menu a {
@@ -295,9 +304,10 @@
  padding: 80px 0 4rem;
  position: relative;
  overflow: hidden;
- /* Was pinned to gray-900. Token-driven now so the hero band flips with
- the theme instead of staying black on a light page. */
- background-color: var(--bg);
+ /* The same band the About section sits on, rather than the page ground —
+ it gives the animation something to sit against instead of floating on
+ the base colour, and the two full-height sections now rhyme. */
+ background-color: var(--bg-alt);
  color: var(--text);
  text-align: center;
  scroll-snap-align: start;
@@ -479,9 +489,9 @@
  scroll-snap-type: x mandatory;
  -webkit-overflow-scrolling: touch;
  padding-bottom: 1.5rem;
- margin: 0 calc(-1 * clamp(1.25rem, 4vw, 3rem));
- padding-left: clamp(1.25rem, 4vw, 3rem);
- padding-right: clamp(1.25rem, 4vw, 3rem);
+ margin: 0 calc(-1 * var(--sheet-gutter));
+ padding-left: var(--sheet-gutter);
+ padding-right: var(--sheet-gutter);
  scrollbar-width: none;
  }
  .work-scroll::-webkit-scrollbar { display: none; }
@@ -1067,9 +1077,43 @@
  /* Touch targets. The visual size stays as drawn; the reachable area grows
     to the 44px minimum underneath it, so nothing shifts on screen. */
  @media (hover: none) and (pointer: coarse) {
-   .theme-btn { min-height: 44px; padding-block: 0; }
+   /* Hit area only. min-height turned the control itself into a slab in
+     the header; a pseudo-element reaches the 44px target while the
+     button keeps the size it was drawn at. */
+  .theme-btn { position: relative; }
+  .theme-btn::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: 44px; transform: translateY(-50%);
+  }
    .nav-toggle { min-width: 44px; min-height: 44px; }
    .footer-links a, .nav-logo { display: inline-flex; align-items: center; min-height: 44px; }
+ }
+
+ /* ====== WORK, MOBILE ======
+    A horizontal scroller only works if the next card peeks past the edge, and
+    at 85vw with a full-bleed track it never did — so it read as one card with
+    no sign there were more. Stacked vertically instead, and the cards carry
+    only the tag and the title: the description was three lines of body copy
+    per card and the whole card is already the link. */
+ @media (max-width: 767px) {
+   .work-scroll {
+     display: flex;
+     flex-direction: column;
+     gap: 1.25rem;
+     overflow-x: visible;
+     scroll-snap-type: none;
+     margin: 0;
+     padding: 0 0 0.5rem;
+   }
+   .case-card-link,
+   .work-scroll > .case-card { flex: 0 0 auto; max-width: none; width: 100%; }
+   .case-card p,
+   .case-card .case-link,
+   .case-card .case-link--soon { display: none; }
+   .case-body { padding: 1.25rem; }
+   .case-card h3 { margin-top: 0.5rem; }
+   /* Nothing scrolls sideways any more, so the hint below it is a lie. */
+   .work-scroll-hint { display: none; }
  }
 </style>
 </head>
@@ -1140,7 +1184,7 @@
  <a href="projects/straatos.html" class="case-card-link">
  <article class="case-card r">
  <div class="case-thumb case-thumb--hero">
- <img src="projects/assets/straatos-hero.png" alt="Straatos, Saloum Delta mangrove restoration project">
+ <img src="projects/assets/straatos-hero.jpg" alt="Straatos, Saloum Delta mangrove restoration project">
  </div>
  <div class="case-body">
  <div class="case-meta"><span class="case-tag" data-i18n="c1_tag">Carbon Tech</span></div>
@@ -1154,7 +1198,7 @@
  <a href="projects/wazi.html" class="case-card-link">
  <article class="case-card r">
  <div class="case-thumb case-thumb--hero">
- <img src="projects/assets/wazi/handheld-ipad.png?v=3" alt="WAZI Shipments view on a tablet held in two hands, over a warm gold gradient backdrop">
+ <img src="projects/assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI Shipments view on a tablet held in two hands, over a warm gold gradient backdrop">
  </div>
  <div class="case-body">
  <div class="case-meta"><span class="case-tag" data-i18n="c2_tag">Responsible Sourcing</span></div>
@@ -1196,7 +1240,7 @@
 
  <article class="case-card case-card--soon r" aria-disabled="true">
  <div class="case-thumb case-thumb--hero case-thumb--safra">
- <img src="projects/assets/safra-hero.png" alt="Safra, a sunset-lit Brazilian crop field with a centred card showing a soy leaf texture and the 'safra' wordmark in yellow.">
+ <img src="projects/assets/safra-hero.jpg" alt="Safra, a sunset-lit Brazilian crop field with a centred card showing a soy leaf texture and the 'safra' wordmark in yellow.">
  <span class="case-thumb-overlay" aria-hidden="true">
  <span data-i18n="c3_overlay">Coming soon</span>
  </span>

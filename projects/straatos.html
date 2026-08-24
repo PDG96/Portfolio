@@ -136,44 +136,6 @@
  outline-offset: 3px;
  }
 
- /* Mobile menu */
-
- (() => {
-
-   const tog = document.querySelector('.nav-toggle');
-
-   const mob = document.querySelector('.mobile-menu');
-
-   if (!tog || !mob) return;
-
-   const close = () => {
-
-     mob.classList.remove('open');
-
-     tog.classList.remove('open');
-
-     tog.setAttribute('aria-expanded', 'false');
-
-     document.body.style.overflow = '';
-
-   };
-
-   tog.addEventListener('click', () => {
-
-     const open = mob.classList.toggle('open');
-
-     tog.classList.toggle('open', open);
-
-     tog.setAttribute('aria-expanded', open);
-
-     document.body.style.overflow = open ? 'hidden' : '';
-
-   });
-
-   mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
-
- })();
-
 
  /* Custom cursor */
  .cursor {
@@ -2858,7 +2820,14 @@
  /* Touch targets: the reachable area reaches the 44px minimum without
     changing how anything looks. */
  @media (hover: none) and (pointer: coarse) {
-   .theme-btn { min-height: 44px; padding-block: 0; }
+   /* Hit area only. min-height turned the control itself into a slab in
+     the header; a pseudo-element reaches the 44px target while the
+     button keeps the size it was drawn at. */
+  .theme-btn { position: relative; }
+  .theme-btn::after {
+    content: ""; position: absolute; left: 0; right: 0;
+    top: 50%; height: 44px; transform: translateY(-50%);
+  }
    .nav-logo, .case-meta-value[href] { display: inline-flex; align-items: center; min-height: 44px; }
  }
  /* Mobile navigation, ported from the landing. Without it these pages lose
@@ -2886,6 +2855,39 @@
  .mobile-menu a { font-size: 1.5rem; font-weight: 500; color: var(--text); }
  @media (min-width: 768px) {
    .nav-toggle, .mobile-menu { display: none; }
+ }
+
+ /* ====== MOBILE WEIGHT ======
+    This page pulls three videos and three live embeds. On a phone that was
+    minutes of loading and sections below the fold never painting at all. The
+    decorative video layers are dropped there — they carry no information the
+    stills next to them do not already carry. */
+ @media (max-width: 900px) {
+   .app-shot--video-bg .video-bg,
+   .id-car-slide video { display: none; }
+   .app-shot--video-bg .video-bg-frame { background: var(--bg-alt); }
+ }
+
+ /* ====== DASHBOARD AS A PHONE APP ======
+    On a phone the browser chrome and the 1000px floor are the wrong frame:
+    the app was scaled to a third of its size to fit the column. The embed
+    now runs at the real width, where dashboard.html has a layout of its own,
+    inside a phone-shaped frame instead of a desktop one. */
+ @media (max-width: 900px) {
+   .app-shot--browser .browser-bar { display: none; }
+   .app-shot--browser .browser-frame {
+     max-width: 380px;
+     margin-inline: auto;
+     border-radius: 28px;
+     padding: 8px;
+     border: 1px solid var(--border);
+     background: var(--bg-alt);
+   }
+   .app-shot--browser .embed-frame {
+     --dash-h: 620px;
+     border-radius: 22px;
+     overflow: hidden;
+   }
  }
 </style>
 </head>
@@ -2955,7 +2957,7 @@
   <!-- Image-only cards: the alt text carries the project name for
        screen readers and the link label. -->
   <a href="wazi.html" class="sidebar-card">
-   <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.png?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
+   <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
   </a>
   <a href="supply-chain.html" class="sidebar-card">
    <div class="sidebar-card-thumb"><img src="assets/supply-chain/card.jpg" alt="Continuous due diligence for commodity supply chains"></div>
@@ -2965,7 +2967,7 @@
   </a>
   <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
    <div class="sidebar-card-thumb">
-   <img src="assets/safra-hero.png" alt="Safra, Operating system for sustainable Brazilian agriculture">
+   <img src="assets/safra-hero.jpg" alt="Safra, Operating system for sustainable Brazilian agriculture">
    <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
    </div>
   </div>
@@ -2979,7 +2981,7 @@
  <section class="case-hero">
  <div class="wrap">
  <div class="case-hero-mockup r">
- <img src="assets/straatos-hero.png" alt="Straatos hero, platform overview">
+ <img src="assets/straatos-hero.jpg" alt="Straatos hero, platform overview">
  </div>
  </div>
  </section>
@@ -3088,7 +3090,7 @@
  <figure class="app-shot app-shot--pair r">
  <div class="app-pair">
  <div class="app-pair__cell app-pair__cell--phone">
- <img src="assets/straatos-phone.png?v=2" alt="Two iPhones showing the Daily Planting form, details, species data, photo evidence, and submit/save draft actions">
+ <img src="assets/straatos-phone.jpg?v=2" alt="Two iPhones showing the Daily Planting form, details, species data, photo evidence, and submit/save draft actions">
  </div>
  <div class="app-pair__cell app-pair__cell--polygon">
  <video src="assets/polygon-draw.mp4" autoplay muted loop playsinline preload="metadata"
@@ -3100,12 +3102,12 @@
 
  <figure class="app-shot app-shot--video-bg r">
  <div class="video-bg-frame">
- <video class="video-bg" autoplay muted loop playsinline preload="auto" aria-hidden="true"
+ <video class="video-bg" autoplay muted loop playsinline preload="none" aria-hidden="true"
  src="assets/calculations-bg.mp4"></video>
  <div class="video-bg-overlay" aria-hidden="true"></div>
  <div class="video-bg-fg ipad-fg">
  <div class="fg-video-card">
- <video autoplay muted loop playsinline preload="auto"
+ <video autoplay muted loop playsinline preload="none"
  src="assets/calculations.mov"
  aria-label="Straatos calculations module, biomass, carbon stock and uncertainty figures derived from field measurements"></video>
  </div>
@@ -3463,8 +3465,12 @@
  // something actually moved, or the two chase each other.
  if (cw <= 0 || (cw === lastW && H === lastH)) return;
  lastW = cw; lastH = H;
- const w = Math.max(MIN_W, cw);
- const scale = Math.min(1, cw / w);
+ // Below the phone breakpoint the embed has a layout of its own, so it
+ // takes the real width and no transform. Above it, the floor and the
+ // scale-down still apply.
+ const phone = matchMedia('(max-width: 900px)').matches;
+ const w = phone ? cw : Math.max(MIN_W, cw);
+ const scale = phone ? 1 : Math.min(1, cw / w);
  iframe.style.width = w + 'px';
  iframe.style.height = H + 'px';
  iframe.style.transform = 'scale(' + scale + ')';
@@ -3528,6 +3534,59 @@
  }
  });
  ro.observe(frame);
+ });
+ })();
+
+
+ /* Mobile menu */
+
+ (() => {
+
+   const tog = document.querySelector('.nav-toggle');
+
+   const mob = document.querySelector('.mobile-menu');
+
+   if (!tog || !mob) return;
+
+   const close = () => {
+
+     mob.classList.remove('open');
+
+     tog.classList.remove('open');
+
+     tog.setAttribute('aria-expanded', 'false');
+
+     document.body.style.overflow = '';
+
+   };
+
+   tog.addEventListener('click', () => {
+
+     const open = mob.classList.toggle('open');
+
+     tog.classList.toggle('open', open);
+
+     tog.setAttribute('aria-expanded', open);
+
+     document.body.style.overflow = open ? 'hidden' : '';
+
+   });
+
+   mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+
+ })();
+
+ /* On a phone the decorative video on this page is 33MB of autoplay — the
+    flamingos loop alone is 24MB — and it downloads before anything below it
+    gets a chance to paint. Hidden by CSS is not enough: a hidden <video
+    autoplay> still fetches. The source is taken off them here, so the bytes
+    are never requested at all. The stills beside them carry the same point. */
+ (() => {
+ if (!matchMedia('(max-width: 900px)').matches) return;
+ document.querySelectorAll('.app-shot--video-bg video, .id-car-slide video').forEach((v) => {
+ v.removeAttribute('autoplay');
+ v.removeAttribute('src');
+ v.load();
  });
  })();
 
