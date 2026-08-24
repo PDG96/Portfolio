@@ -247,6 +247,9 @@
     /* readout: "band" names the zone the needle landed in -- Alkaline, Neutral,
        Acidic -- instead of repeating a number the scale already shows. The
        nearest label by position wins, so it needs no extra data. */
+    /* readout: "none" leaves the scale to speak for itself -- just the marker
+       riding the gradient, no figure and no word beside it. */
+    const noReadout = payload.readout === 'none';
     const bandMode = payload.readout === 'band';
     const bandPos = (value - min) / ((max - min) || 1);
     const bandList = Array.isArray(payload.labels) ? payload.labels : [];
@@ -277,16 +280,18 @@
           <span class="vg-pointer" style="--pointer-pos: 0%"></span>
         </div>
         <div class="vg-readout" aria-label="${bandMode ? escapeHtml(bandName) : escapeHtml(valuePrefix) + ' ' + formatNumber(value, decimals) + escapeHtml(valueSuffix)}">
-          <div class="vg-readout-row${bandMode ? ' vg-readout-row--band' : ''}" style="--pointer-pos: 0%">
-            ${bandMode ? '' : '<span class="vg-dash"></span>'}
+          <div class="vg-readout-row${bandMode ? ' vg-readout-row--band' : ''}${noReadout ? ' vg-readout-row--none' : ''}" style="--pointer-pos: 0%">
+            ${bandMode || noReadout ? '' : '<span class="vg-dash"></span>'}
             <span class="vg-value-text">
-              ${!bandMode && valuePrefix ? `<span class="vg-prefix">${escapeHtml(valuePrefix)}</span>` : ''}
+              ${!bandMode && !noReadout && valuePrefix ? `<span class="vg-prefix">${escapeHtml(valuePrefix)}</span>` : ''}
               <!-- Rendered at the real reading rather than at the minimum. If
                    the count-up never runs (background tab, stalled rAF, a host
                    that never reports visibility) a gauge sitting on its minimum
                    reads as a genuine measurement of zero. countUp resets this
                    to the starting value itself the moment it begins. -->
-              ${bandMode
+              ${noReadout
+                ? ''
+                : bandMode
                 ? `<span class="vg-band">${escapeHtml(bandName)}</span>`
                 : `<span class="vg-value">${formatNumber(value, decimals)}</span>` +
                   (valueSuffix ? `<span class="vg-suffix">${escapeHtml(valueSuffix)}</span>` : '')}
