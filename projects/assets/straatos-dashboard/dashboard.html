@@ -347,7 +347,9 @@
 		position: relative;
 		padding: 24px;
 	}
-	.chart-wrap svg { display: block; width: 100%; height: auto; }
+	/* No width:100% here: renderChart sizes the svg in real pixels so the
+	   axis type and the margins keep the size they were written at. */
+	.chart-wrap svg { display: block; max-width: 100%; }
 	.axis-label { font-size: 9px; fill: #6C737F; }
 	.grid-line { stroke: #F3F4F6; }
 	.axis-line { stroke: #E5E7EB; }
@@ -973,8 +975,19 @@ try {
 
 	function renderChart(containerId, cfg) {
 		const wrap = document.getElementById(containerId);
-		const W = 340, H = 250;
-		const M = { top: 8, right: 16, bottom: 34, left: 46 };
+		/* Drawn at the box's own pixel size rather than in a 340x250 viewBox
+		   stretched to fit. Stretching scaled the axis type and the margins
+		   along with the plot, so on a wide card the 9px labels outgrew the
+		   16px header above them and the gutters ballooned -- and unevenly,
+		   since 46 left and 34 bottom grew as fast as 8 top. At real pixels
+		   the type stays 9px, the margins stay put, and only the plot grows. */
+		/* clientWidth counts the wrap's own 24px padding, which would push the
+		   svg past its content box and let max-width clip the last x label. */
+		const cs = getComputedStyle(wrap);
+		const inner = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+		const W = Math.max(300, Math.round(inner || 340));
+		const H = 250;
+		const M = { top: 12, right: 16, bottom: 30, left: 44 };
 		const plotW = W - M.left - M.right;
 		const plotH = H - M.top - M.bottom;
 
@@ -991,7 +1004,7 @@ try {
 			for (let i = 0; i < running.length; i++) running[i] = upper[i];
 		});
 
-		let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
+		let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
 
 		// Gridlines + y labels
 		for (let v = 0; v <= cfg.yMax; v += cfg.yStep) {
@@ -1085,9 +1098,27 @@ try {
 		target.addEventListener("mouseleave", hide);
 	}
 
-	renderChart("chartHectares", CHART_DATA.hectares);
-	renderChart("chartCo2", CHART_DATA.co2);
-	renderChart("chartCommunity", CHART_DATA.community);
+	const CHARTS = [
+		["chartHectares", CHART_DATA.hectares],
+		["chartCo2", CHART_DATA.co2],
+		["chartCommunity", CHART_DATA.community],
+	];
+	const drawAll = () => CHARTS.forEach(([id, cfg]) => renderChart(id, cfg));
+	drawAll();
+
+	/* Sized in real pixels now, so a width change means a redraw rather than a
+	   stretch. Debounced because the observer fires through the whole drag. */
+	if ('ResizeObserver' in window) {
+		let t = null, last = -1;
+		const ro = new ResizeObserver((entries) => {
+			const w = Math.round(entries[0].contentRect.width);
+			if (w <= 0 || w === last) return;
+			last = w;
+			clearTimeout(t);
+			t = setTimeout(drawAll, 120);
+		});
+		ro.observe(document.getElementById("chartHectares"));
+	}
 </script>
 
 <style>

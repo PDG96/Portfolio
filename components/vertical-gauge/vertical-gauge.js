@@ -140,6 +140,11 @@
         font-weight: 500;
         opacity: 0.8;
       }
+      .vg-band {
+        font-size: var(--vg-band-size, 15px);
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
       .vg-value {
         font-size: var(--vg-value-size, 28px);
         font-weight: 600;
@@ -238,6 +243,18 @@
     const valuePrefix = payload.valuePrefix || '';
     const valueSuffix = payload.valueSuffix || '';
     const decimals = typeof payload.valueDecimals === 'number' ? payload.valueDecimals : 0;
+
+    /* readout: "band" names the zone the needle landed in -- Alkaline, Neutral,
+       Acidic -- instead of repeating a number the scale already shows. The
+       nearest label by position wins, so it needs no extra data. */
+    const bandMode = payload.readout === 'band';
+    const bandPos = (value - min) / ((max - min) || 1);
+    const bandList = Array.isArray(payload.labels) ? payload.labels : [];
+    const bandName = bandMode && bandList.length
+      ? bandList.reduce((best, l) =>
+          Math.abs(l.position - bandPos) < Math.abs(best.position - bandPos) ? l : best
+        ).text
+      : '';
     const gradientCss = buildGradientCss(payload.gradient) || 'linear-gradient(to top, #FF8B6F, #FFE48A 50%, #9BBEEA)';
 
     const labels = Array.isArray(payload.labels) ? payload.labels : [];
@@ -259,18 +276,20 @@
           <span class="vg-bar-fill" style="background: ${gradientCss};"></span>
           <span class="vg-pointer" style="--pointer-pos: 0%"></span>
         </div>
-        <div class="vg-readout" aria-label="${escapeHtml(valuePrefix)} ${formatNumber(value, decimals)}${escapeHtml(valueSuffix)}">
-          <div class="vg-readout-row" style="--pointer-pos: 0%">
-            <span class="vg-dash"></span>
+        <div class="vg-readout" aria-label="${bandMode ? escapeHtml(bandName) : escapeHtml(valuePrefix) + ' ' + formatNumber(value, decimals) + escapeHtml(valueSuffix)}">
+          <div class="vg-readout-row${bandMode ? ' vg-readout-row--band' : ''}" style="--pointer-pos: 0%">
+            ${bandMode ? '' : '<span class="vg-dash"></span>'}
             <span class="vg-value-text">
-              ${valuePrefix ? `<span class="vg-prefix">${escapeHtml(valuePrefix)}</span>` : ''}
+              ${!bandMode && valuePrefix ? `<span class="vg-prefix">${escapeHtml(valuePrefix)}</span>` : ''}
               <!-- Rendered at the real reading rather than at the minimum. If
                    the count-up never runs (background tab, stalled rAF, a host
                    that never reports visibility) a gauge sitting on its minimum
                    reads as a genuine measurement of zero. countUp resets this
                    to the starting value itself the moment it begins. -->
-              <span class="vg-value">${formatNumber(value, decimals)}</span>
-              ${valueSuffix ? `<span class="vg-suffix">${escapeHtml(valueSuffix)}</span>` : ''}
+              ${bandMode
+                ? `<span class="vg-band">${escapeHtml(bandName)}</span>`
+                : `<span class="vg-value">${formatNumber(value, decimals)}</span>` +
+                  (valueSuffix ? `<span class="vg-suffix">${escapeHtml(valueSuffix)}</span>` : '')}
             </span>
           </div>
         </div>

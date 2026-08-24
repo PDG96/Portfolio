@@ -7,21 +7,52 @@
   "valueDecimals": 1,
   "valueColor": "#1B989B",
   "labels": [
-    { "text": "Alkaline", "position": 1.0 },
-    { "text": "Neutral",  "position": 0.5 },
-    { "text": "Acidic",   "position": 0.0 }
+    {
+      "text": "Alkaline",
+      "position": 1.0
+    },
+    {
+      "text": "Neutral",
+      "position": 0.5
+    },
+    {
+      "text": "Acidic",
+      "position": 0.0
+    }
   ],
   "gradient": [
-    { "stop": 0.0,  "color": "#FF8B6F" },
-    { "stop": 0.18, "color": "#FFB789" },
-    { "stop": 0.36, "color": "#FFDCA0" },
-    { "stop": 0.5,  "color": "#E7EE9C" },
-    { "stop": 0.62, "color": "#C8E9C2" },
-    { "stop": 0.78, "color": "#B0E1EE" },
-    { "stop": 1.0,  "color": "#9BBEEA" }
+    {
+      "stop": 0.0,
+      "color": "#FF8B6F"
+    },
+    {
+      "stop": 0.18,
+      "color": "#FFB789"
+    },
+    {
+      "stop": 0.36,
+      "color": "#FFDCA0"
+    },
+    {
+      "stop": 0.5,
+      "color": "#E7EE9C"
+    },
+    {
+      "stop": 0.62,
+      "color": "#C8E9C2"
+    },
+    {
+      "stop": 0.78,
+      "color": "#B0E1EE"
+    },
+    {
+      "stop": 1.0,
+      "color": "#9BBEEA"
+    }
   ],
   "caption": {
     "title": "Safe Range",
     "subtitle": "6.5 - 8.5"
-  }
+  },
+  "readout": "band"
 }

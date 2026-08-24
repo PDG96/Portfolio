@@ -145,29 +145,11 @@
   </div>
 </div>
 
-<script src="/components/chart-tooltip/chart-tooltip.js?v=2" defer></script>
-<script src="/components/chart-card/chart-card.js?v=2" defer></script>
-<script src="/components/area-comparison/area-comparison.js?v=2" defer></script>
-<script src="/components/vertical-gauge/vertical-gauge.js?v=2" defer></script>
+<script src="/components/chart-tooltip/chart-tooltip.js?v=3" defer></script>
+<script src="/components/chart-card/chart-card.js?v=3" defer></script>
+<script src="/components/area-comparison/area-comparison.js?v=3" defer></script>
+<script src="/components/vertical-gauge/vertical-gauge.js?v=3" defer></script>
 
-<script>
-  /* Type inside this composition is sized in px against the 1282 px the bento was
-     drawn at, while the tiles themselves are laid out in %. Left alone, a wide
-     column grows the tiles and leaves the headers and the indicator figures
-     behind, reading as tiny. Zoom scales layout and text together and, unlike a
-     transform, re-renders at the new size rather than stretching pixels.
-
-     The width arrives from the host: reading it here instead would feed back
-     into itself, since zoom changes what the document thinks its width is. */
-  (() => {
-    const BASE = 1282;
-    addEventListener('message', (e) => {
-      const w = e.data && e.data.type === 'bento:width' && e.data.w;
-      if (!w) return;
-      document.documentElement.style.zoom = (w / BASE).toFixed(4);
-    });
-  })();
-</script>
 
 </body>
 </html>
