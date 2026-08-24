@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>Applicant review — Meridian Holdings</title>
 <link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
 <style>
   /* Tokens live in kota/tokens.css, shared with the operator's KYC view. */
 
@@ -58,41 +59,16 @@
   .canvas{padding:24px;display:grid;grid-template-columns:336px minmax(0,1fr);gap:24px;align-items:start}
   .content{display:flex;flex-direction:column;gap:24px;min-width:0}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-  .card > .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:24px 24px 0}
-  .card .body{padding:24px}
-  .title{font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--text);margin:0}
-  .sub{color:var(--muted);font-size:13px;margin-top:2px}
-  .eyebrow{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
 
-  .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
-  .pill.good{color:var(--good);background:var(--good-bg);border-color:var(--good-bd)}
-  .pill.warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-bd)}
-  .pill.bad{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-bd)}
-  .pill.neutral{color:var(--text-2);background:var(--surface-2);border-color:var(--border)}
-  .pill.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-  .delta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600}
-  .delta.up{color:var(--good)}
 
   /* ---- Standardized legend (single format everywhere) ---- */
-  .legend{display:flex;flex-wrap:wrap;gap:14px 20px}
-  .legend.col{flex-direction:column;gap:12px;min-width:150px}
-  .legend .item{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}
-  .legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
-  .legend .k{color:var(--muted)}
-  .legend .v{color:var(--text);font-weight:600}
   .legend.col .v{margin-left:auto}
 
   /* ---- Applicant + decision panel ---- */
   .applicant{position:sticky;top:108px}
   .idrow{display:flex;align-items:center;gap:14px}
   .emblem{width:56px;height:56px;border-radius:14px;flex:none;box-shadow:var(--shadow);overflow:hidden;display:block}
-  .kv{display:flex;flex-direction:column;gap:13px}
-  .kv .r{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-  .kv .k{color:var(--muted);font-size:13px}
-  .kv .v{color:var(--text-2);font-weight:500;text-align:right}
   .kv .v a{color:var(--accent);text-decoration:none;font-weight:600}
-  .divider{height:1px;background:var(--border-soft);margin:20px 0}
 
   .reco{display:flex;gap:10px;background:var(--accent-tint);border:1px solid var(--accent-tint-2);border-radius:10px;padding:12px 14px}
   .reco .ic{color:var(--accent)}

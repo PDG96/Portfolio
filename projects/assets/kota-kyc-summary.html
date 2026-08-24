@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <title>KOTA — Operator KYC Summary (interactive recreation, fictional data)</title>
 <link rel="stylesheet" href="kota/tokens.css">
+<link rel="stylesheet" href="kota/components.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -104,13 +105,9 @@
   .pill-btn svg { width: 14px; height: 14px; }
 
   /* cards */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-  }
-  .card-pad { padding: 16px; }
+  /* .card comes from kota/components.css. Its padding is .body there, so
+     .card-pad is kept only as an alias while this file's markup uses it. */
+  .card-pad { padding: 24px; }
   .card-title-row {
     display: flex; align-items: center; gap: 8px;
     padding: 14px 16px; border-bottom: 1px solid var(--border);
@@ -124,15 +121,11 @@
   .kpi-head { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--muted); }
   .kpi-head svg { width: 13px; height: 13px; margin-left: auto; color: var(--muted-2); }
   .kpi-val { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-  .chip {
-    align-self: flex-start;
-    display: inline-flex; align-items: center; gap: 5px;
-    border-radius: 6px; padding: 3px 8px;
-    font-size: 12px; font-weight: 600;
-  }
-  .chip svg { width: 12px; height: 12px; }
-  .chip--green { background: var(--good-bg); color: var(--good); }
-  .chip--red { background: var(--bad-bg); color: var(--bad); }
+  /* Status chips are .pill from kota/components.css now — same object the
+     bank's review screen uses, so the two screens stop drawing one as a 6px
+     rounded rect and the other as a full pill. */
+  .pill { align-self: flex-start; }
+  .pill svg { width: 12px; height: 12px; }
 
   /* locations + key info */
   .duo { display: grid; grid-template-columns: 1.45fr 1fr; gap: 24px; align-items: stretch; }
@@ -314,17 +307,17 @@
         <div class="card kpi">
           <span class="kpi-head">Watchlist Mentions
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14l-2 6 2 6H5"/><path d="M5 4v16"/></svg></span>
-          <span class="chip chip--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>0</span>
+          <span class="pill good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>0</span>
         </div>
         <div class="card kpi">
           <span class="kpi-head">Red Flags
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4h13l-2.5 4L18 12H5"/></svg></span>
-          <span class="chip chip--red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4M12 16.8v.4"/></svg>1</span>
+          <span class="pill bad"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4M12 16.8v.4"/></svg>1</span>
         </div>
         <div class="card kpi">
           <span class="kpi-head">Identified UBOs
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20c1.2-3.2 3.6-4.8 6.5-4.8s5.3 1.6 6.5 4.8"/></svg></span>
-          <span class="chip chip--green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>2</span>
+          <span class="pill good"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.2 4.2L19 7"/></svg>2</span>
         </div>
       </div>
 
