@@ -1,0 +1,267 @@
+{
+  "title": "Hectares Restored",
+  "opacity": 0.55,
+  "showTotal": true,
+  "yMin": 0,
+  "yMax": 550,
+  "series": [
+    {
+      "name": "Atlantic Forest Corridor",
+      "color": "#016C6E"
+    },
+    {
+      "name": "Misiones Native Forest",
+      "color": "#028788"
+    },
+    {
+      "name": "Saloum Delta Mangroves",
+      "color": "#00AEB1"
+    },
+    {
+      "name": "Chocó Rainforest Corridor",
+      "color": "#A0EBEC"
+    }
+  ],
+  "data": [
+    {
+      "date": "2014-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 15
+    },
+    {
+      "date": "2014-01",
+      "series": "Misiones Native Forest",
+      "value": 8
+    },
+    {
+      "date": "2014-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 0
+    },
+    {
+      "date": "2014-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 0
+    },
+    {
+      "date": "2015-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 28
+    },
+    {
+      "date": "2015-01",
+      "series": "Misiones Native Forest",
+      "value": 16
+    },
+    {
+      "date": "2015-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 5
+    },
+    {
+      "date": "2015-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 0
+    },
+    {
+      "date": "2016-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 42
+    },
+    {
+      "date": "2016-01",
+      "series": "Misiones Native Forest",
+      "value": 26
+    },
+    {
+      "date": "2016-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 12
+    },
+    {
+      "date": "2016-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 6
+    },
+    {
+      "date": "2017-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 58
+    },
+    {
+      "date": "2017-01",
+      "series": "Misiones Native Forest",
+      "value": 38
+    },
+    {
+      "date": "2017-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 20
+    },
+    {
+      "date": "2017-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 14
+    },
+    {
+      "date": "2018-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 76
+    },
+    {
+      "date": "2018-01",
+      "series": "Misiones Native Forest",
+      "value": 50
+    },
+    {
+      "date": "2018-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 30
+    },
+    {
+      "date": "2018-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 22
+    },
+    {
+      "date": "2019-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 95
+    },
+    {
+      "date": "2019-01",
+      "series": "Misiones Native Forest",
+      "value": 62
+    },
+    {
+      "date": "2019-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 40
+    },
+    {
+      "date": "2019-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 32
+    },
+    {
+      "date": "2020-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 115
+    },
+    {
+      "date": "2020-01",
+      "series": "Misiones Native Forest",
+      "value": 75
+    },
+    {
+      "date": "2020-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 50
+    },
+    {
+      "date": "2020-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 42
+    },
+    {
+      "date": "2021-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 135
+    },
+    {
+      "date": "2021-01",
+      "series": "Misiones Native Forest",
+      "value": 88
+    },
+    {
+      "date": "2021-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 60
+    },
+    {
+      "date": "2021-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 52
+    },
+    {
+      "date": "2022-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 155
+    },
+    {
+      "date": "2022-01",
+      "series": "Misiones Native Forest",
+      "value": 100
+    },
+    {
+      "date": "2022-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 68
+    },
+    {
+      "date": "2022-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 60
+    },
+    {
+      "date": "2023-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 172
+    },
+    {
+      "date": "2023-01",
+      "series": "Misiones Native Forest",
+      "value": 112
+    },
+    {
+      "date": "2023-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 76
+    },
+    {
+      "date": "2023-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 68
+    },
+    {
+      "date": "2024-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 188
+    },
+    {
+      "date": "2024-01",
+      "series": "Misiones Native Forest",
+      "value": 122
+    },
+    {
+      "date": "2024-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 84
+    },
+    {
+      "date": "2024-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 75
+    },
+    {
+      "date": "2025-01",
+      "series": "Atlantic Forest Corridor",
+      "value": 200
+    },
+    {
+      "date": "2025-01",
+      "series": "Misiones Native Forest",
+      "value": 130
+    },
+    {
+      "date": "2025-01",
+      "series": "Saloum Delta Mangroves",
+      "value": 90
+    },
+    {
+      "date": "2025-01",
+      "series": "Chocó Rainforest Corridor",
+      "value": 80
+    }
+  ]
+}

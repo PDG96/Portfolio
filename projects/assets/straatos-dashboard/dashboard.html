@@ -325,7 +325,13 @@
 		border: 1px solid #E5E7EB;
 		border-radius: 8px;
 		overflow: hidden;
+		/* A definite height so the component inside can resolve its own 100%.
+		   Without it G2Plot falls back to a default box and the canvas comes
+		   out 280 wide inside a 430 card. */
+		height: 340px;
 	}
+	.chart-card > chart-card,
+	.chart-card .chart-mount { width: 100%; height: 100%; }
 	/* The last column used to run at flex 1.14, carried over from the mockup's
 	   proportions. The SVGs are width:100%, so that 14% scaled the whole third
 	   chart up -- bigger type, taller plot, less breathing room inside its own
@@ -348,76 +354,8 @@
 		color: #141414;
 		margin: 0;
 	}
-	.chart-wrap {
-		position: relative;
-		padding: 24px;
-	}
-	/* No width:100% here: renderChart sizes the svg in real pixels so the
-	   axis type and the margins keep the size they were written at. */
-	.chart-wrap svg { display: block; max-width: 100%; }
-	/* Same axis treatment as the component: 11px, the same muted ink, and a
-	   dashed grid rather than a solid one. */
-	.axis-label { font-size: 11px; fill: rgba(20, 20, 20, 0.55); }
-	.grid-line { stroke: rgba(20, 20, 20, 0.08); stroke-dasharray: 3 4; }
-	.axis-line { stroke: rgba(20, 20, 20, 0.12); }
-
-	.chart-tip {
-		position: absolute;
-		z-index: 10;
-		width: 219px;
-		background: #fff;
-		border-radius: 6px;
-		box-shadow: 0 9px 14px rgba(16, 24, 40, 0.05), 0 3px 3px rgba(16, 24, 40, 0.12), 0 6px 8px rgba(16, 24, 40, 0.08);
-		pointer-events: none;
-		opacity: 0;
-		transition: opacity 0.12s;
-		overflow: hidden;
-	}
-	.chart-tip.visible { opacity: 1; }
-	.chart-tip-head {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		padding: 12px 14px 0;
-	}
-	.chart-tip-head strong { font-size: 13px; font-weight: 600; color: #384250; }
-	.chart-tip-year { font-size: 12px; color: #6C737F; padding: 4px 14px 10px; }
-	.chart-tip-total {
-		display: flex;
-		justify-content: space-between;
-		font-size: 13px;
-		padding: 10px 14px;
-		border-top: 1px solid #F3F4F6;
-	}
-	.chart-tip-total span:first-child { color: #384250; font-weight: 600; }
-	.chart-tip-total span:last-child { color: #384250; font-weight: 600; }
-	.chart-tip-series { padding: 4px 14px 12px; }
-	.chart-tip-row {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		padding: 5px 0;
-		font-size: 12px;
-	}
-	.chart-tip-row .dot {
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		flex-shrink: 0;
-	}
-	.chart-tip-row .name {
-		flex: 1;
-		color: #6C737F;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-	.chart-tip-row .val { color: #384250; font-weight: 500; flex-shrink: 0; }
-
-	/* ==================== ENTRANCE CHOREOGRAPHY ====================
-	   Only armed when the dashboard runs inside the case study, which posts
-	   "bento:visible" as the frame reaches the viewport. Opened on its own
-	   nothing is hidden, so the prototype still works standalone. */
+	/* The hand-rolled renderer's styles lived here — axis type, grid,
+	   tooltip. All of that belongs to the shared component now. */
 	.anim-armed .card {
 		opacity: 0;
 		transform: translateY(20px);
@@ -657,18 +595,26 @@
 			<!-- Projects Performance -->
 			<div class="card">
 				<div class="card-header"><h2>Projects Performance</h2></div>
+				<!-- The same <chart-card> + stacked-area the bentos are built from.
+				     These used to be a hand-rolled SVG renderer living only here,
+				     which is why the two chart systems on the page kept drifting
+				     apart on type, grid and padding no matter how often the
+				     numbers were matched up by hand. One implementation now. -->
 				<div class="charts-row">
 					<div class="chart-card">
-						<div class="chart-card-header"><h3>Hectares Restored</h3></div>
-						<div class="chart-wrap" id="chartHectares"></div>
+						<chart-card title="Hectares Restored">
+							<div class="chart-mount" data-chart="stacked-area" data-src="/projects/assets/straatos-dashboard/data/hectares.json"></div>
+						</chart-card>
 					</div>
 					<div class="chart-card">
-						<div class="chart-card-header"><h3>CO2 Sequestered</h3></div>
-						<div class="chart-wrap" id="chartCo2"></div>
+						<chart-card title="CO2 Sequestered">
+							<div class="chart-mount" data-chart="stacked-area" data-src="/projects/assets/straatos-dashboard/data/co2.json"></div>
+						</chart-card>
 					</div>
 					<div class="chart-card">
-						<div class="chart-card-header"><h3>Engaged Community</h3></div>
-						<div class="chart-wrap" id="chartCommunity"></div>
+						<chart-card title="Engaged Community">
+							<div class="chart-mount" data-chart="stacked-area" data-src="/projects/assets/straatos-dashboard/data/community.json"></div>
+						</chart-card>
 					</div>
 				</div>
 			</div>
@@ -931,213 +877,6 @@ try {
 }
 </script>
 
-<script>
-	/* ==================== PERFORMANCE CHARTS ====================
-	   Deliberately its own script block: the charts need no network and must
-	   keep working even when the map block above bails out. */
-	const YEARS = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
-	// Teal ramp from the Straatos palette, darkest series at the bottom of the stack.
-	const SERIES_COLORS = ["#016C6E", "#028788", "#00AEB1", "#A0EBEC"];
-
-	const CHART_DATA = {
-		hectares: {
-			tipTitle: "Covered Area",
-			unit: " ha",
-			yMax: 550,
-			yStep: 50,
-			series: [
-				{ name: "Atlantic Forest Corridor", values: [15, 28, 42, 58, 76, 95, 115, 135, 155, 172, 188, 200] },
-				{ name: "Misiones Native Forest", values: [8, 16, 26, 38, 50, 62, 75, 88, 100, 112, 122, 130] },
-				{ name: "Saloum Delta Mangroves", values: [0, 5, 12, 20, 30, 40, 50, 60, 68, 76, 84, 90] },
-				{ name: "Chocó Rainforest Corridor", values: [0, 0, 6, 14, 22, 32, 42, 52, 60, 68, 75, 80] },
-			],
-		},
-		co2: {
-			tipTitle: "CO2 Sequestered",
-			unit: " t",
-			yMax: 100000,
-			yStep: 10000,
-			series: [
-				{ name: "Atlantic Forest Corridor", values: [2500, 5200, 8000, 11000, 14500, 18000, 21500, 25000, 28500, 31500, 34000, 36000] },
-				{ name: "Misiones Native Forest", values: [1200, 2600, 4200, 6000, 8000, 10000, 12000, 14000, 16000, 18000, 19500, 21000] },
-				{ name: "Saloum Delta Mangroves", values: [0, 800, 2000, 3500, 5200, 7000, 8800, 10500, 12000, 13500, 15000, 16500] },
-				{ name: "Chocó Rainforest Corridor", values: [0, 0, 900, 2200, 3800, 5500, 7200, 9000, 10500, 12000, 13500, 15000] },
-			],
-		},
-		community: {
-			tipTitle: "Stakeholders",
-			unit: "",
-			yMax: 2000,
-			yStep: 200,
-			series: [
-				{ name: "Atlantic Forest Corridor", values: [40, 85, 140, 200, 265, 330, 395, 455, 510, 555, 590, 620] },
-				{ name: "Misiones Native Forest", values: [20, 45, 80, 120, 165, 210, 255, 295, 330, 360, 385, 400] },
-				{ name: "Saloum Delta Mangroves", values: [0, 15, 40, 70, 105, 140, 175, 205, 230, 250, 265, 280] },
-				{ name: "Chocó Rainforest Corridor", values: [0, 0, 20, 45, 75, 105, 135, 160, 180, 195, 205, 215] },
-			],
-		},
-	};
-
-	const fmt = (n) => n.toLocaleString("en-US");
-
-	function renderChart(containerId, cfg) {
-		const wrap = document.getElementById(containerId);
-		/* Drawn at the box's own pixel size rather than in a 340x250 viewBox
-		   stretched to fit. Stretching scaled the axis type and the margins
-		   along with the plot, so on a wide card the 9px labels outgrew the
-		   16px header above them and the gutters ballooned -- and unevenly,
-		   since 46 left and 34 bottom grew as fast as 8 top. At real pixels
-		   the type stays 9px, the margins stay put, and only the plot grows. */
-		/* clientWidth counts the wrap's own 24px padding, which would push the
-		   svg past its content box and let max-width clip the last x label. */
-		const cs = getComputedStyle(wrap);
-		const inner = wrap.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-		const W = Math.max(300, Math.round(inner || 340));
-		/* Trimmed with the label move below: the x labels used to be painted 18px
-		   above the svg's bottom edge, and that dead band sat on top of the 24px
-		   card padding — about 15px more air under these charts than under the
-		   bento ones, which is what made the padding look inconsistent. */
-		const H = 240;
-		const M = { top: 12, right: 12, bottom: 28, left: 52 };
-		const plotW = W - M.left - M.right;
-		const plotH = H - M.top - M.bottom;
-
-		const x = (i) => M.left + (plotW * i) / (YEARS.length - 1);
-		const y = (v) => M.top + plotH - (plotH * v) / cfg.yMax;
-
-		// Cumulative stack: each series sits on top of the ones before it.
-		const stacked = [];
-		const running = new Array(YEARS.length).fill(0);
-		cfg.series.forEach((s) => {
-			const lower = running.slice();
-			const upper = running.map((base, i) => base + s.values[i]);
-			stacked.push({ lower, upper });
-			for (let i = 0; i < running.length; i++) running[i] = upper[i];
-		});
-
-		let svg = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">`;
-
-		// Gridlines + y labels
-		for (let v = 0; v <= cfg.yMax; v += cfg.yStep) {
-			const yy = y(v);
-			svg += `<line class="grid-line" x1="${M.left}" y1="${yy}" x2="${W - M.right}" y2="${yy}" />`;
-			svg += `<text class="axis-label" x="${M.left - 8}" y="${yy + 3}" text-anchor="end">${fmt(v)}</text>`;
-		}
-
-		// Stacked areas, painted bottom series first
-		stacked.forEach((band, si) => {
-			const color = SERIES_COLORS[si % SERIES_COLORS.length];
-			const top = band.upper.map((v, i) => `${x(i)},${y(v)}`).join(" L");
-			const bottom = band.lower.map((v, i) => `${x(i)},${y(v)}`).reverse().join(" L");
-			svg += `<path d="M${top} L${bottom} Z" fill="${color}" fill-opacity="0.25" />`;
-			svg += `<path d="M${top}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />`;
-		});
-
-		// X axis labels (two-digit years, matching the design)
-		YEARS.forEach((yr, i) => {
-			svg += `<line class="axis-line" x1="${x(i)}" y1="${M.top + plotH}" x2="${x(i)}" y2="${M.top + plotH + 5}" />`;
-			svg += `<text class="axis-label" x="${x(i)}" y="${H - 8}" text-anchor="middle">${String(yr).slice(2)}</text>`;
-		});
-
-		// Hover chrome, hidden until the pointer is over the plot
-		svg += `<line class="hover-line" stroke="#E5E7EB" stroke-width="1" y1="${M.top}" y2="${M.top + plotH}" style="display:none" />`;
-		cfg.series.forEach((_, si) => {
-			svg += `<circle class="hover-dot" data-i="${si}" r="3" fill="#fff" stroke="${SERIES_COLORS[si % SERIES_COLORS.length]}" stroke-width="2" style="display:none" />`;
-		});
-		svg += `<rect class="hover-target" x="${M.left}" y="${M.top}" width="${plotW}" height="${plotH}" fill="transparent" />`;
-		svg += `</svg>`;
-
-		wrap.innerHTML = svg + `<div class="chart-tip"></div>`;
-
-		const svgEl = wrap.querySelector("svg");
-		const tip = wrap.querySelector(".chart-tip");
-		const line = svgEl.querySelector(".hover-line");
-		const dots = [...svgEl.querySelectorAll(".hover-dot")];
-		const target = svgEl.querySelector(".hover-target");
-
-		function hide() {
-			tip.classList.remove("visible");
-			line.style.display = "none";
-			dots.forEach((d) => (d.style.display = "none"));
-		}
-
-		target.addEventListener("mousemove", (e) => {
-			const rect = svgEl.getBoundingClientRect();
-			const wrapRect = wrap.getBoundingClientRect();
-			// .chart-tip is positioned relative to .chart-wrap's padding box, while
-			// x(i)*scale is a coordinate inside the svg -- offset by the svg's own
-			// position inside the wrap (i.e. the wrap's padding) to line them up.
-			const svgOffsetX = rect.left - wrapRect.left;
-			const svgOffsetY = rect.top - wrapRect.top;
-			const scale = rect.width / W;
-			const localX = (e.clientX - rect.left) / scale;
-			let i = Math.round(((localX - M.left) / plotW) * (YEARS.length - 1));
-			i = Math.max(0, Math.min(YEARS.length - 1, i));
-
-			line.setAttribute("x1", x(i));
-			line.setAttribute("x2", x(i));
-			line.style.display = "";
-			dots.forEach((d, si) => {
-				d.setAttribute("cx", x(i));
-				d.setAttribute("cy", y(stacked[si].upper[i]));
-				d.style.display = "";
-			});
-
-			const total = cfg.series.reduce((sum, s) => sum + s.values[i], 0);
-			tip.innerHTML = `
-				<div class="chart-tip-head"><strong>${cfg.tipTitle}</strong></div>
-				<div class="chart-tip-year">${YEARS[i]}</div>
-				<div class="chart-tip-total"><span>Total</span><span>${fmt(total)}${cfg.unit}</span></div>
-				<div class="chart-tip-series">
-					${cfg.series.map((s, si) => `
-						<div class="chart-tip-row">
-							<span class="dot" style="background:${SERIES_COLORS[si % SERIES_COLORS.length]}"></span>
-							<span class="name">${s.name}</span>
-							<span class="val">${fmt(s.values[i])}${cfg.unit}</span>
-						</div>`).join("")}
-				</div>`;
-			tip.classList.add("visible");
-
-			// Keep the tooltip inside the card, flipping to the left near the right edge.
-			const tipW = 219;
-			let left = svgOffsetX + x(i) * scale + 14;
-			if (left + tipW > wrapRect.width) left = svgOffsetX + x(i) * scale - tipW - 14;
-			tip.style.left = Math.max(4, left) + "px";
-			tip.style.top = svgOffsetY + "px";
-		});
-
-		target.addEventListener("mouseleave", hide);
-	}
-
-	const CHARTS = [
-		["chartHectares", CHART_DATA.hectares],
-		["chartCo2", CHART_DATA.co2],
-		["chartCommunity", CHART_DATA.community],
-	];
-	const drawAll = () => CHARTS.forEach(([id, cfg]) => renderChart(id, cfg));
-	drawAll();
-
-	/* Sized in real pixels now, so a width change means a redraw rather than a
-	   stretch. Debounced because the observer fires through the whole drag. */
-	if ('ResizeObserver' in window) {
-		/* Each chart watches its own box. Watching only the first meant the
-		   other two kept whatever width they happened to be measured at on
-		   first paint, which is why one plot stopped short of its card. */
-		CHARTS.forEach(([id, cfg]) => {
-			let t = null, last = -1;
-			const wrap = document.getElementById(id);
-			if (!wrap) return;
-			const ro = new ResizeObserver((entries) => {
-				const w = Math.round(entries[0].contentRect.width);
-				if (w <= 0 || w === last) return;
-				last = w;
-				clearTimeout(t);
-				t = setTimeout(() => renderChart(id, cfg), 120);
-			});
-			ro.observe(wrap);
-		});
-	}
-</script>
 
 <style>
 	.pin {
@@ -1270,5 +1009,8 @@ try {
 	})();
 </script>
 
+<script src="/components/chart-tooltip/chart-tooltip.js?v=4" defer></script>
+<script src="/components/chart-card/chart-card.js?v=4" defer></script>
+<script src="/components/stacked-area/stacked-area.js?v=4" defer></script>
 </body>
 </html>
