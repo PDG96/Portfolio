@@ -3,32 +3,22 @@
 <head>
 <meta charset="utf-8">
 <title>KOTA — Operator KYC Summary (interactive recreation, fictional data)</title>
+<link rel="stylesheet" href="kota/tokens.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --ink: #141414;
-    --ink-2: rgba(20,20,20,0.55);
-    --ink-3: rgba(20,20,20,0.40);
-    --line: rgba(20,20,20,0.10);
-    --bg: #f3f4f6;
-    --card: #ffffff;
-    --navy: #2e3a46;
-    --navy-2: #27313c;
-    --orange: #E25E25;
-    --orange-soft: rgba(226,94,37,0.12);
-    --green: #3E9B5F;
-    --green-soft: rgba(111,204,140,0.18);
-    --red: #C0392B;
-    --red-soft: rgba(226,87,74,0.16);
-  }
+  /* Tokens come from kota/tokens.css, the same sheet the bank's review
+     screen uses. This file used to carry its own --ink/--card vocabulary,
+     which is how the two Kota surfaces drifted apart. */
 
   html, body { width: 100%; height: 100%; }
   body {
     background: var(--bg);
-    color: var(--ink);
+    color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', system-ui, sans-serif;
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 1.45;
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     /* app shell: viewport-locked, only the dashboard area scrolls */
     display: flex;
@@ -40,8 +30,8 @@
   .side {
     flex: none;
     width: 196px;
-    background: #384250;
-    color: rgba(255,255,255,0.78);
+    background: var(--sidebar);
+    color: var(--sidebar-text);
     display: flex;
     flex-direction: column;
     padding: 18px 0 18px;
@@ -68,13 +58,13 @@
   }
   .side a svg { width: 15px; height: 15px; flex: none; opacity: 0.85; }
   .side .nav-ico { width: 16px; height: 16px; flex: none; display: block; }
-  .side a:hover { color: #fff; background: rgba(255,255,255,0.05); }
+  .side a:hover { color: #fff; background: var(--sidebar-hover); }
   .side a.on {
-    color: #fff; background: var(--orange); border-left-color: #b5491c; font-weight: 600;
+    color: #fff; background: var(--accent); border-left-color: #b5491c; font-weight: 600;
   }
   .side a .chev { margin-left: auto; opacity: 0.5; }
   .side a.sub { padding-left: 24px; font-size: 12px; }
-  .side a.sub--dim { background: rgba(0,0,0,0.16); color: rgba(255,255,255,0.85); }
+  .side a.sub--dim { background: rgba(0,0,0,0.16); color: var(--sidebar-text-strong); }
 
   /* ===== Main ===== */
   .main { flex: 1; min-width: 0; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
@@ -83,7 +73,7 @@
     display: block;
     width: 100%;
     height: auto;
-    background: var(--navy-2);
+    background: var(--sidebar-2);
   }
 
   .content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 24px; width: 100%; }
@@ -91,39 +81,39 @@
   /* page header bar, white background under the dark topbar — fixed in the shell */
   .pagebar {
     flex: none;
-    background: var(--card);
-    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
     padding: 12px 24px 14px;
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
-  .crumbs { font-size: 11px; color: var(--ink-3); }
-  .crumbs b { color: var(--ink-2); font-weight: 500; }
+  .crumbs { font-size: 11px; color: var(--muted-2); }
+  .crumbs b { color: var(--muted); font-weight: 500; }
   .pagehead { display: flex; align-items: center; gap: 10px; }
   .pagehead h1 { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
-  .pagehead .back { color: var(--ink-3); font-size: 15px; }
+  .pagehead .back { color: var(--muted-2); font-size: 15px; }
   .pagehead .acts { margin-left: auto; display: flex; gap: 8px; }
   .pill-btn {
     display: inline-flex; align-items: center; gap: 6px;
-    border: 1px solid var(--line); background: var(--card);
+    border: 1px solid var(--border); background: var(--surface);
     border-radius: 8px; height: 30px; padding: 0 9px;
-    color: var(--ink-2); font-size: 12px; cursor: pointer;
+    color: var(--muted); font-size: 12px; cursor: pointer;
   }
-  .pill-btn .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); }
+  .pill-btn .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); }
   .pill-btn svg { width: 14px; height: 14px; }
 
   /* cards */
   .card {
-    background: var(--card);
-    border: 1px solid var(--line);
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
   }
   .card-pad { padding: 16px; }
   .card-title-row {
     display: flex; align-items: center; gap: 8px;
-    padding: 14px 16px; border-bottom: 1px solid var(--line);
+    padding: 14px 16px; border-bottom: 1px solid var(--border);
     font-size: 12.5px; font-weight: 600;
   }
   .card-title-row .sp { flex: 1; }
@@ -131,8 +121,8 @@
   /* KPI strip */
   .kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
   .kpi { padding: 13px 14px; display: flex; flex-direction: column; gap: 8px; min-height: 76px; }
-  .kpi-head { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--ink-2); }
-  .kpi-head svg { width: 13px; height: 13px; margin-left: auto; color: var(--ink-3); }
+  .kpi-head { display: flex; align-items: center; gap: 6px; font-size: 10.5px; color: var(--muted); }
+  .kpi-head svg { width: 13px; height: 13px; margin-left: auto; color: var(--muted-2); }
   .kpi-val { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
   .chip {
     align-self: flex-start;
@@ -141,8 +131,8 @@
     font-size: 12px; font-weight: 600;
   }
   .chip svg { width: 12px; height: 12px; }
-  .chip--green { background: var(--green-soft); color: var(--green); }
-  .chip--red { background: var(--red-soft); color: var(--red); }
+  .chip--green { background: var(--good-bg); color: var(--good); }
+  .chip--red { background: var(--bad-bg); color: var(--bad); }
 
   /* locations + key info */
   .duo { display: grid; grid-template-columns: 1.45fr 1fr; gap: 24px; align-items: stretch; }
@@ -170,30 +160,30 @@
   }
   .pin:hover + .map-tip, .map-tip:hover { opacity: 1; pointer-events: auto; }
   .map-tip h4 { font-size: 11px; margin-bottom: 6px; display: flex; }
-  .map-tip h4 i { margin-left: auto; color: var(--ink-3); font-style: normal; cursor: pointer; }
+  .map-tip h4 i { margin-left: auto; color: var(--muted-2); font-style: normal; cursor: pointer; }
   .map-tip dl { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px; }
-  .map-tip dt { color: var(--ink-3); }
-  .map-tip dd { color: var(--ink); text-align: right; }
+  .map-tip dt { color: var(--muted-2); }
+  .map-tip dd { color: var(--text); text-align: right; }
 
   .ki-rows { display: flex; flex-direction: column; flex: 1; }
   .ki-row {
     flex: 1;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 2px; border-bottom: 1px solid var(--line);
-    font-size: 12px; color: var(--ink-2);
+    padding: 10px 2px; border-bottom: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
   }
   .ki-row:last-child { border-bottom: 0; }
-  .ki-row b { color: var(--ink); font-weight: 600; }
-  .flag-dot { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(#9aa6b2 0 50%, #cfd6dd 50% 100%); border: 1px solid var(--line); }
+  .ki-row b { color: var(--text); font-weight: 600; }
+  .flag-dot { width: 18px; height: 18px; border-radius: 50%; background: conic-gradient(#9aa6b2 0 50%, #cfd6dd 50% 100%); border: 1px solid var(--border); }
 
   /* governance tabs */
-  .tabs { display: flex; gap: 18px; padding: 0 16px; border-bottom: 1px solid var(--line); }
+  .tabs { display: flex; gap: 18px; padding: 0 16px; border-bottom: 1px solid var(--border); }
   .tab {
     background: none; border: 0; cursor: pointer;
-    font: inherit; font-size: 12px; font-weight: 600; color: var(--ink-3);
+    font: inherit; font-size: 12px; font-weight: 600; color: var(--muted-2);
     padding: 11px 2px; border-bottom: 2px solid transparent; margin-bottom: -1px;
   }
-  .tab.on { color: var(--orange); border-bottom-color: var(--orange); }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
   .pane { padding: 16px; }
   .pane[hidden] { display: none; }
 
@@ -211,7 +201,7 @@
     gap: 12px;
   }
   .ad-stat .txt { display: flex; flex-direction: column; gap: 4px; }
-  .ad-stat .txt .lbl { font-size: 10.5px; color: var(--ink-2); }
+  .ad-stat .txt .lbl { font-size: 10.5px; color: var(--muted); }
   .ad-stat .v { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
   .ad-stat .ico {
     flex: none;
@@ -220,8 +210,8 @@
     display: flex; align-items: center; justify-content: center;
   }
   .ad-stat .ico svg { width: 17px; height: 17px; }
-  .ico--green { background: var(--green-soft); color: var(--green); }
-  .ico--orange { background: var(--orange-soft); color: var(--orange); }
+  .ico--green { background: var(--good-bg); color: var(--good); }
+  .ico--orange { background: var(--accent-tint); color: var(--accent); }
 
   .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
   @media (max-width: 900px) { .grid4 { grid-template-columns: 1fr 1fr; } }
@@ -481,5 +471,17 @@
       });
     })();
   </script>
+
+<script>
+  /* The case study carries a light/dark toggle; an iframe never inherits it,
+     and these tokens follow prefers-color-scheme on their own. Left alone the
+     embed would sit dark inside a light page whenever the OS says dark. The
+     host posts its theme, and an explicit data-theme outranks the media query
+     in tokens.css. */
+  addEventListener('message', (e) => {
+    const t = e.data && e.data.type === 'theme' && e.data.theme;
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  });
+</script>
 </body>
 </html>

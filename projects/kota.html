@@ -4060,12 +4060,21 @@ let lang = 'en';
  setLang stay wired so the copy still localizes on load and the control
  can come back without rebuilding any of it. */
 setLang(lang);
+ /* The Kota embeds run on their own token sheet, which follows
+ prefers-color-scheme. Tell them which way this page went so they don't
+ sit dark inside a light study, or the reverse. */
+ function tellEmbeds(t) {
+ document.querySelectorAll('iframe').forEach((f) => {
+ try { f.contentWindow.postMessage({ type: 'theme', theme: t }, '*'); } catch (e) {}
+ });
+ }
  /* ============ Light / dark theme ============ */
  function setTheme(t) {
  document.documentElement.setAttribute('data-theme', t);
  localStorage.setItem('theme', t);
  document.querySelector('meta[name="theme-color"]')
  ?.setAttribute('content', t === 'dark' ? '#0f0f0f' : '#f0f0ee');
+ tellEmbeds(t);
  document.querySelectorAll('.theme-btn').forEach(b => {
  const on = b.dataset.themeSet === t;
  b.classList.toggle('active', on);

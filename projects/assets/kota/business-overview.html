@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Applicant review — Meridian Holdings</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  /* Tokens live in kota/tokens.css, shared with the operator's KYC view. */
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums;
+  }
+  .ic{width:20px;height:20px;flex:none;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  .ic.sm{width:16px;height:16px}
+  button{font:inherit;cursor:pointer}
+  .app{display:flex;min-height:100vh}
+
+  /* ---- Rail ---- */
+  .rail{width:72px;flex:none;background:var(--surface);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 0;position:sticky;top:0;height:100vh}
+  .logo{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:#fff;
+    background:linear-gradient(180deg,var(--accent),#AF471A);box-shadow:var(--shadow);margin-bottom:6px}
+  .logo .ic{width:26px;height:26px;stroke:#FFF3EE;fill:#FFF3EE;stroke-width:0}
+  .nav{width:48px;height:48px;border-radius:8px;border:0;background:transparent;color:var(--muted);
+    display:grid;place-items:center;transition:.15s}
+  .nav:hover{background:var(--border-soft);color:var(--text-2)}
+  .nav.active{background:var(--accent-tint);color:var(--accent)}
+  .rail .spacer{margin-top:auto}
+  .rail .me{width:48px;height:48px;border-radius:50%;background:var(--border);display:grid;place-items:center;
+    color:var(--muted);font-weight:600;font-size:13px}
+
+  /* ---- Topbar ---- */
+  .topbar{height:84px;flex:none;background:var(--surface-2);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:14px;padding:0 24px;position:sticky;top:0;z-index:5}
+  .crumbs{display:flex;align-items:center;gap:8px;color:var(--muted);min-width:0}
+  .crumbs .ic{color:var(--muted-2)}
+  .crumb{color:var(--muted);white-space:nowrap;font-weight:500}
+  .crumb.here{color:var(--text)}
+  .crumbs svg.chev{width:16px;height:16px;color:var(--faint)}
+  .topbar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+  .iconbtn{width:40px;height:40px;border-radius:8px;border:1px solid var(--border);background:var(--surface);
+    color:var(--muted);display:grid;place-items:center;transition:.15s}
+  .iconbtn:hover{color:var(--accent);border-color:var(--accent-soft)}
+  .iconbtn.busy{opacity:.6;pointer-events:none}
+
+  .statuschip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;line-height:1;
+    padding:5px 10px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text-2)}
+  .statuschip .d{width:6px;height:6px;border-radius:50%;background:var(--muted-2)}
+  .statuschip[data-s="review"]{color:var(--info);background:var(--info-bg);border-color:var(--info-bd)} .statuschip[data-s="review"] .d{background:var(--info)}
+  .statuschip[data-s="approved"]{color:var(--good);background:var(--good-bg);border-color:var(--good-bd)} .statuschip[data-s="approved"] .d{background:var(--good)}
+  .statuschip[data-s="corrections"]{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-bd)} .statuschip[data-s="corrections"] .d{background:var(--warn)}
+  .statuschip[data-s="rejected"]{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-bd)} .statuschip[data-s="rejected"] .d{background:var(--bad)}
+
+  /* ---- Canvas / cards ---- */
+  .canvas{padding:24px;display:grid;grid-template-columns:336px minmax(0,1fr);gap:24px;align-items:start}
+  .content{display:flex;flex-direction:column;gap:24px;min-width:0}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .card > .head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:24px 24px 0}
+  .card .body{padding:24px}
+  .title{font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--text);margin:0}
+  .sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .eyebrow{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid transparent;white-space:nowrap}
+  .pill.good{color:var(--good);background:var(--good-bg);border-color:var(--good-bd)}
+  .pill.warn{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-bd)}
+  .pill.bad{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-bd)}
+  .pill.neutral{color:var(--text-2);background:var(--surface-2);border-color:var(--border)}
+  .pill.dot::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .delta{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600}
+  .delta.up{color:var(--good)}
+
+  /* ---- Standardized legend (single format everywhere) ---- */
+  .legend{display:flex;flex-wrap:wrap;gap:14px 20px}
+  .legend.col{flex-direction:column;gap:12px;min-width:150px}
+  .legend .item{display:flex;align-items:center;gap:8px;font-size:13px;min-width:0}
+  .legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
+  .legend .k{color:var(--muted)}
+  .legend .v{color:var(--text);font-weight:600}
+  .legend.col .v{margin-left:auto}
+
+  /* ---- Applicant + decision panel ---- */
+  .applicant{position:sticky;top:108px}
+  .idrow{display:flex;align-items:center;gap:14px}
+  .emblem{width:56px;height:56px;border-radius:14px;flex:none;box-shadow:var(--shadow);overflow:hidden;display:block}
+  .kv{display:flex;flex-direction:column;gap:13px}
+  .kv .r{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+  .kv .k{color:var(--muted);font-size:13px}
+  .kv .v{color:var(--text-2);font-weight:500;text-align:right}
+  .kv .v a{color:var(--accent);text-decoration:none;font-weight:600}
+  .divider{height:1px;background:var(--border-soft);margin:20px 0}
+
+  .reco{display:flex;gap:10px;background:var(--accent-tint);border:1px solid var(--accent-tint-2);border-radius:10px;padding:12px 14px}
+  .reco .ic{color:var(--accent)}
+  .reco b{color:var(--text)}
+  .reco p{margin:2px 0 0;color:var(--text-2);font-size:13px;line-height:1.4}
+
+  .decision{margin-top:18px}
+  .acts{display:flex;flex-direction:column;gap:10px}
+  .act{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;padding:11px 16px;font-weight:600;border:1px solid transparent;transition:.15s}
+  .act.approve{background:var(--approve);color:#fff;border-color:var(--approve)}
+  .act.approve:hover{background:var(--approve-hover);border-color:var(--approve-hover)}
+  .act.correct{background:var(--surface);color:var(--correct);border-color:var(--warn-bd)}
+  .act.correct:hover{background:var(--warn-bg)}
+  .act.reject{background:var(--surface);color:var(--reject);border-color:var(--border)}
+  .act.reject:hover{background:var(--bad-bg);border-color:var(--bad-bd)}
+  .act .ic{stroke-width:2}
+
+  .subform{margin-top:12px;border:1px solid var(--border);border-radius:10px;padding:14px;background:var(--surface-2)}
+  .subform.hidden{display:none}
+  .subform label{font-size:12px;font-weight:600;color:var(--text-2);display:block;margin-bottom:8px}
+  .subform textarea{width:100%;min-height:74px;resize:vertical;border:1px solid var(--border);border-radius:8px;
+    background:var(--surface);color:var(--text);font:inherit;padding:9px 11px;outline:none}
+  .subform textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+  .subform .warn-line{display:flex;gap:8px;align-items:flex-start;color:var(--text-2);font-size:13px}
+  .subform .warn-line .ic{color:var(--reject);margin-top:1px}
+  .subform .brow{display:flex;gap:8px;margin-top:12px}
+  .btn-sm{border-radius:7px;padding:8px 14px;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text-2)}
+  .btn-sm:hover{background:var(--surface-2)}
+  .btn-sm.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn-sm.primary:hover{background:var(--accent-hover)}
+  .btn-sm.danger{background:var(--reject);border-color:var(--reject);color:#fff}
+  .btn-sm.danger:hover{filter:brightness(.94)}
+
+  .result{margin-top:16px;border-radius:10px;padding:14px;display:none;gap:11px;align-items:flex-start}
+  .result.show{display:flex}
+  .result .ic{flex:none;margin-top:1px}
+  .result .t{font-weight:600;color:var(--text)}
+  .result .m{font-size:13px;color:var(--muted);margin-top:2px}
+  .result .m em{color:var(--text-2);font-style:normal}
+  .result .reopen{margin-top:8px;background:none;border:0;padding:0;color:var(--accent);font-weight:600;font-size:13px}
+  .result.approved{background:var(--good-bg);border:1px solid var(--good-bd)} .result.approved .ic{color:var(--good)}
+  .result.corrections{background:var(--warn-bg);border:1px solid var(--warn-bd)} .result.corrections .ic{color:var(--warn)}
+  .result.rejected{background:var(--bad-bg);border:1px solid var(--bad-bd)} .result.rejected .ic{color:var(--bad)}
+
+  /* ---- Gauge / stat ---- */
+  .stat-wrap{display:flex;align-items:center;gap:22px;margin-top:16px;flex-wrap:wrap}
+  .ring{position:relative;width:150px;height:150px;flex:none}
+  .ring .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .ring .val b{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .ring .val .of{font-size:12px;color:var(--muted-2);margin-top:2px}
+  .stat-side{display:flex;flex-direction:column;gap:10px;min-width:150px;flex:1}
+  .stat-side .lab{font-size:13px;color:var(--muted)}
+  .minis{display:flex;gap:18px;margin-top:2px}
+  .minis .eyebrow{display:block}
+  .minis b{font-size:16px;color:var(--text)}
+
+  /* ---- Line chart ---- */
+  .chart{width:100%;height:auto;display:block;margin-top:18px;overflow:visible}
+  .grid line{stroke:var(--border);stroke-width:.8}
+  .axis text{fill:var(--muted-2);font-size:11px}
+  .xlab{fill:var(--muted-2);font-size:11px;text-anchor:middle}
+
+  /* ---- KRI table ---- */
+  table.kri{width:100%;border-collapse:collapse;margin-top:2px}
+  table.kri th{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted-2);
+    text-align:left;padding:12px 16px;border-bottom:1px solid var(--border)}
+  table.kri th.r,table.kri td.r{text-align:right}
+  table.kri td{padding:16px;border-bottom:1px solid var(--border-soft);vertical-align:middle}
+  table.kri tr:last-child td{border-bottom:0}
+  table.kri tbody tr:hover td{background:var(--surface-2)}
+  .ind{display:flex;align-items:center;gap:12px}
+  .ind .ico{width:36px;height:36px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);
+    display:grid;place-items:center;color:var(--muted);flex:none}
+  .ind .nm{font-weight:600;color:var(--text)}
+  .ind .id{font-size:12px;color:var(--muted-2)}
+  .scorecell{display:flex;align-items:center;gap:12px;min-width:160px}
+  .bar{flex:1;height:7px;border-radius:99px;background:var(--border-soft);overflow:hidden}
+  .bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent-soft),var(--accent))}
+  .scorecell b{width:26px;text-align:right;color:var(--text)}
+  .spark{width:96px;height:26px}
+
+  /* ---- Ranked bars ---- */
+  .tabs{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:3px}
+  .tabs button{border:0;background:transparent;color:var(--muted);padding:5px 12px;border-radius:6px;font-weight:500;transition:.15s}
+  .tabs button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+  .ranks{display:flex;flex-direction:column;gap:18px;margin-top:20px}
+  .rank .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .rank .nm{color:var(--text-2);font-weight:500}
+  .rank .pc{color:var(--text);font-weight:600}
+  .rank .bar{height:8px}
+  .rank .bar > i{transition:width .35s ease}
+
+  /* ---- Timeline ---- */
+  .tl{display:flex;flex-direction:column;margin-top:6px}
+  .tl .e{display:grid;grid-template-columns:24px 1fr;gap:14px;padding-bottom:20px;position:relative}
+  .tl .e:last-child{padding-bottom:0}
+  .tl .e:not(:last-child)::before{content:"";position:absolute;left:11px;top:22px;bottom:-2px;width:1.5px;background:var(--border)}
+  .tl .dot{width:24px;height:24px;border-radius:50%;background:var(--accent-tint);border:1.5px solid var(--accent-tint-2);
+    display:grid;place-items:center;color:var(--accent);z-index:1}
+  .tl .dot::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+  .tl .e.muted .dot{background:var(--surface-2);border-color:var(--border)}
+  .tl .e.muted .dot::after{background:var(--faint)}
+  .tl .t{font-weight:600;color:var(--text)}
+  .tl .m{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* ---- Lineage ---- */
+  .flow-outer{margin-top:20px;position:relative}
+  .flow-scroll{overflow-x:auto;padding-bottom:4px}
+  .flow{position:relative;width:880px;height:360px;transform-origin:top left;transition:transform .2s ease}
+  .flow svg.links{position:absolute;inset:0;pointer-events:none}
+  .flow svg.links path{fill:none;stroke:var(--faint);stroke-width:1.4}
+  .flow svg.links path.hot{stroke:var(--accent);stroke-width:1.8}
+  .node{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    box-shadow:var(--shadow);display:flex;align-items:center;gap:12px;padding:12px}
+  .node .tile{width:34px;height:34px;border-radius:8px;flex:none;display:grid;place-items:center;
+    background:var(--surface-2);border:1px solid var(--border);color:var(--muted)}
+  .node .tile .ic{width:18px;height:18px}
+  .node .nm{font-weight:600;color:var(--text);font-size:13px;line-height:1.2}
+  .node .mt{font-size:11px;color:var(--muted-2);margin-top:2px}
+  .node.center{background:var(--accent-tint);border-color:var(--accent-tint-2)}
+  .node.center .tile{background:var(--accent);border-color:var(--accent);color:#fff}
+  .node.out{border-color:var(--accent-tint-2)}
+  .node.out .tile{background:var(--accent);border-color:var(--accent);color:#fff}
+  .zoom{position:absolute;right:0;top:0;display:flex;flex-direction:column;background:var(--surface);
+    border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);overflow:hidden;z-index:2}
+  .zoom button{width:36px;height:36px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center}
+  .zoom button+button{border-top:1px solid var(--border)}
+  .zoom button:hover{background:var(--surface-2);color:var(--text)}
+
+  /* ---- Toast ---- */
+  .toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--text);color:var(--surface);
+    padding:11px 16px;border-radius:10px;box-shadow:var(--shadow-lg);font-weight:500;font-size:13px;
+    display:flex;align-items:center;gap:9px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90vw}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast .ic{stroke:var(--surface)}
+
+  @media (max-width:960px){
+    .canvas{grid-template-columns:1fr}
+    .applicant{position:static}
+    .row2{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- RAIL -->
+  <nav class="rail" aria-label="Primary">
+    <div class="logo" title="Sentinel"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3Z"/></svg></div>
+    <button class="nav" data-nav title="Home"><svg class="ic" viewBox="0 0 24 24"><path d="M4 10 12 4l8 6v9a1 1 0 0 1-1 1h-4v-6h-6v6H5a1 1 0 0 1-1-1v-9Z"/></svg></button>
+    <button class="nav" data-nav title="Insights"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-6M22 20H2"/></svg></button>
+    <button class="nav active" data-nav aria-current="page" title="Applicants"><svg class="ic" viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-4-4M2 21a6 6 0 0 1 12 0M18 14a6 6 0 0 1 4 7"/></svg></button>
+    <button class="nav" data-nav title="Companies"><svg class="ic" viewBox="0 0 24 24"><path d="M5 21V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15M15 21V11h3a2 2 0 0 1 2 2v8M3 21h18M8 8h1M8 12h1M8 16h1"/></svg></button>
+    <div class="spacer"></div>
+    <button class="nav" data-nav title="Settings"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
+    <div class="me">PG</div>
+  </nav>
+
+  <div class="main">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="crumbs">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M16 11a4 4 0 1 0-4-4M2 21a6 6 0 0 1 12 0M18 14a6 6 0 0 1 4 7"/></svg>
+        <svg class="chev ic" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+        <span class="crumb">Applicants</span>
+        <svg class="chev ic" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+        <span class="crumb">Meridian Holdings</span>
+        <svg class="chev ic" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+        <span class="crumb here">Review</span>
+      </div>
+      <div class="right">
+        <span class="statuschip" id="chip" data-s="review"><span class="d"></span><span id="chiptext">Under review</span></span>
+        <button class="iconbtn" id="export" title="Export summary" aria-label="Export summary"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg></button>
+        <button class="iconbtn" id="theme" title="Toggle theme" aria-label="Toggle theme">
+          <svg class="ic sm sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/></svg>
+          <svg class="ic sm moon" viewBox="0 0 24 24" style="display:none"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3 6.6 6.6 0 0 0 21 12.8Z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="canvas">
+      <!-- LEFT: applicant + decision -->
+      <aside class="card applicant">
+        <div class="body">
+          <div class="idrow">
+            <!-- applicant image (embedded logo emblem) -->
+            <svg class="emblem" viewBox="0 0 56 56" role="img" aria-label="Meridian Holdings logo">
+              <rect width="56" height="56" rx="14" fill="#0E2138"/>
+              <circle cx="28" cy="27" r="17" fill="none" stroke="#33506E" stroke-width="1.3" opacity=".7"/>
+              <path d="M17 39V20l11 11 11-11v19" fill="none" stroke="#FFFFFF" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round"/>
+              <rect x="18" y="43" width="20" height="2.6" rx="1.3" fill="#E25E25"/>
+            </svg>
+            <div style="min-width:0">
+              <div class="title" style="font-size:17px">Meridian Holdings</div>
+              <div class="sub">Applied 4 days ago · Freight &amp; logistics</div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+          <div class="kv">
+            <div class="r"><span class="k">Company number</span><span class="v">08 829 471</span></div>
+            <div class="r"><span class="k">Jurisdiction</span><span class="v">United Kingdom</span></div>
+            <div class="r"><span class="k">Sector</span><span class="v">Freight &amp; logistics</span></div>
+            <div class="r"><span class="k">Ultimate owner</span><span class="v"><a href="#">Meridian Group S.A.</a></span></div>
+            <div class="r"><span class="k">Documents received</span><span class="v">7 of 9</span></div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="reco">
+            <svg class="ic" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3ZM9 12l2 2 4-4"/></svg>
+            <div><b>Recommended: approve with conditions</b><p>Strong financials and clean sanctions screening. Two documents (litigation disclosure, proof of address) need updating before onboarding.</p></div>
+          </div>
+
+          <div class="decision">
+            <div class="eyebrow" style="margin-bottom:12px">Your decision</div>
+            <div class="acts" id="acts">
+              <button class="act approve" data-act="approve"><svg class="ic sm" viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></svg>Approve applicant</button>
+              <button class="act correct" data-act="correct"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 20h9M4 20v-3.5L15 5.5a1.8 1.8 0 0 1 2.5 2.5L6.5 19 4 20Z"/></svg>Request corrections</button>
+              <button class="act reject" data-act="reject"><svg class="ic sm" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>Reject</button>
+            </div>
+
+            <!-- corrections form -->
+            <div class="subform hidden" id="correctForm">
+              <label for="note">What needs to be corrected?</label>
+              <textarea id="note" placeholder="e.g. Litigation disclosure is out of date; proof of address must be within 90 days.">Litigation disclosure is out of date; proof of address must be within 90 days.</textarea>
+              <div class="brow">
+                <button class="btn-sm primary" data-send="correct">Send request</button>
+                <button class="btn-sm" data-cancel>Cancel</button>
+              </div>
+            </div>
+
+            <!-- reject confirm -->
+            <div class="subform hidden" id="rejectForm">
+              <div class="warn-line"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 3 3 20h18L12 3ZM12 10v4M12 17h.01"/></svg><span>Rejecting closes this application. The applicant will be notified and can reapply after 90 days.</span></div>
+              <div class="brow">
+                <button class="btn-sm danger" data-send="reject">Confirm reject</button>
+                <button class="btn-sm" data-cancel>Cancel</button>
+              </div>
+            </div>
+
+            <!-- result -->
+            <div class="result" id="result">
+              <svg class="ic" id="resultIcon" viewBox="0 0 24 24"></svg>
+              <div>
+                <div class="t" id="resultTitle"></div>
+                <div class="m" id="resultMsg"></div>
+                <button class="reopen" id="reopen">Reopen review</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- RIGHT: analysis -->
+      <div class="content">
+        <div class="row2">
+          <!-- Confidence -->
+          <section class="card">
+            <div class="head">
+              <div><h2 class="title">Confidence score</h2><div class="sub">Aggregate profile reliability</div></div>
+              <span class="delta up"><svg class="ic sm" viewBox="0 0 24 24" style="stroke-width:2"><path d="M6 15l6-6 6 6"/></svg>+6</span>
+            </div>
+            <div class="body" style="padding-top:8px">
+              <div class="stat-wrap">
+                <div class="ring">
+                  <svg viewBox="0 0 150 150" width="150" height="150">
+                    <circle cx="75" cy="75" r="54" fill="none" stroke="var(--accent-tint)" stroke-width="16"/>
+                    <circle cx="75" cy="75" r="54" fill="none" stroke="var(--accent)" stroke-width="16" stroke-linecap="round" stroke-dasharray="264.6 339.3" transform="rotate(-90 75 75)"/>
+                  </svg>
+                  <div class="val"><b>78</b><span class="of">of 100</span></div>
+                </div>
+                <div class="stat-side">
+                  <span class="pill good" style="align-self:flex-start">High confidence</span>
+                  <div class="lab">Built from <b style="color:var(--text-2)">9 connected sources</b>, weighted by recency and corroboration.</div>
+                  <div class="minis">
+                    <span><span class="eyebrow">Coverage</span><b>92%</b></span>
+                    <span><span class="eyebrow">Corroboration</span><b>3.4×</b></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Risk distribution -->
+          <section class="card">
+            <div class="head"><div><h2 class="title">Risk distribution</h2><div class="sub">24 open signals by severity</div></div></div>
+            <div class="body" style="padding-top:8px">
+              <div class="stat-wrap">
+                <div class="ring">
+                  <svg viewBox="0 0 150 150" width="150" height="150">
+                    <g transform="rotate(-90 75 75)" fill="none" stroke-width="16">
+                      <circle cx="75" cy="75" r="54" stroke="var(--c-green)"  stroke-dasharray="183.6 339.3" stroke-dashoffset="0"/>
+                      <circle cx="75" cy="75" r="54" stroke="var(--c-yellow)" stroke-dasharray="71.6 339.3"  stroke-dashoffset="-186.6"/>
+                      <circle cx="75" cy="75" r="54" stroke="var(--c-orange)" stroke-dasharray="47.9 339.3"  stroke-dashoffset="-261.2"/>
+                      <circle cx="75" cy="75" r="54" stroke="var(--c-red)"    stroke-dasharray="24.1 339.3"  stroke-dashoffset="-312.1"/>
+                    </g>
+                  </svg>
+                  <div class="val"><b>24</b><span class="of">signals</span></div>
+                </div>
+                <!-- standardized legend -->
+                <div class="legend col">
+                  <span class="item"><span class="sw" style="background:var(--c-green)"></span><span class="k">Low</span><span class="v">13</span></span>
+                  <span class="item"><span class="sw" style="background:var(--c-yellow)"></span><span class="k">Medium</span><span class="v">5</span></span>
+                  <span class="item"><span class="sw" style="background:var(--c-orange)"></span><span class="k">High</span><span class="v">4</span></span>
+                  <span class="item"><span class="sw" style="background:var(--c-red)"></span><span class="k">Critical</span><span class="v">2</span></span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Reliability -->
+        <section class="card">
+          <div class="head">
+            <div><h2 class="title">Data reliability over time</h2><div class="sub">Rolling 12-month index</div></div>
+            <!-- same standardized legend format (square swatch + label + value) -->
+            <div class="legend">
+              <span class="item"><span class="sw" style="background:var(--c-line-a)"></span><span class="k">Verified sources</span><span class="v">80</span></span>
+              <span class="item"><span class="sw" style="background:var(--c-line-b)"></span><span class="k">Overall reliability</span><span class="v">86</span></span>
+            </div>
+          </div>
+          <div class="body" style="padding-top:8px">
+            <svg class="chart" viewBox="0 0 940 190" preserveAspectRatio="none" aria-label="Reliability over 12 months">
+              <defs><linearGradient id="fillA" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity="0.16"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0"/></linearGradient></defs>
+              <g class="grid"><line x1="40" y1="20" x2="900" y2="20"/><line x1="40" y1="52.5" x2="900" y2="52.5"/><line x1="40" y1="85" x2="900" y2="85"/><line x1="40" y1="117.5" x2="900" y2="117.5"/><line x1="40" y1="150" x2="900" y2="150"/></g>
+              <g class="axis" text-anchor="end"><text x="30" y="24">90</text><text x="30" y="89">65</text><text x="30" y="154">40</text></g>
+              <path d="M40,92.8 118.2,103.2 196.4,87.6 274.5,98 352.7,77.2 430.9,82.4 509.1,66.8 587.3,72 665.5,61.6 743.6,64.2 821.8,53.8 900,46 L900,150 L40,150 Z" fill="url(#fillA)"/>
+              <polyline points="40,72 118.2,82.4 196.4,66.8 274.5,77.2 352.7,59 430.9,61.6 509.1,48.6 587.3,53.8 665.5,43.4 743.6,46 821.8,35.6 900,30.4" fill="none" stroke="var(--c-line-b)" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+              <polyline points="40,92.8 118.2,103.2 196.4,87.6 274.5,98 352.7,77.2 430.9,82.4 509.1,66.8 587.3,72 665.5,61.6 743.6,64.2 821.8,53.8 900,46" fill="none" stroke="var(--c-line-a)" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+              <circle cx="900" cy="46" r="4.5" fill="var(--surface)" stroke="var(--c-line-a)" stroke-width="2.5"/>
+              <circle cx="900" cy="30.4" r="4.5" fill="var(--surface)" stroke="var(--c-line-b)" stroke-width="2.5"/>
+              <g class="xlab"><text x="40" y="170">Jan</text><text x="118" y="170">Feb</text><text x="196" y="170">Mar</text><text x="274" y="170">Apr</text><text x="353" y="170">May</text><text x="431" y="170">Jun</text><text x="509" y="170">Jul</text><text x="587" y="170">Aug</text><text x="665" y="170">Sep</text><text x="744" y="170">Oct</text><text x="822" y="170">Nov</text><text x="900" y="170">Dec</text></g>
+            </svg>
+          </div>
+        </section>
+
+        <!-- KRI -->
+        <section class="card">
+          <div class="head"><div><h2 class="title">Key risk indicators</h2><div class="sub">Scored against sector baseline · updated 2 days ago</div></div></div>
+          <div class="body" style="padding:20px 8px 8px">
+            <div style="overflow-x:auto">
+            <table class="kri">
+              <thead><tr><th>Indicator</th><th>Score</th><th>30-day trend</th><th class="r">Status</th></tr></thead>
+              <tbody>
+                <tr><td><div class="ind"><span class="ico"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-6M22 20H2"/></svg></span><span><span class="nm">Financial stability</span><br><span class="id">STK 000 000 247</span></span></div></td><td><div class="scorecell"><span class="bar"><i style="width:82%"></i></span><b>82</b></div></td><td><svg class="spark" viewBox="0 0 96 26"><polyline points="0,18 16,20 32,14 48,16 64,10 80,12 96,7" fill="none" stroke="var(--good)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="r"><span class="pill good dot">Stable</span></td></tr>
+                <tr><td><div class="ind"><span class="ico"><svg class="ic sm" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M12 3l7 3v6c0 4.5-3 7-7 9-4-2-7-4.5-7-9V6l7-3Z"/></svg></span><span><span class="nm">Compliance history</span><br><span class="id">STK 000 000 118</span></span></div></td><td><div class="scorecell"><span class="bar"><i style="width:74%"></i></span><b>74</b></div></td><td><svg class="spark" viewBox="0 0 96 26"><polyline points="0,12 16,10 32,15 48,13 64,16 80,14 96,17" fill="none" stroke="var(--warn)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="r"><span class="pill warn dot">Monitor</span></td></tr>
+                <tr><td><div class="ind"><span class="ico"><svg class="ic sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3"/><path d="M6 20a6 6 0 0 1 12 0"/></svg></span><span><span class="nm">Ownership transparency</span><br><span class="id">STK 000 000 305</span></span></div></td><td><div class="scorecell"><span class="bar"><i style="width:91%"></i></span><b>91</b></div></td><td><svg class="spark" viewBox="0 0 96 26"><polyline points="0,16 16,14 32,15 48,11 64,12 80,8 96,7" fill="none" stroke="var(--good)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="r"><span class="pill good dot">Clear</span></td></tr>
+                <tr><td><div class="ind"><span class="ico"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 3 3 20h18L12 3ZM12 10v4M12 17h.01"/></svg></span><span><span class="nm">Litigation exposure</span><br><span class="id">STK 000 000 472</span></span></div></td><td><div class="scorecell"><span class="bar"><i style="width:48%"></i></span><b>48</b></div></td><td><svg class="spark" viewBox="0 0 96 26"><polyline points="0,10 16,12 32,9 48,14 64,13 80,18 96,20" fill="none" stroke="var(--bad)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="r"><span class="pill bad dot">Elevated</span></td></tr>
+                <tr><td><div class="ind"><span class="ico"><svg class="ic sm" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><span><span class="nm">Sanctions screening</span><br><span class="id">STK 000 000 061</span></span></div></td><td><div class="scorecell"><span class="bar"><i style="width:96%"></i></span><b>96</b></div></td><td><svg class="spark" viewBox="0 0 96 26"><polyline points="0,14 16,13 32,14 48,10 64,11 80,8 96,7" fill="none" stroke="var(--good)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></td><td class="r"><span class="pill good dot">Clear</span></td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </section>
+
+        <div class="row2">
+          <!-- Ranked sources -->
+          <section class="card">
+            <div class="head"><div><h2 class="title">Signal coverage by source</h2><div class="sub">Share of corroborated data points</div></div></div>
+            <div class="body">
+              <div class="tabs" role="tablist" id="covTabs">
+                <button class="on" role="tab" data-tab="all" aria-selected="true">All</button>
+                <button role="tab" data-tab="verified" aria-selected="false">Verified</button>
+                <button role="tab" data-tab="pending" aria-selected="false">Pending</button>
+              </div>
+              <div class="ranks" id="ranks"></div>
+            </div>
+          </section>
+
+          <!-- Activity -->
+          <section class="card">
+            <div class="head"><div><h2 class="title">Recent activity</h2><div class="sub">Across all connected sources</div></div></div>
+            <div class="body">
+              <div class="tl">
+                <div class="e"><span class="dot"></span><div><div class="t">New annual filing detected</div><div class="m">Corporate registry · 2 hours ago</div></div></div>
+                <div class="e"><span class="dot"></span><div><div class="t">Sanctions screening cleared</div><div class="m">Watchlist monitor · 6 hours ago</div></div></div>
+                <div class="e"><span class="dot"></span><div><div class="t">Ownership record updated</div><div class="m">Corporate registry · Yesterday</div></div></div>
+                <div class="e muted"><span class="dot"></span><div><div class="t">Adverse media flagged for review</div><div class="m">News &amp; media · 2 days ago</div></div></div>
+                <div class="e muted"><span class="dot"></span><div><div class="t">Application submitted</div><div class="m">Applicant portal · 4 days ago</div></div></div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Lineage -->
+        <section class="card">
+          <div class="head"><div><h2 class="title">Data lineage</h2><div class="sub">How connected sources resolve into one verified record</div></div></div>
+          <div class="body" style="padding-top:8px">
+            <div class="flow-outer">
+              <div class="flow-scroll">
+                <div class="flow" id="flow">
+                  <svg class="links" width="880" height="360" viewBox="0 0 880 360">
+                    <path d="M210,48 C285,48 265,180 340,180"/>
+                    <path d="M210,132 C285,132 265,180 340,180"/>
+                    <path d="M210,216 C285,216 265,180 340,180"/>
+                    <path d="M210,300 C285,300 265,180 340,180"/>
+                    <path class="hot" d="M540,180 L670,180"/>
+                  </svg>
+
+                  <div class="node" style="left:0;top:16px"><span class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M5 21V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15M3 21h18M8 8h1M8 12h1"/></svg></span><div><div class="nm">Corporate registry</div><div class="mt">92% confidence</div></div></div>
+                  <div class="node" style="left:0;top:100px"><span class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-6M22 20H2"/></svg></span><div><div class="nm">Financial filings</div><div class="mt">64% confidence</div></div></div>
+                  <div class="node" style="left:0;top:184px"><span class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M4 5h16v14H4zM8 9h8M8 13h8M8 17h5"/></svg></span><div><div class="nm">News &amp; media</div><div class="mt">78% confidence</div></div></div>
+                  <div class="node" style="left:0;top:268px"><span class="tile"><svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></span><div><div class="nm">Sanctions lists</div><div class="mt">51% confidence</div></div></div>
+
+                  <div class="node center" style="left:340px;top:150px;width:200px"><span class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M12 3l7 3v6c0 4.5-3 7-7 9-4-2-7-4.5-7-9V6l7-3Z"/></svg></span><div><div class="nm">Identity resolution</div><div class="mt">Deduplicates &amp; verifies 9 sources</div></div></div>
+
+                  <div class="node out" style="left:670px;top:148px;width:210px"><span class="tile"><svg class="ic" viewBox="0 0 24 24"><path d="M5 21V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v15M3 21h18"/></svg></span><div><div class="nm">Unified client record</div><div class="mt">Confidence 78 / 100</div></div></div>
+
+                  <div class="zoom">
+                    <button id="zin" title="Zoom in"><svg class="ic sm" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+                    <button id="zout" title="Zoom out"><svg class="ic sm" viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+                    <button id="zfit" title="Reset"><svg class="ic sm" viewBox="0 0 24 24"><path d="M4 9V5a1 1 0 0 1 1-1h4M20 9V5a1 1 0 0 0-1-1h-4M4 15v4a1 1 0 0 0 1 1h4M20 15v4a1 1 0 0 1-1 1h-4"/></svg></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><svg class="ic sm" viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></svg><span id="toastText"></span></div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var $=function(s,c){return (c||document).querySelector(s)};
+  var $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+
+  /* ---- toast ---- */
+  var toast=$('#toast'), toastText=$('#toastText'), tHide;
+  function say(msg){toastText.textContent=msg;toast.classList.add('show');clearTimeout(tHide);tHide=setTimeout(function(){toast.classList.remove('show')},2400)}
+
+  /* ---- theme ---- */
+  var tbtn=$('#theme'), sun=$('.sun',tbtn), moon=$('.moon',tbtn);
+  function syncTheme(){var d=root.getAttribute('data-theme')==='dark'||(!root.getAttribute('data-theme')&&matchMedia('(prefers-color-scheme: dark)').matches);sun.style.display=d?'none':'block';moon.style.display=d?'block':'none'}
+  tbtn.addEventListener('click',function(){var c=root.getAttribute('data-theme');var d=c==='dark'||(!c&&matchMedia('(prefers-color-scheme: dark)').matches);root.setAttribute('data-theme',d?'light':'dark');syncTheme()});
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncTheme); syncTheme();
+
+  /* ---- rail selection ---- */
+  $$('[data-nav]').forEach(function(b){b.addEventListener('click',function(){$$('[data-nav]').forEach(function(n){n.classList.remove('active');n.removeAttribute('aria-current')});b.classList.add('active');b.setAttribute('aria-current','page')})});
+
+  /* ---- export ---- */
+  $('#export').addEventListener('click',function(){var b=this;b.classList.add('busy');say('Preparing summary…');setTimeout(function(){b.classList.remove('busy');say('Summary exported (PDF)')},900)});
+
+  /* ---- decision ---- */
+  var chip=$('#chip'), chiptext=$('#chiptext'), acts=$('#acts');
+  var correctForm=$('#correctForm'), rejectForm=$('#rejectForm'), result=$('#result');
+  var resultIcon=$('#resultIcon'), resultTitle=$('#resultTitle'), resultMsg=$('#resultMsg');
+  var ICON_OK='<path d="m5 13 4 4L19 7"/>', ICON_EDIT='<path d="M12 20h9M4 20v-3.5L15 5.5a1.8 1.8 0 0 1 2.5 2.5L6.5 19 4 20Z"/>', ICON_X='<path d="M6 6l12 12M18 6 6 18"/>';
+  function closeForms(){correctForm.classList.add('hidden');rejectForm.classList.add('hidden')}
+  function setStatus(state, opts){
+    opts=opts||{};
+    var map={review:['Under review','neutral'],approved:['Approved','good'],corrections:['Corrections requested','warn'],rejected:['Rejected','bad']};
+    var m=map[state]; chip.setAttribute('data-s',state); chiptext.textContent=m[0];
+    if(state==='review'){ acts.style.display='flex'; closeForms(); result.className='result'; return; }
+    acts.style.display='none'; closeForms();
+    result.className='result show '+state;
+    if(state==='approved'){resultIcon.innerHTML=ICON_OK;resultTitle.textContent='Applicant approved';resultMsg.innerHTML='<em>Meridian Holdings</em> approved for onboarding · just now';}
+    if(state==='corrections'){resultIcon.innerHTML=ICON_EDIT;resultTitle.textContent='Corrections requested';resultMsg.innerHTML=(opts.note?('“'+opts.note+'”'):'Request sent to applicant')+' · just now';}
+    if(state==='rejected'){resultIcon.innerHTML=ICON_X;resultTitle.textContent='Application rejected';resultMsg.innerHTML='<em>Meridian Holdings</em> notified · can reapply in 90 days';}
+  }
+  $$('[data-act]',acts).forEach(function(b){b.addEventListener('click',function(){
+    var a=b.getAttribute('data-act');
+    if(a==='approve'){setStatus('approved');say('Applicant approved')}
+    if(a==='correct'){closeForms();correctForm.classList.remove('hidden');$('#note').focus()}
+    if(a==='reject'){closeForms();rejectForm.classList.remove('hidden')}
+  })});
+  $$('[data-cancel]').forEach(function(b){b.addEventListener('click',closeForms)});
+  $('[data-send="correct"]').addEventListener('click',function(){var n=$('#note').value.trim();setStatus('corrections',{note:n});say('Correction request sent')});
+  $('[data-send="reject"]').addEventListener('click',function(){setStatus('rejected');say('Application rejected')});
+  $('#reopen').addEventListener('click',function(){setStatus('review');say('Review reopened')});
+
+  /* ---- coverage tabs ---- */
+  var DATA={
+    all:[['Corporate registry',92],['News & media',78],['Financial filings',64],['Sanctions lists',51],['Web & social',39]],
+    verified:[['Corporate registry',92],['Financial filings',64],['Sanctions lists',51]],
+    pending:[['News & media',78],['Web & social',39],['Adverse media',33]]
+  };
+  var ranks=$('#ranks');
+  function renderRanks(key){
+    ranks.innerHTML=DATA[key].map(function(r){
+      return '<div class="rank"><div class="top"><span class="nm">'+r[0]+'</span><span class="pc">'+r[1]+'%</span></div><span class="bar"><i style="width:0%"></i></span></div>';
+    }).join('');
+    requestAnimationFrame(function(){$$('.rank .bar > i',ranks).forEach(function(i,idx){i.style.width=DATA[key][idx][1]+'%'})});
+  }
+  $$('#covTabs button').forEach(function(b){b.addEventListener('click',function(){
+    $$('#covTabs button').forEach(function(x){x.classList.remove('on');x.setAttribute('aria-selected','false')});
+    b.classList.add('on');b.setAttribute('aria-selected','true');renderRanks(b.getAttribute('data-tab'));
+  })});
+  renderRanks('all');
+
+  /* ---- lineage zoom ---- */
+  var flow=$('#flow'), z=1;
+  function apply(){flow.style.transform='scale('+z+')'}
+  $('#zin').addEventListener('click',function(){z=Math.min(1.4,z+0.1);apply()});
+  $('#zout').addEventListener('click',function(){z=Math.max(0.7,z-0.1);apply()});
+  $('#zfit').addEventListener('click',function(){z=1;apply()});
+})();
+</script>
+
+
+<script>
+  /* The case study carries a light/dark toggle; an iframe never inherits it,
+     and these tokens follow prefers-color-scheme on their own. Left alone the
+     embed would sit dark inside a light page whenever the OS says dark. The
+     host posts its theme, and an explicit data-theme outranks the media query
+     in tokens.css. */
+  addEventListener('message', (e) => {
+    const t = e.data && e.data.type === 'theme' && e.data.theme;
+    if (t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  });
+</script>
+</body>
+</html>
