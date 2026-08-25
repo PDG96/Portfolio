@@ -1189,14 +1189,9 @@
  /* Below 900px the bento switches to a stacked vertical layout, the iframe
     needs a taller aspect (or auto height) so the stacked tiles fit. */
  @media (max-width: 900px) {
- .app-shot--embed .embed-frame {
-   aspect-ratio: auto !important;
-   /* Stacked height of the analysis bento: 4x320 + 1x500 + 4 gaps. */
-   height: 1880px;
- }
  /* The simulation bento stacks four tiles, not five, so the figure above
     left 171px of blank frame trailing it. */
- .app-shot--sim .embed-frame { height: 1720px; }
+
  }
  /* Browser chrome around the live dashboard, so it reads as a running app
  instead of another block of the page. Everything is tokenized, so the
@@ -1240,6 +1235,7 @@
  border-radius: 0;
  max-width: none;
  --dash-h: 780px;
+ height: var(--dash-h);
  }
  @media (max-width: 900px) {
  /* The dashboard has no layout of its own below ~1000px, so on a phone
@@ -2876,6 +2872,7 @@
  @media (max-width: 900px) {
    .app-shot--browser .browser-bar { display: none; }
    .app-shot--browser .browser-frame {
+     width: 100%;
      max-width: 380px;
      margin-inline: auto;
      border-radius: 28px;
@@ -3069,7 +3066,7 @@
   <span class="browser-dots"><i></i><i></i><i></i></span>
   <span class="browser-url">app.straatos.io/dashboard</span>
   </div>
-  <div class="embed-frame" style="height: 780px;">
+  <div class="embed-frame">
   <iframe class="embed-iframe embed-iframe--app" src="assets/straatos-dashboard/dashboard.html?v=7" data-min-w="1000" data-h="780"
   title="Straatos dashboard, interactive: developer metrics, a 3D globe with every active project pinned by country, and stacked performance charts by year"
   loading="lazy"></iframe>
@@ -3511,27 +3508,19 @@
  // so hand it the width it actually got. Reading it from inside would
  // feed back on itself once it zooms.
 
- if (cw < 900) {
- // Below its own breakpoint the bento has a stacked layout built for
- // exactly this, which is the right thing to show on a phone. Hand it
- // the real width and get out of the way: no floor, no transform, and
- // a zoom of 1 (told === w), so the CSS height rule stands. Scaling a
- // 920px desktop composition down to a third and zooming it as well
- // was shrinking it twice over.
- iframe.style.width = '';
- iframe.style.height = '';
- iframe.style.transform = '';
- frame.style.aspectRatio = '';
- frame.style.height = '';
- } else {
- const iw = cw;
+ // One regime at every width: render at the floor the composition needs and
+ // scale the whole thing to fit. Handing a phone the real width let the
+ // bento use its stacked layout, but the live charts inside it do not
+ // follow — cards overflowed, the gauge labels piled on top of each other.
+ // A faithful miniature beats a broken layout.
+ const iw = Math.max(920, cw);
  const ih = Math.round(iw * (h / w));
+ const scale = Math.min(1, cw / iw);
  iframe.style.width = iw + 'px';
  iframe.style.height = ih + 'px';
- iframe.style.transform = '';
+ iframe.style.transform = 'scale(' + scale + ')';
  frame.style.aspectRatio = 'auto';
- frame.style.height = ih + 'px';
- }
+ frame.style.height = Math.round(ih * scale) + 'px';
  });
  ro.observe(frame);
  });

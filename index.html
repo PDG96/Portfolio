@@ -324,7 +324,10 @@
  .hero-content {
  position: relative;
  z-index: 1;
- max-width: none;
+ /* Was max-width: none, which let the hero alone run the full width of the
+    display while Work, About and Contact all sat inside .wrap's measure —
+    1760px against 4300px on a wide screen. It keeps the same measure as
+    every other section now, so the page has one left and right edge. */
  }
 
  .hero-eyebrow {
