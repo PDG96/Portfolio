@@ -379,30 +379,66 @@
 	}
 
 	/* ==================== PHONE ====================
-	   Below 700px this stops pretending to be a desktop window. The case study
-	   used to scale the whole 1000px app down to fit a phone column, which
-	   produced a legible-at-arms-length miniature and nothing more. Here it
-	   lays out as an app instead: the rail collapses to a strip of icons, the
-	   cards stack, and the map takes a height a thumb can live with. */
+	   A phone version of the app rather than the desktop one shrunk: the rail
+	   and the two header rows step aside for an app bar and a bottom tab bar,
+	   the cards run edge to edge, and the map takes a height a thumb can work
+	   with. */
+	.m-appbar, .m-tabbar { display: none; }
+
 	@media (max-width: 700px) {
-		.sidebar { width: 56px; }
-		.sidebar svg { width: 56px; margin-left: -8px; }
-		.header { height: 52px; padding: 0 14px; }
-		.page-title { height: 56px; padding: 0 14px; }
-		.page-title h1 { font-size: 17px; }
+		.sidebar, .header, .page-title { display: none; }
+		.app-shell { flex-direction: column; padding-top: 56px; padding-bottom: 60px; }
+		.main { height: auto; }
+
+		.m-appbar {
+			display: flex; align-items: center; gap: 12px;
+			position: fixed; top: 0; left: 0; right: 0; height: 56px; z-index: 20;
+			padding: 0 14px; background: #01393A; color: #fff;
+		}
+		.m-burger { display: flex; flex-direction: column; gap: 4px; background: none; border: 0; padding: 6px; cursor: pointer; }
+		.m-burger span { display: block; width: 18px; height: 1.5px; background: #fff; border-radius: 1px; }
+		.m-title { display: flex; flex-direction: column; line-height: 1.15; min-width: 0; }
+		.m-eyebrow { font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.62); }
+		.m-title strong { font-size: 15px; font-weight: 600; }
+		.m-avatar { width: 28px; height: 28px; border-radius: 50%; background: #E8833A; margin-left: auto; flex: none; }
+
+		.m-tabbar {
+			display: grid; grid-template-columns: repeat(4, 1fr);
+			position: fixed; left: 0; right: 0; bottom: 0; height: 60px; z-index: 20;
+			background: #fff; border-top: 1px solid #E5E7EB;
+		}
+		.m-tab {
+			display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+			background: none; border: 0; cursor: pointer; color: #9AA3AF; font-size: 10px; font-weight: 500;
+		}
+		.m-tab svg { width: 20px; height: 20px; }
+		.m-tab.is-on { color: #01393A; }
+
 		.content { padding: 14px; gap: 14px; }
 		.card-header { height: 52px; padding: 0 14px; }
 		.metrics { flex-wrap: wrap; }
 		.metric { flex: 1 0 45%; padding: 12px 14px; border-right: none; }
-		.map-body { height: 320px; }
-		#map { height: 320px; }
+		.map-body, #map { height: 300px; }
 		.charts-row { flex-direction: column; padding: 14px; gap: 14px; }
-		.chart-card { height: 260px; }
-		.nav-strip { transform: scale(0.85); transform-origin: top right; }
+		.chart-card { height: 240px; }
+		.nav-strip { transform: scale(.85); transform-origin: top right; }
 	}
 </style>
 </head>
 <body>
+	<!-- Mobile app chrome. The desktop rail is a single exported SVG, so the
+	     phone version is authored here rather than reflowed: a compact app bar
+	     with the project switcher, and a bottom tab bar for the sections that
+	     matter on a phone. Both are hidden above 700px. -->
+	<header class="m-appbar">
+		<button class="m-burger" aria-label="Menu"><span></span><span></span><span></span></button>
+		<div class="m-title">
+			<span class="m-eyebrow">Project Developer</span>
+			<strong>Terra Viva</strong>
+		</div>
+		<span class="m-avatar" aria-hidden="true"></span>
+	</header>
+
 <div class="app-shell">
 	<div class="sidebar">
 <svg width="291" height="1093" viewBox="0 0 291 1093" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1035,5 +1071,13 @@ try {
 <script src="/components/chart-tooltip/chart-tooltip.js?v=4" defer></script>
 <script src="/components/chart-card/chart-card.js?v=4" defer></script>
 <script src="/components/stacked-area/stacked-area.js?v=4" defer></script>
+
+	<nav class="m-tabbar" aria-label="Sections">
+		<button class="m-tab is-on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+		<button class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg><span>Projects</span></button>
+		<button class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Analysis</span></button>
+		<button class="m-tab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg><span>Data</span></button>
+	</nav>
+
 </body>
 </html>

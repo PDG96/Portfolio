@@ -183,7 +183,11 @@
 
  .wrap {
  width: 100%;
- max-width: clamp(72rem, 90vw, 110rem); /* 1152 → 90vw → 1760, grows on wide screens, capped before getting silly */
+ /* No cap: the page runs to the gutter, the same edge the case studies
+    keep. The old clamp topped out at 1760px, so on a wide display the
+    landing sat in a centred column while a case study ran nearly to the
+    window edge — the two read as different sites. */
+ max-width: none;
  margin: 0 auto;
  padding: 0 var(--sheet-gutter);
  }
