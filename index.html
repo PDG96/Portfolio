@@ -211,7 +211,6 @@
  }
  body,
  .hero,
- .about,
  .contact {
  background-image: var(--grain);
  background-size: 200px;
@@ -741,25 +740,21 @@
  .case-link--muted { color: var(--text-3); }
  .case-link--muted:hover { gap: 0.5rem; }
 
- /* ====== ABOUT ("Let's connect") ======
-    One centred column, no portrait. Measured off the mockup: the block runs
-    ~59% of the measure and sits centred on both axes. */
- .about {
+ /* ====== GET IN TOUCH ("Let's connect") ======
+    One centred column: a greeting, three paragraphs, the ask in italic, and
+    three cards that go somewhere. The contact form and the dot-circle that
+    used to fill this view are gone; email, LinkedIn and CV are the routes. */
+ .contact {
  padding: var(--view-pad-top) 0 var(--seg-band);
- /* The page ground, like every other view. It sat on --bg-alt to lift a
-    photo off the page; with the portrait gone there is nothing to lift,
-    and the band behind the mobile pill is drawn in --bg. */
  background: var(--bg);
  min-height: 100svh;
  display: flex;
  align-items: safe center;
  }
 
- .connect {
- width: 100%;
- max-width: 52rem;
- margin-inline: auto;
- }
+ /* No measure of its own: --measure is the width Work computes, so the
+    column here is always exactly as wide as the case cards next door. */
+ .connect { width: 100%; }
  .connect h2 {
  font-size: clamp(1.5rem, 2.5vw, 2rem);
  font-weight: 400;
@@ -834,178 +829,6 @@
  }
  .fact-card--link:hover .fact-value.fact-value { text-decoration-thickness: 2px; }
 
- /* ====== CONTACT ====== */
- /* Held to one screen like the other views, on the same budget: the nav
-    above, the segmented control below. */
- .contact {
- padding: var(--view-pad-top) 0 var(--seg-band);
- background: var(--bg);
- color: var(--text);
- display: flex;
- align-items: center;
- min-height: 100svh;
- }
-
- .contact-layout {
- display: grid;
- grid-template-columns: 1fr;
- gap: 3rem;
- }
- @media (min-width: 900px) {
- .contact-layout {
-   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-   /* Same gutter About uses, so both views split the measure identically. */
-   gap: 80px;
-   align-items: center;
- }
- }
-
- /* The copy introduces the fields, so it sits directly above them and on
-    their left edge rather than in a column of its own. */
- /* No max-width of its own: the column is the measure's half, the same
-    648px the About bio column runs at. It was capped at 34rem, which left
-    Get in touch a hundred pixels narrower than About at every width. */
- .contact-left {
- display: flex;
- flex-direction: column;
- }
- /* The same step the About column puts between its blocks. */
- .contact-intro {
- display: flex;
- flex-direction: column;
- gap: clamp(1.5rem, 2.5vw, 2rem);
- margin-bottom: clamp(1.5rem, 2.5vw, 2rem);
- }
-
- /* Right half, centred on the same band as the copy and the form. */
- .contact-canvas {
- position: relative;
- width: 100%;
- max-width: 520px;
- aspect-ratio: 1;
- margin: 0 auto;
- }
- .contact-canvas canvas {
- position: absolute;
- inset: 0;
- width: 100%;
- height: 100%;
- }
- @media (max-width: 899px) {
- .contact-canvas { display: none; }
- }
-
- /* Was running at .section-header h2's display size (up to 2.75rem) while
-    About's lead sits at 1.75rem, so the two views opened at different
-    volumes. One scale across both now. */
- .contact-left h2 {
- text-wrap: balance;
- color: var(--text);
- font-size: clamp(1.5rem, 2.5vw, 2rem);
- font-weight: 400;
- letter-spacing: -0.01em;
- line-height: 1.3;
- max-width: 38ch;
- }
- /* Body paragraph styling, scoped to NOT touch .section-label which is also a <p>. */
- .contact-left p:not(.section-label):not(.section-header-num) {
- font-size: 1.0625rem;
- color: var(--text-2);
- line-height: 1.7;
- max-width: 440px;
- margin-bottom: 0;
- }
- .contact-email {
- font-family: var(--mono);
- font-size: 0.875rem;
- font-weight: 500;
- color: var(--cta);
- display: inline-flex;
- align-items: center;
- gap: 0.5rem;
- margin-bottom: 1.5rem;
- transition: opacity 0.3s;
- }
- .contact-email:hover { opacity: 0.7; }
- .contact-calendly {
- display: inline-flex;
- }
-
- /* Contact form */
- .contact-form {
- display: flex;
- flex-direction: column;
- gap: 1.25rem;
- }
- .form-group {
- display: flex;
- flex-direction: column;
- gap: 0.5rem;
- }
- .form-group label {
- font-family: var(--mono);
- font-size: 0.625rem;
- font-weight: 500;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- color: var(--text-2);
- }
- .form-group input,
- .form-group textarea {
- font-family: var(--font);
- font-size: 1rem; /* 16px floor: iOS Safari zooms the viewport on focus below it */
- color: var(--text);
- /* Was a white-on-white wash in light mode — the field boundary vanished.
- Tokenized so the inputs read on either ground. */
- background: var(--surface);
- border: 1px solid var(--border);
- border-radius: 8px;
- padding: 0.875rem 1rem;
- transition: border-color 0.3s, background 0.3s;
- resize: vertical;
- }
- .form-group input::placeholder,
- .form-group textarea::placeholder {
- color: var(--text-3);
- }
- .form-group input:focus,
- .form-group textarea:focus {
- outline: none;
- border-color: var(--cta);
- background: var(--bg-alt);
- }
- .form-group textarea { min-height: 120px; }
-
- /* Honeypot, kept in the DOM for bots but invisible to humans */
- .form-honeypot {
- position: absolute;
- left: -10000px;
- width: 1px;
- height: 1px;
- overflow: hidden;
- opacity: 0;
- pointer-events: none;
- }
-
- /* Inline status message under the submit button */
- .form-status {
- font-family: var(--mono);
- font-size: 0.75rem;
- letter-spacing: 0.04em;
- margin-top: 0.25rem;
- min-height: 1.1em;
- color: var(--text-2);
- opacity: 0;
- transition: opacity 0.25s var(--ease);
- }
- .form-status.is-visible { opacity: 1; }
- .form-status.is-success { color: var(--cta); }
- .form-status.is-error   { color: #f08a8a; }
-
- .contact-form .btn-primary[disabled] {
- opacity: 0.55;
- cursor: progress;
- }
 
  .contact .btn-primary {
  background: var(--text);
@@ -1267,8 +1090,8 @@
  </div>
  </section>
 
- <!-- ABOUT ("Let's connect": one centred column, no portrait) -->
- <section class="about view" id="about">
+ <!-- GET IN TOUCH ("Let's connect": one centred column) -->
+ <section class="contact view" id="contact">
  <div class="wrap">
  <div class="connect">
  <h2 class="r" data-i18n="connect_h">Let's connect :)</h2>
@@ -1295,56 +1118,9 @@
  </div>
  </section>
 
- <!-- CONTACT -->
- <section class="contact view" id="contact">
- <div class="wrap">
- <div class="contact-layout">
- <div class="contact-left">
- <div class="contact-intro">
- <div class="section-header r">
- <div>
- <h2 data-i18n="contact_heading">Let's build something<br>people understand.</h2>
- </div>
- </div>
- <p class="r" data-i18n="contact_p">Have a SaaS product that needs clarity? A complex interface that users struggle with? I'd love to hear about it.</p>
- </div>
- <form class="contact-form r" id="contactForm" novalidate>
- <div class="form-group">
- <label for="name" data-i18n="form_name">Name</label>
- <input type="text" id="name" name="name" placeholder="Your name" data-i18n-placeholder="form_name_ph" required>
- </div>
- <div class="form-group">
- <label for="email" data-i18n="form_email">Email</label>
- <input type="email" id="email" name="email" placeholder="you@company.com" required>
- </div>
- <div class="form-group">
- <label for="message" data-i18n="form_message">Message</label>
- <textarea id="message" name="message" placeholder="Tell me about your project..." data-i18n-placeholder="form_msg_ph" required></textarea>
- </div>
- <!-- Honeypot, invisible to humans, irresistible to bots -->
- <div class="form-honeypot" aria-hidden="true">
- <label for="website">Website</label>
- <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
- </div>
- <button type="submit" class="btn btn-primary" id="contactSubmit" data-i18n="form_send">Send message</button>
- <p class="form-status" id="contactStatus" role="status" aria-live="polite"></p>
- </form>
- </div>
- <div class="contact-canvas r" aria-hidden="true">
- <canvas id="swarmCanvas"></canvas>
- </div>
- </div>
- </section>
-
- <!-- FOOTER -->
-
- <!-- Navigation moves out of the header and into a segmented control at the
-      foot of the page. Only one section is on screen at a time, so this is a
-      view switcher rather than a set of scroll anchors. -->
  <nav class="seg" role="tablist" aria-label="Sections">
    <button class="seg-btn is-on" role="tab" aria-selected="true" data-view="hero" data-i18n="seg_landing">Landing</button>
    <button class="seg-btn" role="tab" aria-selected="false" data-view="work" data-i18n="nav_work">Work</button>
-   <button class="seg-btn" role="tab" aria-selected="false" data-view="about" data-i18n="nav_about">About me</button>
    <button class="seg-btn" role="tab" aria-selected="false" data-view="contact" data-i18n="seg_contact">Get in touch</button>
  </nav>
 
@@ -1359,7 +1135,7 @@
  connect_p3:"I've worked across climate tech, fintech, and enterprise platforms, partnering closely with product and engineering teams from discovery to implementation.",
  connect_p4:"Interested in working together, discussing an opportunity, or just saying hello? I'd love to hear from you.",
  fact_mail_l:"Reach me at",
- nav_work:"Work", nav_about:"About me", nav_contact:"Contact",
+ nav_work:"Work", nav_contact:"Contact",
  hero_eyebrow:"Senior Product Designer",
  hero_h1:"I turn dense, regulated products<br>into <em>interfaces people trust</em>.",
     m1:"UI/UX Design", m2:"Design Systems", m3:"Product Strategy", m4:"User Research", m5:"SaaS", m6:"B2B Platforms",
@@ -1385,19 +1161,8 @@
  about_label:"About",
  about_photo_ph:"Replace with portrait",
  fact_li_l:"LinkedIn", fact_cv_l:"CV", fact_cv_v:"Download PDF",
- contact_label:"Get in touch",
- contact_heading:"Let's build something<br>people understand.",
- contact_p:"Have a SaaS product that needs clarity? A complex interface that users struggle with? I'd love to hear about it.",
  contact_email:"hello@yourname.com",
  contact_cal:"Book a call ↗",
- form_name:"Name",
- form_email:"Email",
- form_message:"Message",
- form_send:"Send message",
- form_sending:"Sending…",
- form_success:"Thanks, your message just landed in my inbox.",
- form_error:"Something went sideways. Try again, or email pietragottardo@gmail.com.",
- form_missing:"Please fill in name, email, and message.",
  },
  pt: {
  connect_h:"Vamos conversar :)",
@@ -1406,7 +1171,7 @@
  connect_p3:"Já trabalhei em climate tech, fintech e plataformas enterprise, lado a lado com times de produto e engenharia, da descoberta à implementação.",
  connect_p4:"Quer trabalhar junto, conversar sobre uma oportunidade ou só dizer oi? Vou adorar te ouvir.",
  fact_mail_l:"Fale comigo em",
- nav_work:"Projetos", nav_about:"Sobre mim", nav_contact:"Contato",
+ nav_work:"Projetos", nav_contact:"Contato",
  hero_eyebrow:"Senior Product Designer",
  hero_h1:"Eu transformo produtos densos e regulados<br>em <em>interfaces em que as pessoas confiam</em>.",
     m1:"UI/UX Design", m2:"Design Systems", m3:"Estratégia de Produto", m4:"Pesquisa com Usuários", m5:"SaaS", m6:"Plataformas B2B",
@@ -1432,19 +1197,8 @@
  about_label:"Sobre",
  about_photo_ph:"Substituir pelo retrato",
  fact_li_l:"LinkedIn", fact_cv_l:"CV", fact_cv_v:"Baixar PDF",
- contact_label:"Entre em contato",
- contact_heading:"Vamos construir algo<br>que as pessoas entendam.",
- contact_p:"Tem um produto SaaS que precisa de clareza? Uma interface complexa que os usuários não entendem? Quero ouvir sobre.",
  contact_email:"hello@yourname.com",
  contact_cal:"Agendar conversa ↗",
- form_name:"Nome",
- form_email:"Email",
- form_message:"Mensagem",
- form_send:"Enviar mensagem",
- form_sending:"Enviando…",
- form_success:"Valeu, sua mensagem chegou na minha caixa.",
- form_error:"Algo deu errado. Tenta de novo, ou manda direto pra pietragottardo@gmail.com.",
- form_missing:"Preencha nome, email e mensagem.",
  }
  };
 
@@ -1508,75 +1262,7 @@
  );
  setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
 
- // Contact form, POSTs to the Cloudflare Pages Function at /contact,
- // which relays via MailChannels. No mail client opens.
- const contactForm = document.getElementById('contactForm');
- if (contactForm) {
- const submitBtn = document.getElementById('contactSubmit');
- const statusEl = document.getElementById('contactStatus');
- const labelDefault = () => T[lang].form_send;
- const setStatus = (text, kind) => {
- statusEl.textContent = text;
- statusEl.classList.remove('is-success', 'is-error');
- if (kind) statusEl.classList.add(kind === 'ok' ? 'is-success' : 'is-error');
- statusEl.classList.add('is-visible');
- };
- const clearStatus = () => {
- statusEl.classList.remove('is-visible', 'is-success', 'is-error');
- };
- contactForm.addEventListener('submit', async (e) => {
- e.preventDefault();
- const name    = (document.getElementById('name').value || '').trim();
- const email   = (document.getElementById('email').value || '').trim();
- const message = (document.getElementById('message').value || '').trim();
- const website = (document.getElementById('website').value || '').trim();
- if (!name || !email || !message) {
- setStatus(T[lang].form_missing, 'err');
- return;
- }
- submitBtn.disabled = true;
- submitBtn.textContent = T[lang].form_sending;
- clearStatus();
- try {
- const resp = await fetch('/contact', {
- method: 'POST',
- headers: { 'content-type': 'application/json' },
- body: JSON.stringify({ name, email, message, website })
- });
- const data = await resp.json().catch(() => ({}));
- if (resp.ok && data.ok) {
- contactForm.reset();
- setStatus(T[lang].form_success, 'ok');
- } else {
- setStatus(T[lang].form_error, 'err');
- }
- } catch (err) {
- setStatus(T[lang].form_error, 'err');
- } finally {
- submitBtn.disabled = false;
- submitBtn.textContent = labelDefault();
- }
- });
- }
-
- // Nav scroll. The page is dark-native, so over-dark is the norm — but it
- // has to come off when the light theme is on, or the nav keeps painting
- // light text on a light ground.
- const nav = document.querySelector('.nav');
- function updateNav() {
- nav.classList.toggle('scrolled', scrollY > 10);
- nav.classList.toggle('over-dark',
- document.documentElement.getAttribute('data-theme') !== 'light');
- }
- window.addEventListener('scroll', updateNav, { passive: true });
- window.addEventListener('resize', updateNav, { passive: true });
- window.addEventListener('themechange', updateNav);
- updateNav();
-
- /* Segmented navigation, in place of the header links and the burger.
-    Switching views instead of scrolling means the reveal observer has to be
-    re-run over whatever just appeared: those elements were display:none the
-    first time it looked at them, so they never intersected anything. */
+ // ====== VIEW SWITCHER ======
  (() => {
  const btns = [...document.querySelectorAll('.seg-btn')];
  const views = [...document.querySelectorAll('.view')];
@@ -1635,163 +1321,17 @@
  show(fromHash());
  })();
 
- // ====== CONTACT CIRCLE canvas (chaos -> circle -> scatter) ======
- // Restored from the old CTC section: same dot swarm, now carrying the
- // left column of Get in touch.
- (() => {
- const canvas = document.getElementById('swarmCanvas');
- if (!canvas) return;
- const ctx = canvas.getContext('2d');
- const N = 90;
- const DOT_SIZE = 2;
- let W, H, dots, running = false;
-
- function resize() {
- const rect = canvas.parentElement.getBoundingClientRect();
- // Same guard the hero canvas carries: a hidden view measures 0x0, and
- // sizing to that leaves an empty canvas behind.
- if (!rect.width || !rect.height) return false;
- const dpr = Math.min(window.devicePixelRatio || 1, 2);
- W = rect.width; H = rect.height;
- canvas.width = W * dpr; canvas.height = H * dpr;
- canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
- ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
- return true;
+ // Nav scroll. The page is dark-native, so over-dark is the norm — but it
+ // has to come off when the light theme is on, or the nav keeps painting
+ // light text on a light ground.
+ const nav = document.querySelector('.nav');
+ function updateNav() {
+ nav.classList.toggle('scrolled', scrollY > 10);
+ nav.classList.toggle('over-dark',
+ document.documentElement.getAttribute('data-theme') !== 'light');
  }
-
- function init() {
- if (!resize()) return false;
- const circleCx = W * 0.5;
- const circleCy = H * 0.5;
- const radius = Math.min(W, H) * 0.4;
- dots = [];
- for (let i = 0; i < N; i++) {
- dots.push({
- baseAngle: (i / N) * Math.PI * 2,
- circleCx, circleCy, radius,
- x: Math.random() * W,
- y: Math.random() * H,
- chaosVx: (Math.random() - 0.5) * 1.4,
- chaosVy: (Math.random() - 0.5) * 1.4,
- });
- }
- return true;
- }
-
- // Same cache as the hero canvas: getComputedStyle per dot per frame is
- // not free, and the value only changes when the theme does.
- let dotCache = '', dotTheme = null, dotAlpha = 1, lineAlpha = 0.08;
- function readDotTokens() {
- const t = document.documentElement.getAttribute('data-theme');
- if (t !== dotTheme) {
- dotTheme = t;
- const cs = getComputedStyle(document.documentElement);
- dotCache = cs.getPropertyValue('--dot-rgb').trim() || '247,253,185';
- dotAlpha = parseFloat(cs.getPropertyValue('--dot-alpha')) || 1;
- lineAlpha = parseFloat(cs.getPropertyValue('--line-alpha')) || 0.08;
- }
- }
- function dotRGB() { readDotTokens(); return dotCache; }
- function dotA(a) { readDotTokens(); return Math.min(1, a * dotAlpha); }
-
- const GATHER = 3000, SPIN = 4000, SCATTER = 3200;
- const TOTAL = GATHER + SPIN + SCATTER;
- const smoothstep = x => { const c = Math.max(0, Math.min(1, x)); return c * c * (3 - 2 * c); };
-
- let mouseX = -9999, mouseY = -9999;
- const REPEL_RADIUS = 100, REPEL_FORCE = 25;
- canvas.addEventListener('pointermove', e => {
- const rect = canvas.getBoundingClientRect();
- mouseX = e.clientX - rect.left;
- mouseY = e.clientY - rect.top;
- });
- canvas.addEventListener('pointerleave', () => { mouseX = -9999; mouseY = -9999; });
- canvas.style.pointerEvents = 'auto';
-
- function draw(time) {
- if (!running) return;
- ctx.clearRect(0, 0, W, H);
- const phase = time % TOTAL;
-
- let formProg, spinAngle;
- if (phase < GATHER) {
- formProg = smoothstep(phase / GATHER);
- spinAngle = 0;
- } else if (phase < GATHER + SPIN) {
- formProg = 1;
- spinAngle = smoothstep((phase - GATHER) / SPIN) * Math.PI * 2;
- } else {
- formProg = 1 - smoothstep((phase - GATHER - SPIN) / SCATTER);
- spinAngle = Math.PI * 2;
- }
-
- for (const d of dots) {
- d.x += d.chaosVx * (1 - formProg);
- d.y += d.chaosVy * (1 - formProg);
- if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
- if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
-
- const cAngle = d.baseAngle + spinAngle;
- const circX = d.circleCx + Math.cos(cAngle) * d.radius;
- const circY = d.circleCy + Math.sin(cAngle) * d.radius;
-
- let dx = d.x + (circX - d.x) * formProg;
- let dy = d.y + (circY - d.y) * formProg;
-
- const mdx = dx - mouseX, mdy = dy - mouseY;
- const distSq = mdx * mdx + mdy * mdy;
- if (distSq < REPEL_RADIUS * REPEL_RADIUS) {
- const dist = Math.sqrt(distSq) || 1;
- const falloff = 1 - dist / REPEL_RADIUS;
- const force = falloff * falloff * REPEL_FORCE;
- dx += (mdx / dist) * force;
- dy += (mdy / dist) * force;
- }
-
- d.drawX = dx; d.drawY = dy;
- d.drawAlpha = 0.12 + formProg * 0.38;
- }
-
- for (const d of dots) {
- ctx.beginPath();
- ctx.arc(d.drawX, d.drawY, DOT_SIZE, 0, Math.PI * 2);
- ctx.fillStyle = `rgba(${dotRGB()},${dotA(d.drawAlpha)})`;
- ctx.fill();
- }
-
- requestAnimationFrame(draw);
- }
-
- // The views are display:none until selected, so the parent has no box to
- // measure until Contact is on screen — re-init on show rather than at load.
- const ctcObs = new IntersectionObserver(([entry]) => {
- if (entry.isIntersecting && !running) {
- init();
- running = true;
- requestAnimationFrame(draw);
- } else if (!entry.isIntersecting) {
- running = false;
- }
- }, { threshold: 0.05 });
- ctcObs.observe(canvas.parentElement);
-
- // Driven by the view switcher, with the observer left in place only to
- // idle the loop when the section is scrolled out of frame.
- const host = canvas.closest('.view');
- const wake = () => {
- if (running) return;
- if (!init()) return;
- running = true;
- requestAnimationFrame(draw);
- };
- document.addEventListener('view:shown', (e) => {
- if (host && e.detail.id !== host.id) { running = false; return; }
- wake();
- });
-
-
- window.addEventListener('resize', () => { if (running) init(); }, { passive: true });
- })();
+ window.addEventListener('scroll', updateNav, { passive: true });
+ window.addEventListener('resize', updateNav, { passive: true });
 
  // Reveal, global observer
  const obs = new IntersectionObserver(es =>
