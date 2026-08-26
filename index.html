@@ -741,130 +741,61 @@
  .case-link--muted { color: var(--text-3); }
  .case-link--muted:hover { gap: 0.5rem; }
 
- /* ====== ABOUT (editorial) ====== */
+ /* ====== ABOUT ("Let's connect") ======
+    One centred column, no portrait. Measured off the mockup: the block runs
+    ~59% of the measure and sits centred on both axes. */
  .about {
  padding: var(--view-pad-top) 0 var(--seg-band);
- background: var(--bg-alt);
+ /* The page ground, like every other view. It sat on --bg-alt to lift a
+    photo off the page; with the portrait gone there is nothing to lift,
+    and the band behind the mobile pill is drawn in --bg. */
+ background: var(--bg);
  min-height: 100svh;
  display: flex;
- /* Fits the budget or scrolls: "safe" keeps the top reachable when the
-    content is taller than one screen, which plain centring does not. */
  align-items: safe center;
  }
 
- /* Bio + photo grid, photo on the left, text on the right at the same height. */
- .about-main {
- display: grid;
- grid-template-columns: 1fr;
- gap: 2.5rem;
- align-items: stretch;
- }
- @media (min-width: 900px) {
- .about-main {
- grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
- gap: 80px;
- }
- }
- .about-bio-col {
- display: flex;
- flex-direction: column;
- gap: clamp(1.5rem, 2.5vw, 2rem);
+ .connect {
  width: 100%;
+ max-width: 52rem;
+ margin-inline: auto;
  }
- .about-bio {
- max-width: none;
- width: 100%;
- }
- .about-photo {
- position: relative;
- width: 100%;
- height: 100%;
- align-self: stretch;
- min-height: 420px;
- border-radius: 16px;
- overflow: hidden;
- background: var(--surface);
- border: 1px solid var(--border);
- isolation: isolate;
- }
- .about-photo::before {
- content: '';
- position: absolute;
- inset: 0;
- background:
- radial-gradient(circle at 30% 25%, rgba(61, 90, 62, 0.18), transparent 60%),
- linear-gradient(160deg, #e8ede8 0%, #f3f1e6 60%, #ddd1b5 100%);
- z-index: 0;
- }
- .about-photo img {
- position: absolute;
- inset: 0;
- width: 100%;
- height: 100%;
- object-fit: cover;
- z-index: 1;
- display: block;
- }
- .about-photo .ph-caption {
- position: absolute;
- bottom: 1.25rem;
- left: 1.25rem;
- z-index: 2;
- display: flex;
- flex-direction: column;
- gap: 0.25rem;
- }
- .about-photo .ph-caption-label {
- font-family: var(--mono);
- font-size: 0.6875rem;
- font-weight: 500;
- letter-spacing: 0.16em;
- text-transform: uppercase;
- color: var(--text-3);
- }
- .about-photo .ph-caption-text {
- font-size: 0.9375rem;
- color: var(--text-2);
- }
- .about-bio .about-lead {
- /* "borders." was landing alone on its own line. balance evens the lines
-    out instead of filling the first one to the measure. */
- text-wrap: balance;
+ .connect h2 {
  font-size: clamp(1.5rem, 2.5vw, 2rem);
  font-weight: 400;
  letter-spacing: -0.01em;
  line-height: 1.3;
  color: var(--text);
  margin: 0 0 1.75rem;
- max-width: 38ch;
  }
- .about-bio p {
- font-size: 1.1875rem;
+ .connect p {
+ font-size: 1.0625rem;
  color: var(--text-2);
  line-height: 1.75;
- margin: 0 0 1.4rem;
+ margin: 0 0 1.15rem;
  }
- .about-bio p:last-of-type { margin-bottom: 0; }
- .about-bio p strong { color: var(--text); font-weight: 500; }
+ /* The ask, set apart from the three paragraphs that lead up to it. */
+ .connect-cta {
+ font-style: italic;
+ font-weight: 500;
+ color: var(--text) !important;
+ margin-top: 1.75rem !important;
+ }
+ .connect .facts-grid { margin-top: 2.5rem; }
 
- /* Facts grid, sits inside the bio column, 2x2 layout */
- .about-facts-row {
- padding-top: clamp(1.5rem, 2.5vw, 2rem);
- border-top: 1px solid var(--border);
- }
+ /* Three cards under the copy: reach me at, LinkedIn, CV. All three go
+    somewhere, so the value carries a link affordance. */
  .facts-grid {
  display: grid;
  grid-template-columns: 1fr;
  gap: 1rem;
  }
  @media (min-width: 640px) {
- .facts-grid { grid-template-columns: repeat(2, 1fr); }
- }
- @media (min-width: 900px) {
  .facts-grid { grid-template-columns: repeat(3, 1fr); }
  }
  .fact-card {
  position: relative;
+ display: block;
  padding: 1.15rem 1.25rem 1.25rem;
  background: transparent;
  border: 1px solid var(--border);
@@ -875,19 +806,6 @@
  border-color: var(--text-3);
  background: var(--surface);
  }
- /* Two of the six go somewhere. Same card, but the value carries a link
-    affordance so the difference is visible before the hover. */
- .fact-card--link { display: block; }
- /* .fact-card .fact-value sets --text at the same specificity further down,
-    so without the extra class here the later rule won and the links came
-    out the same colour as every other value. */
- .fact-card--link .fact-value.fact-value {
- color: var(--cta);
- text-decoration: underline;
- text-underline-offset: 3px;
- text-decoration-thickness: 1px;
- }
- .fact-card--link:hover .fact-value { text-decoration-thickness: 2px; }
  .fact-card .fact-label {
  font-family: var(--mono);
  font-size: 0.6875rem;
@@ -896,7 +814,7 @@
  text-transform: uppercase;
  color: var(--text-3);
  display: block;
- margin-bottom: 0.45rem;
+ margin-bottom: 0.5rem;
  }
  .fact-card .fact-value {
  font-size: 0.9375rem;
@@ -905,24 +823,16 @@
  letter-spacing: -0.003em;
  margin: 0;
  }
- .fact-status {
- display: inline-flex;
- align-items: center;
- gap: 0.5rem;
+ /* The colour has to outrank .fact-card .fact-value, which sits at the same
+    specificity — hence the doubled class. */
+ .fact-card--link .fact-value.fact-value {
+ color: var(--cta);
+ text-decoration: underline;
+ text-underline-offset: 3px;
+ text-decoration-thickness: 1px;
+ word-break: break-word;
  }
- .fact-status::before {
- content: '';
- width: 7px; height: 7px;
- background: #21a06a;
- border-radius: 50%;
- box-shadow: 0 0 0 0 rgba(33, 160, 106, 0.4);
- animation: about-pulse 2.2s infinite;
- }
- @keyframes about-pulse {
- 0% { box-shadow: 0 0 0 0 rgba(33, 160, 106, 0.5); }
- 70% { box-shadow: 0 0 0 8px rgba(33, 160, 106, 0); }
- 100% { box-shadow: 0 0 0 0 rgba(33, 160, 106, 0); }
- }
+ .fact-card--link:hover .fact-value.fact-value { text-decoration-thickness: 2px; }
 
  /* ====== CONTACT ====== */
  /* Held to one screen like the other views, on the same budget: the nav
@@ -1357,49 +1267,29 @@
  </div>
  </section>
 
- <!-- ABOUT (editorial layout, bio + horizontal facts row) -->
+ <!-- ABOUT ("Let's connect": one centred column, no portrait) -->
  <section class="about view" id="about">
  <div class="wrap">
- <div class="about-main">
- <div class="about-photo r">
- <img src="assets/pietra-portrait.png" alt="Portrait of Pietra Gottardo">
- </div>
- <div class="about-bio-col">
- <div class="about-bio">
- <p class="about-lead r" data-i18n="about_lead">Hey! I'm Pietra, I design solutions that work across borders.</p>
- <p class="r" data-i18n="about_p1">I started in graphic design, branding, editorial, industrial, before moving into digital product design. For the past four years I've been focused on SaaS, working with international teams that need to turn complex, regulated, multi-stakeholder domains into interfaces people can actually use.</p>
- <p class="r" data-i18n="about_p2">My work tends to live at the boundary between research, information architecture and the UI itself. I map ecosystems, draw service blueprints, design role-based sidebars, and ship the screens that come out the other end, often working alongside engineering as a product architect rather than handing files over a wall.</p>
- <p class="r" data-i18n="about_p3">I work in EN and PT-BR. Available for new engagements with startups that take their domain seriously.</p>
- </div>
+ <div class="connect">
+ <h2 class="r" data-i18n="connect_h">Let's connect :)</h2>
+ <p class="r" data-i18n="connect_p1">Hi, I'm Pietra, a Senior Product Designer with 5+ years of experience designing complex B2B SaaS products.</p>
+ <p class="r" data-i18n="connect_p2">I specialise in transforming dense workflows, data-heavy interfaces, and regulated domains into intuitive products through systems thinking, information architecture, and scalable design systems.</p>
+ <p class="r" data-i18n="connect_p3">I've worked across climate tech, fintech, and enterprise platforms, partnering closely with product and engineering teams from discovery to implementation.</p>
+ <p class="connect-cta r" data-i18n="connect_p4">Interested in working together, discussing an opportunity, or just saying hello? I'd love to hear from you.</p>
 
- <div class="about-facts-row">
  <div class="facts-grid r-stagger">
- <article class="fact-card r">
- <span class="fact-label" data-i18n="fact_based_l">Based</span>
- <p class="fact-value" data-i18n="fact_based_v">Remote · Brazil &amp; EU timezones</p>
- </article>
- <article class="fact-card r">
- <span class="fact-label" data-i18n="fact_lang_l">Languages</span>
- <p class="fact-value" data-i18n="fact_lang_v">EN · PT-BR</p>
- </article>
- <article class="fact-card r">
- <span class="fact-label" data-i18n="fact_work_l">Engagement</span>
- <p class="fact-value" data-i18n="fact_work_v">Embedded · specs, tokens, AI handoff</p>
- </article>
- <article class="fact-card r">
- <span class="fact-label" data-i18n="fact_now_l">Currently</span>
- <p class="fact-value"><span class="fact-status" data-i18n="fact_now_v">Available for new engagements</span></p>
- </article>
+ <a class="fact-card fact-card--link r" href="mailto:pietragottardo@gmail.com">
+ <span class="fact-label" data-i18n="fact_mail_l">Reach me at</span>
+ <p class="fact-value">pietragottardo@gmail.com</p>
+ </a>
  <a class="fact-card fact-card--link r" href="https://www.linkedin.com/in/pietragotardo/" target="_blank" rel="noopener">
  <span class="fact-label" data-i18n="fact_li_l">LinkedIn</span>
- <p class="fact-value" data-i18n="fact_li_v">/in/pietragotardo</p>
+ <p class="fact-value">/in/pietragotardo</p>
  </a>
  <a class="fact-card fact-card--link r" href="assets/pietra-gotardo-cv.pdf" download>
  <span class="fact-label" data-i18n="fact_cv_l">CV</span>
  <p class="fact-value" data-i18n="fact_cv_v">Download PDF</p>
  </a>
- </div>
- </div>
  </div>
  </div>
  </div>
@@ -1454,7 +1344,7 @@
  <nav class="seg" role="tablist" aria-label="Sections">
    <button class="seg-btn is-on" role="tab" aria-selected="true" data-view="hero" data-i18n="seg_landing">Landing</button>
    <button class="seg-btn" role="tab" aria-selected="false" data-view="work" data-i18n="nav_work">Work</button>
-   <button class="seg-btn" role="tab" aria-selected="false" data-view="about" data-i18n="nav_about">About</button>
+   <button class="seg-btn" role="tab" aria-selected="false" data-view="about" data-i18n="nav_about">About me</button>
    <button class="seg-btn" role="tab" aria-selected="false" data-view="contact" data-i18n="seg_contact">Get in touch</button>
  </nav>
 
@@ -1463,7 +1353,13 @@
  en: {
  seg_landing:"Landing",
  seg_contact:"Get in touch",
- nav_work:"Work", nav_about:"About", nav_contact:"Contact",
+ connect_h:"Let's connect :)",
+ connect_p1:"Hi, I'm Pietra, a Senior Product Designer with 5+ years of experience designing complex B2B SaaS products.",
+ connect_p2:"I specialise in transforming dense workflows, data-heavy interfaces, and regulated domains into intuitive products through systems thinking, information architecture, and scalable design systems.",
+ connect_p3:"I've worked across climate tech, fintech, and enterprise platforms, partnering closely with product and engineering teams from discovery to implementation.",
+ connect_p4:"Interested in working together, discussing an opportunity, or just saying hello? I'd love to hear from you.",
+ fact_mail_l:"Reach me at",
+ nav_work:"Work", nav_about:"About me", nav_contact:"Contact",
  hero_eyebrow:"Senior Product Designer",
  hero_h1:"I turn dense, regulated products<br>into <em>interfaces people trust</em>.",
     m1:"UI/UX Design", m2:"Design Systems", m3:"Product Strategy", m4:"User Research", m5:"SaaS", m6:"B2B Platforms",
@@ -1487,21 +1383,8 @@
  c4_l:"Read case study",
  c4_overlay:"Coming soon",
  about_label:"About",
- about_lead:"Hey! I'm Pietra, I design solutions that work across borders.",
- about_p1:"I started in graphic design, branding, editorial, industrial, before moving into digital product design. For the past four years I've been focused on SaaS, working with international teams that need to turn complex, regulated, multi-stakeholder domains into interfaces people can actually use.",
- about_p2:"My work tends to live at the boundary between research, information architecture and the UI itself. I map ecosystems, draw service blueprints, design role-based sidebars, and ship the screens that come out the other end, often working alongside engineering as a product architect rather than handing files over a wall.",
- about_p3:"I work in EN and PT-BR. Available for new engagements with startups that take their domain seriously.",
  about_photo_ph:"Replace with portrait",
- fact_based_l:"Based",
- fact_based_v:"Remote · Brazil & EU timezones",
- fact_lang_l:"Languages",
- fact_lang_v:"EN · PT-BR",
- fact_work_l:"Engagement",
- fact_work_v:"Embedded · specs, tokens, AI handoff",
- fact_now_l:"Currently",
- fact_now_v:"Available for new engagements",
- fact_li_l:"LinkedIn", fact_li_v:"/in/pietragotardo",
- fact_cv_l:"CV", fact_cv_v:"Download PDF",
+ fact_li_l:"LinkedIn", fact_cv_l:"CV", fact_cv_v:"Download PDF",
  contact_label:"Get in touch",
  contact_heading:"Let's build something<br>people understand.",
  contact_p:"Have a SaaS product that needs clarity? A complex interface that users struggle with? I'd love to hear about it.",
@@ -1517,7 +1400,13 @@
  form_missing:"Please fill in name, email, and message.",
  },
  pt: {
- nav_work:"Projetos", nav_about:"Sobre", nav_contact:"Contato",
+ connect_h:"Vamos conversar :)",
+ connect_p1:"Oi, eu sou a Pietra, Senior Product Designer com mais de 5 anos desenhando produtos B2B SaaS complexos.",
+ connect_p2:"Me especializei em transformar fluxos densos, interfaces cheias de dados e domínios regulados em produtos intuitivos, com systems thinking, arquitetura de informação e design systems escaláveis.",
+ connect_p3:"Já trabalhei em climate tech, fintech e plataformas enterprise, lado a lado com times de produto e engenharia, da descoberta à implementação.",
+ connect_p4:"Quer trabalhar junto, conversar sobre uma oportunidade ou só dizer oi? Vou adorar te ouvir.",
+ fact_mail_l:"Fale comigo em",
+ nav_work:"Projetos", nav_about:"Sobre mim", nav_contact:"Contato",
  hero_eyebrow:"Senior Product Designer",
  hero_h1:"Eu transformo produtos densos e regulados<br>em <em>interfaces em que as pessoas confiam</em>.",
     m1:"UI/UX Design", m2:"Design Systems", m3:"Estratégia de Produto", m4:"Pesquisa com Usuários", m5:"SaaS", m6:"Plataformas B2B",
@@ -1541,21 +1430,8 @@
  c4_l:"Ler case study",
  c4_overlay:"Em breve",
  about_label:"Sobre",
- about_lead:"Oi! Eu sou a Pietra, desenho soluções que funcionam sem fronteiras.",
- about_p1:"Comecei em design gráfico, branding, editorial, industrial, antes de migrar pro design de produto digital. Nos últimos quatro anos foquei em SaaS, trabalhando com times internacionais que precisam transformar domínios complexos, regulados e multi-stakeholder em interfaces que as pessoas realmente conseguem usar.",
- about_p2:"Meu trabalho vive na fronteira entre pesquisa, arquitetura da informação e a própria UI. Mapeio ecossistemas, desenho service blueprints, projeto sidebars baseadas em papel, e entrego as telas que saem do outro lado, frequentemente trabalhando lado a lado com engenharia como product architect, em vez de jogar arquivos por cima do muro.",
- about_p3:"Trabalho em EN e PT-BR. Disponível pra novos engajamentos com startups que levam o domínio delas a sério.",
  about_photo_ph:"Substituir pelo retrato",
- fact_based_l:"Base",
- fact_based_v:"Remoto · Fusos do Brasil & Europa",
- fact_lang_l:"Idiomas",
- fact_lang_v:"EN · PT-BR",
- fact_work_l:"Engajamento",
- fact_work_v:"Embutida · specs, tokens, handoff com IA",
- fact_now_l:"Agora",
- fact_now_v:"Disponível pra novos engajamentos",
- fact_li_l:"LinkedIn", fact_li_v:"/in/pietragotardo",
- fact_cv_l:"CV", fact_cv_v:"Baixar PDF",
+ fact_li_l:"LinkedIn", fact_cv_l:"CV", fact_cv_v:"Baixar PDF",
  contact_label:"Entre em contato",
  contact_heading:"Vamos construir algo<br>que as pessoas entendam.",
  contact_p:"Tem um produto SaaS que precisa de clareza? Uma interface complexa que os usuários não entendem? Quero ouvir sobre.",
