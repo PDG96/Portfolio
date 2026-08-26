@@ -66,6 +66,15 @@
  --dot-rgb: 142, 196, 138;
  /* Card CTA. Pale yellow only works on the dark card. */
  --cta: var(--accent-yellow);
+ /* Canvas strength, per theme. A light mark on a dark ground carries at a
+    low alpha; the same alpha of a dark mark on paper barely registers, so
+    the light theme needs more of both. --dot-alpha multiplies the per-dot
+    alpha, --line-alpha is the ceiling for the threads between them. */
+ --dot-alpha: 1;
+ --line-alpha: 0.08;
+
+ --seg-on-bg: var(--gray-true-25);
+ --seg-on-fg: var(--gray-true-900);
 
  /* Vertical rhythm */
  /* One side spacing for the whole site. The case studies moved to this
@@ -84,12 +93,12 @@
 
       nav band = edge (32) + header row (24) + edge (32) = 88
       content top    = nav band (88) + grid gap (24)      = 112
-      content bottom = edge (32) + pill (32) + edge (32)  = 96
+      content bottom = edge (32) + pill (40) + edge (32)  = 104
 
     So there is one number to change, not six. */
  --edge: 32px;
  --header-h: 24px;   /* the logo / theme-toggle row itself */
- --seg-h: 32px;      /* the segmented pill itself, as drawn */
+ --seg-h: 40px;      /* the segmented pill itself */
  --nav-h: calc(var(--edge) * 2 + var(--header-h));   /* 88: header sits 32 in */
 
  --page-gutter: var(--edge);
@@ -153,9 +162,19 @@
         clear the threshold, give it its own token at #AA4E0E (5.29:1, same
         family) rather than darkening the dots. */
         --dot-rgb: 255, 122, 69;
+        /* 1.6 and 0.145 are what it takes to match the dark theme's
+           presence: at parity the threads read 1.14:1 against their ground
+           in both, where the literal 0.08 gave the light one only 1.08. */
+        --dot-alpha: 1.6;
+        --line-alpha: 0.145;
+        --seg-on-bg: #2e2e2e;
+        --seg-on-fg: #fbfaf8;
  /* Same hue as the brand yellow (65deg), darkened until it reads on a
         light ground: 4.7:1 even on the tinted card. The literal #f7fdb9 sits at 1.04:1 there. */
-        --cta: #6b7310;
+        /* Same family as the dots, darkened until it holds as text: 5.29:1
+           on --bg. Was an olive #6b7310, which left the light theme with
+           two unrelated accents — coral dots, olive links and focus rings. */
+        --cta: #AA4E0E;
  --accent-glow: rgba(61,90,62,0.10);
  }
 
@@ -808,6 +827,9 @@
  color: var(--text-2);
  }
  .about-bio .about-lead {
+ /* "borders." was landing alone on its own line. balance evens the lines
+    out instead of filling the first one to the measure. */
+ text-wrap: balance;
  font-size: clamp(1.375rem, 2.2vw, 1.75rem);
  font-weight: 400;
  letter-spacing: -0.01em;
@@ -856,7 +878,10 @@
  /* Two of the six go somewhere. Same card, but the value carries a link
     affordance so the difference is visible before the hover. */
  .fact-card--link { display: block; }
- .fact-card--link .fact-value {
+ /* .fact-card .fact-value sets --text at the same specificity further down,
+    so without the extra class here the later rule won and the links came
+    out the same colour as every other value. */
+ .fact-card--link .fact-value.fact-value {
  color: var(--cta);
  text-decoration: underline;
  text-underline-offset: 3px;
@@ -931,7 +956,13 @@
  flex-direction: column;
  max-width: 34rem;
  }
- .contact-intro { margin-bottom: 2.5rem; }
+ /* The same step the About column puts between its blocks. */
+ .contact-intro {
+ display: flex;
+ flex-direction: column;
+ gap: clamp(1.5rem, 2.5vw, 2rem);
+ margin-bottom: clamp(1.5rem, 2.5vw, 2rem);
+ }
 
  /* Right half, centred on the same band as the copy and the form. */
  .contact-canvas {
@@ -951,11 +982,23 @@
  .contact-canvas { display: none; }
  }
 
- /* Inherits size/weight from .section-header h2; just sets dark-section colour */
- .contact-left h2 { color: var(--text); }
+ /* Was running at .section-header h2's display size (up to 2.75rem) while
+    About's lead sits at 1.75rem, so the two views opened at different
+    volumes. One scale across both now. */
+ .contact-left h2 {
+ text-wrap: balance;
+ color: var(--text);
+ font-size: clamp(1.375rem, 2.2vw, 1.75rem);
+ font-weight: 400;
+ letter-spacing: -0.01em;
+ line-height: 1.3;
+ /* The same measure the About lead runs at, so the two views open on one
+    column width as well as one type size. */
+ max-width: 38ch;
+ }
  /* Body paragraph styling, scoped to NOT touch .section-label which is also a <p>. */
  .contact-left p:not(.section-label):not(.section-header-num) {
- font-size: 0.9375rem;
+ font-size: 1.0625rem;
  color: var(--text-2);
  line-height: 1.7;
  max-width: 440px;
@@ -1172,22 +1215,24 @@
    background: transparent;
    color: var(--text);
    font-family: var(--font);
-   font-size: 0.8125rem;
+   font-size: 0.875rem;
    font-weight: 500;
    letter-spacing: -0.005em;
    display: inline-flex;
    align-items: center;
    height: calc(var(--seg-h) - 8px);
-   padding: 0 0.95rem;
+   padding: 0 1.15rem;
    border-radius: 999px;
    white-space: nowrap;
    transition: background 0.3s var(--ease), color 0.3s var(--ease);
  }
  .seg-btn:not(.is-on):hover { background: rgba(255, 255, 255, 0.08); }
  [data-theme="light"] .seg-btn:not(.is-on):hover { background: rgba(20, 20, 20, 0.06); }
+ /* A dark grey, not the near-black --text: at this size a flat #141414
+    chip reads as a hole punched in the pill. */
  .seg-btn.is-on {
-   background: var(--text);
-   color: var(--bg);
+   background: var(--seg-on-bg);
+   color: var(--seg-on-fg);
  }
 
  /* Only the selected section is in the document. The others are removed
@@ -1197,7 +1242,39 @@
     content vertically inside the budget, and display: block here quietly
     cancelled that. It showed up first on the hero, whose text sat at the
     top, and again on Work once the grid stopped filling the full height. */
- .view.is-on { display: flex; }
+ .view.is-on,
+ .view.is-leaving { display: flex; }
+
+ /* ====== VIEW TRANSITION ======
+    Switching views was a bare display swap: one screen replaced another on
+    the same frame with nothing in between, which read as a jump rather than
+    a move. The two halves run in sequence rather than crossfading, because
+    only one view is in the document at a time — mounting both would restart
+    the canvas animations of the one on its way out.
+
+    The outgoing half is deliberately the shorter of the two: leaving should
+    get out of the way, arriving is what the eye should follow. */
+ .view.is-leaving {
+   animation: view-out 150ms ease-in both;
+   pointer-events: none;
+ }
+ .view.is-on {
+   animation: view-in 380ms var(--ease) both;
+ }
+ @keyframes view-out {
+   from { opacity: 1; transform: none; }
+   to   { opacity: 0; transform: translateY(-6px); }
+ }
+ @keyframes view-in {
+   from { opacity: 0; transform: translateY(14px); }
+   to   { opacity: 1; transform: none; }
+ }
+ /* The switch still has to happen, it just happens without the movement. */
+ @media (prefers-reduced-motion: reduce) {
+   .view.is-leaving { animation-duration: 1ms; }
+   .view.is-on { animation: view-fade 120ms linear both; }
+   @keyframes view-fade { from { opacity: 0; } to { opacity: 1; } }
+ }
  /* The page no longer scrolls between sections, so the snap and the scroll
     hint that belonged to that model go with it. */
  html { scroll-snap-type: none; }
@@ -1627,16 +1704,45 @@
  const btns = [...document.querySelectorAll('.seg-btn')];
  const views = [...document.querySelectorAll('.view')];
  if (!btns.length) return;
- const show = (name) => {
- views.forEach(v => v.classList.toggle('is-on', v.id === name));
- btns.forEach(b => {
+ const OUT_MS = 150;   // must match view-out in the stylesheet
+ const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+ let leaving = null;
+
+ const markButtons = (name) => btns.forEach(b => {
  const on = b.dataset.view === name;
  b.classList.toggle('is-on', on);
  b.setAttribute('aria-selected', on);
  });
+
+ const mount = (name) => {
+ views.forEach(v => {
+ v.classList.toggle('is-on', v.id === name);
+ v.classList.remove('is-leaving');
+ });
  window.scrollTo(0, 0);
  const active = document.getElementById(name);
  if (active) active.querySelectorAll('.r').forEach(el => el.classList.add('v'));
+ // The canvases key off this rather than off an IntersectionObserver
+ // alone. Going from display:none to flex does not reliably produce an
+ // intersection callback, which is what left the hero blank on some
+ // returns to the landing: the observer simply never said "visible".
+ document.dispatchEvent(new CustomEvent('view:shown', { detail: { id: name } }));
+ };
+
+ // The outgoing view plays its exit, then the incoming one mounts and plays
+ // its entrance. Sequential rather than crossfaded: only one view lives in
+ // the document at a time, so overlapping them would mean mounting both and
+ // restarting the canvas of the one already on its way out.
+ const show = (name) => {
+ const current = views.find(v => v.classList.contains('is-on'));
+ markButtons(name);
+ if (!current || current.id === name || reduced.matches) { mount(name); return; }
+
+ // A second click mid-transition must not leave the previous view stranded
+ // with .is-leaving and display: flex on top of the new one.
+ if (leaving) { clearTimeout(leaving.timer); leaving.el.classList.remove('is-leaving'); }
+ current.classList.add('is-leaving');
+ leaving = { el: current, timer: setTimeout(() => { leaving = null; mount(name); }, OUT_MS) };
  };
  // The hash is the address of a view, so the segmented control on the case
  // study pages can link back to a specific one (../index.html#work).
@@ -1664,16 +1770,20 @@
  let W, H, dots, running = false;
 
  function resize() {
- const dpr = Math.min(window.devicePixelRatio || 1, 2);
  const rect = canvas.parentElement.getBoundingClientRect();
+ // Same guard the hero canvas carries: a hidden view measures 0x0, and
+ // sizing to that leaves an empty canvas behind.
+ if (!rect.width || !rect.height) return false;
+ const dpr = Math.min(window.devicePixelRatio || 1, 2);
  W = rect.width; H = rect.height;
  canvas.width = W * dpr; canvas.height = H * dpr;
  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ return true;
  }
 
  function init() {
- resize();
+ if (!resize()) return false;
  const circleCx = W * 0.5;
  const circleCy = H * 0.5;
  const radius = Math.min(W, H) * 0.4;
@@ -1688,20 +1798,24 @@
  chaosVy: (Math.random() - 0.5) * 1.4,
  });
  }
+ return true;
  }
 
  // Same cache as the hero canvas: getComputedStyle per dot per frame is
  // not free, and the value only changes when the theme does.
- let dotCache = '', dotTheme = null;
- function dotRGB() {
+ let dotCache = '', dotTheme = null, dotAlpha = 1, lineAlpha = 0.08;
+ function readDotTokens() {
  const t = document.documentElement.getAttribute('data-theme');
  if (t !== dotTheme) {
  dotTheme = t;
- dotCache = getComputedStyle(document.documentElement)
- .getPropertyValue('--dot-rgb').trim() || '247,253,185';
+ const cs = getComputedStyle(document.documentElement);
+ dotCache = cs.getPropertyValue('--dot-rgb').trim() || '247,253,185';
+ dotAlpha = parseFloat(cs.getPropertyValue('--dot-alpha')) || 1;
+ lineAlpha = parseFloat(cs.getPropertyValue('--line-alpha')) || 0.08;
  }
- return dotCache;
  }
+ function dotRGB() { readDotTokens(); return dotCache; }
+ function dotA(a) { readDotTokens(); return Math.min(1, a * dotAlpha); }
 
  const GATHER = 3000, SPIN = 4000, SCATTER = 3200;
  const TOTAL = GATHER + SPIN + SCATTER;
@@ -1764,7 +1878,7 @@
  for (const d of dots) {
  ctx.beginPath();
  ctx.arc(d.drawX, d.drawY, DOT_SIZE, 0, Math.PI * 2);
- ctx.fillStyle = `rgba(${dotRGB()},${d.drawAlpha})`;
+ ctx.fillStyle = `rgba(${dotRGB()},${dotA(d.drawAlpha)})`;
  ctx.fill();
  }
 
@@ -1783,6 +1897,21 @@
  }
  }, { threshold: 0.05 });
  ctcObs.observe(canvas.parentElement);
+
+ // Driven by the view switcher, with the observer left in place only to
+ // idle the loop when the section is scrolled out of frame.
+ const host = canvas.closest('.view');
+ const wake = () => {
+ if (running) return;
+ if (!init()) return;
+ running = true;
+ requestAnimationFrame(draw);
+ };
+ document.addEventListener('view:shown', (e) => {
+ if (host && e.detail.id !== host.id) { running = false; return; }
+ wake();
+ });
+
 
  window.addEventListener('resize', () => { if (running) init(); }, { passive: true });
  })();
@@ -1828,28 +1957,36 @@
 
  // Dot color follows the theme token. Cached per frame batch rather than
  // read per particle — getComputedStyle on 220 dots a frame is not free.
- let dotCache = '', dotTheme = null;
- function dotRGB() {
+ let dotCache = '', dotTheme = null, dotAlpha = 1, lineAlpha = 0.08;
+ function readDotTokens() {
  const t = document.documentElement.getAttribute('data-theme');
  if (t !== dotTheme) {
  dotTheme = t;
- dotCache = getComputedStyle(document.documentElement)
- .getPropertyValue('--dot-rgb').trim() || '247,253,185';
+ const cs = getComputedStyle(document.documentElement);
+ dotCache = cs.getPropertyValue('--dot-rgb').trim() || '247,253,185';
+ dotAlpha = parseFloat(cs.getPropertyValue('--dot-alpha')) || 1;
+ lineAlpha = parseFloat(cs.getPropertyValue('--line-alpha')) || 0.08;
  }
- return dotCache;
  }
+ function dotRGB() { readDotTokens(); return dotCache; }
+ function dotA(a) { readDotTokens(); return Math.min(1, a * dotAlpha); }
 
  function resize() {
- const dpr = Math.min(window.devicePixelRatio || 1, 2);
  const rect = canvas.parentElement.getBoundingClientRect();
+ // A hidden view measures 0x0. Sizing to that wiped the canvas and laid
+ // every particle out inside nothing, so coming back to the landing after
+ // a resize elsewhere showed an empty hero.
+ if (!rect.width || !rect.height) return false;
+ const dpr = Math.min(window.devicePixelRatio || 1, 2);
  W = rect.width; H = rect.height;
  canvas.width = W * dpr; canvas.height = H * dpr;
  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+ return true;
  }
 
  function init() {
- resize();
+ if (!resize()) return false;
  // On phones the same alpha reads way more intense due to smaller screen
  // and longer dwell time on the hero. Soften everything for narrow viewports.
  const isMobile = W < 720;
@@ -1885,6 +2022,7 @@
  wobbleAmp: 1.5 + Math.random() * 2,
  });
  }
+ return true;
  }
 
  const GATHER = 3000;
@@ -1961,14 +2099,14 @@
  for (const p of particles) {
  ctx.beginPath();
  ctx.arc(p.drawX, p.drawY, p.drawSize, 0, Math.PI * 2);
- ctx.fillStyle = `rgba(${dotRGB()},${p.drawAlpha})`;
+ ctx.fillStyle = `rgba(${dotRGB()},${dotA(p.drawAlpha)})`;
  ctx.fill();
  }
 
  // Pass 3: connecting lines when ordered
  if (prog > 0.55) {
  const lineScale = W < 720 ? 0.45 : 1;
- const la = (prog - 0.55) / 0.45 * 0.08 * lineScale;
+ const la = (prog - 0.55) / 0.45 * lineAlpha * lineScale;
  ctx.strokeStyle = `rgba(${dotRGB()},${la})`;
  ctx.lineWidth = 0.5;
  for (let i = 0; i < particles.length; i++) {
@@ -1989,6 +2127,9 @@
 
  const heroObs = new IntersectionObserver(([entry]) => {
  if (entry.isIntersecting && !running) {
+ // Re-init on the way in, not once at load: the view is display:none
+ // between visits, so whatever the canvas last measured may be stale.
+ init();
  running = true;
  requestAnimationFrame(draw);
  } else if (!entry.isIntersecting) {
@@ -1997,8 +2138,23 @@
  }, { threshold: 0.05 });
  heroObs.observe(canvas.parentElement);
 
+ // Driven by the view switcher, with the observer left in place only to
+ // idle the loop when the section is scrolled out of frame.
+ const host = canvas.closest('.view');
+ const wake = () => {
+ if (running) return;
+ if (!init()) return;
+ running = true;
+ requestAnimationFrame(draw);
+ };
+ document.addEventListener('view:shown', (e) => {
+ if (host && e.detail.id !== host.id) { running = false; return; }
+ wake();
+ });
+
+
  init();
- window.addEventListener('resize', init, { passive: true });
+ window.addEventListener('resize', () => { if (running) init(); }, { passive: true });
  })();
 
  </script>
