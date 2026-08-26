@@ -1,0 +1,5 @@
+# Kota is held back: the Work card shows it as Coming soon and nothing links to
+# it, but the page itself still built and answered on a typed URL. Delete this
+# line to publish it — the case study is untouched in projects/kota.html.
+/projects/kota    /    302
+/projects/kota.html    /    302
