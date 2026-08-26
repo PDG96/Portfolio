@@ -351,7 +351,9 @@
   /* ====== SIDEBAR SHELL ====== */
  /* White mode: light gutter, white sidebar + sheet cards. Same structure
  as the dark version, colors flipped to the site's default light tokens. */
- .shell-page { background: var(--shell-bg); }
+ /* background-color, not the shorthand: `background:` resets
+     background-image and would strip the grain given above. */
+  .shell-page { background-color: var(--shell-bg); }
 
  /* Header matches the page background instead of the usual white frosted bar */
  /* Glass, not a slab: the base .nav blurs what passes under it, and this
@@ -393,7 +395,7 @@
  position: fixed;
  inset: var(--view-pad-top) 0 var(--seg-band) 0;
  display: flex;
- gap: var(--grid-gap);
+ gap: var(--edge);
  padding: 0;
  box-sizing: border-box;
  /* Same measure as the landing views, so the sidebar edge and the
@@ -426,7 +428,7 @@
  min-width: 260px;
  display: flex;
  flex-direction: column;
- background: var(--sheet);
+ background-color: var(--sheet);
  border: 1px solid var(--border);
  border-radius: 16px;
  padding: 2rem;
@@ -560,7 +562,7 @@
  white card surface matching the sidebar. */
  flex: 1 1 0%;
  min-width: 0;
- background: var(--sheet);
+ background-color: var(--sheet);
  border: 1px solid var(--border);
  border-radius: 16px;
  overflow-y: auto;
@@ -579,7 +581,7 @@
  .sidebar-intro keeps the card treatment the sidebar used to carry. */
  .sidebar { display: contents; }
  .sidebar-intro {
- background: var(--sheet);
+ background-color: var(--sheet);
  border: 1px solid var(--border);
  border-radius: 16px;
  padding: 1.75rem;
@@ -591,7 +593,7 @@
  space under it, separate nothing -- so the card ends on the last value. */
  .sidebar-meta { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
  }
- .main-sheet .case-hero { padding: 2rem 0; }
+ .main-sheet .case-hero { padding: 0 0 2rem; }
  .main-sheet .case-hero .wrap,
  .main-sheet .case-section .wrap { max-width: 100%; padding-left: var(--page-gutter); padding-right: var(--page-gutter); }
 
@@ -2137,7 +2139,10 @@
       color: var(--seg-on-fg);
     }
     /* Room under the last section so the control never covers the copy. */
-    .main-sheet { padding-bottom: 5.5rem; }
+    /* The same inset the sidebar carries, so the two panes start and end on
+       the same lines. Was 0 on top and 5.5rem at the bottom, from back when
+       the segmented control still floated over the sheet. */
+    .main-sheet { padding-block: var(--edge); }
     @media (max-width: 640px) {
       .seg { gap: 0; padding: 0 3px; }
       .seg-btn { font-size: 0.75rem; padding: 0 0.7rem; }
