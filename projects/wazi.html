@@ -71,7 +71,9 @@
     crushed the sheet into narrow columns on a wide screen. */
  --edge: 32px;
  --header-h: 24px;
- --seg-h: 32px;
+ --seg-h: 40px;
+ --seg-on-bg: #2e2e2e;
+ --seg-on-fg: #fbfaf8;
  --nav-h: calc(var(--edge) * 2 + var(--header-h));
  --grid-gap: 24px;
 
@@ -121,6 +123,8 @@
  its meaning, the roles swap ends of it. Ratios against the pane
  (#1a1a1a): text 16.7:1, text-2 6.9:1, text-3 5.4:1, link 8.9:1. */
  [data-theme="dark"] {
+ --seg-on-bg: #fbfaf8;
+ --seg-on-fg: #141414;
  --bg: #141414;
  --bg-alt: #232323;
  --surface: #1a1a1a;
@@ -2129,8 +2133,8 @@
     .seg-btn:not(.is-on):hover { background: rgba(20, 20, 20, 0.06); }
     [data-theme="dark"] .seg-btn:not(.is-on):hover { background: rgba(255, 255, 255, 0.08); }
     .seg-btn.is-on {
-      background: var(--text);
-      color: var(--sheet);
+      background: var(--seg-on-bg);
+      color: var(--seg-on-fg);
     }
     /* Room under the last section so the control never covers the copy. */
     .main-sheet { padding-bottom: 5.5rem; }
@@ -2736,7 +2740,6 @@ setLang(lang);
  <nav class="seg" aria-label="Sections">
    <a class="seg-btn" href="../index.html#hero" data-i18n="seg_landing">Landing</a>
    <a class="seg-btn is-on" href="../index.html#work" aria-current="page" data-i18n="nav_work">Work</a>
-   <a class="seg-btn" href="../index.html#about" data-i18n="nav_about">About</a>
    <a class="seg-btn" href="../index.html#contact" data-i18n="seg_contact">Get in touch</a>
  </nav>
 
