@@ -753,30 +753,54 @@
  }
 
  /* No measure of its own: --measure is the width Work computes, so the
-    column here is always exactly as wide as the case cards next door. */
- .connect { width: 100%; }
+    column here is always exactly as wide as the case cards next door.
+
+    container-type makes it a query container, which lets everything inside
+    be sized in cqi — 1% of this block's own width. Type and spacing then
+    scale with the column instead of sitting at a fixed size while it grows,
+    which is what made the wide screens look off: the box got bigger and the
+    words stayed put. The clamps are floors and ceilings, not the rule; the
+    cqi term is what does the work between them.
+
+    The ratios come from a 1440 reference, where the block is 1376px. */
+ .connect {
+ width: 100%;
+ container-type: inline-size;
+ }
  .connect h2 {
- font-size: clamp(1.5rem, 2.5vw, 2rem);
+ font-size: clamp(1.75rem, 2.907cqi, 3.75rem);
  font-weight: 400;
- letter-spacing: -0.01em;
- line-height: 1.3;
+ letter-spacing: -0.015em;
+ line-height: 1.25;
  color: var(--text);
- margin: 0 0 1.75rem;
+ margin: 0 0 clamp(1.5rem, 2.6cqi, 3rem);
+ text-wrap: balance;
  }
  .connect p {
- font-size: 1.0625rem;
+ font-size: clamp(1.0625rem, 1.526cqi, 2rem);
  color: var(--text-2);
- line-height: 1.75;
- margin: 0 0 1.15rem;
+ line-height: 1.7;
+ margin: 0 0 clamp(1rem, 1.3cqi, 1.6rem);
  }
  /* The ask, set apart from the three paragraphs that lead up to it. */
  .connect-cta {
  font-style: italic;
  font-weight: 500;
  color: var(--text) !important;
- margin-top: 1.75rem !important;
+ margin-top: clamp(1.5rem, 2.6cqi, 3rem) !important;
  }
- .connect .facts-grid { margin-top: 2.5rem; }
+ .connect .facts-grid {
+ margin-top: clamp(2rem, 3.6cqi, 4.5rem);
+ gap: clamp(0.85rem, 1.5cqi, 1.75rem);
+ }
+ /* The cards scale with the block too, or they read as a fixed-size strip
+    pinned under type that has grown past them. */
+ .connect .fact-card { padding: clamp(1rem, 1.6cqi, 2rem) clamp(1.1rem, 1.8cqi, 2.25rem); }
+ .connect .fact-card .fact-label {
+ font-size: clamp(0.6875rem, 0.872cqi, 1rem);
+ margin-bottom: clamp(0.4rem, 0.7cqi, 0.85rem);
+ }
+ .connect .fact-card .fact-value { font-size: clamp(0.875rem, 1.235cqi, 1.45rem); }
 
  /* Three cards under the copy: reach me at, LinkedIn, CV. All three go
     somewhere, so the value carries a link affordance. */
