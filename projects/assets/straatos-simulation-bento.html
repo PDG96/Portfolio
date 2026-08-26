@@ -110,10 +110,31 @@
       width: 100% !important;
       height: auto !important;
     }
-    .tile.mangrove    { min-height: 520px; }
-    .tile.ph          { min-height: 360px; }
-    .tile.sos         { min-height: 280px; }
-    .tile.emissions   { min-height: 320px; }
+    /* Same as the analysis indicators: a fixed height left 75px and 47px of
+       empty card under these two images, which reads as an inconsistent gap. */
+    .tile.mangrove    { height: auto !important; min-height: 0; }
+    .tile.sos         { height: auto !important; min-height: 0; }
+    /* object-fit: cover crops to fill; with the tile hugging its content
+       these should show whole, so the fit goes back to contain-by-default. */
+    .tile.mangrove img,
+    .tile.sos img     { height: auto; object-fit: fill; }
+    .tile.ph          { height: 420px !important; min-height: 0; }
+    /* Stacked, the gauge had its labels column crushed to nothing and
+       Alkaline, Neutral and Acidic printed on top of each other. Full width
+       gives it room, and the readout column is gone in this tile anyway. */
+    .tile.ph > chart-card,
+    .tile.ph .chart-mount { width: 100%; height: 100%; }
+    .tile.ph {
+      --vg-bar-width: 54px;
+      --vg-col-gap: 18px;
+      --vg-max-width: none;
+      --vg-label-size: 12px;
+    }
+    /* Same reason as the pH tile: the chart inside needs a definite box to
+       size against, or it falls back to 400px and overflows the card. */
+    .tile.emissions   { height: 400px !important; min-height: 0; }
+    .tile.emissions > chart-card,
+    .tile.emissions .chart-mount { width: 100%; height: 100%; }
   }
 </style>
 </head>

@@ -37,7 +37,7 @@
  --gray-true-800: #292929;
  --gray-true-900: #141414;
 
- /* Semantic tokens, dark theme. Body wears a fine grain texture via body::after. */
+ /* Semantic tokens, dark theme. The grain lives in --grain, painted into each ground. */
  --bg: var(--gray-true-900);
  --bg-alt: #1c1c1c;
  --surface: rgba(255, 255, 255, 0.04);
@@ -71,10 +71,60 @@
  /* One side spacing for the whole site. The case studies moved to this
     token when their components each drifted to a different inset; the
     landing was still on the old 4vw gutter, so the two did not line up. */
- --sheet-gutter: clamp(1.25rem, 2.5vw, 2rem);
 
  --section-py: clamp(4.5rem, 9vw, 7rem);
  --section-gap: clamp(2.5rem, 5vw, 3.5rem);
+
+ /* ====== ONE EDGE ======
+    Every outer corner on every page is the same distance from the window,
+    and everything else is derived from it. Measured off the three display
+    mockups (MacBook Air 1280x832, Desktop 1440x1024, Ultrawide 3440x1258),
+    which agree: 32px at the sides, the logo on that same 32, content
+    starting 112 from the top and ending 100 from the bottom.
+
+      nav band = edge (32) + header row (24) + edge (32) = 88
+      content top    = nav band (88) + grid gap (24)      = 112
+      content bottom = edge (32) + pill (32) + edge (32)  = 96
+
+    So there is one number to change, not six. */
+ --edge: 32px;
+ --header-h: 24px;   /* the logo / theme-toggle row itself */
+ --seg-h: 32px;      /* the segmented pill itself, as drawn */
+ --nav-h: calc(var(--edge) * 2 + var(--header-h));   /* 88: header sits 32 in */
+
+ --page-gutter: var(--edge);
+ --page-max: 2272px;
+ --work-max: 2208px;
+ --grid-gap: 24px;
+
+ --view-pad-top: calc(var(--nav-h) + var(--grid-gap));   /* 112 */
+ --seg-band: calc(var(--edge) * 2 + var(--seg-h));      /* 100 */
+ --view-h: calc(100svh - var(--view-pad-top) - var(--seg-band));
+
+ /* ====== THE MEASURE ======
+    Work is the constrained surface: its cards take their height from
+    --view-h and have a ceiling on how wide they may get relative to it, so
+    past a point the grid stops growing. Every other surface takes its width
+    from Work rather than computing its own — About, Get in touch, the
+    case-study shell and the header included. That is what keeps one left
+    edge and one right edge across the whole site.
+
+    --edge is the floor. Once the window is small enough that Work fits at a
+    32px margin, the third term stops binding and everything locks there
+    together. */
+ --card-h: calc((var(--view-h) - var(--grid-gap)) / 2);
+ --measure: min(
+   calc(100% - 2 * var(--edge)),
+   var(--work-max),
+   calc(var(--card-h) * var(--card-max) * 2 + var(--grid-gap))
+ );
+
+ /* Ceiling on how wide a Work card may get relative to its height.
+    Uncapped, the drawn cards run 2.00 / 1.72 / 2.14 on the three displays
+    while the screenshots are 1.44 to 1.78, so the widest crop eats a third
+    of Kota's height. 2.0 reproduces the drawing exactly on the MacBook and
+    Desktop and only trims the ultrawide, to 2068 from the 2210 drawn. */
+ --card-max: 2.0;
  }
 
  /* Light theme. This page is dark-native — :root above is the dark set —
@@ -85,22 +135,24 @@
  under the grain, and the slight warmth gives the page a paper ground
  for the texture to sit on. */
  --bg: #fbfaf8;
- /* The second tone, same job the #1c1c1c band does in dark: it lifts the
- About section and the case thumbs off the page ground instead of
- leaving everything on one flat sheet. */
- --bg-alt: #f1efea;
+ /* Was a second, warmer white so About and the case thumbs sat on their
+    own band. One tone across every page now, so it just tracks --bg. */
+ --bg-alt: #fbfaf8;
  --surface: rgba(20, 20, 20, 0.03);
  --text: var(--gray-true-900);
  --text-2: #666666;
  --text-3: #6b6b6b;
  --border: rgba(20, 20, 20, 0.12);
 
- /* Pale yellow disappears on a light ground, so the dots go sage. */
- /* Dots are decorative, so they can stay lighter than the text accent —
-        soft olive, same yellow family, ~2.8:1 so the pattern is visible. */
-        /* Same move on the light ground: the sage itself, a shade deeper so it
-           holds against the warm off-white. */
-        --dot-rgb: 74, 110, 76;
+ /* Light theme only — the dark set above is untouched. Pale yellow is
+        1.04:1 on a light ground, invisible, so this carries a coral orange
+        instead: both canvases and the hero eyebrow read from it.
+
+        2.48:1 on --bg. Fine for a decorative dot, under the 4.5:1 that 11px
+        uppercase text wants; chosen knowing that. If the eyebrow has to
+        clear the threshold, give it its own token at #AA4E0E (5.29:1, same
+        family) rather than darkening the dots. */
+        --dot-rgb: 255, 122, 69;
  /* Same hue as the brand yellow (65deg), darkened until it reads on a
         light ground: 4.7:1 even on the tinted card. The literal #f7fdb9 sits at 1.04:1 there. */
         --cta: #6b7310;
@@ -121,23 +173,31 @@
  overflow-x: hidden;
  }
 
- /* Grain texture overlay */
- body::after {
- content: '';
- position: fixed;
- inset: 0;
- pointer-events: none;
- z-index: 9998; /* under the lightbox (9999) and the cursor (10000) */
- opacity: 0.3;
- background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
- background-size: 200px;
+ /* ====== GRAIN ======
+    The grain is part of the ground, not a film over the page. It used to be
+    a fixed body::after at z-index 9998, which put it across the case-study
+    screenshots as well — the texture read as dirt on the photos. As a
+    background-image on each ground it paints above that ground's colour and
+    below everything sitting on it, so content covers it for free.
+
+    The old layer opacity (0.3 dark / 0.42 light) is baked into the SVG
+    instead, and the light theme's multiply is a background-blend-mode. */
+ :root {
+ --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+ --grain-blend: normal;
  }
- /* On a light ground the same overlay lightens instead of textures, so the
- grain multiplies into the paper and runs a little stronger to survive
- the brighter surface. */
- [data-theme="light"] body::after {
- opacity: 0.42;
- mix-blend-mode: multiply;
+ [data-theme="light"] {
+ --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.21'/%3E%3C/svg%3E");
+ --grain-blend: multiply;
+ }
+ body,
+ .hero,
+ .about,
+ .contact {
+ background-image: var(--grain);
+ background-size: 200px;
+ background-attachment: fixed;
+ background-blend-mode: var(--grain-blend);
  }
 
  a { color: inherit; text-decoration: none; }
@@ -178,14 +238,14 @@
  @media (hover: hover) and (pointer: fine) {
  .cursor { display: block; }
  html, body { cursor: none; }
- a, button, input, textarea, .case-card, .work-scroll { cursor: none; }
+ a, button, input, textarea, .case-card { cursor: none; }
  }
 
  .wrap {
  width: 100%;
  max-width: clamp(72rem, 90vw, 110rem); /* 1152 → 90vw → 1760 */
  margin: 0 auto;
- padding: 0 var(--sheet-gutter);
+ padding: 0 var(--edge);
  }
 
  /* ====== NAV ====== */
@@ -213,7 +273,9 @@
 
  .nav-inner {
  display: flex; align-items: center; justify-content: space-between;
- height: 60px;
+ /* Centred in the band, which puts the row at 32..56 from the top —
+    the same 32 the sides use. */
+ height: var(--nav-h);
  }
 
  .nav-logo {
@@ -271,7 +333,7 @@
  display: none; position: fixed;
  top: 60px; left: 0; right: 0; bottom: 0;
  background: var(--bg); z-index: 99;
- padding: 2rem var(--sheet-gutter);
+ padding: 2rem var(--edge);
  }
  .mobile-menu.open { display: flex; flex-direction: column; gap: 1.5rem; }
  .mobile-menu a {
@@ -301,13 +363,13 @@
  display: flex;
  align-items: center;
  justify-content: center;
- padding: 80px 0 4rem;
+ padding: 80px 0;
  position: relative;
  overflow: hidden;
- /* The same band the About section sits on, rather than the page ground —
- it gives the animation something to sit against instead of floating on
- the base colour, and the two full-height sections now rhyme. */
- background-color: var(--bg-alt);
+ /* The page ground, not the About band. It stops rhyming with About, but
+    the dots read better on the lighter surface and both canvases now sit
+    on the same colour, so one contrast number covers the two. */
+ background-color: var(--bg);
  color: var(--text);
  text-align: center;
  scroll-snap-align: start;
@@ -330,6 +392,10 @@
     every other section now, so the page has one left and right edge. */
  }
 
+ /* Points at --dot-rgb rather than holding a colour of its own, so the
+    eyebrow and the dots can never drift apart. Light theme only: --cta
+    still carries the dark theme. */
+ [data-theme="light"] .hero-eyebrow { color: rgb(var(--dot-rgb)); }
  .hero-eyebrow {
  font-family: var(--mono);
  font-size: 0.6875rem;
@@ -359,62 +425,6 @@
  color: var(--text-2);
  max-width: 440px;
  line-height: 1.7;
- }
-
- .hero-ctas {
- margin-top: 2.5rem;
- display: flex;
- flex-wrap: wrap;
- gap: 0.75rem;
- justify-content: center;
- }
- .hero .btn-primary {
- background: var(--text);
- color: var(--bg);
- }
- .hero .btn-primary:hover {
- background: var(--accent-yellow);
- color: var(--gray-true-900);
- }
- .hero .btn-ghost {
- background: transparent;
- color: var(--text);
- border-color: var(--border);
- }
- .hero .btn-ghost:hover {
- background: var(--accent-yellow);
- color: var(--gray-true-900);
- border-color: var(--accent-yellow);
- }
-
- .hero-scroll-hint {
- position: absolute;
- left: 50%;
- bottom: clamp(1.5rem, 4vw, 2.75rem);
- transform: translateX(-50%);
- z-index: 1;
- display: flex;
- flex-direction: column;
- align-items: center;
- gap: 0.5rem;
- font-family: var(--mono);
- font-size: 0.6875rem;
- font-weight: 500;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- color: var(--text-3);
- text-decoration: none;
- transition: color 0.35s var(--ease);
- }
- .hero-scroll-hint:hover { color: var(--cta); }
- .hero-scroll-hint svg {
- width: 14px;
- height: 14px;
- animation: hero-hint-bounce 2.2s var(--ease) infinite;
- }
- @keyframes hero-hint-bounce {
- 0%, 100% { transform: translateY(0); }
- 50% { transform: translateY(5px); }
  }
 
  .btn {
@@ -476,74 +486,53 @@
 
  /* ====== WORK ====== */
  .work {
- padding: var(--section-py) 0;
+ padding: var(--view-pad-top) 0 var(--seg-band);
  overflow: hidden;
  min-height: 100svh;
  display: flex;
  align-items: center;
  }
- .work > .wrap { width: 100%; }
 
- .work-scroll {
- display: flex;
- align-items: stretch;
- gap: 1.5rem;
- overflow-x: auto;
- scroll-snap-type: x mandatory;
- -webkit-overflow-scrolling: touch;
- padding-bottom: 1.5rem;
- margin: 0 calc(-1 * var(--sheet-gutter));
- padding-left: var(--sheet-gutter);
- padding-right: var(--sheet-gutter);
- scrollbar-width: none;
+
+ /* Two by two, filling the height left between the nav and the segmented
+    control. Was a horizontal scroller; four cases fit on one screen, so
+    nothing has to be scrolled past to be seen. */
+ /* Two rows filling the vertical budget, as drawn. The card height is
+    derived, not set: (view-h - gap) / 2.
+
+    Width and height are derived independently, so the card ratio drifts
+    with the window — 2.01 on the MacBook, 1.72 on the Desktop, 2.14 on the
+    ultrawide. The screenshots are 1.44 to 1.78, so past a point the crop
+    eats real content (Kota loses a third of its height at 2.14). --card-max
+    is the ceiling: the grid fills as drawn until the cards would get wider
+    than that, then it stops and centres in the leftover band. */
+ .work-grid {
+ display: grid;
+ grid-template-columns: repeat(2, 1fr);
+ gap: var(--grid-gap);
+ width: 100%;
  }
- .work-scroll::-webkit-scrollbar { display: none; }
+ .case-card-link {
+ height: var(--card-h);
+ max-height: 100%;
+ }
 
  .case-card-link {
- flex: 0 0 85vw;
- max-width: 560px;
- scroll-snap-align: start;
  display: block;
+ min-height: 0;
  }
- @media (min-width: 768px) {
- .case-card-link { flex: 0 0 45vw; max-width: 620px; }
- }
- @media (min-width: 1100px) {
- .case-card-link { flex: 0 0 38vw; max-width: 680px; }
- }
- .case-card-link .case-card {
- flex: none;
- max-width: none;
- height: 100%;
- }
+ .case-card-link .case-card { height: 100%; }
 
+ /* The image is the card. Copy sits on a gradient scrim over its lower
+    half so the tag and title stay readable whatever the photo does. */
  .case-card {
- flex: 0 0 85vw;
- max-width: 560px;
+ position: relative;
  background: var(--surface);
  border: 1px solid var(--border);
  border-radius: 12px;
  overflow: hidden;
- transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
- scroll-snap-align: start;
- display: flex;
- flex-direction: column;
  height: 100%;
- }
- /* The body fills the leftover height so the bottom "Read case study"
- line lands at the same baseline across all cards regardless of how
- much copy each one carries. */
- .case-body {
- flex: 1;
- display: flex;
- flex-direction: column;
- }
- .case-body p { flex: 1; }
- @media (min-width: 768px) {
- .case-card { flex: 0 0 45vw; max-width: 620px; }
- }
- @media (min-width: 1100px) {
- .case-card { flex: 0 0 38vw; max-width: 680px; }
+ transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease), border-color 0.5s var(--ease);
  }
  .case-card:hover {
  transform: translateY(-6px);
@@ -553,9 +542,16 @@
 
  /* Coming-soon variant, not interactive. Sits flat in the carousel with a
  subtle disabled state and a chip on the link slot. */
+ /* Not walkable yet. The other three cards are bare screenshots, so the
+    state has to be readable without a hover: the scrim and the label sit
+    on permanently rather than appearing on pointer-over. */
  .case-card--soon {
  cursor: default;
  }
+ .case-card-link--soon { pointer-events: none; }
+ .case-card--soon .case-thumb-overlay { opacity: 1; }
+ .case-card--soon:hover { transform: none; box-shadow: none; border-color: var(--border); }
+ .case-card--soon:hover img { transform: none; }
  .case-card--soon:hover {
  transform: none;
  box-shadow: none;
@@ -565,9 +561,9 @@
  .case-thumb-overlay {
  position: absolute;
  inset: 0;
- background: rgba(15, 22, 18, 0.55);
- backdrop-filter: blur(2px);
- -webkit-backdrop-filter: blur(2px);
+ background: rgba(12, 14, 13, 0.62);
+ backdrop-filter: blur(1.5px);
+ -webkit-backdrop-filter: blur(1.5px);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -618,12 +614,13 @@
  }
 
  .case-thumb {
- width: 100%;
- aspect-ratio: 16/10;
+ position: absolute;
+ inset: 0;
  background: var(--bg-alt);
- position: relative;
  overflow: hidden;
  }
+ .case-card img { transition: transform 0.7s var(--ease); }
+ .case-card:hover img { transform: scale(1.04); }
  .case-card:nth-child(1) .case-thumb { background: var(--accent-yellow); }
  .case-card:nth-child(2) .case-thumb { background: var(--accent-blue); }
  .case-card:nth-child(3) .case-thumb { background: var(--accent-pink); }
@@ -659,11 +656,27 @@
  border-radius: 40px;
  }
 
- .case-body { padding: 1.75rem; }
+ /* Overlaid on the image rather than stacked under it. */
+ .case-body {
+ position: absolute;
+ left: 0; right: 0; bottom: 0;
+ z-index: 1;
+ padding: 1.75rem;
+ display: flex;
+ flex-direction: column;
+ align-items: flex-start;
+ gap: 0.5rem;
+ }
+
+ /* The scrim under this copy is dark in both themes, so these colours are
+    fixed rather than following --text / --text-2. */
+ .case-body h3, .case-body p, .case-body .case-tag { color: #fcfcfc; }
+ .case-body p { color: rgba(252, 252, 252, 0.72); }
+ .case-body .case-tag { background: rgba(252, 252, 252, 0.14); }
+ .case-body .case-meta, .case-body h3, .case-body p { margin-bottom: 0; }
 
  .case-meta {
  display: flex; align-items: center; gap: 0.75rem;
- margin-bottom: 0.75rem;
  }
  .case-tag {
  font-family: var(--mono);
@@ -678,7 +691,7 @@
  }
 
  .case-body h3 {
- font-size: 1.25rem;
+ font-size: clamp(1.25rem, 1.6vw, 1.6rem);
  font-weight: 500;
  letter-spacing: -0.01em;
  line-height: 1.3;
@@ -686,14 +699,17 @@
  }
  .case-body p {
  font-size: 0.9375rem;
- color: var(--text-2);
- line-height: 1.65;
- margin-bottom: 1.25rem;
- max-width: 520px;
+ line-height: 1.6;
+ max-width: 46ch;
+ display: -webkit-box;
+ -webkit-line-clamp: 2;
+ -webkit-box-orient: vertical;
+ overflow: hidden;
  }
  /* No trailing gap when the paragraph is the last element in the body
  (Safra card has no link below, others end with .case-link). */
  .case-body p:last-child { margin-bottom: 0; }
+ .case-body .case-link { margin-top: 0.35rem; }
  .case-link {
  font-family: var(--mono);
  font-size: 0.6875rem;
@@ -709,56 +725,22 @@
  .case-link--muted { color: var(--text-3); }
  .case-link--muted:hover { gap: 0.5rem; }
 
- /* Scroll indicator */
- .work-scroll-hint {
- display: flex;
- align-items: center;
- gap: 0.75rem;
- margin-top: 1.5rem;
- }
- .work-scroll-track {
- flex: 1;
- height: 2px;
- background: var(--border);
- border-radius: 1px;
- position: relative;
- overflow: hidden;
- }
- .work-scroll-thumb {
- position: absolute;
- top: 0; left: 0;
- height: 100%;
- width: 33%;
- background: var(--accent-yellow);
- border-radius: 1px;
- transition: left 0.15s ease-out;
- }
- .work-scroll-label {
- font-family: var(--mono);
- font-size: 0.6875rem;
- font-weight: 500;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- color: var(--text-3);
- white-space: nowrap;
- }
-
  /* ====== ABOUT (editorial) ====== */
  .about {
- padding: var(--section-py) 0;
+ padding: var(--view-pad-top) 0 var(--seg-band);
  background: var(--bg-alt);
  min-height: 100svh;
  display: flex;
- align-items: center;
+ /* Fits the budget or scrolls: "safe" keeps the top reachable when the
+    content is taller than one screen, which plain centring does not. */
+ align-items: safe center;
  }
- .about > .wrap { width: 100%; }
 
  /* Bio + photo grid, photo on the left, text on the right at the same height. */
  .about-main {
  display: grid;
  grid-template-columns: 1fr;
  gap: 2.5rem;
- margin-top: clamp(2rem, 4vw, 3rem);
  align-items: stretch;
  }
  @media (min-width: 900px) {
@@ -859,6 +841,9 @@
  @media (min-width: 640px) {
  .facts-grid { grid-template-columns: repeat(2, 1fr); }
  }
+ @media (min-width: 900px) {
+ .facts-grid { grid-template-columns: repeat(3, 1fr); }
+ }
  .fact-card {
  position: relative;
  padding: 1rem 1.125rem 1.125rem;
@@ -871,6 +856,16 @@
  border-color: var(--text-3);
  background: var(--surface);
  }
+ /* Two of the six go somewhere. Same card, but the value carries a link
+    affordance so the difference is visible before the hover. */
+ .fact-card--link { display: block; }
+ .fact-card--link .fact-value {
+ color: var(--cta);
+ text-decoration: underline;
+ text-underline-offset: 3px;
+ text-decoration-thickness: 1px;
+ }
+ .fact-card--link:hover .fact-value { text-decoration-thickness: 2px; }
  .fact-card .fact-label {
  font-family: var(--mono);
  font-size: 0.625rem;
@@ -908,16 +903,16 @@
  }
 
  /* ====== CONTACT ====== */
+ /* Held to one screen like the other views, on the same budget: the nav
+    above, the segmented control below. */
  .contact {
- padding: var(--section-py) 0;
+ padding: var(--view-pad-top) 0 var(--seg-band);
  background: var(--bg);
  color: var(--text);
  display: flex;
  align-items: center;
- scroll-snap-align: start;
- scroll-margin-top: 60px;
+ min-height: 100svh;
  }
- .contact > .wrap { width: 100%; }
 
  .contact-layout {
  display: grid;
@@ -925,7 +920,38 @@
  gap: 3rem;
  }
  @media (min-width: 900px) {
- .contact-layout { grid-template-columns: 1fr 1fr; gap: 5rem; }
+ .contact-layout {
+   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+   gap: clamp(3rem, 7vw, 7rem);
+   align-items: center;
+ }
+ }
+
+ /* The copy introduces the fields, so it sits directly above them and on
+    their left edge rather than in a column of its own. */
+ .contact-left {
+ display: flex;
+ flex-direction: column;
+ max-width: 34rem;
+ }
+ .contact-intro { margin-bottom: 2.5rem; }
+
+ /* Right half, centred on the same band as the copy and the form. */
+ .contact-canvas {
+ position: relative;
+ width: 100%;
+ max-width: 520px;
+ aspect-ratio: 1;
+ margin: 0 auto;
+ }
+ .contact-canvas canvas {
+ position: absolute;
+ inset: 0;
+ width: 100%;
+ height: 100%;
+ }
+ @media (max-width: 899px) {
+ .contact-canvas { display: none; }
  }
 
  /* Inherits size/weight from .section-header h2; just sets dark-section colour */
@@ -936,7 +962,7 @@
  color: var(--text-2);
  line-height: 1.7;
  max-width: 440px;
- margin-bottom: 2rem;
+ margin-bottom: 0;
  }
  .contact-email {
  font-family: var(--mono);
@@ -1041,41 +1067,6 @@
  }
 
  /* ====== FOOTER ====== */
- .footer {
- padding: 2rem 0;
- background: var(--bg);
- border-top: 1px solid var(--border);
- }
- .footer-inner {
- display: flex;
- flex-wrap: wrap;
- justify-content: space-between;
- align-items: center;
- gap: 1rem;
- }
- .footer-copy {
- font-family: var(--mono);
- font-size: 0.625rem;
- font-weight: 500;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- color: var(--text-2);
- }
- .footer-links {
- display: flex;
- gap: 1.5rem;
- list-style: none;
- }
- .footer-links a {
- font-family: var(--mono);
- font-size: 0.625rem;
- font-weight: 500;
- text-transform: uppercase;
- letter-spacing: 0.12em;
- color: var(--text-2);
- transition: color 0.3s;
- }
- .footer-links a:hover { color: var(--cta); }
  
  /* Touch targets. The visual size stays as drawn; the reachable area grows
     to the 44px minimum underneath it, so nothing shifts on screen. */
@@ -1089,7 +1080,7 @@
     top: 50%; height: 44px; transform: translateY(-50%);
   }
    .nav-toggle { min-width: 44px; min-height: 44px; }
-   .footer-links a, .nav-logo { display: inline-flex; align-items: center; min-height: 44px; }
+   .nav-logo { display: inline-flex; align-items: center; min-height: 44px; }
  }
 
  /* ====== WORK, MOBILE ======
@@ -1099,56 +1090,124 @@
     only the tag and the title: the description was three lines of body copy
     per card and the whole card is already the link. */
  @media (max-width: 767px) {
-   .work-scroll {
-     display: flex;
-     flex-direction: column;
-     gap: 1.25rem;
-     overflow-x: visible;
-     scroll-snap-type: none;
-     margin: 0;
-     padding: 0 0 0.5rem;
+   /* One column, and the grid gives up its fixed height so the four cards
+      scroll rather than being squeezed into a phone viewport. */
+   .work { padding: var(--view-pad-top) 0 var(--seg-band); display: block; }
+   .work-grid {
+     grid-template-columns: 1fr;
+     width: 100%;
+     gap: 1rem;
    }
-   .case-card-link,
-   .work-scroll > .case-card { flex: 0 0 auto; max-width: none; width: 100%; }
-   .case-card p,
-   .case-card .case-link,
-   .case-card .case-link--soon { display: none; }
+   /* Stacked, the two-row budget no longer applies: the cards keep the
+      screenshot ratio and the page scrolls. */
+   .case-card-link { height: auto; aspect-ratio: 1.6; }
    .case-body { padding: 1.25rem; }
-   .case-card h3 { margin-top: 0.5rem; }
-   /* Nothing scrolls sideways any more, so the hint below it is a lie. */
-   .work-scroll-hint { display: none; }
+   .case-body h3 { font-size: 1.15rem; }
  }
 
- /* ====== WORK, AS A GRID ======
-    Four cases, two to a row, each big enough to read the screenshot rather
-    than guess at it. The scroller is gone: with four cards there is nothing
-    to page through, and a grid shows the whole body of work at once. Only
-    this section escapes the page measure — About and Contact keep theirs. */
- @media (min-width: 768px) {
-   #work > .wrap { max-width: none; }
-   .work-scroll {
-     display: grid;
-     grid-template-columns: 1fr 1fr;
-     gap: clamp(1.5rem, 2.5vw, 2.5rem);
-     overflow: visible;
-     scroll-snap-type: none;
-     margin: 0;
-     padding: 0;
-   }
-   .case-card-link, .work-scroll > .case-card { flex: none; max-width: none; width: 100%; }
-   .case-card { flex: none; max-width: none; }
-   .work-scroll-hint { display: none; }
-   /* The blurb drops to a single quiet line under the title. */
-   .case-card p {
-     font-size: 0.8125rem;
-     color: var(--text-3);
-     white-space: nowrap;
-     overflow: hidden;
-     text-overflow: ellipsis;
-     margin-top: 0.375rem;
-   }
-   .case-card h3 { margin-bottom: 0; }
-   .case-body { padding: 1.5rem 1.75rem 1.75rem; }
+
+ /* ====== THE MEASURE, SHARED ======
+    Every surface on both page types rides the width Work computes, the
+    header bar with it: the logo lands on the content's left edge at any
+    window size. The bar itself stays full-bleed; only its contents move. */
+ .hero > .wrap,
+ .work > .wrap,
+ .about > .wrap,
+ .contact > .wrap,
+ .nav > .wrap {
+   width: var(--measure);
+   max-width: none;
+   padding-left: 0;
+   padding-right: 0;
+   margin-inline: auto;
+ }
+
+ /* On a phone every view scrolls, so a floating pill has copy running
+    underneath it the whole way down. The band gives it a ground of its own:
+    content still scrolls past, but it is never legible under the control,
+    and each view's bottom padding is --seg-band so the last element stops
+    above it rather than beneath. */
+ @media (max-width: 900px) {
+ .seg::before {
+   content: "";
+   position: fixed;
+   left: 0; right: 0; bottom: 0;
+   height: var(--seg-band);
+   background: linear-gradient(to top,
+     var(--bg) 0%, var(--bg) 62%, transparent 100%);
+   z-index: -1;
+   pointer-events: none;
+ }
+ }
+
+ /* ====== SEGMENTED NAVIGATION ======
+    One section on screen at a time, switched from a pill at the foot of the
+    page. The track is a translucent white capsule; the active segment is a
+    solid white pill with dark type, everything else plain white labels. */
+ .seg {
+   position: fixed;
+   left: 50%;
+   bottom: var(--edge);
+   transform: translateX(-50%);
+   z-index: 90;
+   display: flex;
+   align-items: center;
+   gap: 0.25rem;
+   /* Height comes from the token, so --seg-band's arithmetic stays true.
+      It rendered 45px against the 32 that was drawn, which left the gap
+      above the pill 13px short of the edge everywhere. */
+   height: var(--seg-h);
+   padding: 0 4px;
+   border-radius: 999px;
+   background: rgba(255, 255, 255, 0.1);
+   backdrop-filter: blur(12px);
+   -webkit-backdrop-filter: blur(12px);
+   max-width: calc(100vw - 2 * var(--edge));
+   overflow-x: auto;
+   scrollbar-width: none;
+ }
+ .seg::-webkit-scrollbar { display: none; }
+ [data-theme="light"] .seg { background: rgba(20, 20, 20, 0.08); }
+ .seg-btn {
+   flex: none;
+   border: 0;
+   cursor: pointer;
+   background: transparent;
+   color: var(--text);
+   font-family: var(--font);
+   font-size: 0.8125rem;
+   font-weight: 500;
+   letter-spacing: -0.005em;
+   display: inline-flex;
+   align-items: center;
+   height: calc(var(--seg-h) - 8px);
+   padding: 0 0.95rem;
+   border-radius: 999px;
+   white-space: nowrap;
+   transition: background 0.3s var(--ease), color 0.3s var(--ease);
+ }
+ .seg-btn:not(.is-on):hover { background: rgba(255, 255, 255, 0.08); }
+ [data-theme="light"] .seg-btn:not(.is-on):hover { background: rgba(20, 20, 20, 0.06); }
+ .seg-btn.is-on {
+   background: var(--text);
+   color: var(--bg);
+ }
+
+ /* Only the selected section is in the document. The others are removed
+    rather than hidden so their canvases, videos and observers stay idle. */
+ .view { display: none; }
+ /* flex, not block: all four views are flex containers that centre their
+    content vertically inside the budget, and display: block here quietly
+    cancelled that. It showed up first on the hero, whose text sat at the
+    top, and again on Work once the grid stopped filling the full height. */
+ .view.is-on { display: flex; }
+ /* The page no longer scrolls between sections, so the snap and the scroll
+    hint that belonged to that model go with it. */
+ html { scroll-snap-type: none; }
+ .scroll-hint { display: none; }
+ @media (max-width: 640px) {
+   .seg { gap: 0; padding: 0 3px; }
+   .seg-btn { font-size: 0.75rem; padding: 0 0.7rem; }
  }
 </style>
 </head>
@@ -1161,138 +1220,71 @@
  <!-- NAV -->
  <nav class="nav" role="navigation" aria-label="Main navigation">
  <div class="wrap nav-inner">
- <a href="#" class="nav-logo">Pietra Gottardo.</a>
+ <a href="#hero" class="nav-logo">Pietra Gottardo.</a>
  <div class="nav-right">
- <ul class="nav-links">
- <li><a href="#work" data-i18n="nav_work">Work</a></li>
- <li><a href="#about" data-i18n="nav_about">About</a></li>
- <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
- </ul>
  <div class="theme-toggle" role="group" aria-label="Color theme">
    <button class="theme-btn active" data-theme-set="dark" aria-pressed="true" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
    <button class="theme-btn" data-theme-set="light" aria-pressed="false" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
- <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
- <span></span><span></span><span></span>
- </button>
  </div>
  </div>
  </nav>
 
- <div class="mobile-menu" role="dialog" aria-label="Mobile navigation">
- <a href="#work" data-i18n="nav_work">Work</a>
- <a href="#about" data-i18n="nav_about">About</a>
- <a href="#contact" data-i18n="nav_contact">Contact</a>
- <div class="theme-toggle" role="group" aria-label="Color theme">
-   <button class="theme-btn active" data-theme-set="dark" aria-pressed="true" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
-   <button class="theme-btn" data-theme-set="light" aria-pressed="false" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
- </div>
- </div>
 
  <!-- HERO -->
- <section class="hero" id="hero">
+ <section class="hero view is-on" id="hero">
  <canvas id="heroCanvas" class="hero-canvas-full" aria-hidden="true"></canvas>
  <div class="wrap hero-content">
- <p class="hero-eyebrow r" data-i18n="hero_eyebrow">Product Designer</p>
+ <p class="hero-eyebrow r" data-i18n="hero_eyebrow">Senior Product Designer</p>
  <h1 class="r" data-i18n="hero_h1">I turn dense, regulated products<br>into <em>interfaces people trust</em>.</h1>
- <div class="hero-ctas r">
- <a href="#work" class="btn btn-primary" data-i18n="hero_cta_work">See selected work</a>
- <a href="#contact" class="btn btn-ghost" data-i18n="hero_cta_contact">Get in touch</a>
- </div>
- </div>
- <a href="#work" class="hero-scroll-hint r" aria-label="Scroll to selected work">
- <span data-i18n="hero_scroll_hint">Selected work</span>
- <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v14M6 13l6 6 6-6"/></svg>
- </a>
+  </div>
  </section>
 
  <!-- WORK -->
- <section class="work" id="work">
+ <section class="work view" id="work">
  <div class="wrap">
- <div class="section-header r">
- <div>
- <h2 data-i18n="work_heading">Problems solved, products shipped.</h2>
- </div>
- </div>
- <div class="work-scroll" id="workScroll">
-
- <a href="projects/straatos.html" class="case-card-link">
- <article class="case-card r">
- <div class="case-thumb case-thumb--hero">
- <img src="projects/assets/straatos-hero.jpg" alt="Straatos, Saloum Delta mangrove restoration project">
- </div>
- <div class="case-body">
- <div class="case-meta"><span class="case-tag" data-i18n="c1_tag">Carbon Tech</span></div>
- <h3 data-i18n="c1_t">Straatos, Climate action infrastructure</h3>
- <p data-i18n="c1_d">The single platform for carbon project developers, from plot registration to Verra submission, adapted to each stage.</p>
- <span class="case-link"><span data-i18n="c1_l">Read case study</span> →</span>
- </div>
- </article>
- </a>
+ <div class="work-grid">
 
  <a href="projects/wazi.html" class="case-card-link">
  <article class="case-card r">
  <div class="case-thumb case-thumb--hero">
  <img src="projects/assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI Shipments view on a tablet held in two hands, over a warm gold gradient backdrop">
  </div>
- <div class="case-body">
- <div class="case-meta"><span class="case-tag" data-i18n="c2_tag">Responsible Sourcing</span></div>
- <h3 data-i18n="c2_t">WAZI, Digital gold ecosystem</h3>
- <p data-i18n="c2_d">Trust and transparency for artisanal gold mining, a shared evidence base built with sovereignty by design.</p>
- <span class="case-link"><span data-i18n="c2_l">Read case study</span> →</span>
+ </article>
+ </a>
+
+ <a href="projects/straatos.html" class="case-card-link">
+ <article class="case-card r">
+ <div class="case-thumb case-thumb--hero">
+ <img src="projects/assets/straatos-hero.jpg" alt="Straatos, Saloum Delta mangrove restoration project">
  </div>
  </article>
  </a>
+
+ <div class="case-card-link case-card-link--soon" aria-disabled="true">
+ <article class="case-card case-card--soon r">
+ <div class="case-thumb case-thumb--hero case-thumb--kota">
+ <img src="projects/assets/kota-cover.jpg" alt="Kota, Counterparty due-diligence infrastructure. Coming soon">
+ <span class="case-thumb-overlay"><span data-i18n="c4_overlay">Coming soon</span></span>
+ </div>
+ </article>
+ </div>
 
  <a href="projects/supply-chain.html" class="case-card-link">
  <article class="case-card r">
  <div class="case-thumb case-thumb--hero">
  <img src="projects/assets/supply-chain/card.jpg" alt="Supply chain flow map on a laptop, the cobalt route from artisanal mine sites in the DRC up through refiners and cathode makers to the battery pack manufacturer">
  </div>
- <div class="case-body">
- <div class="case-meta"><span class="case-tag" data-i18n="c5_tag">Supply Chain Due Diligence</span></div>
- <h3 data-i18n="c5_t">Continuous due diligence for commodity supply chains</h3>
- <p data-i18n="c5_d">Supplier assessment as a living graph, ESG risk, audit performance and watchlist screening in one workspace.</p>
- <span class="case-link"><span data-i18n="c5_l">Read case study</span> →</span>
- </div>
  </article>
  </a>
 
- <a href="projects/kota.html" class="case-card-link">
- <article class="case-card r">
- <div class="case-thumb case-thumb--hero case-thumb--kota">
- <img src="projects/assets/kota-cover.jpg" alt="Kota, a counterparty business overview on a tablet: confidence score, risk distribution by severity, data reliability over twelve months and key risk indicators">
- </span>
- </div>
- <div class="case-body">
- <div class="case-meta"><span class="case-tag" data-i18n="c4_tag">Onboarding & Due Diligence</span></div>
- <h3 data-i18n="c4_t">Kota, Counterparty due-diligence infrastructure</h3>
- <p data-i18n="c4_d">One durable profile per counterparty, identity, documents and self-assessment compiled once, then reused across every institution and configured for bank or aggregator alike.</p>
- <span class="case-link"><span data-i18n="c4_l">Read case study</span> →</span>
- </div>
- </article>
- </a>
-
-
- </div>
- <div class="work-scroll-hint r">
- <div class="work-scroll-track">
- <div class="work-scroll-thumb" id="workScrollThumb"></div>
- </div>
- <span class="work-scroll-label" data-i18n="scroll_hint">Scroll to explore</span>
  </div>
  </div>
  </section>
 
  <!-- ABOUT (editorial layout, bio + horizontal facts row) -->
- <section class="about" id="about">
+ <section class="about view" id="about">
  <div class="wrap">
- <div class="section-header r">
- <div>
- <h2 data-i18n="about_heading">The story so far.</h2>
- </div>
- </div>
-
  <div class="about-main">
  <div class="about-photo r">
  <img src="assets/pietra-portrait.png" alt="Portrait of Pietra Gottardo">
@@ -1323,6 +1315,14 @@
  <span class="fact-label" data-i18n="fact_now_l">Currently</span>
  <p class="fact-value"><span class="fact-status" data-i18n="fact_now_v">Available for new engagements</span></p>
  </article>
+ <a class="fact-card fact-card--link r" href="https://www.linkedin.com/in/pietragotardo/" target="_blank" rel="noopener">
+ <span class="fact-label" data-i18n="fact_li_l">LinkedIn</span>
+ <p class="fact-value" data-i18n="fact_li_v">/in/pietragotardo</p>
+ </a>
+ <a class="fact-card fact-card--link r" href="assets/pietra-gotardo-cv.pdf" download>
+ <span class="fact-label" data-i18n="fact_cv_l">CV</span>
+ <p class="fact-value" data-i18n="fact_cv_v">Download PDF</p>
+ </a>
  </div>
  </div>
  </div>
@@ -1331,10 +1331,11 @@
  </section>
 
  <!-- CONTACT -->
- <section class="contact" id="contact">
+ <section class="contact view" id="contact">
  <div class="wrap">
  <div class="contact-layout">
  <div class="contact-left">
+ <div class="contact-intro">
  <div class="section-header r">
  <div>
  <h2 data-i18n="contact_heading">Let's build something<br>people understand.</h2>
@@ -1364,30 +1365,33 @@
  <p class="form-status" id="contactStatus" role="status" aria-live="polite"></p>
  </form>
  </div>
+ <div class="contact-canvas r" aria-hidden="true">
+ <canvas id="swarmCanvas"></canvas>
+ </div>
  </div>
  </section>
 
  <!-- FOOTER -->
- <footer class="footer">
- <div class="wrap footer-inner">
- <span class="footer-copy" data-i18n="footer_copy">&copy; 2026 · Pietra Gottardo</span>
- <ul class="footer-links">
- <li><a href="https://www.linkedin.com/in/pietragotardo/" target="_blank" rel="noopener">LinkedIn</a></li>
- <li><a href="#hero" data-i18n="footer_top">Back to top</a></li>
- </ul>
- </div>
- </footer>
+
+ <!-- Navigation moves out of the header and into a segmented control at the
+      foot of the page. Only one section is on screen at a time, so this is a
+      view switcher rather than a set of scroll anchors. -->
+ <nav class="seg" role="tablist" aria-label="Sections">
+   <button class="seg-btn is-on" role="tab" aria-selected="true" data-view="hero" data-i18n="seg_landing">Landing</button>
+   <button class="seg-btn" role="tab" aria-selected="false" data-view="work" data-i18n="nav_work">Work</button>
+   <button class="seg-btn" role="tab" aria-selected="false" data-view="about" data-i18n="nav_about">About</button>
+   <button class="seg-btn" role="tab" aria-selected="false" data-view="contact" data-i18n="seg_contact">Get in touch</button>
+ </nav>
 
  <script>
  const T = {
  en: {
+ seg_landing:"Landing",
+ seg_contact:"Get in touch",
  nav_work:"Work", nav_about:"About", nav_contact:"Contact",
- hero_eyebrow:"Product Designer",
+ hero_eyebrow:"Senior Product Designer",
  hero_h1:"I turn dense, regulated products<br>into <em>interfaces people trust</em>.",
- hero_cta_work:"See selected work",
- hero_cta_contact:"Get in touch",
- hero_scroll_hint:"Selected work",
- m1:"UI/UX Design", m2:"Design Systems", m3:"Product Strategy", m4:"User Research", m5:"SaaS", m6:"B2B Platforms",
+    m1:"UI/UX Design", m2:"Design Systems", m3:"Product Strategy", m4:"User Research", m5:"SaaS", m6:"B2B Platforms",
  work_label:"Selected work",
  work_heading:"Problems solved, products shipped.",
  c1_tag:"Carbon Tech",
@@ -1412,9 +1416,7 @@
  c4_d:"One durable profile per counterparty, identity, documents and self-assessment compiled once, then reused across every institution and configured for bank or aggregator alike.",
  c4_l:"Read case study",
  c4_overlay:"Coming soon",
- scroll_hint:"Scroll to explore",
  about_label:"About",
- about_heading:"The story so far.",
  about_lead:"Hey! I'm Pietra, I design solutions that work across borders.",
  about_p1:"I started in graphic design, branding, editorial, industrial, before moving into digital product design. For the past four years I've been focused on SaaS, working with international teams that need to turn complex, regulated, multi-stakeholder domains into interfaces people can actually use.",
  about_p2:"My work tends to live at the boundary between research, information architecture and the UI itself. I map ecosystems, draw service blueprints, design role-based sidebars, and ship the screens that come out the other end, often working alongside engineering as a product architect rather than handing files over a wall.",
@@ -1428,6 +1430,8 @@
  fact_work_v:"Embedded · specs, tokens, AI handoff",
  fact_now_l:"Currently",
  fact_now_v:"Available for new engagements",
+ fact_li_l:"LinkedIn", fact_li_v:"/in/pietragotardo",
+ fact_cv_l:"CV", fact_cv_v:"Download PDF",
  contact_label:"Get in touch",
  contact_heading:"Let's build something<br>people understand.",
  contact_p:"Have a SaaS product that needs clarity? A complex interface that users struggle with? I'd love to hear about it.",
@@ -1441,17 +1445,12 @@
  form_success:"Thanks, your message just landed in my inbox.",
  form_error:"Something went sideways. Try again, or email pietragottardo@gmail.com.",
  form_missing:"Please fill in name, email, and message.",
- footer_copy:"© 2026 · Pietra Gottardo",
- footer_top:"Back to top"
  },
  pt: {
  nav_work:"Projetos", nav_about:"Sobre", nav_contact:"Contato",
- hero_eyebrow:"Product Designer",
+ hero_eyebrow:"Senior Product Designer",
  hero_h1:"Eu transformo produtos densos e regulados<br>em <em>interfaces em que as pessoas confiam</em>.",
- hero_cta_work:"Ver projetos",
- hero_cta_contact:"Entrar em contato",
- hero_scroll_hint:"Projetos selecionados",
- m1:"UI/UX Design", m2:"Design Systems", m3:"Estratégia de Produto", m4:"Pesquisa com Usuários", m5:"SaaS", m6:"Plataformas B2B",
+    m1:"UI/UX Design", m2:"Design Systems", m3:"Estratégia de Produto", m4:"Pesquisa com Usuários", m5:"SaaS", m6:"Plataformas B2B",
  work_label:"Projetos selecionados",
  work_heading:"Problemas resolvidos, produtos entregues.",
  c1_tag:"Carbon Tech",
@@ -1476,9 +1475,7 @@
  c4_d:"Um perfil durável por contraparte, identidade, documentos e self-assessment compilados uma vez e reusados em cada instituição, configurado para banco ou agregador.",
  c4_l:"Ler case study",
  c4_overlay:"Em breve",
- scroll_hint:"Deslize para explorar",
  about_label:"Sobre",
- about_heading:"A história até aqui.",
  about_lead:"Oi! Eu sou a Pietra, desenho soluções que funcionam sem fronteiras.",
  about_p1:"Comecei em design gráfico, branding, editorial, industrial, antes de migrar pro design de produto digital. Nos últimos quatro anos foquei em SaaS, trabalhando com times internacionais que precisam transformar domínios complexos, regulados e multi-stakeholder em interfaces que as pessoas realmente conseguem usar.",
  about_p2:"Meu trabalho vive na fronteira entre pesquisa, arquitetura da informação e a própria UI. Mapeio ecossistemas, desenho service blueprints, projeto sidebars baseadas em papel, e entrego as telas que saem do outro lado, frequentemente trabalhando lado a lado com engenharia como product architect, em vez de jogar arquivos por cima do muro.",
@@ -1492,6 +1489,8 @@
  fact_work_v:"Embutida · specs, tokens, handoff com IA",
  fact_now_l:"Agora",
  fact_now_v:"Disponível pra novos engajamentos",
+ fact_li_l:"LinkedIn", fact_li_v:"/in/pietragotardo",
+ fact_cv_l:"CV", fact_cv_v:"Baixar PDF",
  contact_label:"Entre em contato",
  contact_heading:"Vamos construir algo<br>que as pessoas entendam.",
  contact_p:"Tem um produto SaaS que precisa de clareza? Uma interface complexa que os usuários não entendem? Quero ouvir sobre.",
@@ -1505,8 +1504,6 @@
  form_success:"Valeu, sua mensagem chegou na minha caixa.",
  form_error:"Algo deu errado. Tenta de novo, ou manda direto pra pietragottardo@gmail.com.",
  form_missing:"Preencha nome, email e mensagem.",
- footer_copy:"© 2026 · Pietra Gottardo",
- footer_top:"Voltar ao topo"
  }
  };
 
@@ -1635,36 +1632,173 @@
  window.addEventListener('themechange', updateNav);
  updateNav();
 
- // Mobile menu
- const tog = document.querySelector('.nav-toggle');
- const mob = document.querySelector('.mobile-menu');
- tog.addEventListener('click', () => {
- const open = mob.classList.toggle('open');
- tog.classList.toggle('open', open);
- tog.setAttribute('aria-expanded', open);
- document.body.style.overflow = open ? 'hidden' : '';
+ /* Segmented navigation, in place of the header links and the burger.
+    Switching views instead of scrolling means the reveal observer has to be
+    re-run over whatever just appeared: those elements were display:none the
+    first time it looked at them, so they never intersected anything. */
+ (() => {
+ const btns = [...document.querySelectorAll('.seg-btn')];
+ const views = [...document.querySelectorAll('.view')];
+ if (!btns.length) return;
+ const show = (name) => {
+ views.forEach(v => v.classList.toggle('is-on', v.id === name));
+ btns.forEach(b => {
+ const on = b.dataset.view === name;
+ b.classList.toggle('is-on', on);
+ b.setAttribute('aria-selected', on);
  });
- mob.querySelectorAll('a').forEach(a =>
- a.addEventListener('click', () => {
- mob.classList.remove('open');
- tog.classList.remove('open');
- tog.setAttribute('aria-expanded', 'false');
- document.body.style.overflow = '';
- })
- );
+ window.scrollTo(0, 0);
+ const active = document.getElementById(name);
+ if (active) active.querySelectorAll('.r').forEach(el => el.classList.add('v'));
+ };
+ // The hash is the address of a view, so the segmented control on the case
+ // study pages can link back to a specific one (../index.html#work).
+ const fromHash = () => {
+ const name = location.hash.replace('#', '');
+ return views.some(v => v.id === name) ? name : 'hero';
+ };
+ btns.forEach(b => b.addEventListener('click', () => {
+ history.replaceState(null, '', '#' + b.dataset.view);
+ show(b.dataset.view);
+ }));
+ window.addEventListener('hashchange', () => show(fromHash()));
+ show(fromHash());
+ })();
 
- // Work scroll progress bar
- const workScroll = document.getElementById('workScroll');
- const workThumb = document.getElementById('workScrollThumb');
- if (workScroll && workThumb) {
- workScroll.addEventListener('scroll', () => {
- const max = workScroll.scrollWidth - workScroll.clientWidth;
- if (max > 0) {
- const pct = workScroll.scrollLeft / max;
- workThumb.style.left = (pct * 67) + '%';
+ // ====== CONTACT CIRCLE canvas (chaos -> circle -> scatter) ======
+ // Restored from the old CTC section: same dot swarm, now carrying the
+ // left column of Get in touch.
+ (() => {
+ const canvas = document.getElementById('swarmCanvas');
+ if (!canvas) return;
+ const ctx = canvas.getContext('2d');
+ const N = 90;
+ const DOT_SIZE = 2;
+ let W, H, dots, running = false;
+
+ function resize() {
+ const dpr = Math.min(window.devicePixelRatio || 1, 2);
+ const rect = canvas.parentElement.getBoundingClientRect();
+ W = rect.width; H = rect.height;
+ canvas.width = W * dpr; canvas.height = H * dpr;
+ canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+ ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
  }
- }, { passive: true });
+
+ function init() {
+ resize();
+ const circleCx = W * 0.5;
+ const circleCy = H * 0.5;
+ const radius = Math.min(W, H) * 0.4;
+ dots = [];
+ for (let i = 0; i < N; i++) {
+ dots.push({
+ baseAngle: (i / N) * Math.PI * 2,
+ circleCx, circleCy, radius,
+ x: Math.random() * W,
+ y: Math.random() * H,
+ chaosVx: (Math.random() - 0.5) * 1.4,
+ chaosVy: (Math.random() - 0.5) * 1.4,
+ });
  }
+ }
+
+ // Same cache as the hero canvas: getComputedStyle per dot per frame is
+ // not free, and the value only changes when the theme does.
+ let dotCache = '', dotTheme = null;
+ function dotRGB() {
+ const t = document.documentElement.getAttribute('data-theme');
+ if (t !== dotTheme) {
+ dotTheme = t;
+ dotCache = getComputedStyle(document.documentElement)
+ .getPropertyValue('--dot-rgb').trim() || '247,253,185';
+ }
+ return dotCache;
+ }
+
+ const GATHER = 3000, SPIN = 4000, SCATTER = 3200;
+ const TOTAL = GATHER + SPIN + SCATTER;
+ const smoothstep = x => { const c = Math.max(0, Math.min(1, x)); return c * c * (3 - 2 * c); };
+
+ let mouseX = -9999, mouseY = -9999;
+ const REPEL_RADIUS = 100, REPEL_FORCE = 25;
+ canvas.addEventListener('pointermove', e => {
+ const rect = canvas.getBoundingClientRect();
+ mouseX = e.clientX - rect.left;
+ mouseY = e.clientY - rect.top;
+ });
+ canvas.addEventListener('pointerleave', () => { mouseX = -9999; mouseY = -9999; });
+ canvas.style.pointerEvents = 'auto';
+
+ function draw(time) {
+ if (!running) return;
+ ctx.clearRect(0, 0, W, H);
+ const phase = time % TOTAL;
+
+ let formProg, spinAngle;
+ if (phase < GATHER) {
+ formProg = smoothstep(phase / GATHER);
+ spinAngle = 0;
+ } else if (phase < GATHER + SPIN) {
+ formProg = 1;
+ spinAngle = smoothstep((phase - GATHER) / SPIN) * Math.PI * 2;
+ } else {
+ formProg = 1 - smoothstep((phase - GATHER - SPIN) / SCATTER);
+ spinAngle = Math.PI * 2;
+ }
+
+ for (const d of dots) {
+ d.x += d.chaosVx * (1 - formProg);
+ d.y += d.chaosVy * (1 - formProg);
+ if (d.x < 0) d.x = W; if (d.x > W) d.x = 0;
+ if (d.y < 0) d.y = H; if (d.y > H) d.y = 0;
+
+ const cAngle = d.baseAngle + spinAngle;
+ const circX = d.circleCx + Math.cos(cAngle) * d.radius;
+ const circY = d.circleCy + Math.sin(cAngle) * d.radius;
+
+ let dx = d.x + (circX - d.x) * formProg;
+ let dy = d.y + (circY - d.y) * formProg;
+
+ const mdx = dx - mouseX, mdy = dy - mouseY;
+ const distSq = mdx * mdx + mdy * mdy;
+ if (distSq < REPEL_RADIUS * REPEL_RADIUS) {
+ const dist = Math.sqrt(distSq) || 1;
+ const falloff = 1 - dist / REPEL_RADIUS;
+ const force = falloff * falloff * REPEL_FORCE;
+ dx += (mdx / dist) * force;
+ dy += (mdy / dist) * force;
+ }
+
+ d.drawX = dx; d.drawY = dy;
+ d.drawAlpha = 0.12 + formProg * 0.38;
+ }
+
+ for (const d of dots) {
+ ctx.beginPath();
+ ctx.arc(d.drawX, d.drawY, DOT_SIZE, 0, Math.PI * 2);
+ ctx.fillStyle = `rgba(${dotRGB()},${d.drawAlpha})`;
+ ctx.fill();
+ }
+
+ requestAnimationFrame(draw);
+ }
+
+ // The views are display:none until selected, so the parent has no box to
+ // measure until Contact is on screen — re-init on show rather than at load.
+ const ctcObs = new IntersectionObserver(([entry]) => {
+ if (entry.isIntersecting && !running) {
+ init();
+ running = true;
+ requestAnimationFrame(draw);
+ } else if (!entry.isIntersecting) {
+ running = false;
+ }
+ }, { threshold: 0.05 });
+ ctcObs.observe(canvas.parentElement);
+
+ window.addEventListener('resize', () => { if (running) init(); }, { passive: true });
+ })();
 
  // Reveal, global observer
  const obs = new IntersectionObserver(es =>

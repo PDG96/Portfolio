@@ -15,6 +15,12 @@ CLAUDE.md
 _case-studies/
 datastake/
 portfolio/
+product-docs/
+reference/
+
+# Local scratch and backups
+*.bak
+_m2.html
 
 # Build / cache (none right now, but future-proof)
 node_modules/

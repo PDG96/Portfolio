@@ -423,9 +423,47 @@
 		.chart-card { height: 240px; }
 		.nav-strip { transform: scale(.85); transform-origin: top right; }
 	}
+
+	/* ====== GLOBE-ONLY MODE (?only=globe) ======
+	   The case study embeds this file twice over: once as the whole product
+	   surface, and once as the globe on its own, framed the way the WAZI
+	   network graph is — a bare interactive card with no browser chrome and
+	   no dashboard around it. Everything but the map is taken out of the
+	   flow and the map is allowed to fill the frame instead of standing at
+	   its fixed 684px. */
+	body.globe-only .sidebar,
+	body.globe-only .m-appbar,
+	body.globe-only .m-tabbar,
+	body.globe-only .header,
+	body.globe-only .page-title,
+	body.globe-only .card-header,
+	body.globe-only .content > .card + .card { display: none !important; }
+
+	body.globe-only .app-shell { padding: 0; }
+	body.globe-only .content {
+		padding: 0;
+		gap: 0;
+		overflow: hidden;
+		background: transparent;
+	}
+	body.globe-only .content > .card {
+		flex: 1;
+		min-height: 0;
+		border: 0;
+		border-radius: 0;
+		background: transparent;
+	}
+	body.globe-only .map-body { height: 100%; }
 </style>
 </head>
 <body>
+<script>
+	/* Read before anything paints, so the globe-only frame never flashes the
+	   full dashboard first. */
+	if (new URLSearchParams(location.search).get('only') === 'globe') {
+		document.body.classList.add('globe-only');
+	}
+</script>
 	<!-- Mobile app chrome. The desktop rail is a single exported SVG, so the
 	     phone version is authored here rather than reflowed: a compact app bar
 	     with the project switcher, and a bottom tab bar for the sections that

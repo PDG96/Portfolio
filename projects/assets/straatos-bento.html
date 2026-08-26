@@ -75,8 +75,12 @@
       width: 100% !important;
       height: auto !important;
     }
+    /* A definite height, not a minimum. The chart mount asks for height: 100%,
+       and against an auto-height tile that resolves to nothing — so G2Plot fell
+       back to its own 400px default and the canvas hung 54px out of a 346px
+       card. With a real height the chain resolves and the chart fits the box. */
     .tile.salinity,
-    .tile.stakeholder { min-height: 320px; }
+    .tile.stakeholder { height: 400px !important; min-height: 0; }
     .tile.indicators  { min-height: 320px; }
     .tile.species     { min-height: 320px; }
     .tile.awareness   { min-height: 500px; }
@@ -89,17 +93,6 @@
        Cards size to their content here, and the thumb comes down with them. */
     /* Same selector the desktop sizes are set on, or its 64px thumb wins on
        specificity and the custom property here never lands. */
-    .tile.indicators > [data-chart="indicator-stack"] {
-      --is-thumb-size: 44px;
-      --is-value-size: 19px;
-      --is-label-size: 13px;
-      --is-gap: 12px;
-      height: auto;
-    }
-    .tile.indicators > [data-chart="indicator-stack"] > .is-card {
-      flex: 0 0 auto;
-      min-height: 0;
-    }
   }
 
   /* Live components fill their tile entirely. */
@@ -172,6 +165,40 @@
     height: 100%;
     object-fit: contain;
     filter: drop-shadow(0 1.2% 3% rgba(0, 0, 0, 0.32));
+  }
+
+  @media (max-width: 900px) {
+    /* At the end on purpose. These override the desktop indicator rules, which
+       are declared further down the file, and between selectors of equal weight
+       source order decides — from up in the mobile block they simply lost.
+       The gap is the visible one: 3.82% of an auto-height column resolves to
+       nothing, which is why two of the three cards were touching. */
+    .tile.indicators > [data-chart="indicator-stack"] {
+      --is-thumb-size: 44px;
+      --is-value-size: 19px;
+      --is-label-size: 13px;
+      --is-gap: 12px;
+      height: auto;
+    }
+    .tile.indicators > [data-chart="indicator-stack"] > .is-card {
+      flex: 0 0 auto;
+      min-height: 0;
+    }
+    /* The tile was a fixed 320 while its three cards add up to 270, so 50px
+       of empty card trailed them and the gap to the next tile read as 62px
+       instead of 12. Tiles whose content has a natural height hug it; only
+       the chart tiles keep a definite box, because their canvas needs one
+       to size against. */
+    .tile.indicators {
+      height: auto !important;
+      min-height: 0;
+      /* Nothing here needs clipping — no image, no rounded photo — and the
+         hidden overflow was cutting the last card off by 14px. */
+      overflow: visible;
+    }
+    /* A stray margin was making the first gap 26px against the second's 12,
+       and that difference is what spilled past the tile. */
+    .tile.indicators .is-card { margin: 0 !important; }
   }
 </style>
 </head>
