@@ -135,6 +135,13 @@
         letter-spacing: -0.005em;
         line-height: 1.2;
       }
+      /* Value and delta on one line, the chip pushed to the far edge. */
+      .is-row {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+      }
+      .is-row .is-delta { margin-left: auto; }
       .is-value {
         font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', sans-serif;
         font-size: var(--is-value-size);
@@ -162,6 +169,7 @@
         font-weight: 500;
         font-variant-numeric: tabular-nums;
         flex: none;
+        align-self: center;
         opacity: 0;
         transform: translateX(8px);
         transition:
@@ -216,7 +224,13 @@
   // Animate the number from 0 to `to`, formatting every frame.
   function countUp(el, to, opts, duration = 650) {
     const start = performance.now();
+    let settled = false;
     function tick(now) {
+      // The safety timeout below is the authority. Without this check the
+      // loop kept running after it fired and overwrote the true figure with
+      // an interpolated one on the very next frame — which is how the
+      // counter could sit frozen part-way up and read as a real number.
+      if (settled) return;
       // Clamped to [0, 1]: `now` should never come in before `start`, but a
       // backgrounded/throttled tab (common for an iframe scrolled off, or
       // paused while hidden) can hand rAF a timestamp that doesn't line up
@@ -228,14 +242,17 @@
       const current = to * easeOutQuint(t);
       el.firstChild.nodeValue = formatNumber(current, opts);
       if (t < 1) requestAnimationFrame(tick);
-      else el.firstChild.nodeValue = formatNumber(to, opts);
+      else { settled = true; el.firstChild.nodeValue = formatNumber(to, opts); }
     }
     el.firstChild.nodeValue = formatNumber(0, opts);
     requestAnimationFrame(tick);
     /* Same guard as vertical-gauge: rAF is suspended in a background tab, so
        an indicator revealed there would stay frozen on 0 and read as a real
        figure. Timers keep running, so this lands the true value regardless. */
-    setTimeout(() => { el.firstChild.nodeValue = formatNumber(to, opts); }, duration + 250);
+    setTimeout(() => {
+      settled = true;
+      el.firstChild.nodeValue = formatNumber(to, opts);
+    }, duration + 250);
   }
 
   function arrowSvg(direction) {
@@ -266,13 +283,20 @@
 
     const card = document.createElement('div');
     card.className = 'is-card';
+    // The delta sits on the value's row rather than as a sibling of the whole
+    // text block. As a sibling it was centred against the card, so a label
+    // that fits on one line put the chip level with the label while a label
+    // that wrapped to two put it level with the number — three identical
+    // cards, three different chip positions.
     card.innerHTML = `
       <div class="is-thumb">${imgHtml}</div>
       <div class="is-text">
         <div class="is-label">${escapeHtml(item.label || '')}</div>
-        <div class="is-value"><span class="is-number">${initialDisplay}</span>${unitHtml}</div>
+        <div class="is-row">
+          <div class="is-value"><span class="is-number">${initialDisplay}</span>${unitHtml}</div>
+          ${deltaHtml}
+        </div>
       </div>
-      ${deltaHtml}
     `;
     card._numberEl = card.querySelector('.is-number');
     card._numberOpts = numberOpts;
