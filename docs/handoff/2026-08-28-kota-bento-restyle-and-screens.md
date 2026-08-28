@@ -103,3 +103,13 @@ greens off-token, score bars are images not components, two cards named
 - Cache-bust dos CSS → `?v=5`.
 
 Nada commitado.
+
+## Update 2026-08-28 (tarde) — ajustes finos + publicação
+- Confidence score: gauge centralizado, texto menor embaixo (coluna única); número desceu pra dentro do arco.
+- Data lineage: tiles de origem com largura fixa 190px (bordas direitas alinhadas às linhas).
+- Decisão: botões sem ícone; subform de condições começa vazio com placeholder claro; confirmação vira "Send conditions" (uma linha).
+- Tooltips em todos os gráficos: gauge, donut (fatia destaca no hover), linha (mês + os dois valores, guia vertical), barras e sparklines da KRI, coverage. Engine única em `.tip` + `data-tip`.
+- Registration: chips de filtro removidos (só busca).
+- Case Kota: vídeo do bento agora na largura total, igual aos dashboards.
+- Landing: Get in touch redesenhado (duas colunas, e-mail como CTA, lista com régua). Sem `connect_p3`; chaves novas `connect_eyebrow`.
+- Commit `1ae987f` em main → deploy Cloudflare Pages.
