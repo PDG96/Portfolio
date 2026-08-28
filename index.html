@@ -786,10 +786,9 @@
  font-weight: 500;
  letter-spacing: 0.14em;
  text-transform: uppercase;
- color: var(--text-3);
+ color: rgb(var(--dot-rgb));   /* green in dark, coral in light — same token as the dots */
  margin-bottom: clamp(1rem, 1.6cqi, 1.75rem);
  }
- [data-theme="light"] .connect-eyebrow { color: rgb(var(--dot-rgb)); }
  .connect h2 {
  font-size: clamp(2.25rem, 4.5cqi, 5.25rem);
  font-weight: 300;
@@ -834,13 +833,13 @@
  transition: border-color 0.3s var(--ease), color 0.3s var(--ease);
  word-break: break-all;
  }
- .connect-mail:hover { color: var(--cta); border-color: var(--cta); }
+ .connect-mail:hover { color: rgb(var(--dot-rgb)); border-color: rgb(var(--dot-rgb)); }
  .connect-arrow {
  font-size: 0.7em;
  color: var(--text-3);
  transition: transform 0.35s var(--ease), color 0.3s var(--ease);
  }
- .connect-mail:hover .connect-arrow { color: var(--cta); transform: translate(0.12em, -0.12em); }
+ .connect-mail:hover .connect-arrow { color: rgb(var(--dot-rgb)); transform: translate(0.12em, -0.12em); }
 
  /* The three ways in, as a ruled list rather than three boxes. */
  .connect-list {
@@ -883,8 +882,8 @@
  font-size: 0.95em;
  transition: transform 0.35s var(--ease), color 0.3s var(--ease);
  }
- .connect-row:hover .connect-row-v { color: var(--cta); }
- .connect-row:hover .connect-row-a { color: var(--cta); transform: translate(0.12em, -0.12em); }
+ .connect-row:hover .connect-row-v { color: rgb(var(--dot-rgb)); }
+ .connect-row:hover .connect-row-a { color: rgb(var(--dot-rgb)); transform: translate(0.12em, -0.12em); }
 
 
  .contact .btn-primary {
