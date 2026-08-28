@@ -26,25 +26,11 @@
   --c-line-a:#E25E25; --c-line-b:#85A5FF;
   --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
   --shadow-lg:0 8px 24px rgba(16,24,40,.12);
-  --radius:12px;
+  --radius:8px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --bg:#151109; --surface:#211A12; --surface-2:#271F16;
-    --border:#352B20; --border-soft:#2C2318;
-    --text:#F6EFE7; --text-2:#DCD1C4; --muted:#A99C8C; --muted-2:#7E7161; --faint:#4C4133;
-    --accent:#F0743F; --accent-hover:#F5854F; --accent-soft:#F08F65; --accent-tint:#2B1B10; --accent-tint-2:#3A2416;
-    --good:#75E0A7; --good-bg:#0F241A; --good-bd:#1F4632;
-    --warn:#FDB750; --warn-bg:#2A2010; --warn-bd:#5A431A;
-    --bad:#FDA29B;  --bad-bg:#2A1512;  --bad-bd:#5A2723;
-    --approve:#12B76A; --approve-hover:#3BCB86;
-    --reject:#F04438;
-    --correct:#F79009;
-    --c-line-b:#9DB0FF;
-    --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.5);
-    --shadow-lg:0 10px 28px rgba(0,0,0,.55);
-  }
-}
+/* Light by default. Dark only when the host explicitly stamps data-theme="dark";
+   the case study pins these screens to light whatever the page theme. */
 :root[data-theme="dark"]{
   --bg:#151109; --surface:#211A12; --surface-2:#271F16;
   --border:#352B20; --border-soft:#2C2318;
@@ -74,4 +60,13 @@
 :root[data-theme="dark"], :root:not([data-theme="light"]) {
   --sidebar: #1B150E;
   --sidebar-2: #241C13;
+}
+
+/* Type scale from the Figma bento (Text md/sm/xs). Titles are Gray/90, not
+   Gray/900: the bento keeps headings a step softer than body numerals. */
+:root{
+  --title:#384250;
+  --t-md:16px; --t-md-lh:24px;
+  --t-sm:14px; --t-sm-lh:20px;
+  --t-xs:12px; --t-xs-lh:18px;
 }

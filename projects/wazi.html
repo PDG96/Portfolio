@@ -2738,7 +2738,40 @@ setLang(lang);
  if (e.key === 'Escape' && lb.classList.contains('is-open')) close();
  });
  })();
- </script>
+ 
+ /* Wheel anywhere scrolls the sheet. The shell is a fixed frame and the
+ sheet is the only scroller, so a wheel over the sidebar or the gutters
+ used to do nothing. The sidebar keeps its own scroll while it can still
+ move in that direction; otherwise the motion goes to the sheet. */
+ (function () {
+ const sheet = document.querySelector('.main-sheet');
+ if (!sheet) return;
+ const sidebar = document.querySelector('.sidebar');
+ function canScroll(el, dy) {
+ if (!el) return false;
+ const st = getComputedStyle(el).overflowY;
+ if (st !== 'auto' && st !== 'scroll') return false;
+ if (el.scrollHeight <= el.clientHeight + 1) return false;
+ return dy > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0;
+ }
+ document.addEventListener('wheel', (e) => {
+ if (sheet.contains(e.target)) return;                 // native scroll
+ if (sidebar && sidebar.contains(e.target) && canScroll(sidebar, e.deltaY)) return;
+ if (e.ctrlKey) return;                                // pinch-zoom
+ e.preventDefault();
+ sheet.scrollBy({ top: e.deltaY, left: 0 });
+ }, { passive: false });
+ document.addEventListener('keydown', (e) => {
+ const a = document.activeElement;
+ if (a && a !== document.body && !a.classList.contains('seg-btn')) return;
+ const page = sheet.clientHeight * 0.85;
+ const map = { ArrowDown: 60, ArrowUp: -60, PageDown: page, PageUp: -page, ' ': e.shiftKey ? -page : page };
+ if (!(e.key in map)) return;
+ e.preventDefault();
+ sheet.scrollBy({ top: map[e.key], behavior: 'smooth' });
+ });
+ })();
+</script>
 
 
  <!-- Segmented nav, same control as the landing. -->

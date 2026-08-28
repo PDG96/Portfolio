@@ -1222,6 +1222,219 @@
  line-height: 1.4;
  }
  }
+ /* Motion capture. Recorded at 2x (1980px for a 990px viewport), so the frame
+    stops at 990px and renders 1:1 on retina rather than being upscaled — which
+    is what made the earlier export read as soft. Corner is the house radius:
+    unlike the Jitter export, this capture carries none of its own. */
+ .app-shot--video .video-frame {
+ width: 100%;
+ max-width: none;
+ margin-inline: auto;
+ border-radius: 14px;
+ overflow: hidden;
+ line-height: 0;
+ }
+ .app-shot--video .video-frame video {
+ width: 100%;
+ height: auto;
+ display: block;
+ }
+
+
+ /* ====== KOTA · THE BRIEF (pull quote) ====== */
+ .brief { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 4vw, 3rem); }
+ @media (min-width: 900px) {
+ .brief { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(3rem, 6vw, 5rem); align-items: start; }
+ }
+ .brief-quote { margin: 0; padding-left: clamp(1.25rem, 2.5vw, 2rem); border-left: 2px solid var(--accent); }
+ .brief-quote p {
+ font-size: clamp(1.5rem, 3.1vw, 2.5rem); font-weight: 300; line-height: 1.25;
+ letter-spacing: -0.02em; color: var(--text); margin: 0; text-wrap: balance;
+ }
+ .brief-quote footer {
+ margin-top: 1.25rem; font-family: var(--mono); font-size: 0.6875rem; font-weight: 500;
+ letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3);
+ }
+ .brief-body p { color: var(--text-2); font-size: 1rem; line-height: 1.7; margin: 0 0 1rem; }
+ .brief-inputs { list-style: none; margin: 1.5rem 0 0; padding: 0; border-top: 1px solid var(--border); }
+ .brief-inputs li {
+ display: grid; grid-template-columns: 7.5rem 1fr; gap: 1rem; padding: 0.9rem 0;
+ border-bottom: 1px solid var(--border); font-size: 0.9375rem; color: var(--text-2); line-height: 1.5;
+ }
+ .brief-inputs b {
+ font-family: var(--mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.12em;
+ text-transform: uppercase; color: var(--accent); padding-top: 0.2rem;
+ }
+
+ /* ====== KOTA · CONSTRAINT CHIPS ====== */
+ .constraints { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: clamp(2rem, 4vw, 3rem); }
+ .constraints-label {
+ font-family: var(--mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.12em;
+ text-transform: uppercase; color: var(--text-3); margin-right: 0.5rem;
+ }
+ .constraint {
+ font-size: 0.8125rem; font-weight: 500; color: var(--text); background: var(--surface);
+ border: 1px solid var(--border); border-radius: 999px; padding: 0.4rem 0.85rem;
+ }
+
+ /* ====== KOTA · GRAMMAR FLOW (three mini screens; product visuals stay light) ====== */
+ .gflow {
+ --k-bg: #F9FAFB; --k-surface: #fff; --k-border: #EAECF0; --k-soft: #F3F4F6; --k-text: #101828;
+ --k-muted: #667085; --k-faint: #D2D6DB; --k-accent: #E25E25; --k-tint: #FFF3EE; --k-tint2: #FFE2D6;
+ display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: clamp(2rem, 4vw, 3rem);
+ }
+ @media (min-width: 820px) {
+ .gflow { grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 0.75rem; }
+ }
+ .gflow-arrow { display: none; }
+ @media (min-width: 820px) { .gflow-arrow { display: grid; place-items: center; color: var(--text-3); font-size: 1.25rem; } }
+ .gscreen {
+ background: var(--k-bg); border: 1px solid var(--k-border); border-radius: 14px; padding: 0.875rem;
+ display: flex; flex-direction: column; gap: 0.5rem; font-family: var(--font); color: var(--k-text); min-height: 210px;
+ }
+ .gscreen-tag {
+ font-size: 0.625rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+ color: var(--k-muted); display: flex; justify-content: space-between; gap: 0.5rem;
+ }
+ .gscreen-tag i { font-style: normal; color: var(--k-accent); }
+ .gcard { background: var(--k-surface); border: 1px solid var(--k-border); border-radius: 8px; box-shadow: 0 1px 2px rgba(16,24,40,.06); flex: 1; }
+ .gtable { padding: 0; overflow: hidden; }
+ .gtable .gth, .gtable .gtr {
+ display: grid; grid-template-columns: 1.6fr 1fr 0.9fr; gap: 0.5rem; padding: 0.45rem 0.65rem;
+ font-size: 0.6rem; align-items: center;
+ }
+ .gtable .gth {
+ color: var(--k-muted); font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+ font-size: 0.55rem; border-bottom: 1px solid var(--k-border); background: #FCFCFD;
+ }
+ .gtable .gtr { border-bottom: 1px solid var(--k-soft); color: var(--k-text); }
+ .gtable .gtr:last-child { border-bottom: 0; }
+ .gtable .gtr.on { background: var(--k-tint); }
+ .gbar { height: 5px; border-radius: 99px; background: var(--k-soft); overflow: hidden; }
+ .gbar i { display: block; height: 100%; background: linear-gradient(90deg, #F08F65, var(--k-accent)); }
+ .gpill { display: inline-block; font-size: 0.55rem; font-weight: 600; padding: 1px 6px; border-radius: 99px; border: 1px solid; justify-self: start; white-space: nowrap; }
+ .gpill.a { color: #027A48; background: #ECFDF3; border-color: #ABEFC6; }
+ .gpill.b { color: #175CD3; background: #EFF4FF; border-color: #B2CCFF; }
+ .gpill.c { color: #B54708; background: #FFFAEB; border-color: #FEDF89; }
+ .ghub-head { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 0.65rem; border-bottom: 1px solid var(--k-border); }
+ .ghub-head .gav { width: 18px; height: 18px; border-radius: 5px; background: var(--k-accent); flex: none; }
+ .ghub-head b { font-size: 0.7rem; font-weight: 600; display: block; }
+ .ghub-head small { font-size: 0.55rem; color: var(--k-muted); display: block; }
+ .ghub-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; padding: 0.6rem 0.65rem; }
+ .gtile {
+ border: 1px solid var(--k-border); border-radius: 6px; padding: 0.5rem 0.55rem; font-size: 0.6rem;
+ font-weight: 500; color: var(--k-text); display: flex; flex-direction: column; gap: 0.2rem;
+ }
+ .gtile small { font-size: 0.52rem; color: var(--k-muted); font-weight: 400; }
+ .gtile.on { border-color: var(--k-tint2); background: var(--k-tint); }
+ .gstages { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; flex: 1; }
+ .gstage { padding: 0.55rem; }
+ .gstage-k {
+ font-size: 0.55rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+ color: var(--k-muted); margin-bottom: 0.4rem;
+ }
+ .gstage.on .gstage-k { color: var(--k-accent); }
+ .gact { display: flex; align-items: center; gap: 0.35rem; font-size: 0.6rem; padding: 0.32rem 0; border-top: 1px solid var(--k-soft); color: var(--k-text); }
+ .gact::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--k-accent); flex: none; }
+ .gact.off { color: var(--k-faint); }
+ .gact.off::before { background: var(--k-faint); }
+
+ /* ====== KOTA · EMPTY STATE, BEFORE / AFTER (product visuals stay light) ====== */
+ .sba {
+ --k-bg: #F9FAFB; --k-surface: #fff; --k-border: #EAECF0; --k-soft: #F3F4F6; --k-text: #101828;
+ --k-muted: #667085; --k-faint: #D2D6DB; --k-accent: #E25E25; --k-tint: #FFF3EE; --k-tint2: #FFE2D6;
+ background: var(--k-bg); border: 1px solid var(--k-border); border-radius: 14px; padding: 0.875rem;
+ font-family: var(--font); color: var(--k-text); aspect-ratio: 16 / 10; display: flex; flex-direction: column; gap: 0.5rem; overflow: hidden;
+ }
+ .sba-chrome { display: flex; align-items: center; justify-content: space-between; font-size: 0.6rem; color: var(--k-muted); }
+ .sba-chrome b { color: var(--k-text); font-weight: 600; font-size: 0.7rem; }
+ .sba-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+ .sba-empty { flex: 1; display: grid; place-items: center; text-align: center; background: var(--k-surface); border: 1px dashed var(--k-border); border-radius: 10px; padding: 1rem; }
+ .sba-empty .ico { width: 34px; height: 34px; border-radius: 50%; background: var(--k-soft); margin: 0 auto 0.6rem; display: grid; place-items: center; color: var(--k-faint); }
+ .sba-empty .ico svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.6; }
+ .sba-empty p { margin: 0; font-size: 0.7rem; font-weight: 600; }
+ .sba-empty small { display: block; font-size: 0.58rem; color: var(--k-muted); margin-top: 0.15rem; }
+ .sba-btn {
+ display: inline-block; margin-top: 0.65rem; font-size: 0.6rem; font-weight: 600; padding: 0.3rem 0.65rem;
+ border-radius: 6px; border: 1px solid var(--k-border); background: var(--k-surface); color: var(--k-text); white-space: nowrap;
+ }
+ .sba-btn.pri { background: var(--k-accent); border-color: var(--k-accent); color: #fff; }
+ .sba-banner {
+ display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; background: var(--k-tint);
+ border: 1px solid var(--k-tint2); border-radius: 8px; padding: 0.45rem 0.6rem; font-size: 0.6rem; color: var(--k-text);
+ }
+ .sba-banner .sba-btn { margin: 0; }
+ .sba-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+ .ghost { background: var(--k-surface); border: 1px solid var(--k-border); border-radius: 8px; position: relative; overflow: hidden; }
+ .ghost::before {
+ content: ""; position: absolute; inset: 0;
+ background: linear-gradient(100deg, transparent 30%, rgba(16,24,40,.045) 50%, transparent 70%);
+ animation: sba-shimmer 2.4s linear infinite;
+ }
+ @keyframes sba-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+ .ghost .gl { height: 6px; border-radius: 99px; background: var(--k-soft); margin: 0.5rem 0.55rem 0; }
+ .ghost .gl.w40 { width: 40%; } .ghost .gl.w70 { width: 70%; }
+ .ghost .gl.big { height: 12px; width: 35%; margin-top: 0.4rem; }
+ .ghost.kpi { padding-bottom: 0.55rem; }
+ .sba-main { flex: 1; min-height: 0; display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.4rem; }
+ .ghost.map { background: #EEF2EE; border-color: #E1E7E1; }
+ .ghost.map::after {
+ content: ""; position: absolute; left: 38%; top: 42%; width: 8px; height: 8px; border-radius: 50%;
+ background: var(--k-accent); box-shadow: 0 0 0 4px rgba(226,94,37,.18);
+ }
+ .sba-blocks { display: grid; grid-template-rows: 1fr 1fr; gap: 0.4rem; }
+ .ba-cap { font-size: 0.9375rem; color: var(--text-2); line-height: 1.55; margin: 0; }
+ @media (prefers-reduced-motion: reduce) { .ghost::before { animation: none; } }
+
+ /* ====== KOTA · WHAT HELD (evidence strip) ====== */
+ .held { display: grid; grid-template-columns: 1fr; border-top: 1px solid var(--border); }
+ @media (min-width: 700px) { .held { grid-template-columns: repeat(2, 1fr); column-gap: clamp(1.5rem, 3vw, 2.5rem); } }
+ @media (min-width: 1000px) { .held { grid-template-columns: repeat(4, 1fr); } }
+ .held-item {
+ padding: clamp(1.5rem, 2.5vw, 2rem) 0; border-bottom: 1px solid var(--border);
+ display: flex; flex-direction: column; gap: 0.6rem;
+ }
+ .held-item b { font-size: clamp(1.5rem, 2.4vw, 2rem); font-weight: 300; letter-spacing: -0.02em; line-height: 1.1; color: var(--text); }
+ .held-item b em { font-style: normal; color: var(--accent); }
+ .held-item p { margin: 0; font-size: 0.9375rem; color: var(--text-2); line-height: 1.55; max-width: 26ch; }
+
+ /* Two story screens side by side; each frame keeps its own height. */
+ /* Stacked, one per row: the sheet is never wide enough for two app screens
+    to stay legible side by side. */
+ .app-pair--embeds { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 4vw, 3rem); }
+ .app-pair--embeds .app-shot { min-width: 0; }
+ .app-pair--embeds .embed-frame { max-width: none; }
+
+ /* ====== Interactive-embed hint ======
+    A dark scrim with a hand that fades after two seconds, or on the first
+    pointer/wheel/key inside the frame; plus a small permanent tag so anyone
+    who arrives after the scrim still knows the screen is live. */
+ .embed-frame { position: relative; }
+ .embed-hint {
+ position: absolute; inset: 0; z-index: 3; display: grid; place-items: center;
+ background: rgba(16, 24, 40, .52); color: #fff;
+ opacity: 0; pointer-events: none; transition: opacity .45s var(--ease);
+ }
+ .embed-frame.is-hinting .embed-hint { opacity: 1; pointer-events: auto; cursor: pointer; }
+ .embed-hint .hand {
+ display: flex; align-items: center; gap: .75rem;
+ background: rgba(0, 0, 0, .55); border: 1px solid rgba(255, 255, 255, .22);
+ border-radius: 999px; padding: .7rem 1.1rem .7rem .9rem;
+ font-family: var(--mono); font-size: .75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+ backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+ }
+ .embed-hint svg { width: 26px; height: 26px; stroke: #fff; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+ .embed-frame.is-hinting .embed-hint svg { animation: hint-tap 1.1s ease-in-out infinite; transform-origin: 50% 90%; }
+ @keyframes hint-tap { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(5px) scale(.94) } }
+ .embed-tag {
+ position: absolute; top: 12px; right: 12px; z-index: 2; pointer-events: none;
+ display: inline-flex; align-items: center; gap: .4rem;
+ background: rgba(16, 24, 40, .72); color: #fff; border-radius: 999px; padding: .3rem .65rem .3rem .55rem;
+ font-family: var(--mono); font-size: .625rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
+ opacity: .9;
+ }
+ .embed-tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: #6AD99E; }
+ @media (prefers-reduced-motion: reduce) { .embed-frame.is-hinting .embed-hint svg { animation: none } }
  /* Embedded composition (iframe), same outer treatment as .app-shot img */
  .app-shot--embed .embed-frame {
  position: relative;
@@ -3562,10 +3775,6 @@
  <span class="case-meta-label" data-i18n="meta_team">Team</span>
  <span class="case-meta-value" data-i18n="meta_team_val">Sole designer · Datastake (founder + engineering)</span>
  </div>
- <div class="sidebar-meta-item r">
- <span class="case-meta-label" data-i18n="meta_live">Live site</span>
- <span class="case-meta-value" data-i18n="meta_live_val">—</span>
- </div>
  </div>
 
  </div><!-- /.sidebar-intro -->
@@ -3621,6 +3830,66 @@
  </div>
  </section>
 
+ <!-- ====== THE PRODUCT, SHOWN EARLY ======
+      The reveal sits between the problem and the process: what was built,
+      before how it was reasoned about. Each figure carries its own caption,
+      so the beat needs no section header of its own. -->
+ <section class="case-section">
+ <div class="wrap">
+   <!-- The dashboard bento. Screen capture at 2x; it scrolls down and back, and
+        the last frame matches the first, so it loops with no visible seam. -->
+   <figure class="app-shot app-shot--video r">
+   <div class="video-frame">
+   <video autoplay muted loop playsinline preload="metadata"
+   src="assets/kota-bento.mp4"
+   aria-label="Scrolling through the KOTA dashboard: declared settlement profile, declared volume by mineral, key risk indicators, score build-up, counterparties by grade, documentation status, overall risk score and trade relationships."></video>
+   </div>
+   <figcaption data-i18n="fig_bento">The dashboard end to end: every reading of one applicant, in the order a reviewer needs them.</figcaption>
+   </figure>
+
+   <!-- Interactive recreation of the operator's KYC Summary (fictional data) -->
+   
+   <!-- The other side of the same relationship. Both screens are built from
+        kota/tokens.css and kota/components.css, so a card is a card and a
+        status pill is a status pill whichever seat you are in. -->
+   <figure class="app-shot app-shot--embed app-shot--kyc r" style="margin-top: 2rem;">
+   <div class="embed-frame">
+ <div class="embed-hint" aria-hidden="true"><span class="hand"><svg viewBox="0 0 24 24"><path d="M9 11.5V5.2a1.7 1.7 0 0 1 3.4 0V11M12.4 10.4V8.6a1.7 1.7 0 0 1 3.4 0v2.6M15.8 10.9V9.8a1.7 1.7 0 0 1 3.4 0v6.4c0 3-2.3 5.3-5.3 5.3h-1.6c-1.7 0-3.3-.8-4.3-2.2L4.5 14.6a1.6 1.6 0 0 1 2.5-2l2 2.2"/></svg><span data-i18n="hint_live">Interactive · click and scroll inside</span></span></div>
+ <span class="embed-tag" data-i18n="hint_tag">Live</span>
+    <iframe class="embed-iframe embed-iframe--app" src="assets/kota/business-overview.html" data-min-w="920" data-h="780"
+   title="KOTA, the applicant review a bank sees while assessing an operator: confidence score, risk distribution by severity, data reliability over twelve months, key risk indicators and the approve or reject decision."
+   loading="lazy"></iframe>
+   </div>
+   <figcaption data-i18n="fig_review">The same record from the bank's seat, where the decision gets made.</figcaption>
+   </figure>
+ </div>
+ </section>
+
+ <!-- ====== THE BRIEF (pull quote) ====== -->
+ <section class="case-section case-section--alt">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="brief_label">The Brief</p>
+ <h2 data-i18n="brief_title">Nothing arrived as a design.</h2>
+ </div>
+ <div class="brief">
+ <blockquote class="brief-quote r">
+ <p data-i18n="brief_quote">There will be stages. At each stage, they provide a form and some documents. Then they wait to be approved. Then they get an answer.</p>
+ <footer data-i18n="brief_attr">The entire brief for the operator's application flow</footer>
+ </blockquote>
+ <div class="brief-body r">
+ <p data-i18n="brief_p1">Everything else was design work: what progress looks like, what waiting feels like, what happens when the answer is no.</p>
+ <p data-i18n="brief_p2">The rest of KOTA arrived the same way. Three kinds of input, and my job was the same for each: find the gap, ask the question that fills it, and come back with a form.</p>
+ <ul class="brief-inputs">
+ <li><b data-i18n="brief_in1_k">The document</b><span data-i18n="brief_in1_v">A specification. Precise about what the system does; silent about what anyone sees.</span></li>
+ <li><b data-i18n="brief_in2_k">The sentence</b><span data-i18n="brief_in2_v">One-line briefings, like the one above.</span></li>
+ <li><b data-i18n="brief_in3_k">The voice</b><span data-i18n="brief_in3_v">Features that lived in the founder's head, told in conversation, never written down.</span></li>
+ </ul>
+ </div>
+ </div>
+ </div>
+ </section>
+
  <!-- ====== WHO IT SERVES ====== -->
  <section class="case-section">
  <div class="wrap">
@@ -3656,32 +3925,20 @@
  </div>
 
  </div>
- </div>
- </section>
-
- <!-- ====== THE STAKES (market + constraints) ====== -->
- <section class="case-section case-section--alt">
- <div class="wrap">
- <div class="cs-grid">
- <div class="cs-block cs-block--solution r">
- <span class="cs-block-label" data-i18n="opp_label">The Opportunity</span>
- <h3 data-i18n="opp_title">Financial inclusion meets regulatory pressure.</h3>
- <p data-i18n="opp_p1">The informal economy in sub-Saharan extractive industries is large, underserved, and increasingly visible to regulators. Banks want to grow this client segment but can't afford the manual overhead. Aggregators face compliance demands from buyers in Europe and North America that they can't fulfill at scale. And operators — who have assets, production, and real relationships — lack the documentation infrastructure to be taken seriously by formal institutions.</p>
- <p data-i18n="opp_p2">KOTA's engine runs one product across multiple institution types, adapted through configuration — not separate builds. Each new institution that deploys it is a high-margin contract, not a new development project. And the data the platform accumulates — operator profiles, verified documents, compliance histories — is the foundation of a future information layer the team is already mapping.</p>
- </div>
-
- <div class="cs-block cs-block--challenge r">
- <span class="cs-block-label" data-i18n="con_label">The Constraints</span>
- <h3 data-i18n="con_title">Connectivity, trust, regulation, language.</h3>
- <p data-i18n="con_p1">The operator using KOTA may be on a slow mobile connection, encountering formal due diligence for the first time, in a context where documented records barely exist. Every friction point in the operator-facing flow is a reason to abandon. The product has to be simple at a level business software rarely is.</p>
- <p data-i18n="con_p2">Beyond usability: the product operates across DRC regulation, OECD guidance, and EU conflict minerals rules — each with different vocabulary. It runs in English and French. And the trust deficit is structural: operators have good reasons to distrust a system that collects sensitive data about their business. The two-copy data model — the bank inherits a copy when it edits, never mutating the operator's record — is one answer. The design is another.</p>
- </div>
+ <div class="constraints r" role="list">
+ <span class="constraints-label" data-i18n="cons_label">Designed for</span>
+ <span class="constraint" role="listitem" data-i18n="cons_1">Slow mobile connections</span>
+ <span class="constraint" role="listitem" data-i18n="cons_2">First-time due diligence</span>
+ <span class="constraint" role="listitem" data-i18n="cons_3">English and French</span>
+ <span class="constraint" role="listitem" data-i18n="cons_4">DRC regulation · OECD guidance · EU conflict-minerals rules</span>
+ <span class="constraint" role="listitem" data-i18n="cons_5">Sensitive data, earned trust</span>
  </div>
  </div>
  </section>
+
 
  <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
- <section class="case-section">
+ <section class="case-section case-section--alt">
  <div class="wrap">
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
@@ -3737,7 +3994,6 @@
  <li data-i18n="sm_n_reg">Registration record</li>
  <li data-i18n="sm_n_sum">Customer summary</li>
  </ul>
- <p class="sm-roles-line" data-i18n="sm_roles_line">Editor populates · Custodian submits · Reviewer decides</p>
  </div>
  <div class="sm-view sm-view--mirror">
  <div class="sm-view-head"><span data-i18n="sm_op">Operator · the mirror</span><span class="sm-chips"><span class="sm-chip sm-chip--yellow" data-i18n="op_ctx">Counterparty</span></span></div>
@@ -3754,43 +4010,6 @@
  </div>
  </section>
 
- <!-- ====== THE INPUTS ====== -->
- <section class="case-section case-section--alt">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="inputs_label">The Inputs</p>
- <h2 data-i18n="inputs_title">Nothing arrived as a design.</h2>
- <p class="explore-intro" data-i18n="inputs_intro">Three kinds of input shaped every decision — and each one required a different way of closing the gap between what was specified and what someone would actually see on screen.</p>
- </div>
- <div class="insights-grid r-stagger" style="margin-top: 2rem;">
-
- <div class="insight-item r">
- <div class="insight-content">
- <span class="step-num" data-i18n="input_1_step">01 · The document</span>
- <h3 data-i18n="input_1_t">A specification.</h3>
- <p data-i18n="input_1_d">Workflows, rules, requirements. Precise about what the system does; silent about what anyone sees.</p>
- </div>
- </div>
-
- <div class="insight-item r">
- <div class="insight-content">
- <span class="step-num" data-i18n="input_2_step">02 · The sentence</span>
- <h3 data-i18n="input_2_t">One-line briefings.</h3>
- <p data-i18n="input_2_d">"There will be stages; at each one, a form and documents; then waiting; then an answer." That sentence was the entire brief for the application flow.</p>
- </div>
- </div>
-
- <div class="insight-item r">
- <div class="insight-content">
- <span class="step-num" data-i18n="input_3_step">03 · The voice</span>
- <h3 data-i18n="input_3_t">Spoken visions.</h3>
- <p data-i18n="input_3_d">Features that lived in the founder's head, told in conversation, never written down.</p>
- </div>
- </div>
-
- </div>
- </div>
- </section>
 
  <!-- ====== THE METHOD (two loops) ====== -->
  <section class="case-section case-section--insights">
@@ -3822,14 +4041,59 @@
  </section>
 
  <!-- ====== NAVIGATION GRAMMAR ====== -->
- <section class="case-section case-section--alt">
+ <section class="case-section">
  <div class="wrap">
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="gram_label">Navigation Grammar</p>
  <h2 data-i18n="gram_title">One pattern carries every app.</h2>
  <p class="explore-intro" data-i18n="gram_intro">The structure that made the split work isn't KOTA-specific. It's a grammar I created and refined across all of the platform's apps — and it held while I was away: engineering kept building inside it, and two years later the structure was still carrying the product.</p>
  </div>
- <div class="insights-grid r-stagger" style="margin-top: 2rem;">
+ <div class="gflow r" aria-label="The navigation grammar as three screens: a table landing, the Details hub, and stage-scoped actions">
+ <div class="gscreen">
+ <div class="gscreen-tag"><span data-i18n="gf_1_tag">Landing</span><i data-i18n="gf_1_i">A table</i></div>
+ <div class="gcard gtable">
+ <div class="gth"><span data-i18n="gf_th_sub">Subject</span><span data-i18n="gf_th_prog">Progress</span><span data-i18n="gf_th_stage">Stage</span></div>
+ <div class="gtr on"><span>Riverbend cooperative</span><span class="gbar"><i style="width:72%"></i></span><span class="gpill b" data-i18n="gf_st_eval">Evaluation</span></div>
+ <div class="gtr"><span>Kivu Minerals</span><span class="gbar"><i style="width:38%"></i></span><span class="gpill c" data-i18n="gf_st_reg">Registration</span></div>
+ <div class="gtr"><span>Tantalux</span><span class="gbar"><i style="width:91%"></i></span><span class="gpill a" data-i18n="gf_st_appr">Approved</span></div>
+ <div class="gtr"><span>Amani Bethem</span><span class="gbar"><i style="width:12%"></i></span><span class="gpill c" data-i18n="gf_st_reg">Registration</span></div>
+ </div>
+ </div>
+ <div class="gflow-arrow" aria-hidden="true">→</div>
+ <div class="gscreen">
+ <div class="gscreen-tag"><span data-i18n="gf_2_tag">Subject</span><i data-i18n="gf_2_i">The Details hub</i></div>
+ <div class="gcard">
+ <div class="ghub-head"><span class="gav"></span><span><b>Riverbend cooperative</b><small data-i18n="gf_hub_sub">Operator · Evaluation</small></span></div>
+ <div class="ghub-grid">
+ <div class="gtile on"><span data-i18n="gf_t1">Forms</span><small data-i18n="gf_t1_s">Stage 2 of 2</small></div>
+ <div class="gtile"><span data-i18n="gf_t2">Indicators</span><small data-i18n="gf_t2_s">5 scored</small></div>
+ <div class="gtile"><span data-i18n="gf_t3">Summary</span><small data-i18n="gf_t3_s">Open</small></div>
+ <div class="gtile"><span data-i18n="gf_t4">Settings</span><small data-i18n="gf_t4_s">Access · roles</small></div>
+ </div>
+ </div>
+ </div>
+ <div class="gflow-arrow" aria-hidden="true">→</div>
+ <div class="gscreen">
+ <div class="gscreen-tag"><span data-i18n="gf_3_tag">Actions</span><i data-i18n="gf_3_i">Stage-scoped</i></div>
+ <div class="gstages">
+ <div class="gcard gstage">
+ <div class="gstage-k" data-i18n="gf_st_reg">Registration</div>
+ <div class="gact" data-i18n="gf_a1">Review identity</div>
+ <div class="gact" data-i18n="gf_a2">Request documents</div>
+ <div class="gact off" data-i18n="gf_a3">Invite operator</div>
+ <div class="gact off" data-i18n="gf_a4">Open summary</div>
+ </div>
+ <div class="gcard gstage on">
+ <div class="gstage-k" data-i18n="gf_st_eval">Evaluation</div>
+ <div class="gact" data-i18n="gf_a5">Score indicators</div>
+ <div class="gact" data-i18n="gf_a2">Request documents</div>
+ <div class="gact" data-i18n="gf_a3">Invite operator</div>
+ <div class="gact" data-i18n="gf_a4">Open summary</div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <div class="insights-grid r-stagger">
 
  <div class="insight-item r">
  <div class="insight-content">
@@ -3856,96 +4120,111 @@
  </div>
 
  </div>
+ <!-- The grammar in the bank's seat: the landing is a table, every subject
+      opens into a hub, and evaluation-stage actions stay locked until then. -->
+ <div class="app-pair--embeds r-stagger" style="margin-top: clamp(2rem, 4vw, 3rem);">
+ <figure class="app-shot app-shot--embed app-shot--kyc r">
+ <div class="embed-frame" style="--dash-h: 820px;">
+ <div class="embed-hint" aria-hidden="true"><span class="hand"><svg viewBox="0 0 24 24"><path d="M9 11.5V5.2a1.7 1.7 0 0 1 3.4 0V11M12.4 10.4V8.6a1.7 1.7 0 0 1 3.4 0v2.6M15.8 10.9V9.8a1.7 1.7 0 0 1 3.4 0v6.4c0 3-2.3 5.3-5.3 5.3h-1.6c-1.7 0-3.3-.8-4.3-2.2L4.5 14.6a1.6 1.6 0 0 1 2.5-2l2 2.2"/></svg><span data-i18n="hint_live">Interactive · click and scroll inside</span></span></div>
+ <span class="embed-tag" data-i18n="hint_tag">Live</span>
+  <iframe class="embed-iframe embed-iframe--app" src="assets/kota/bank-registration.html" data-min-w="920" data-h="820"
+ title="KOTA, the bank's Registration landing: a table of operators with stage, progress, documents and last update, plus search and filters. Fictional data."
+ loading="lazy"></iframe>
+ </div>
+ <figcaption data-i18n="fig_registration">Rule one, in the bank's seat: Registration lands on a table.</figcaption>
+ </figure>
+  </div>
  </div>
  </section>
 
- <!-- ====== APPLICATION (all product mockups in one section) ====== -->
+
+ <!-- ====== THE DISCIPLINE OF STATES (before / after) ====== -->
  <section class="case-section case-section--alt">
  <div class="wrap">
  <div class="case-section-header r">
- <p class="case-section-label" data-i18n="product_label">The Product</p>
- <h2 data-i18n="product_title">The screens, carrying the decisions.</h2>
- <p class="explore-intro" data-i18n="product_intro">Each surface below makes one of the decisions above concrete. The gallery fills in as screens are exported.</p>
+ <p class="case-section-label" data-i18n="sba_label">The Discipline of States</p>
+ <h2 data-i18n="sba_title">A screen is done when every state is.</h2>
+ <p class="explore-intro" data-i18n="sba_intro">My deliverables include state matrices — boards mapping every empty state and every outcome of an action, so engineering never has to invent what happens when there is nothing to show. One episode on the bank's analysis page shows why that matters.</p>
  </div>
+ <div class="ba-grid r-stagger">
+ <div class="ba-block r">
+ <span class="ba-tag ba-tag--before" data-i18n="sba_before_tag">Before · adopted while I was away</span>
+ <div class="sba" role="img" aria-label="A generic empty state: a centred icon, the words no customers to review yet, and a button leading to Registration">
+ <div class="sba-chrome"><b data-i18n="sba_chrome">Customer review</b><span data-i18n="sba_chrome_s">Bank · Analysis</span></div>
+ <div class="sba-body">
+ <div class="sba-empty">
+ <div>
+ <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 10h16"/></svg></div>
+ <p data-i18n="sba_empty_t">No customers to review yet</p>
+ <small data-i18n="sba_empty_s">Customers will appear here once registered</small>
+ <span class="sba-btn" data-i18n="sba_empty_btn">Go to Registration</span>
+ </div>
+ </div>
+ </div>
+ </div>
+ <p class="ba-cap" data-i18n="sba_before_cap">An icon, a sentence, a button leading elsewhere. The analysis the page exists for is invisible.</p>
+ </div>
+ <div class="ba-block r">
+ <span class="ba-tag ba-tag--after" data-i18n="sba_after_tag">After · my redesign on return</span>
+ <div class="sba" role="img" aria-label="The same page as a skeleton of the analysis to come: a contextual banner with a create button, three ghost KPI cards, a ghost map and two ghost blocks">
+ <div class="sba-chrome"><b data-i18n="sba_chrome">Customer review</b><span data-i18n="sba_chrome_s">Bank · Analysis</span></div>
+ <div class="sba-body">
+ <div class="sba-banner"><span data-i18n="sba_banner">Create a new customer to populate this analysis</span><span class="sba-btn pri" data-i18n="sba_banner_btn">Create</span></div>
+ <div class="sba-kpis">
+ <div class="ghost kpi"><div class="gl w40"></div><div class="gl big"></div></div>
+ <div class="ghost kpi"><div class="gl w40"></div><div class="gl big"></div></div>
+ <div class="ghost kpi"><div class="gl w40"></div><div class="gl big"></div></div>
+ </div>
+ <div class="sba-main">
+ <div class="ghost map"></div>
+ <div class="sba-blocks">
+ <div class="ghost"><div class="gl w70"></div><div class="gl w40"></div></div>
+ <div class="ghost"><div class="gl w70"></div><div class="gl w40"></div></div>
+ </div>
+ </div>
+ </div>
+ </div>
+ <p class="ba-cap" data-i18n="sba_after_cap">A skeleton of the analysis to come, with a banner that says how to fill it. The empty screen shows the shape of its future.</p>
+ </div>
+ </div>
+ <div class="cs-grid cs-grid--stack" style="margin-top: clamp(2rem, 4vw, 3rem);">
+ <div class="cs-block r">
+ <p data-i18n="sba_p2">The system catches what I miss, by design. A developer flagged an edge case on that same screen — one subject type with data, the other empty — and asked how to resolve it. He was right, I said so, and the fix shipped. State discipline makes gaps visible enough that anyone can catch them.</p>
+ </div>
+ </div>
+ </div>
+ </section>
 
- <!-- Interactive recreation of the operator's KYC Summary (fictional data) -->
- <figure class="app-shot app-shot--embed app-shot--kyc r" style="margin-top: 2rem;">
- <div class="embed-frame">
- <iframe class="embed-iframe embed-iframe--app" src="assets/kota-kyc-summary.html" data-min-w="920" data-h="780"
- title="KOTA, the operator's KYC Summary as the bank sees it: score gauge, governance graph and table, compliance table, trade relationships and information access charts. Interactive recreation with fictional data."
- loading="lazy"></iframe>
+ <!-- ====== WHAT HELD (evidence, in place of a screen gallery) ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="held_label">What Held</p>
+ <h2 data-i18n="held_title">What the work left behind.</h2>
  </div>
- <figcaption data-i18n="fig_kyc">The operator's own record: what they filled in, and where they stand.</figcaption>
- </figure>
-
- <!-- The other side of the same relationship. Both screens are built from
-      kota/tokens.css and kota/components.css, so a card is a card and a
-      status pill is a status pill whichever seat you are in. -->
- <figure class="app-shot app-shot--embed app-shot--kyc r" style="margin-top: 2rem;">
- <div class="embed-frame">
- <iframe class="embed-iframe embed-iframe--app" src="assets/kota/business-overview.html" data-min-w="920" data-h="780"
- title="KOTA, the applicant review a bank sees while assessing an operator: confidence score, risk distribution by severity, data reliability over twelve months, key risk indicators and the approve or reject decision."
- loading="lazy"></iframe>
+ <div class="held r-stagger">
+ <div class="held-item r">
+ <b data-i18n="held_1_b">One <em>question</em></b>
+ <p data-i18n="held_1_p">reshaped the bank's side into two areas, Registration and Evaluation, before any screen was final.</p>
  </div>
- <figcaption data-i18n="fig_review">The same record from the bank's seat, where the decision gets made.</figcaption>
- </figure>
-
- <div class="process-gallery r-stagger" style="margin-top: 2rem;">
-
- <div class="process-item r">
- <div class="ph ph--grid ph--green screen-ph screen-ph--tall">
- <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
+ <div class="held-item r">
+ <b data-i18n="held_2_b">One <em>grammar</em></b>
+ <p data-i18n="held_2_p">carries every app on the platform: a table to land on, a hub for each subject, actions scoped to its stage.</p>
  </div>
- <span class="process-item-label" data-i18n="scr1_l">Operator · Application flow</span>
- <span class="process-item-title" data-i18n="scr1_t">The one-sentence brief, made navigable: stages, forms, documents, waiting and response</span>
+ <div class="held-item r">
+ <b data-i18n="held_3_b">Two <em>years</em></b>
+ <p data-i18n="held_3_p">away from the project. Engineering kept building inside the structure, and it was still carrying the product when I returned.</p>
  </div>
-
- <div class="process-item r">
- <div class="ph ph--grid ph--green screen-ph screen-ph--tall">
- <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
+ <div class="held-item r">
+ <b data-i18n="held_4_b">One <em>form</em></b>
+ <p data-i18n="held_4_p">for Find Data, proposed whole from a vision that had only ever been spoken, then refined together and scoped to ship.</p>
  </div>
- <span class="process-item-label" data-i18n="scr2_l">Bank · Registration</span>
- <span class="process-item-title" data-i18n="scr2_t">Table landing scoped to registration work</span>
- </div>
-
- <div class="process-item r">
- <div class="ph ph--grid ph--green screen-ph">
- <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
- </div>
- <span class="process-item-label" data-i18n="scr3_l">Bank · Evaluation</span>
- <span class="process-item-title" data-i18n="scr3_t">Same grammar, different stage: its own forms, indicators and stage-gated actions</span>
- </div>
-
- <div class="process-item r">
- <div class="ph ph--grid ph--green screen-ph">
- <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
- </div>
- <span class="process-item-label" data-i18n="scr4_l">Bank · Details hub</span>
- <span class="process-item-title" data-i18n="scr4_t">Everything possible for one subject at its current stage, in one place</span>
- </div>
-
- <div class="process-item r">
- <div class="ph ph--grid ph--green screen-ph">
- <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
- </div>
- <span class="process-item-label" data-i18n="scr5_l">Bank · Customer Review, empty state</span>
- <span class="process-item-title" data-i18n="scr5_t">The redesign: a skeleton of the analysis to come, not a dead end</span>
- </div>
-
- <div class="process-item r">
- <div class="ph ph--grid ph--green screen-ph">
- <span class="screen-soon" data-i18n="screen_ph">Placeholder</span>
- </div>
- <span class="process-item-label" data-i18n="scr6_l">Bank · Find Data</span>
- <span class="process-item-title" data-i18n="scr6_t">A spoken vision given form: search, sources, acquisition</span>
- </div>
-
  </div>
  </div>
  </section>
 
  <!-- ====== OWNERSHIP ====== -->
- <section class="case-section">
+ <section class="case-section case-section--alt">
  <div class="wrap">
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="mine_label">Ownership</p>
@@ -4104,6 +4383,13 @@
  scr5_t: "The redesign: a skeleton of the analysis to come, not a dead end",
  scr6_l: "Bank · Find Data",
  scr6_t: "A spoken vision given form: search, sources, acquisition",
+ hint_live: "Interactive · click and scroll inside",
+ hint_tag: "Live",
+ fig_bento: "The dashboard end to end: every reading of one applicant, in the order a reviewer needs them.",
+ fig_signin: "Where it starts: the operator opens their own account.",
+ fig_application: "The sentence, made navigable: stages, forms, documents, and what comes next.",
+ fig_registration: "Rule one, in the bank's seat: Registration lands on a table.",
+ fig_hub: "Rules two and three: one hub per subject, with the next stage's actions in sight but locked.",
  fig_kyc: "The operator's own record: what they filled in, and where they stand.",
  fig_review: "The same record from the bank's seat, where the decision gets made.",
  mine_label: "Ownership",
@@ -4116,6 +4402,60 @@
  refl_title: "Rigor doesn't disappear without users. It relocates.",
  refl_p1: "Working without user access doesn't excuse you from rigor; it moves the rigor into your questions — what you ask, who you ask, and how honestly you track what's still an assumption.",
  refl_p2: "It also taught me what a domain expert can and can't give you. Mine could answer how a bank divides its work; he couldn't tell me how a first-time operator reads a progress bar. I designed those parts on judgment and pattern — and if I started today, I'd negotiate one round of user contact into the scope before the first screen. Not because the work is weak without it, but because one conversation closes gaps that two years of documents leave open.",
+ brief_label: "The Brief",
+ brief_title: "Nothing arrived as a design.",
+ brief_quote: "There will be stages. At each stage, they provide a form and some documents. Then they wait to be approved. Then they get an answer.",
+ brief_attr: "The entire brief for the operator's application flow",
+ brief_p1: "Everything else was design work: what progress looks like, what waiting feels like, what happens when the answer is no.",
+ brief_p2: "The rest of KOTA arrived the same way. Three kinds of input, and my job was the same for each: find the gap, ask the question that fills it, and come back with a form.",
+ brief_in1_k: "The document",
+ brief_in1_v: "A specification. Precise about what the system does; silent about what anyone sees.",
+ brief_in2_k: "The sentence",
+ brief_in2_v: "One-line briefings, like the one above.",
+ brief_in3_k: "The voice",
+ brief_in3_v: "Features that lived in the founder's head, told in conversation, never written down.",
+ cons_label: "Designed for",
+ cons_1: "Slow mobile connections",
+ cons_2: "First-time due diligence",
+ cons_3: "English and French",
+ cons_4: "DRC regulation · OECD guidance · EU conflict-minerals rules",
+ cons_5: "Sensitive data, earned trust",
+ gf_1_tag: "Landing", gf_1_i: "A table",
+ gf_2_tag: "Subject", gf_2_i: "The Details hub",
+ gf_3_tag: "Actions", gf_3_i: "Stage-scoped",
+ gf_th_sub: "Subject", gf_th_prog: "Progress", gf_th_stage: "Stage",
+ gf_st_eval: "Evaluation", gf_st_reg: "Registration", gf_st_appr: "Approved",
+ gf_hub_sub: "Operator · Evaluation",
+ gf_t1: "Forms", gf_t1_s: "Stage 2 of 2",
+ gf_t2: "Indicators", gf_t2_s: "5 scored",
+ gf_t3: "Summary", gf_t3_s: "Open",
+ gf_t4: "Settings", gf_t4_s: "Access · roles",
+ gf_a1: "Review identity", gf_a2: "Request documents", gf_a3: "Invite operator", gf_a4: "Open summary", gf_a5: "Score indicators",
+ sba_label: "The Discipline of States",
+ sba_title: "A screen is done when every state is.",
+ sba_intro: "My deliverables include state matrices — boards mapping every empty state and every outcome of an action, so engineering never has to invent what happens when there is nothing to show. One episode on the bank's analysis page shows why that matters.",
+ sba_before_tag: "Before · adopted while I was away",
+ sba_after_tag: "After · my redesign on return",
+ sba_chrome: "Customer review",
+ sba_chrome_s: "Bank · Analysis",
+ sba_empty_t: "No customers to review yet",
+ sba_empty_s: "Customers will appear here once registered",
+ sba_empty_btn: "Go to Registration",
+ sba_banner: "Create a new customer to populate this analysis",
+ sba_banner_btn: "Create",
+ sba_before_cap: "An icon, a sentence, a button leading elsewhere. The analysis the page exists for is invisible.",
+ sba_after_cap: "A skeleton of the analysis to come, with a banner that says how to fill it. The empty screen shows the shape of its future.",
+ sba_p2: "The system catches what I miss, by design. A developer flagged an edge case on that same screen — one subject type with data, the other empty — and asked how to resolve it. He was right, I said so, and the fix shipped. State discipline makes gaps visible enough that anyone can catch them.",
+ held_label: "What Held",
+ held_title: "What the work left behind.",
+ held_1_b: "One <em>question</em>",
+ held_1_p: "reshaped the bank's side into two areas, Registration and Evaluation, before any screen was final.",
+ held_2_b: "One <em>grammar</em>",
+ held_2_p: "carries every app on the platform: a table to land on, a hub for each subject, actions scoped to its stage.",
+ held_3_b: "Two <em>years</em>",
+ held_3_p: "away from the project. Engineering kept building inside the structure, and it was still carrying the product when I returned.",
+ held_4_b: "One <em>form</em>",
+ held_4_p: "for Find Data, proposed whole from a vision that had only ever been spoken, then refined together and scoped to ship.",
  next_label: "Next up",
  next_title: "Other work.",
  next_wazi_tag: "Responsible Sourcing",
@@ -4242,6 +4582,13 @@
  scr5_t: "O redesign: um skeleton da análise por vir, não um beco sem saída",
  scr6_l: "Banco · Find Data",
  scr6_t: "Uma visão falada ganhando forma: busca, fontes, aquisição",
+ hint_live: "Interativo · clique e role aqui dentro",
+ hint_tag: "Ao vivo",
+ fig_bento: "O dashboard de ponta a ponta: cada leitura de um mesmo solicitante, na ordem em que o analista precisa delas.",
+ fig_signin: "Onde começa: o operador abre a própria conta.",
+ fig_application: "A frase, navegável: etapas, formulários, documentos e o que vem depois.",
+ fig_registration: "Regra um, na cadeira do banco: Registro aterrissa numa tabela.",
+ fig_hub: "Regras dois e três: um hub por sujeito, com as ações da próxima etapa à vista, mas travadas.",
  fig_kyc: "O registro do próprio operador: o que ele preencheu, e onde está.",
  fig_review: "O mesmo registro pela cadeira do banco, onde a decisão acontece.",
  mine_label: "Autoria",
@@ -4254,6 +4601,60 @@
  refl_title: "O rigor não desaparece sem usuários. Ele muda de lugar.",
  refl_p1: "Trabalhar sem acesso a usuário não te dispensa do rigor; ele se move pras suas perguntas — o que você pergunta, pra quem, e com que honestidade você rastreia o que ainda é suposição.",
  refl_p2: "Também me ensinou o que um domain expert pode e não pode te dar. O meu sabia responder como um banco divide o trabalho; não sabia me dizer como um operador de primeira viagem lê uma barra de progresso. Essas partes eu desenhei com julgamento e repertório — e se começasse hoje, negociaria uma rodada de contato com usuários no escopo antes da primeira tela. Não porque o trabalho é fraco sem isso, mas porque uma conversa fecha lacunas que dois anos de documentos deixam abertas.",
+ brief_label: "O Briefing",
+ brief_title: "Nada chegou como design.",
+ brief_quote: "Vai ter etapas. Em cada etapa, eles enviam um formulário e alguns documentos. Depois esperam a aprovação. Depois recebem uma resposta.",
+ brief_attr: "O briefing inteiro do fluxo de aplicação do operador",
+ brief_p1: "Todo o resto era trabalho de design: como o progresso aparece, como a espera se sente, o que acontece quando a resposta é não.",
+ brief_p2: "O resto do KOTA chegou do mesmo jeito. Três tipos de input, e o meu trabalho era o mesmo para cada um: achar a lacuna, fazer a pergunta que a preenche e voltar com uma forma.",
+ brief_in1_k: "O documento",
+ brief_in1_v: "Uma especificação. Precisa sobre o que o sistema faz; muda sobre o que alguém vê.",
+ brief_in2_k: "A frase",
+ brief_in2_v: "Briefings de uma linha, como o de cima.",
+ brief_in3_k: "A voz",
+ brief_in3_v: "Funcionalidades que viviam na cabeça do fundador, contadas em conversa, nunca escritas.",
+ cons_label: "Desenhado para",
+ cons_1: "Conexões móveis lentas",
+ cons_2: "Primeira due diligence",
+ cons_3: "Inglês e francês",
+ cons_4: "Regulação da RDC · guia OCDE · regras da UE para minerais de conflito",
+ cons_5: "Dados sensíveis, confiança conquistada",
+ gf_1_tag: "Landing", gf_1_i: "Uma tabela",
+ gf_2_tag: "Sujeito", gf_2_i: "O hub Details",
+ gf_3_tag: "Ações", gf_3_i: "Por etapa",
+ gf_th_sub: "Sujeito", gf_th_prog: "Progresso", gf_th_stage: "Etapa",
+ gf_st_eval: "Avaliação", gf_st_reg: "Registro", gf_st_appr: "Aprovado",
+ gf_hub_sub: "Operador · Avaliação",
+ gf_t1: "Formulários", gf_t1_s: "Etapa 2 de 2",
+ gf_t2: "Indicadores", gf_t2_s: "5 pontuados",
+ gf_t3: "Resumo", gf_t3_s: "Aberto",
+ gf_t4: "Configurações", gf_t4_s: "Acesso · papéis",
+ gf_a1: "Revisar identidade", gf_a2: "Pedir documentos", gf_a3: "Convidar operador", gf_a4: "Abrir resumo", gf_a5: "Pontuar indicadores",
+ sba_label: "A Disciplina dos Estados",
+ sba_title: "Uma tela está pronta quando todos os estados estão.",
+ sba_intro: "Meus entregáveis incluem matrizes de estado — boards mapeando cada empty state e cada resultado de uma ação, para que a engenharia nunca precise inventar o que acontece quando não há nada para mostrar. Um episódio na página de análise do banco mostra por que isso importa.",
+ sba_before_tag: "Antes · adotado enquanto eu estava fora",
+ sba_after_tag: "Depois · meu redesign na volta",
+ sba_chrome: "Revisão de clientes",
+ sba_chrome_s: "Banco · Análise",
+ sba_empty_t: "Nenhum cliente para revisar ainda",
+ sba_empty_s: "Os clientes aparecem aqui assim que forem registrados",
+ sba_empty_btn: "Ir para Registro",
+ sba_banner: "Crie um novo cliente para popular esta análise",
+ sba_banner_btn: "Criar",
+ sba_before_cap: "Um ícone, uma frase, um botão que leva para outro lugar. A análise pela qual a página existe fica invisível.",
+ sba_after_cap: "Um esqueleto da análise que vem, com um banner dizendo como preenchê-la. A tela vazia mostra a forma do seu futuro.",
+ sba_p2: "O sistema pega o que me escapa, por desenho. Um desenvolvedor apontou um caso de borda nessa mesma tela — um tipo de sujeito com dados, o outro vazio — e perguntou como resolver. Ele estava certo, eu disse isso, e a correção foi para produção. A disciplina de estados deixa as lacunas visíveis o bastante para qualquer um pegar.",
+ held_label: "O Que Ficou",
+ held_title: "O que o trabalho deixou.",
+ held_1_b: "Uma <em>pergunta</em>",
+ held_1_p: "reorganizou o lado do banco em duas áreas, Registro e Avaliação, antes de qualquer tela ser final.",
+ held_2_b: "Uma <em>gramática</em>",
+ held_2_p: "carrega todos os apps da plataforma: uma tabela para chegar, um hub para cada sujeito, ações limitadas à sua etapa.",
+ held_3_b: "Dois <em>anos</em>",
+ held_3_p: "longe do projeto. A engenharia continuou construindo dentro da estrutura, e ela ainda carregava o produto quando eu voltei.",
+ held_4_b: "Uma <em>forma</em>",
+ held_4_p: "para o Find Data, proposta inteira a partir de uma visão que só existia falada, depois refinada em conjunto e escopada para lançar.",
  next_label: "A seguir",
  next_title: "Outros projetos.",
  next_wazi_tag: "Sourcing Responsável",
@@ -4301,9 +4702,13 @@ setLang(lang);
  /* The Kota embeds run on their own token sheet, which follows
  prefers-color-scheme. Tell them which way this page went so they don't
  sit dark inside a light study, or the reverse. */
+ /* The product visuals are pinned to light: the bank's dashboards are light
+ surfaces, and the study reads them beside a light video. The rest of the page
+ keeps following the toggle. */
  function tellEmbeds(t) {
  document.querySelectorAll('iframe').forEach((f) => {
- try { f.contentWindow.postMessage({ type: 'theme', theme: t }, '*'); } catch (e) {}
+ const pinned = f.closest('.app-shot--kyc') ? 'light' : t;
+ try { f.contentWindow.postMessage({ type: 'theme', theme: pinned }, '*'); } catch (e) {}
  });
  }
  /* ============ Light / dark theme ============ */
@@ -4614,12 +5019,76 @@ setLang(lang);
  io.observe(f);
  // Also notify after the iframe finishes loading IF it's already in view
  f.addEventListener('load', () => {
+ /* Lazy frames miss the theme posted at page load; repeat it once the
+ frame exists so a pinned-light dashboard never boots in dark. */
+ tellEmbeds(document.documentElement.getAttribute('data-theme') || 'dark');
  const r = f.getBoundingClientRect();
  if (r.top < innerHeight && r.bottom > 0) notify(f);
  });
  });
  })();
- </script>
+ 
+ /* Interactive-embed hint: show once per frame when it scrolls into view,
+ hide after ~2.2 s or on the first interaction, whichever comes first. */
+ (function () {
+ const frames = document.querySelectorAll('.embed-frame');
+ if (!frames.length || !('IntersectionObserver' in window)) return;
+ const done = new WeakSet();
+ function hide(f) { f.classList.remove('is-hinting'); done.add(f); }
+ const io = new IntersectionObserver((entries) => {
+ entries.forEach((e) => {
+ if (!e.isIntersecting || done.has(e.target)) return;
+ const f = e.target;
+ f.classList.add('is-hinting');
+ setTimeout(() => hide(f), 2200);
+ io.unobserve(f);
+ });
+ }, { threshold: 0.2 }); /* frames are taller than most viewports; 45% never arrived */
+ /* Observe only once the page has settled: before the video and the lazy
+ frames take their height, every embed sits near the top and the hint would
+ fire and expire before anyone scrolls to it. */
+ function start() { setTimeout(() => frames.forEach((f) => io.observe(f)), 400); }
+ if (document.readyState === 'complete') start(); else window.addEventListener('load', start, { once: true });
+ frames.forEach((f) => {
+ const hint = f.querySelector('.embed-hint');
+ if (hint) hint.addEventListener('pointerdown', () => hide(f));
+ ['wheel', 'keydown', 'touchstart'].forEach((ev) => f.addEventListener(ev, () => hide(f), { passive: true }));
+ });
+ })();
+
+ /* Wheel anywhere scrolls the sheet. The shell is a fixed frame and the
+ sheet is the only scroller, so a wheel over the sidebar or the gutters
+ used to do nothing. The sidebar keeps its own scroll while it can still
+ move in that direction; otherwise the motion goes to the sheet. */
+ (function () {
+ const sheet = document.querySelector('.main-sheet');
+ if (!sheet) return;
+ const sidebar = document.querySelector('.sidebar');
+ function canScroll(el, dy) {
+ if (!el) return false;
+ const st = getComputedStyle(el).overflowY;
+ if (st !== 'auto' && st !== 'scroll') return false;
+ if (el.scrollHeight <= el.clientHeight + 1) return false;
+ return dy > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0;
+ }
+ document.addEventListener('wheel', (e) => {
+ if (sheet.contains(e.target)) return;                 // native scroll
+ if (sidebar && sidebar.contains(e.target) && canScroll(sidebar, e.deltaY)) return;
+ if (e.ctrlKey) return;                                // pinch-zoom
+ e.preventDefault();
+ sheet.scrollBy({ top: e.deltaY, left: 0 });
+ }, { passive: false });
+ document.addEventListener('keydown', (e) => {
+ const a = document.activeElement;
+ if (a && a !== document.body && !a.classList.contains('seg-btn')) return;
+ const page = sheet.clientHeight * 0.85;
+ const map = { ArrowDown: 60, ArrowUp: -60, PageDown: page, PageUp: -page, ' ': e.shiftKey ? -page : page };
+ if (!(e.key in map)) return;
+ e.preventDefault();
+ sheet.scrollBy({ top: map[e.key], behavior: 'smooth' });
+ });
+ })();
+</script>
 
 
  <!-- Segmented nav, same control as the landing. -->

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KOTA — Create your account</title>
+<link rel="stylesheet" href="tokens.css?v=5">
+<link rel="stylesheet" href="components.css?v=5">
+<link rel="stylesheet" href="shell.css?v=5">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Operator sign-in / registration. One screen, two panes: the promise on the
+     left, the form on the right. Fictional data throughout. */
+  html,body{height:100%}
+  body{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);min-height:100vh}
+  .promise{background:var(--accent-tint);border-right:1px solid var(--accent-tint-2);padding:40px 44px;display:flex;flex-direction:column;gap:32px}
+  .mark{display:flex;align-items:center;gap:10px}
+  .mark .logo{margin:0;width:36px;height:36px;font-size:16px}
+  .mark b{font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--text)}
+  .promise h1{font-size:30px;line-height:36px;font-weight:600;letter-spacing:-.02em;color:var(--text);margin:0;max-width:16ch}
+  .promise p.lead{margin:0;color:var(--text-2);font-size:var(--t-md);line-height:var(--t-md-lh);max-width:38ch}
+  .steps{display:flex;flex-direction:column;gap:14px;margin-top:auto}
+  .step{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start}
+  .step .n{width:28px;height:28px;border-radius:50%;background:var(--surface);border:1.5px solid var(--accent-tint-2);color:var(--accent);display:grid;place-items:center;font-size:var(--t-xs);font-weight:600}
+  .step b{display:block;font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .step span{font-size:var(--t-sm);color:var(--muted)}
+  .fine{font-size:var(--t-xs);color:var(--muted)}
+
+  .pane{display:flex;flex-direction:column;padding:24px 44px 40px;gap:24px}
+  .pane .top{display:flex;justify-content:space-between;align-items:center}
+  .lang{display:inline-flex;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:3px}
+  .lang button{border:0;background:transparent;color:var(--muted);padding:5px 12px;border-radius:6px;font-weight:500;font-size:var(--t-sm);cursor:pointer}
+  .lang button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+  .formcard{width:100%;max-width:440px;margin:auto;display:flex;flex-direction:column;gap:20px}
+  .tabs{display:flex;border-bottom:1px solid var(--border)}
+  .tabs button{border:0;background:transparent;padding:10px 4px;margin-right:24px;font-weight:500;font-size:var(--t-sm);color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer}
+  .tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+  .formcard h2{font-size:20px;line-height:28px;font-weight:600;letter-spacing:-.01em;margin:0;color:var(--text)}
+  .formcard .sub{margin-top:4px}
+  .field{display:flex;flex-direction:column}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .phone{display:grid;grid-template-columns:88px 1fr;gap:8px}
+  .kind{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .kind label{border:1px solid var(--border);border-radius:8px;padding:10px 12px;display:flex;gap:10px;align-items:center;cursor:pointer;font-size:var(--t-sm);color:var(--text-2)}
+  .kind label.on{border-color:var(--accent);background:var(--accent-tint);color:var(--text)}
+  .kind input{accent-color:var(--accent)}
+  .btn.block{width:100%;justify-content:center;padding:12px 14px;font-size:var(--t-md)}
+  .assure{display:flex;gap:10px;align-items:flex-start;background:var(--surface-2);border:1px solid var(--border-soft);border-radius:8px;padding:10px 12px}
+  .assure .ic{color:var(--accent);width:18px;height:18px;margin-top:1px}
+  .assure span{font-size:var(--t-xs);line-height:var(--t-xs-lh);color:var(--text-2)}
+  .switch{font-size:var(--t-sm);color:var(--muted);text-align:center}
+  .switch a{color:var(--accent);font-weight:500;text-decoration:none}
+  @media (max-width:860px){body{grid-template-columns:1fr}.promise{display:none}.pane{padding:20px}}
+</style>
+</head>
+<body>
+  <aside class="promise">
+    <div class="mark"><span class="logo">K</span><b>KOTA</b></div>
+    <h1>Apply for banking with a record you own.</h1>
+    <p class="lead">Register your cooperative, answer the basic questions yourself, and share your file with a bank when you decide to. Your information stays yours and works for every application you make.</p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><div><b>Express interest</b><span>Create an account and register your organisation.</span></div></div>
+      <div class="step"><span class="n">2</span><div><b>Self assess</b><span>Fill in your file at your own pace. Progress is saved as you go.</span></div></div>
+      <div class="step"><span class="n">3</span><div><b>Apply for services</b><span>Share your file with the bank and follow the decision.</span></div></div>
+      <div class="step"><span class="n">4</span><div><b>Achieve more</b><span>Reuse the same file with other banks and partners.</span></div></div>
+    </div>
+    <p class="fine">Built for slow connections: pages are light and every step saves on its own.</p>
+  </aside>
+
+  <main class="pane">
+    <div class="top">
+      <span class="hint">Already registered? <a href="#" style="color:var(--accent);font-weight:500;text-decoration:none">Sign in</a></span>
+      <div class="lang" role="tablist" aria-label="Language"><button class="on" role="tab" aria-selected="true">EN</button><button role="tab" aria-selected="false">FR</button></div>
+    </div>
+
+    <form class="formcard" onsubmit="return false">
+      <div class="tabs" role="tablist"><button class="on" role="tab" aria-selected="true">Create account</button><button role="tab" aria-selected="false">Sign in</button></div>
+      <div>
+        <h2>Create your operator account</h2>
+        <div class="sub">Takes about five minutes. You can stop and come back at any time.</div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="org">Organisation name</label>
+        <input class="input" id="org" placeholder="e.g. Riverbend mining cooperative">
+      </div>
+
+      <div class="field">
+        <span class="label">Type of operator</span>
+        <div class="kind">
+          <label class="on"><input type="radio" name="kind" checked> Cooperative</label>
+          <label><input type="radio" name="kind"> Small producer</label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="label" for="phone">Mobile number</label>
+          <div class="phone"><input class="input" value="+243" aria-label="Country code"><input class="input" id="phone" placeholder="8X XXX XXXX"></div>
+        </div>
+        <div class="field">
+          <label class="label" for="prov">Province</label>
+          <select class="input" id="prov"><option>North Kivu</option><option>South Kivu</option><option>Haut-Katanga</option><option>Lualaba</option><option>Maniema</option></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="pw">Password</label>
+        <input class="input" id="pw" type="password" placeholder="At least 8 characters">
+        <span class="hint" style="margin-top:6px">We'll send a code to your mobile to confirm it's you.</span>
+      </div>
+
+      <button class="btn primary block" type="submit">Create account</button>
+
+      <div class="assure">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M9 11.4999L11 13.4999L15.5 8.99987M20 11.9999C20 16.9083 14.646 20.4783 12.698 21.6147C12.4766 21.7439 12.3659 21.8085 12.2097 21.842C12.0884 21.868 11.9116 21.868 11.7903 21.842C11.6341 21.8085 11.5234 21.7439 11.302 21.6147C9.35396 20.4783 4 16.9083 4 11.9999V7.21747C4 6.41796 4 6.0182 4.13076 5.67457C4.24627 5.37101 4.43398 5.10015 4.67766 4.8854C4.9535 4.64231 5.3278 4.50195 6.0764 4.22122L11.4382 2.21054C11.6461 2.13258 11.75 2.0936 11.857 2.07815C11.9518 2.06444 12.0482 2.06444 12.143 2.07815C12.25 2.0936 12.3539 2.13258 12.5618 2.21054L17.9236 4.22122C18.6722 4.50195 19.0465 4.64231 19.3223 4.8854C19.566 5.10015 19.7537 5.37101 19.8692 5.67457C20 6.0182 20 6.41796 20 7.21747V11.9999Z"/></svg>
+        <span>Your information is only shared with a bank when you choose to apply. The bank works on its own copy; your record stays yours.</span>
+      </div>
+
+      <p class="switch">Registering on behalf of a bank? <a href="#">Institution sign-in</a></p>
+    </form>
+  </main>
+</body>
+</html>

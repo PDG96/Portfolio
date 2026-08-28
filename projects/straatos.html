@@ -1511,6 +1511,22 @@
  border-radius: 0;
  overflow: visible;
  }
+ /* Motion capture, house radius. A canvas flyover across every screen; it is
+    ping-ponged so the loop has no cut. */
+ .app-shot--video .video-frame {
+ width: 100%;
+ border-radius: 14px;
+ overflow: hidden;
+ line-height: 0;
+ }
+ .app-shot--video .video-frame video { width: 100%; height: auto; display: block; }
+ /* Morph slide: one GIF per theme, on the page ground, so the loop never
+    sits on a mismatched rectangle. Square, so height drives width. */
+ .id-car-slide--morph { aspect-ratio: 1 / 1; }
+ .id-car-slide--morph img { width: 100%; height: 100%; object-fit: contain; }
+ .id-car-slide--morph .morph-dark { display: none; }
+ [data-theme="dark"] .id-car-slide--morph .morph-light { display: none; }
+ [data-theme="dark"] .id-car-slide--morph .morph-dark { display: block; }
 
  /* slide variant with media + overlay text (e.g. type specimen on video) */
  .id-car-slide--overlay {
@@ -3227,25 +3243,13 @@
  <img src="assets/straatos-palette.png?v=5" alt="Color palette with hex codes: #1B989B teal primary, #197778/#095D5E deep teals, #E4FCFD/#C5F5F5/#A2E9E9/#57CACB ice and mint tints, #F85531 coral, #FE9065 peach">
  </div>
 
- <div class="id-car-slide id-car-slide--overlay">
- <video src="assets/straatos-flamingos.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Looping video of flamingos in the field"></video>
- <div class="id-car-slide__type" aria-hidden="true">
- <div class="id-car-slide__type-spec">
- <span class="id-car-slide__type-row id-car-slide__type-row--caps">ABCDEFGHIJKLMN</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--caps">OPQRSTUVWXYZ</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--lower">abcdefghijklmno</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--lower">pqrstuvwxyz</span>
- <span class="id-car-slide__type-row id-car-slide__type-row--num">0 1 2 3 4 5 6 7 8 9</span>
- </div>
- <div class="id-car-slide__type-meta">
- <b>SF UI Display</b>
- Apple system · 200–700
- </div>
- </div>
- </div>
 
- <div class="id-car-slide id-car-slide--bare">
- <img src="assets/straatos-icons.png" alt="Icon set, fauna, flora and field markers in teal stroke style">
+ <!-- The icon set in motion: monkey, ladybug, caterpillar, crab morphing into
+      one another. Frames are computed from the exported strokes (no in-betweens
+      drawn); the GIF is rendered on the page's own ground in each theme. -->
+ <div class="id-car-slide id-car-slide--bare id-car-slide--morph">
+ <img class="morph-light" src="assets/straatos-icon-morph.gif?v=2" alt="Four Straatos icons morphing into each other: monkey, ladybug, caterpillar, crab">
+ <img class="morph-dark" src="assets/straatos-icon-morph-dark.gif?v=2" alt="" aria-hidden="true">
  </div>
  </div>
  <div class="h-scroll-hint">
@@ -3268,6 +3272,14 @@
  </div>
 
  <div class="app-stack r-stagger">
+  <figure class="app-shot app-shot--video r">
+  <div class="video-frame">
+  <video autoplay muted loop playsinline preload="metadata" src="assets/straatos-screens-wall.mp4"
+  aria-label="A slow pass over the Straatos screens laid out side by side: dashboard, restoration, simulation, field capture and sign-in."></video>
+  </div>
+  <figcaption data-i18n="fig_wall">Every screen, side by side. One grammar from sign-in to simulation.</figcaption>
+  </figure>
+
   <figure class="app-shot app-shot--globe r">
   <div class="globe-embed">
   <iframe class="globe-iframe" src="assets/straatos-dashboard/dashboard.html?only=globe&v=9"
@@ -3374,6 +3386,7 @@
  product_label: "The Product",
  product_title: "Application.",
  product_intro: "Five surfaces, one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.",
+ fig_wall: "Every screen, side by side. One grammar from sign-in to simulation.",
  fig_dashboard: "Every active project pinned on the globe. Drag to spin it, zoom into a country",
  fig_analysis: "Analysis, charts, KPIs and field telemetry composed for verifier review",
  fig_field: "Field capture, daily planting forms on mobile + boundary drawing on satellite",
@@ -3429,6 +3442,7 @@
  product_label: "O Produto",
  product_title: "Application.",
  product_intro: "Cinco superfícies, um único modelo mental. O dashboard se ancora num globo 3D, cada projeto fixado em seu lugar. Dali, project developers entram em ciclos e campanhas, vistas de parcelas via satélite, e por fim simulações que projetam os mesmos números que o verificador vai ler no final. Sem tradução entre telas; os dados fluem por uma estrutura só.",
+ fig_wall: "Todas as telas, lado a lado. Uma gramática só, do login à simulação.",
  fig_dashboard: "Cada projeto ativo fixado no globo. Arraste pra girar, aproxime num país",
  fig_analysis: "Análise, gráficos, KPIs e telemetria de campo compostos para revisão do verificador",
  fig_field: "Captura em campo, formulários diários de plantio no mobile + desenho de polígono no satélite",
@@ -3877,7 +3891,40 @@
  });
  });
  })();
- </script>
+ 
+ /* Wheel anywhere scrolls the sheet. The shell is a fixed frame and the
+ sheet is the only scroller, so a wheel over the sidebar or the gutters
+ used to do nothing. The sidebar keeps its own scroll while it can still
+ move in that direction; otherwise the motion goes to the sheet. */
+ (function () {
+ const sheet = document.querySelector('.main-sheet');
+ if (!sheet) return;
+ const sidebar = document.querySelector('.sidebar');
+ function canScroll(el, dy) {
+ if (!el) return false;
+ const st = getComputedStyle(el).overflowY;
+ if (st !== 'auto' && st !== 'scroll') return false;
+ if (el.scrollHeight <= el.clientHeight + 1) return false;
+ return dy > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0;
+ }
+ document.addEventListener('wheel', (e) => {
+ if (sheet.contains(e.target)) return;                 // native scroll
+ if (sidebar && sidebar.contains(e.target) && canScroll(sidebar, e.deltaY)) return;
+ if (e.ctrlKey) return;                                // pinch-zoom
+ e.preventDefault();
+ sheet.scrollBy({ top: e.deltaY, left: 0 });
+ }, { passive: false });
+ document.addEventListener('keydown', (e) => {
+ const a = document.activeElement;
+ if (a && a !== document.body && !a.classList.contains('seg-btn')) return;
+ const page = sheet.clientHeight * 0.85;
+ const map = { ArrowDown: 60, ArrowUp: -60, PageDown: page, PageUp: -page, ' ': e.shiftKey ? -page : page };
+ if (!(e.key in map)) return;
+ e.preventDefault();
+ sheet.scrollBy({ top: map[e.key], behavior: 'smooth' });
+ });
+ })();
+</script>
 
 
  <!-- Segmented nav, same control as the landing. -->
