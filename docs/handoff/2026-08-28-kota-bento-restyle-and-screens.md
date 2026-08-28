@@ -113,3 +113,9 @@ Nada commitado.
 - Case Kota: vídeo do bento agora na largura total, igual aos dashboards.
 - Landing: Get in touch redesenhado (duas colunas, e-mail como CTA, lista com régua). Sem `connect_p3`; chaves novas `connect_eyebrow`.
 - Commit `1ae987f` em main → deploy Cloudflare Pages.
+
+## Update 2026-08-28 (fim do dia) — Method layer nos cases + header
+- Seção "Method" inserida logo após Challenge/Solution nos 4 cases: 3 artefatos por case (SVG inline, 16:10, etiqueta de evidência: From the spec / Domain expert / Client sessions / Designer judgment) + frase curta + nota de honestidade sobre pesquisa. Só em EN (as chaves PT espelham o EN). Proposta completa em docs/decisions/2026-08-28-ux-methods-layer.md.
+- Header dos cases: links Work / Contact, menu mobile e hambúrguer removidos (navegação fica no segmented control). JS do toggle já era null-safe.
+- Confidence card do dashboard Kota: só gauge + pill.
+- Regra nova: sem travessão em nenhum texto (memória salva). Copy do site limpa.

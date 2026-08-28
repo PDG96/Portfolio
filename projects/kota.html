@@ -3719,7 +3719,34 @@
       .seg { gap: 0; padding: 0 3px; }
       .seg-btn { font-size: 0.75rem; padding: 0 0.7rem; }
     }
-  </style>
+  
+ /* ====== METHOD LAYER ======
+    Short method artefacts between the narrative blocks. Each carries an
+    evidence tag so analysis of a spec is never mistaken for user research. */
+ .mth { display: grid; grid-template-columns: 1fr; gap: clamp(1.25rem, 2.5vw, 2rem); }
+ @media (min-width: 900px) { .mth { grid-template-columns: repeat(3, 1fr); } }
+ .mth-item { display: flex; flex-direction: column; gap: 0.85rem; min-width: 0; }
+ .mth-fig { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: clamp(1rem, 1.6vw, 1.4rem); aspect-ratio: 16 / 10; display: grid; place-items: center; overflow: hidden; }
+ .mth-fig svg { width: 100%; height: 100%; display: block; font-family: var(--font); overflow: visible; }
+ .mth-fig svg text { font-size: 10.5px; fill: var(--text-2); }
+ .mth-fig svg .t-strong { fill: var(--text); font-weight: 500; }
+ .mth-fig svg .t-sm { font-size: 9px; }
+ .mth-fig svg .t-mute { fill: var(--text-3); font-size: 9px; }
+ .mth-fig svg .t-mono { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.08em; fill: var(--text-3); }
+ .mth-fig svg .box { fill: var(--surface); stroke: var(--border); stroke-width: 1; }
+ .mth-fig svg .box-acc { fill: var(--accent-light, var(--bg-alt)); stroke: var(--accent); stroke-width: 1; }
+ .mth-fig svg .box-soft { fill: var(--bg-alt); stroke: var(--border); stroke-width: 1; }
+ .mth-fig svg .ln { stroke: var(--text-3); stroke-width: 1; fill: none; }
+ .mth-fig svg .ln-acc { stroke: var(--accent); stroke-width: 1.2; fill: none; }
+ .mth-fig svg .ln-dash { stroke: var(--text-3); stroke-width: 1; fill: none; stroke-dasharray: 3 3; }
+ .mth-fig svg .dot { fill: var(--accent); }
+ .mth-tag { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: var(--bg-alt); color: var(--text-2); border: 1px solid var(--border); }
+ .mth-tag--sess { background: var(--accent-light, var(--bg-alt)); color: var(--accent); border-color: transparent; }
+ .mth-tag--judg { color: #b85c3f; background: rgba(184, 92, 63, 0.08); border-color: transparent; }
+ .mth-method { font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+ .mth-item p { margin: 0.2rem 0 0; font-size: clamp(1.0625rem, 1.5vw, 1.25rem); line-height: 1.35; color: var(--text); letter-spacing: -0.01em; text-wrap: balance; }
+ .mth-note { margin: clamp(1.5rem, 3vw, 2.25rem) 0 0; font-size: 0.9375rem; color: var(--text-2); max-width: 62ch; }
+</style>
 </head>
 
 <body class="shell-page">
@@ -3732,25 +3759,13 @@
  <div class="wrap nav-inner">
  <a href="../index.html#hero" class="nav-logo">Pietra Gottardo.</a>
  <div class="nav-right">
- <ul class="nav-links">
- <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
- <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
- </ul>
  <div class="theme-toggle" role="group" aria-label="Color theme">
    <button class="theme-btn" data-theme-set="dark" aria-pressed="false" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
    <button class="theme-btn active" data-theme-set="light" aria-pressed="true" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
- <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
-   <span></span><span></span><span></span>
- </button>
  </div>
  </div>
  </nav>
-
- <div class="mobile-menu" role="dialog" aria-label="Mobile navigation">
-   <a href="../index.html#work" data-i18n="nav_work">Work</a>
-   <a href="../index.html#contact" data-i18n="nav_contact">Contact</a>
- </div>
 
  <!-- Shell: fixed sidebar (project info + other cases) + scrolling main sheet -->
  <div class="shell">
@@ -3829,6 +3844,37 @@
  </div>
  </div>
  </section>
+ <!-- ====== METHOD LAYER ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="mth_label">Method</p>
+ <h2 data-i18n="mth_title">How the decisions were made.</h2>
+ </div>
+ <div class="mth">
+   <div class="mth-item r">
+   <div class="mth-fig"><span class="mth-tag" data-i18n="mth_tag_spec">From the spec</span>
+   <svg viewBox="0 0 300 180" role="img" aria-label="Stakeholder map"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--text-3)"/></marker></defs><rect class="box-acc" x="14" y="70" width="80" height="40" rx="6"/><text x="54.0" y="87.0" text-anchor="middle" class="t-strong">Operator</text><text x="54.0" y="100.0" text-anchor="middle" class="t-mute">cooperative, producer</text><rect class="box" x="206" y="30" width="80" height="40" rx="6"/><text x="246.0" y="47.0" text-anchor="middle" class="t-strong">Commercial bank</text><text x="246.0" y="60.0" text-anchor="middle" class="t-mute">evaluates</text><rect class="box" x="206" y="110" width="80" height="40" rx="6"/><text x="246.0" y="127.0" text-anchor="middle" class="t-strong">Aggregator</text><text x="246.0" y="140.0" text-anchor="middle" class="t-mute">onboards</text><path class="ln" d="M94,90 L206,50" marker-end="url(#ah)"/><text x="150.0" y="65.0" text-anchor="middle" class="t-mute">application</text><path class="ln" d="M94,90 L206,130" marker-end="url(#ah)"/><text x="150.0" y="105.0" text-anchor="middle" class="t-mute">supply chain</text><text x="150" y="172" text-anchor="middle" class="t-mono">ONE ENGINE · DIFFERENT VOCABULARY</text></svg></div>
+   <span class="mth-method" data-i18n="mth_k1_m">Stakeholder map</span>
+   <p data-i18n="mth_k1_p">Three actors, one pipeline, three vocabularies.</p>
+   </div>
+   <div class="mth-item r">
+   <div class="mth-fig"><span class="mth-tag" data-i18n="mth_tag_expert">Domain expert</span>
+   <svg viewBox="0 0 300 180" role="img" aria-label="Service blueprint"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--text-3)"/></marker></defs><text x="4" y="22" class="t-mono">OPERATOR SEES</text><rect class="box-soft" x="4" y="28" width="68" height="28" rx="6"/><text x="38.0" y="46.0" text-anchor="middle" class="">Interest</text><rect class="box-soft" x="78" y="28" width="68" height="28" rx="6"/><text x="112.0" y="46.0" text-anchor="middle" class="">Self assess</text><rect class="box-soft" x="152" y="28" width="68" height="28" rx="6"/><text x="186.0" y="46.0" text-anchor="middle" class="">Apply</text><rect class="box-soft" x="226" y="28" width="68" height="28" rx="6"/><text x="260.0" y="46.0" text-anchor="middle" class="">Answer</text><text x="4" y="82" class="t-mono">BANK DOES</text><rect class="box-soft" x="78" y="88" width="68" height="28" rx="6"/><text x="112.0" y="106.0" text-anchor="middle" class="">Invite</text><rect class="box-soft" x="152" y="88" width="68" height="28" rx="6"/><text x="186.0" y="106.0" text-anchor="middle" class="">Review</text><rect class="box-soft" x="226" y="88" width="68" height="28" rx="6"/><text x="260.0" y="106.0" text-anchor="middle" class="">Decide</text><text x="4" y="142" class="t-mono">DATA HOLDS</text><rect class="box-acc" x="4" y="148" width="140" height="26" rx="6"/><text x="74.0" y="158.0" text-anchor="middle" class="t-strong">Operator record</text><text x="74.0" y="171.0" text-anchor="middle" class="t-mute">owned by the operator</text><rect class="box" x="156" y="148" width="140" height="26" rx="6"/><text x="226.0" y="158.0" text-anchor="middle" class="t-strong">Bank copy</text><text x="226.0" y="171.0" text-anchor="middle" class="t-mute">inherited on first edit</text><path class="ln-dash" d="M74,148 L74,116"/><path class="ln-dash" d="M226,148 L226,116"/></svg></div>
+   <span class="mth-method" data-i18n="mth_k2_m">Service blueprint</span>
+   <p data-i18n="mth_k2_p">Four stages on the surface, two copies underneath.</p>
+   </div>
+   <div class="mth-item r">
+   <div class="mth-fig"><span class="mth-tag mth-tag--judg" data-i18n="mth_tag_judg">Designer judgment</span>
+   <svg viewBox="0 0 300 180" role="img" aria-label="Object model"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--text-3)"/></marker></defs><rect class="box-acc" x="110" y="70" width="80" height="40" rx="6"/><text x="150.0" y="87.0" text-anchor="middle" class="t-strong">Subject</text><text x="150.0" y="100.0" text-anchor="middle" class="t-mute">operator, applicant</text><rect class="box" x="10" y="20" width="70" height="30" rx="6"/><text x="45.0" y="39.0" text-anchor="middle" class="t-strong">Stage</text><rect class="box" x="220" y="20" width="70" height="30" rx="6"/><text x="255.0" y="39.0" text-anchor="middle" class="t-strong">Action</text><rect class="box" x="10" y="130" width="70" height="30" rx="6"/><text x="45.0" y="149.0" text-anchor="middle" class="t-strong">Form</text><rect class="box" x="220" y="130" width="70" height="30" rx="6"/><text x="255.0" y="149.0" text-anchor="middle" class="t-strong">Document</text><path class="ln" d="M80,35 L110,72"/><path class="ln" d="M220,35 L190,72"/><path class="ln" d="M80,145 L110,108"/><path class="ln" d="M220,145 L190,108"/><path class="ln-acc" d="M45,50 C45,100 220,100 255,50" /><text x="150" y="48" text-anchor="middle" class="t-mute">actions are scoped to a stage</text><text x="30" y="14" class="t-mute">has a</text><text x="248" y="14" class="t-mute">can do</text></svg></div>
+   <span class="mth-method" data-i18n="mth_k3_m">Object model</span>
+   <p data-i18n="mth_k3_p">Subject, stage, action: the nouns every screen is built from.</p>
+   </div>
+ </div>
+ <p class="mth-note r" data-i18n="mth_note">No user research was possible on this project. The rigor moved into the questions, and these are the artefacts that carried it: what the spec said, what the domain expert confirmed, and what I decided as a designer.</p>
+ </div>
+ </section>
+
 
  <!-- ====== THE PRODUCT, SHOWN EARLY ======
       The reveal sits between the problem and the process: what was built,
@@ -4302,6 +4348,8 @@
  con_p1: "The operator using KOTA may be on a slow mobile connection, encountering formal due diligence for the first time, in a context where documented records barely exist. Every friction point in the operator-facing flow is a reason to abandon. The product has to be simple at a level business software rarely is.",
  con_p2: "Beyond usability: the product operates across DRC regulation, OECD guidance, and EU conflict minerals rules, each with different vocabulary. It runs in English and French. And the trust deficit is structural: operators have good reasons to distrust a system that collects sensitive data about their business. The two-copy data model, the bank inherits a copy when it edits, never mutating the operator's record, is one answer. The design is another.",
  challenge_label: "The Challenge",
+ mth_label: "Method", mth_tag_spec: "From the spec", mth_tag_expert: "Domain expert", mth_tag_sess: "Client sessions", mth_tag_judg: "Designer judgment", mth_title: "How the decisions were made.", mth_note: "No user research was possible on this project. The rigor moved into the questions, and these are the artefacts that carried it: what the spec said, what the domain expert confirmed, and what I decided as a designer.", mth_k1_m: "Stakeholder map", mth_k1_p: "Three actors, one pipeline, three vocabularies.", mth_k2_m: "Service blueprint", mth_k2_p: "Four stages on the surface, two copies underneath.", mth_k3_m: "Object model", mth_k3_p: "Subject, stage, action: the nouns every screen is built from.",
+
  challenge_title: "Paper, filled in by the wrong hands.",
  challenge_p1: "The DRC produces over 70% of the world's cobalt. Up to a third of it is dug by hand, in a sector that sustains an estimated 10 million people. Almost none of them can open a bank account: surveys put banking access among artisanal miners at 1 to 3%. The gap is filled by informal lenders on predatory terms, which is part of why the sector stays dangerous and informal.",
  challenge_p2: "The blockage isn't the miner. It's the paperwork. Banks need to verify identity, source of funds and due diligence before they can say yes, and that record doesn't exist where there is no filing system, no shared registry, no compliance function. The process ran on paper forms, usually filled in by a bank agent on the operator's behalf. The person answering wasn't the person who knew. The bank inherited data it couldn't defend, and the easiest decision was always no.",
@@ -4501,6 +4549,8 @@
  con_p1: "O operador que usa o KOTA pode estar em uma conexão móvel lenta, enfrentando um due diligence formal pela primeira vez, em um contexto onde registros documentados mal existem. Cada ponto de fricção no fluxo do operador é um motivo para abandonar. O produto precisa ser simples em um nível que o software de negócios raramente alcança.",
  con_p2: "Além da usabilidade: o produto opera sob a regulação da RDC, as diretrizes da OCDE e as regras europeias de minerais de conflito, cada uma com vocabulário diferente. Roda em inglês e francês. E o déficit de confiança é estrutural: os operadores têm boas razões para desconfiar de um sistema que coleta dados sensíveis sobre seus negócios. O modelo de dados de cópia dupla, o banco herda uma cópia ao editar, sem nunca mutar o registro do operador, é uma resposta. O design é outra.",
  challenge_label: "O Desafio",
+ mth_label: "Method", mth_tag_spec: "From the spec", mth_tag_expert: "Domain expert", mth_tag_sess: "Client sessions", mth_tag_judg: "Designer judgment", mth_title: "How the decisions were made.", mth_k1_m: "Stakeholder map", mth_k1_p: "Three actors, one pipeline, three vocabularies.", mth_k2_m: "Service blueprint", mth_k2_p: "Four stages on the surface, two copies underneath.", mth_k3_m: "Object model", mth_k3_p: "Subject, stage, action: the nouns every screen is built from.", mth_note: "No user research was possible on this project. The rigor moved into the questions, and these are the artefacts that carried it: what the spec said, what the domain expert confirmed, and what I decided as a designer.",
+
  challenge_title: "Papel, preenchido pelas mãos erradas.",
  challenge_p1: "A RDC produz mais de 70% do cobalto do mundo. Até um terço é extraído à mão, num setor que sustenta cerca de 10 milhões de pessoas. Quase nenhuma delas consegue abrir uma conta bancária: pesquisas colocam o acesso bancário entre mineradores artesanais em 1 a 3%. A lacuna é preenchida por agiotas informais em termos predatórios, parte do motivo pelo qual o setor continua perigoso e informal.",
  challenge_p2: "O bloqueio não é o minerador. É a papelada. Bancos precisam verificar identidade, origem de fundos e due diligence antes de dizer sim, e esse registro não existe onde não há sistema de arquivo, nem registro compartilhado, nem função de compliance. O processo rodava em formulários de papel, geralmente preenchidos por um agente do banco em nome do operador. Quem respondia não era quem sabia. O banco herdava dados que não conseguia defender, e a decisão mais fácil era sempre não.",

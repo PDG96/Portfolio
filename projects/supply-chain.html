@@ -1884,7 +1884,34 @@
       .seg { gap: 0; padding: 0 3px; }
       .seg-btn { font-size: 0.75rem; padding: 0 0.7rem; }
     }
-  </style>
+  
+ /* ====== METHOD LAYER ======
+    Short method artefacts between the narrative blocks. Each carries an
+    evidence tag so analysis of a spec is never mistaken for user research. */
+ .mth { display: grid; grid-template-columns: 1fr; gap: clamp(1.25rem, 2.5vw, 2rem); }
+ @media (min-width: 900px) { .mth { grid-template-columns: repeat(3, 1fr); } }
+ .mth-item { display: flex; flex-direction: column; gap: 0.85rem; min-width: 0; }
+ .mth-fig { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: clamp(1rem, 1.6vw, 1.4rem); aspect-ratio: 16 / 10; display: grid; place-items: center; overflow: hidden; }
+ .mth-fig svg { width: 100%; height: 100%; display: block; font-family: var(--font); overflow: visible; }
+ .mth-fig svg text { font-size: 10.5px; fill: var(--text-2); }
+ .mth-fig svg .t-strong { fill: var(--text); font-weight: 500; }
+ .mth-fig svg .t-sm { font-size: 9px; }
+ .mth-fig svg .t-mute { fill: var(--text-3); font-size: 9px; }
+ .mth-fig svg .t-mono { font-family: var(--mono); font-size: 8.5px; letter-spacing: 0.08em; fill: var(--text-3); }
+ .mth-fig svg .box { fill: var(--surface); stroke: var(--border); stroke-width: 1; }
+ .mth-fig svg .box-acc { fill: var(--accent-light, var(--bg-alt)); stroke: var(--accent); stroke-width: 1; }
+ .mth-fig svg .box-soft { fill: var(--bg-alt); stroke: var(--border); stroke-width: 1; }
+ .mth-fig svg .ln { stroke: var(--text-3); stroke-width: 1; fill: none; }
+ .mth-fig svg .ln-acc { stroke: var(--accent); stroke-width: 1.2; fill: none; }
+ .mth-fig svg .ln-dash { stroke: var(--text-3); stroke-width: 1; fill: none; stroke-dasharray: 3 3; }
+ .mth-fig svg .dot { fill: var(--accent); }
+ .mth-tag { position: absolute; top: 10px; right: 10px; font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; background: var(--bg-alt); color: var(--text-2); border: 1px solid var(--border); }
+ .mth-tag--sess { background: var(--accent-light, var(--bg-alt)); color: var(--accent); border-color: transparent; }
+ .mth-tag--judg { color: #b85c3f; background: rgba(184, 92, 63, 0.08); border-color: transparent; }
+ .mth-method { font-family: var(--mono); font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); }
+ .mth-item p { margin: 0.2rem 0 0; font-size: clamp(1.0625rem, 1.5vw, 1.25rem); line-height: 1.35; color: var(--text); letter-spacing: -0.01em; text-wrap: balance; }
+ .mth-note { margin: clamp(1.5rem, 3vw, 2.25rem) 0 0; font-size: 0.9375rem; color: var(--text-2); max-width: 62ch; }
+</style>
 </head>
 
 <body class="shell-page">
@@ -1897,25 +1924,13 @@
     <div class="wrap nav-inner">
       <a href="../index.html#hero" class="nav-logo">Pietra Gottardo.</a>
       <div class="nav-right">
-        <ul class="nav-links">
-          <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
-          <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
-        </ul>
         <div class="theme-toggle" role="group" aria-label="Color theme">
    <button class="theme-btn" data-theme-set="dark" aria-pressed="false" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
    <button class="theme-btn active" data-theme-set="light" aria-pressed="true" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
-      <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
       </div>
     </div>
   </nav>
-
-  <div class="mobile-menu" role="dialog" aria-label="Mobile navigation">
-    <a href="../index.html#work" data-i18n="nav_work">Work</a>
-    <a href="../index.html#contact" data-i18n="nav_contact">Contact</a>
-  </div>
 
   <!-- Shell: fixed sidebar (project info + other cases) + scrolling main sheet -->
   <div class="shell">
@@ -1993,6 +2008,37 @@
       </div>
     </div>
   </section>
+ <!-- ====== METHOD LAYER ====== -->
+ <section class="case-section">
+ <div class="wrap">
+ <div class="case-section-header r">
+ <p class="case-section-label" data-i18n="mth_label">Method</p>
+ <h2 data-i18n="mth_title">The model behind a living profile.</h2>
+ </div>
+ <div class="mth">
+   <div class="mth-item r">
+   <div class="mth-fig"><span class="mth-tag" data-i18n="mth_tag_spec">From the spec</span>
+   <svg viewBox="0 0 300 180" role="img" aria-label="Process comparison"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--text-3)"/></marker></defs><text x="4" y="16" class="t-mono">STATIC</text><path class="ln" d="M4,40 L296,40"/><circle cx="30" cy="40" r="4" class="dot"/><text x="30" y="58" text-anchor="middle" class="t-mute">form scored</text><rect x="40" y="34" width="200" height="12" rx="6" fill="rgba(184,92,63,0.16)"/><text x="140" y="30" text-anchor="middle" class="t-mute">six months out of date</text><circle cx="250" cy="40" r="4" class="dot"/><text x="250" y="58" text-anchor="middle" class="t-mute">re-scored</text><text x="4" y="104" class="t-mono">LIVING</text><path class="ln-acc" d="M4,128 L296,128"/><circle cx="30" cy="128" r="3.5" class="dot"/><circle cx="64" cy="128" r="3.5" class="dot"/><circle cx="98" cy="128" r="3.5" class="dot"/><circle cx="132" cy="128" r="3.5" class="dot"/><circle cx="166" cy="128" r="3.5" class="dot"/><circle cx="200" cy="128" r="3.5" class="dot"/><circle cx="234" cy="128" r="3.5" class="dot"/><circle cx="268" cy="128" r="3.5" class="dot"/><text x="150" y="150" text-anchor="middle" class="t-mute">every new source updates the record and stamps where it came from</text></svg></div>
+   <span class="mth-method" data-i18n="mth_c1_m">Process comparison</span>
+   <p data-i18n="mth_c1_p">A form scored once expires. A record that listens does not.</p>
+   </div>
+   <div class="mth-item r">
+   <div class="mth-fig"><span class="mth-tag" data-i18n="mth_tag_expert">Domain expert</span>
+   <svg viewBox="0 0 300 180" role="img" aria-label="Triangulation model"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--text-3)"/></marker></defs><path class="ln" d="M150,26 L40,150 L260,150 Z"/><circle cx="150" cy="26" r="16" class="box"/><circle cx="40" cy="150" r="16" class="box"/><circle cx="260" cy="150" r="16" class="box"/><text x="150" y="12" text-anchor="middle">Self-assessment</text><text x="40" y="176" text-anchor="middle">Third-party audit</text><text x="260" y="176" text-anchor="middle">Independent research</text><circle cx="150" cy="110" r="22" class="box-acc"/><text x="150" y="108" text-anchor="middle" class="t-strong">field</text><text x="150" y="119" text-anchor="middle" class="t-mute">confidence</text><path class="ln-dash" d="M150,42 L150,88 M54,142 L130,118 M246,142 L170,118"/></svg></div>
+   <span class="mth-method" data-i18n="mth_c2_m">Triangulation model</span>
+   <p data-i18n="mth_c2_p">Three independent sources, one confidence level per field.</p>
+   </div>
+   <div class="mth-item r">
+   <div class="mth-fig"><span class="mth-tag" data-i18n="mth_tag_spec">From the spec</span>
+   <svg viewBox="0 0 300 180" role="img" aria-label="Signal sort"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="var(--text-3)"/></marker></defs><text x="4" y="14" class="t-mono">OECD</text><rect class="box-soft" x="4" y="22" width="92" height="24" rx="6"/><text x="50.0" y="38.0" text-anchor="middle" class="">Annex II risk</text><rect class="box-soft" x="4" y="54" width="92" height="24" rx="6"/><text x="50.0" y="70.0" text-anchor="middle" class="">Watchlist match</text><rect class="box-soft" x="4" y="86" width="92" height="24" rx="6"/><text x="50.0" y="102.0" text-anchor="middle" class="">AML / CFT check</text><rect class="box-acc" x="4" y="118" width="92" height="24" rx="6"/><text x="50.0" y="134.0" text-anchor="middle" class="">Site audit finding</text><text x="104" y="14" class="t-mono">LBMA</text><rect class="box-soft" x="104" y="22" width="92" height="24" rx="6"/><text x="150.0" y="38.0" text-anchor="middle" class="">Annex II risk</text><rect class="box-soft" x="104" y="54" width="92" height="24" rx="6"/><text x="150.0" y="70.0" text-anchor="middle" class="">AML / CFT check</text><rect class="box-acc" x="104" y="86" width="92" height="24" rx="6"/><text x="150.0" y="102.0" text-anchor="middle" class="">Site audit finding</text><rect class="box-soft" x="104" y="118" width="92" height="24" rx="6"/><text x="150.0" y="134.0" text-anchor="middle" class="">ESG score change</text><text x="204" y="14" class="t-mono">RMI</text><rect class="box-soft" x="204" y="22" width="92" height="24" rx="6"/><text x="250.0" y="38.0" text-anchor="middle" class="">Watchlist match</text><rect class="box-acc" x="204" y="54" width="92" height="24" rx="6"/><text x="250.0" y="70.0" text-anchor="middle" class="">Site audit finding</text><rect class="box-soft" x="204" y="86" width="92" height="24" rx="6"/><text x="250.0" y="102.0" text-anchor="middle" class="">ESG score change</text><text x="150" y="170" text-anchor="middle" class="t-mute">the same signal feeds several reports</text></svg></div>
+   <span class="mth-method" data-i18n="mth_c3_m">Signal sort</span>
+   <p data-i18n="mth_c3_p">Every red flag, sorted by the framework that asks for it.</p>
+   </div>
+ </div>
+ <p class="mth-note r" data-i18n="mth_note">No user research on this project. The sorting was done against the regulation and the spec, with the domain expert; that is stated wherever it is used.</p>
+ </div>
+ </section>
+
 
   <!-- ====== THE PLATFORM (real screens) ====== -->
   <section class="case-section">
