@@ -16,7 +16,7 @@
  (function () {
  var saved = null;
  try { saved = localStorage.getItem('theme'); } catch (e) {}
- // Dark is the default landing state, same as the main site — the OS
+ // Dark is the default landing state, same as the main site, the OS
  // preference no longer decides it.
  document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
  })();
@@ -3823,8 +3823,8 @@
  <div class="cs-block cs-block--solution r">
  <span class="cs-block-label" data-i18n="solution_label">The Solution</span>
  <h3 data-i18n="solution_title">Change who holds the pen.</h3>
- <p data-i18n="solution_p1">KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally. The bank receives a structured application instead of a stack of handwritten cards — and the operator gets a score that shows the path forward, not just the verdict.</p>
- <p data-i18n="solution_p2">One engine serves two institutions — a commercial bank and a government-mandated commodity aggregator — wearing different vocabulary. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can use.</p>
+ <p data-i18n="solution_p1">KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward, not just the verdict.</p>
+ <p data-i18n="solution_p2">One engine serves two institutions (a commercial bank and a government-mandated commodity aggregator) wearing different vocabulary. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can use.</p>
  </div>
  </div>
  </div>
@@ -3896,7 +3896,7 @@
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="actors_label">The People</p>
  <h2 data-i18n="actors_title">Three actors, one compliance pipeline.</h2>
- <p class="explore-intro" data-i18n="actors_intro">KOTA is not a single-user product. Three distinct roles touch the same data, at different moments, with different needs — and the platform has to serve all of them without asking any one to work like another.</p>
+ <p class="explore-intro" data-i18n="actors_intro">KOTA is not a single-user product. Three distinct roles touch the same data, at different moments, with different needs, and the platform has to serve all of them without asking any one to work like another.</p>
  </div>
  <div class="insights-grid r-stagger" style="margin-top: 2rem;">
 
@@ -3904,7 +3904,7 @@
  <div class="insight-content">
  <span class="step-num" data-i18n="actor_1_role">The Operator</span>
  <h3 data-i18n="actor_1_t">Gains agency over their own approval.</h3>
- <p data-i18n="actor_1_d">Cooperatives and small producers in extractive industries — the people KOTA is built for — go through due diligence without a compliance team or a filing system. KOTA gives them the tools to register themselves, track their application, and understand exactly what's holding them back. The score makes the process legible: not just a verdict, but a map.</p>
+ <p data-i18n="actor_1_d">Cooperatives and small producers in extractive industries (the people KOTA is built for) go through due diligence without a compliance team or a filing system. KOTA gives them the tools to register themselves, track their application, and understand exactly what's holding them back. The score makes the process legible: not just a verdict, but a map.</p>
  </div>
  </div>
 
@@ -3912,7 +3912,7 @@
  <div class="insight-content">
  <span class="step-num" data-i18n="actor_2_role">The Commercial Bank</span>
  <h3 data-i18n="actor_2_t">Replaces a manual pipeline with a structured one.</h3>
- <p data-i18n="actor_2_d">Banks receive applications they can actually evaluate — organized forms, uploaded documents, stage-gated workflows — instead of handwritten cards filled by an agent on the client's behalf. Registration and evaluation are separated because they belong to different roles inside the bank: what KOTA makes explicit, the bank has always needed.</p>
+ <p data-i18n="actor_2_d">Banks receive applications they can actually evaluate (organized forms, uploaded documents, stage-gated workflows) instead of handwritten cards filled by an agent on the client's behalf. Registration and evaluation are separated because they belong to different roles inside the bank: what KOTA makes explicit, the bank has always needed.</p>
  </div>
  </div>
 
@@ -3920,7 +3920,7 @@
  <div class="insight-content">
  <span class="step-num" data-i18n="actor_3_role">The Commodity Aggregator</span>
  <h3 data-i18n="actor_3_t">Onboards its supply chain into a compliance framework.</h3>
- <p data-i18n="actor_3_d">An aggregator that buys from cooperatives and sells to international markets has direct exposure to supply chain regulation — EU conflict minerals rules, OECD guidance, ESG requirements from buyers. KOTA lets them run that process using the same platform as the bank, adapted through configuration rather than a separate product.</p>
+ <p data-i18n="actor_3_d">An aggregator that buys from cooperatives and sells to international markets has direct exposure to supply chain regulation, EU conflict minerals rules, OECD guidance, ESG requirements from buyers. KOTA lets them run that process using the same platform as the bank, adapted through configuration rather than a separate product.</p>
  </div>
  </div>
 
@@ -3943,7 +3943,7 @@
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
  <h2 data-i18n="ia_title">The question that split the architecture.</h2>
- <p class="explore-intro" data-i18n="ia_intro">The brief had the bank side as a single landing: one view, every operator, registration and evaluation in the same place. What it didn't define was how responsibilities were organized inside it. Exploring the flow, I hit a question I couldn't answer: <strong>is the person who approves a registration the same one who runs the full evaluation later?</strong> I took it to the domain expert. The answer was no — different people, different moments in the bank's workflow. So I separated Registration and Evaluation into distinct areas, each scoped to its own task: its own forms, its own indicators, its own actions. One question, asked before any screen was final, reshaped the product's information architecture.</p>
+ <p class="explore-intro" data-i18n="ia_intro">The brief had the bank side as a single landing: one view, every operator, registration and evaluation in the same place. What it didn't define was how responsibilities were organized inside it. Exploring the flow, I hit a question I couldn't answer: <strong>is the person who approves a registration the same one who runs the full evaluation later?</strong> I took it to the domain expert. The answer was no, different people, different moments in the bank's workflow. So I separated Registration and Evaluation into distinct areas, each scoped to its own task: its own forms, its own indicators, its own actions. One question, asked before any screen was final, reshaped the product's information architecture.</p>
  </div>
  <!-- Inline IA sitemap diagram, vertical flow -->
  <div class="kota-sitemap r">
@@ -4023,16 +4023,16 @@
  <div class="insight-item r">
  <span class="insight-num">01</span>
  <div class="insight-content">
- <h3 data-i18n="loop_1_t">The question loop — for documents.</h3>
- <p data-i18n="loop_1_d">Read the spec, find what it doesn't say, formulate the question precisely, bring it to the domain expert — and listen for what the answer reveals beyond the answer. The questions were the research instrument; each one was a design tool, not a clarification.</p>
+ <h3 data-i18n="loop_1_t">The question loop: for documents.</h3>
+ <p data-i18n="loop_1_d">Read the spec, find what it doesn't say, formulate the question precisely, bring it to the domain expert, and listen for what the answer reveals beyond the answer. The questions were the research instrument; each one was a design tool, not a clarification.</p>
  </div>
  </div>
 
  <div class="insight-item r">
  <span class="insight-num">02</span>
  <div class="insight-content">
- <h3 data-i18n="loop_2_t">The translation loop — for spoken visions.</h3>
- <p data-i18n="loop_2_d">Listen, write it down, propose a complete form, iterate together. Find Data — a capability the founder had wanted for years — reached me as a conversation. I proposed its entire form: the search surface, the sources, the acquisition flow. Then I scoped it down to what could realistically ship.</p>
+ <h3 data-i18n="loop_2_t">The translation loop: for spoken visions.</h3>
+ <p data-i18n="loop_2_d">Listen, write it down, propose a complete form, iterate together. Find Data (a capability the founder had wanted for years) reached me as a conversation. I proposed its entire form: the search surface, the sources, the acquisition flow. Then I scoped it down to what could realistically ship.</p>
  </div>
  </div>
 
@@ -4046,7 +4046,7 @@
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="gram_label">Navigation Grammar</p>
  <h2 data-i18n="gram_title">One pattern carries every app.</h2>
- <p class="explore-intro" data-i18n="gram_intro">The structure that made the split work isn't KOTA-specific. It's a grammar I created and refined across all of the platform's apps — and it held while I was away: engineering kept building inside it, and two years later the structure was still carrying the product.</p>
+ <p class="explore-intro" data-i18n="gram_intro">The structure that made the split work isn't KOTA-specific. It's a grammar I created and refined across all of the platform's apps, and it held while I was away: engineering kept building inside it, and two years later the structure was still carrying the product.</p>
  </div>
  <div class="gflow r" aria-label="The navigation grammar as three screens: a table landing, the Details hub, and stage-scoped actions">
  <div class="gscreen">
@@ -4107,7 +4107,7 @@
  <div class="insight-content">
  <span class="step-num" data-i18n="gram_2_step">Rule 02</span>
  <h3 data-i18n="gram_2_t">Every subject opens into a hub.</h3>
- <p data-i18n="gram_2_d">A page I call Details: everything you can do with a subject at its current stage — forms, indicators, settings, paths to other stages — in one place.</p>
+ <p data-i18n="gram_2_d">A page I call Details: everything you can do with a subject at its current stage (forms, indicators, settings, paths to other stages) in one place.</p>
  </div>
  </div>
 
@@ -4144,7 +4144,7 @@
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="sba_label">The Discipline of States</p>
  <h2 data-i18n="sba_title">A screen is done when every state is.</h2>
- <p class="explore-intro" data-i18n="sba_intro">My deliverables include state matrices — boards mapping every empty state and every outcome of an action, so engineering never has to invent what happens when there is nothing to show. One episode on the bank's analysis page shows why that matters.</p>
+ <p class="explore-intro" data-i18n="sba_intro">My deliverables include state matrices, boards mapping every empty state and every outcome of an action, so engineering never has to invent what happens when there is nothing to show. One episode on the bank's analysis page shows why that matters.</p>
  </div>
  <div class="ba-grid r-stagger">
  <div class="ba-block r">
@@ -4189,7 +4189,7 @@
  </div>
  <div class="cs-grid cs-grid--stack" style="margin-top: clamp(2rem, 4vw, 3rem);">
  <div class="cs-block r">
- <p data-i18n="sba_p2">The system catches what I miss, by design. A developer flagged an edge case on that same screen — one subject type with data, the other empty — and asked how to resolve it. He was right, I said so, and the fix shipped. State discipline makes gaps visible enough that anyone can catch them.</p>
+ <p data-i18n="sba_p2">The system catches what I miss, by design. A developer flagged an edge case on that same screen (one subject type with data, the other empty) and asked how to resolve it. He was right, I said so, and the fix shipped. State discipline makes gaps visible enough that anyone can catch them.</p>
  </div>
  </div>
  </div>
@@ -4233,11 +4233,11 @@
  <div class="cs-grid">
  <div class="cs-block cs-block--challenge r">
  <span class="cs-block-label" data-i18n="mine_1_label">Not mine</span>
- <p data-i18n="mine_1_p">The conceptual bets — operators registering themselves, the data model that keeps the bank's copy and the operator's copy separate, one engine serving two institutions, the scoring system — belong to the product's founders. I won't claim them.</p>
+ <p data-i18n="mine_1_p">The conceptual bets, operators registering themselves, the data model that keeps the bank's copy and the operator's copy separate, one engine serving two institutions, the scoring system, belong to the product's founders. I won't claim them.</p>
  </div>
  <div class="cs-block cs-block--solution r">
  <span class="cs-block-label" data-i18n="mine_2_label">Mine</span>
- <p data-i18n="mine_2_p">Everything between those bets and a usable screen: the navigation grammar, the question that split the bank's workflow, the application flow built from one sentence, the form of Find Data, the discipline of states. That's the designer's layer — and on this product, it was mine.</p>
+ <p data-i18n="mine_2_p">Everything between those bets and a usable screen: the navigation grammar, the question that split the bank's workflow, the application flow built from one sentence, the form of Find Data, the discipline of states. That's the designer's layer, and on this product, it was mine.</p>
  </div>
  </div>
  </div>
@@ -4252,8 +4252,8 @@
  </div>
  <div class="cs-grid cs-grid--stack">
  <div class="cs-block r">
- <p data-i18n="refl_p1">Working without user access doesn't excuse you from rigor; it moves the rigor into your questions — what you ask, who you ask, and how honestly you track what's still an assumption.</p>
- <p data-i18n="refl_p2">It also taught me what a domain expert can and can't give you. Mine could answer how a bank divides its work; he couldn't tell me how a first-time operator reads a progress bar. I designed those parts on judgment and pattern — and if I started today, I'd negotiate one round of user contact into the scope before the first screen. Not because the work is weak without it, but because one conversation closes gaps that two years of documents leave open.</p>
+ <p data-i18n="refl_p1">Working without user access doesn't excuse you from rigor; it moves the rigor into your questions, what you ask, who you ask, and how honestly you track what's still an assumption.</p>
+ <p data-i18n="refl_p2">It also taught me what a domain expert can and can't give you. Mine could answer how a bank divides its work; he couldn't tell me how a first-time operator reads a progress bar. I designed those parts on judgment and pattern, and if I started today, I'd negotiate one round of user contact into the scope before the first screen. Not because the work is weak without it, but because one conversation closes gaps that two years of documents leave open.</p>
  </div>
  </div>
  </div>
@@ -4280,27 +4280,27 @@
  meta_team: "Team",
  meta_team_val: "Sole designer · Datastake (founder + engineering)",
  meta_live: "Live site",
- meta_live_val: "—",
+ meta_live_val: "Not public",
  actors_label: "The People",
  actors_title: "Three actors, one compliance pipeline.",
- actors_intro: "KOTA is not a single-user product. Three distinct roles touch the same data, at different moments, with different needs — and the platform has to serve all of them without asking any one to work like another.",
+ actors_intro: "KOTA is not a single-user product. Three distinct roles touch the same data, at different moments, with different needs, and the platform has to serve all of them without asking any one to work like another.",
  actor_1_role: "The Operator",
  actor_1_t: "Gains agency over their own approval.",
- actor_1_d: "Cooperatives and small producers in extractive industries — the people KOTA is built for — go through due diligence without a compliance team or a filing system. KOTA gives them the tools to register themselves, track their application, and understand exactly what's holding them back. The score makes the process legible: not just a verdict, but a map.",
+ actor_1_d: "Cooperatives and small producers in extractive industries (the people KOTA is built for) go through due diligence without a compliance team or a filing system. KOTA gives them the tools to register themselves, track their application, and understand exactly what's holding them back. The score makes the process legible: not just a verdict, but a map.",
  actor_2_role: "The Commercial Bank",
  actor_2_t: "Replaces a manual pipeline with a structured one.",
- actor_2_d: "Banks receive applications they can actually evaluate — organized forms, uploaded documents, stage-gated workflows — instead of handwritten cards filled by an agent on the client's behalf. Registration and evaluation are separated because they belong to different roles inside the bank: what KOTA makes explicit, the bank has always needed.",
+ actor_2_d: "Banks receive applications they can actually evaluate (organized forms, uploaded documents, stage-gated workflows) instead of handwritten cards filled by an agent on the client's behalf. Registration and evaluation are separated because they belong to different roles inside the bank: what KOTA makes explicit, the bank has always needed.",
  actor_3_role: "The Commodity Aggregator",
  actor_3_t: "Onboards its supply chain into a compliance framework.",
- actor_3_d: "An aggregator that buys from cooperatives and sells to international markets has direct exposure to supply chain regulation — EU conflict minerals rules, OECD guidance, ESG requirements from buyers. KOTA lets them run that process using the same platform as the bank, adapted through configuration rather than a separate product.",
+ actor_3_d: "An aggregator that buys from cooperatives and sells to international markets has direct exposure to supply chain regulation, EU conflict minerals rules, OECD guidance, ESG requirements from buyers. KOTA lets them run that process using the same platform as the bank, adapted through configuration rather than a separate product.",
  opp_label: "The Opportunity",
  opp_title: "Financial inclusion meets regulatory pressure.",
- opp_p1: "The informal economy in sub-Saharan extractive industries is large, underserved, and increasingly visible to regulators. Banks want to grow this client segment but can't afford the manual overhead. Aggregators face compliance demands from buyers in Europe and North America that they can't fulfill at scale. And operators — who have assets, production, and real relationships — lack the documentation infrastructure to be taken seriously by formal institutions.",
- opp_p2: "KOTA's engine runs one product across multiple institution types, adapted through configuration — not separate builds. Each new institution that deploys it is a high-margin contract, not a new development project. And the data the platform accumulates — operator profiles, verified documents, compliance histories — is the foundation of a future information layer the team is already mapping.",
+ opp_p1: "The informal economy in sub-Saharan extractive industries is large, underserved, and increasingly visible to regulators. Banks want to grow this client segment but can't afford the manual overhead. Aggregators face compliance demands from buyers in Europe and North America that they can't fulfill at scale. And operators (who have assets, production, and real relationships) lack the documentation infrastructure to be taken seriously by formal institutions.",
+ opp_p2: "KOTA's engine runs one product across multiple institution types, adapted through configuration, not separate builds. Each new institution that deploys it is a high-margin contract, not a new development project. And the data the platform accumulates (operator profiles, verified documents, compliance histories) is the foundation of a future information layer the team is already mapping.",
  con_label: "The Constraints",
  con_title: "Connectivity, trust, regulation, language.",
  con_p1: "The operator using KOTA may be on a slow mobile connection, encountering formal due diligence for the first time, in a context where documented records barely exist. Every friction point in the operator-facing flow is a reason to abandon. The product has to be simple at a level business software rarely is.",
- con_p2: "Beyond usability: the product operates across DRC regulation, OECD guidance, and EU conflict minerals rules — each with different vocabulary. It runs in English and French. And the trust deficit is structural: operators have good reasons to distrust a system that collects sensitive data about their business. The two-copy data model — the bank inherits a copy when it edits, never mutating the operator's record — is one answer. The design is another.",
+ con_p2: "Beyond usability: the product operates across DRC regulation, OECD guidance, and EU conflict minerals rules, each with different vocabulary. It runs in English and French. And the trust deficit is structural: operators have good reasons to distrust a system that collects sensitive data about their business. The two-copy data model, the bank inherits a copy when it edits, never mutating the operator's record, is one answer. The design is another.",
  challenge_label: "The Challenge",
  challenge_title: "Paper, filled in by the wrong hands.",
  challenge_p1: "The DRC produces over 70% of the world's cobalt. Up to a third of it is dug by hand, in a sector that sustains an estimated 10 million people. Almost none of them can open a bank account: surveys put banking access among artisanal miners at 1 to 3%. The gap is filled by informal lenders on predatory terms, which is part of why the sector stays dangerous and informal.",
@@ -4308,12 +4308,12 @@
  challenge_p3: "So the operator is judged by what is missing, and the informality that makes compliance impossible becomes the evidence against them.",
  solution_label: "The Solution",
  solution_title: "Change who holds the pen.",
- solution_p1: "KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally. The bank receives a structured application instead of a stack of handwritten cards — and the operator gets a score that shows the path forward, not just the verdict.",
- solution_p2: "One engine serves two institutions — a commercial bank and a government-mandated commodity aggregator — wearing different vocabulary. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can use.",
+ solution_p1: "KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward, not just the verdict.",
+ solution_p2: "One engine serves two institutions (a commercial bank and a government-mandated commodity aggregator) wearing different vocabulary. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can use.",
  ph_hero_cap: "Kota platform overview, institution dashboard with a counterparty profile in focus.",
  ia_label: "Information Architecture",
  ia_title: "The question that split the architecture.",
- ia_intro: "The brief had the bank side as a single landing: one view, every operator, registration and evaluation in the same place. What it didn't define was how responsibilities were organized inside it. Exploring the flow, I hit a question I couldn't answer: <strong>is the person who approves a registration the same one who runs the full evaluation later?</strong> I took it to the domain expert. The answer was no — different people, different moments in the bank's workflow. So I separated Registration and Evaluation into distinct areas, each scoped to its own task: its own forms, its own indicators, its own actions. One question, asked before any screen was final, reshaped the product's information architecture.",
+ ia_intro: "The brief had the bank side as a single landing: one view, every operator, registration and evaluation in the same place. What it didn't define was how responsibilities were organized inside it. Exploring the flow, I hit a question I couldn't answer: <strong>is the person who approves a registration the same one who runs the full evaluation later?</strong> I took it to the domain expert. The answer was no, different people, different moments in the bank's workflow. So I separated Registration and Evaluation into distinct areas, each scoped to its own task: its own forms, its own indicators, its own actions. One question, asked before any screen was final, reshaped the product's information architecture.",
  sm_tier1: "The record",
  sm_root: "The Counterparty",
  sm_kicker: "One durable Subject · the operator's record",
@@ -4339,7 +4339,7 @@
  ag_role: "The Aggregator",
  inputs_label: "The Inputs",
  inputs_title: "Nothing arrived as a design.",
- inputs_intro: "Three kinds of input shaped every decision — and each one required a different way of closing the gap between what was specified and what someone would actually see on screen.",
+ inputs_intro: "Three kinds of input shaped every decision, and each one required a different way of closing the gap between what was specified and what someone would actually see on screen.",
  input_1_step: "01 · The document",
  input_1_t: "A specification.",
  input_1_d: "Workflows, rules, requirements. Precise about what the system does; silent about what anyone sees.",
@@ -4351,19 +4351,19 @@
  input_3_d: "Features that lived in the founder's head, told in conversation, never written down.",
  method_label: "The Method",
  method_title: "Two loops closed every gap.",
- loop_1_t: "The question loop — for documents.",
- loop_1_d: "Read the spec, find what it doesn't say, formulate the question precisely, bring it to the domain expert — and listen for what the answer reveals beyond the answer. The questions were the research instrument; each one was a design tool, not a clarification.",
- loop_2_t: "The translation loop — for spoken visions.",
- loop_2_d: "Listen, write it down, propose a complete form, iterate together. Find Data — a capability the founder had wanted for years — reached me as a conversation. I proposed its entire form: the search surface, the sources, the acquisition flow. Then I scoped it down to what could realistically ship.",
+ loop_1_t: "The question loop: for documents.",
+ loop_1_d: "Read the spec, find what it doesn't say, formulate the question precisely, bring it to the domain expert, and listen for what the answer reveals beyond the answer. The questions were the research instrument; each one was a design tool, not a clarification.",
+ loop_2_t: "The translation loop: for spoken visions.",
+ loop_2_d: "Listen, write it down, propose a complete form, iterate together. Find Data (a capability the founder had wanted for years) reached me as a conversation. I proposed its entire form: the search surface, the sources, the acquisition flow. Then I scoped it down to what could realistically ship.",
  gram_label: "Navigation Grammar",
  gram_title: "One pattern carries every app.",
- gram_intro: "The structure that made the split work isn't KOTA-specific. It's a grammar I created and refined across all of the platform's apps — and it held while I was away: engineering kept building inside it, and two years later the structure was still carrying the product.",
+ gram_intro: "The structure that made the split work isn't KOTA-specific. It's a grammar I created and refined across all of the platform's apps, and it held while I was away: engineering kept building inside it, and two years later the structure was still carrying the product.",
  gram_1_step: "Rule 01",
  gram_1_t: "The landing is always a table.",
  gram_1_d: "Every module opens on a list of subjects. No dashboards standing in for navigation, no guesswork about where things live.",
  gram_2_step: "Rule 02",
  gram_2_t: "Every subject opens into a hub.",
- gram_2_d: "A page I call Details: everything you can do with a subject at its current stage — forms, indicators, settings, paths to other stages — in one place.",
+ gram_2_d: "A page I call Details: everything you can do with a subject at its current stage (forms, indicators, settings, paths to other stages) in one place.",
  gram_3_step: "Rule 03",
  gram_3_t: "Actions are stage-scoped.",
  gram_3_d: "What you can do follows where the subject lives. Inviting an operator or opening their summary only appears at evaluation, because that's where it makes sense.",
@@ -4395,13 +4395,13 @@
  mine_label: "Ownership",
  mine_statement: "What was mine, and what <em>wasn't</em>.",
  mine_1_label: "Not mine",
- mine_1_p: "The conceptual bets — operators registering themselves, the data model that keeps the bank's copy and the operator's copy separate, one engine serving two institutions, the scoring system — belong to the product's founders. I won't claim them.",
+ mine_1_p: "The conceptual bets, operators registering themselves, the data model that keeps the bank's copy and the operator's copy separate, one engine serving two institutions, the scoring system, belong to the product's founders. I won't claim them.",
  mine_2_label: "Mine",
- mine_2_p: "Everything between those bets and a usable screen: the navigation grammar, the question that split the bank's workflow, the application flow built from one sentence, the form of Find Data, the discipline of states. That's the designer's layer — and on this product, it was mine.",
+ mine_2_p: "Everything between those bets and a usable screen: the navigation grammar, the question that split the bank's workflow, the application flow built from one sentence, the form of Find Data, the discipline of states. That's the designer's layer, and on this product, it was mine.",
  refl_label: "Reflection",
  refl_title: "Rigor doesn't disappear without users. It relocates.",
- refl_p1: "Working without user access doesn't excuse you from rigor; it moves the rigor into your questions — what you ask, who you ask, and how honestly you track what's still an assumption.",
- refl_p2: "It also taught me what a domain expert can and can't give you. Mine could answer how a bank divides its work; he couldn't tell me how a first-time operator reads a progress bar. I designed those parts on judgment and pattern — and if I started today, I'd negotiate one round of user contact into the scope before the first screen. Not because the work is weak without it, but because one conversation closes gaps that two years of documents leave open.",
+ refl_p1: "Working without user access doesn't excuse you from rigor; it moves the rigor into your questions, what you ask, who you ask, and how honestly you track what's still an assumption.",
+ refl_p2: "It also taught me what a domain expert can and can't give you. Mine could answer how a bank divides its work; he couldn't tell me how a first-time operator reads a progress bar. I designed those parts on judgment and pattern, and if I started today, I'd negotiate one round of user contact into the scope before the first screen. Not because the work is weak without it, but because one conversation closes gaps that two years of documents leave open.",
  brief_label: "The Brief",
  brief_title: "Nothing arrived as a design.",
  brief_quote: "There will be stages. At each stage, they provide a form and some documents. Then they wait to be approved. Then they get an answer.",
@@ -4433,7 +4433,7 @@
  gf_a1: "Review identity", gf_a2: "Request documents", gf_a3: "Invite operator", gf_a4: "Open summary", gf_a5: "Score indicators",
  sba_label: "The Discipline of States",
  sba_title: "A screen is done when every state is.",
- sba_intro: "My deliverables include state matrices — boards mapping every empty state and every outcome of an action, so engineering never has to invent what happens when there is nothing to show. One episode on the bank's analysis page shows why that matters.",
+ sba_intro: "My deliverables include state matrices, boards mapping every empty state and every outcome of an action, so engineering never has to invent what happens when there is nothing to show. One episode on the bank's analysis page shows why that matters.",
  sba_before_tag: "Before · adopted while I was away",
  sba_after_tag: "After · my redesign on return",
  sba_chrome: "Customer review",
@@ -4445,7 +4445,7 @@
  sba_banner_btn: "Create",
  sba_before_cap: "An icon, a sentence, a button leading elsewhere. The analysis the page exists for is invisible.",
  sba_after_cap: "A skeleton of the analysis to come, with a banner that says how to fill it. The empty screen shows the shape of its future.",
- sba_p2: "The system catches what I miss, by design. A developer flagged an edge case on that same screen — one subject type with data, the other empty — and asked how to resolve it. He was right, I said so, and the fix shipped. State discipline makes gaps visible enough that anyone can catch them.",
+ sba_p2: "The system catches what I miss, by design. A developer flagged an edge case on that same screen (one subject type with data, the other empty) and asked how to resolve it. He was right, I said so, and the fix shipped. State discipline makes gaps visible enough that anyone can catch them.",
  held_label: "What Held",
  held_title: "What the work left behind.",
  held_1_b: "One <em>question</em>",
@@ -4479,40 +4479,40 @@
  meta_team: "Time",
  meta_team_val: "Designer única · Datastake (founder + engenharia)",
  meta_live: "Site no ar",
- meta_live_val: "—",
+ meta_live_val: "Not public",
  actors_label: "As Pessoas",
  actors_title: "Três atores, um pipeline de compliance.",
- actors_intro: "O KOTA não é um produto de usuário único. Três papéis distintos tocam os mesmos dados, em momentos diferentes, com necessidades diferentes — e a plataforma precisa servir a todos sem pedir que um trabalhe como o outro.",
+ actors_intro: "O KOTA não é um produto de usuário único. Três papéis distintos tocam os mesmos dados, em momentos diferentes, com necessidades diferentes, e a plataforma precisa servir a todos sem pedir que um trabalhe como o outro.",
  actor_1_role: "O Operador",
  actor_1_t: "Ganha agência sobre a própria aprovação.",
- actor_1_d: "Cooperativas e pequenos produtores em indústrias extrativas — as pessoas para quem o KOTA foi construído — passam por due diligence sem equipe de compliance nem sistema de arquivamento. O KOTA dá a eles as ferramentas para se cadastrar, acompanhar a própria aplicação e entender exatamente o que os está travando. O score torna o processo legível: não só um veredito, mas um mapa.",
+ actor_1_d: "Cooperativas e pequenos produtores em indústrias extrativas (as pessoas para quem o KOTA foi construído) passam por due diligence sem equipe de compliance nem sistema de arquivamento. O KOTA dá a eles as ferramentas para se cadastrar, acompanhar a própria aplicação e entender exatamente o que os está travando. O score torna o processo legível: não só um veredito, mas um mapa.",
  actor_2_role: "O Banco Comercial",
  actor_2_t: "Substitui um pipeline manual por um estruturado.",
- actor_2_d: "Os bancos recebem aplicações que conseguem de fato avaliar — formulários organizados, documentos enviados, workflows com etapas definidas — em vez de fichas manuscritas preenchidas por um agente em nome do cliente. Registro e avaliação são separados porque pertencem a papéis diferentes dentro do banco: o que o KOTA torna explícito, o banco sempre precisou.",
+ actor_2_d: "Os bancos recebem aplicações que conseguem de fato avaliar, formulários organizados, documentos enviados, workflows com etapas definidas, em vez de fichas manuscritas preenchidas por um agente em nome do cliente. Registro e avaliação são separados porque pertencem a papéis diferentes dentro do banco: o que o KOTA torna explícito, o banco sempre precisou.",
  actor_3_role: "O Agregador de Commodity",
  actor_3_t: "Integra sua cadeia de fornecimento em um framework de compliance.",
- actor_3_d: "Um agregador que compra de cooperativas e vende para mercados internacionais tem exposição direta à regulação de cadeia de fornecimento — regras europeias de minerais de conflito, diretrizes da OCDE, exigências de ESG dos compradores. O KOTA permite que ele conduza esse processo usando a mesma plataforma do banco, adaptada por configuração e não como um produto separado.",
+ actor_3_d: "Um agregador que compra de cooperativas e vende para mercados internacionais tem exposição direta à regulação de cadeia de fornecimento, regras europeias de minerais de conflito, diretrizes da OCDE, exigências de ESG dos compradores. O KOTA permite que ele conduza esse processo usando a mesma plataforma do banco, adaptada por configuração e não como um produto separado.",
  opp_label: "A Oportunidade",
  opp_title: "Inclusão financeira encontra pressão regulatória.",
- opp_p1: "A economia informal nas indústrias extrativas da África Subsaariana é grande, mal atendida e cada vez mais visível para os reguladores. Os bancos querem crescer nesse segmento, mas não conseguem arcar com o custo manual. Os agregadores enfrentam exigências de compliance de compradores na Europa e na América do Norte que não conseguem cumprir em escala. E os operadores — que têm ativos, produção e relacionamentos reais — não têm a infraestrutura documental para serem levados a sério pelas instituições formais.",
- opp_p2: "O motor do KOTA roda um único produto para múltiplos tipos de instituição, adaptado por configuração — sem builds separados. Cada nova instituição que o adota é um contrato de alta margem, não um novo projeto de desenvolvimento. E os dados que a plataforma acumula — perfis de operadores, documentos verificados, históricos de compliance — são a base de uma camada de informação futura que o time já está mapeando.",
+ opp_p1: "A economia informal nas indústrias extrativas da África Subsaariana é grande, mal atendida e cada vez mais visível para os reguladores. Os bancos querem crescer nesse segmento, mas não conseguem arcar com o custo manual. Os agregadores enfrentam exigências de compliance de compradores na Europa e na América do Norte que não conseguem cumprir em escala. E os operadores (que têm ativos, produção e relacionamentos reais) não têm a infraestrutura documental para serem levados a sério pelas instituições formais.",
+ opp_p2: "O motor do KOTA roda um único produto para múltiplos tipos de instituição, adaptado por configuração, sem builds separados. Cada nova instituição que o adota é um contrato de alta margem, não um novo projeto de desenvolvimento. E os dados que a plataforma acumula (perfis de operadores, documentos verificados, históricos de compliance) são a base de uma camada de informação futura que o time já está mapeando.",
  con_label: "As Restrições",
  con_title: "Conectividade, confiança, regulação, língua.",
  con_p1: "O operador que usa o KOTA pode estar em uma conexão móvel lenta, enfrentando um due diligence formal pela primeira vez, em um contexto onde registros documentados mal existem. Cada ponto de fricção no fluxo do operador é um motivo para abandonar. O produto precisa ser simples em um nível que o software de negócios raramente alcança.",
- con_p2: "Além da usabilidade: o produto opera sob a regulação da RDC, as diretrizes da OCDE e as regras europeias de minerais de conflito — cada uma com vocabulário diferente. Roda em inglês e francês. E o déficit de confiança é estrutural: os operadores têm boas razões para desconfiar de um sistema que coleta dados sensíveis sobre seus negócios. O modelo de dados de cópia dupla — o banco herda uma cópia ao editar, sem nunca mutar o registro do operador — é uma resposta. O design é outra.",
+ con_p2: "Além da usabilidade: o produto opera sob a regulação da RDC, as diretrizes da OCDE e as regras europeias de minerais de conflito, cada uma com vocabulário diferente. Roda em inglês e francês. E o déficit de confiança é estrutural: os operadores têm boas razões para desconfiar de um sistema que coleta dados sensíveis sobre seus negócios. O modelo de dados de cópia dupla, o banco herda uma cópia ao editar, sem nunca mutar o registro do operador, é uma resposta. O design é outra.",
  challenge_label: "O Desafio",
  challenge_title: "Papel, preenchido pelas mãos erradas.",
- challenge_p1: "A RDC produz mais de 70% do cobalto do mundo. Até um terço é extraído à mão, num setor que sustenta cerca de 10 milhões de pessoas. Quase nenhuma delas consegue abrir uma conta bancária: pesquisas colocam o acesso bancário entre mineradores artesanais em 1 a 3%. A lacuna é preenchida por agiotas informais em termos predatórios — parte do motivo pelo qual o setor continua perigoso e informal.",
- challenge_p2: "O bloqueio não é o minerador. É a papelada. Bancos precisam verificar identidade, origem de fundos e due diligence antes de dizer sim — e esse registro não existe onde não há sistema de arquivo, nem registro compartilhado, nem função de compliance. O processo rodava em formulários de papel, geralmente preenchidos por um agente do banco em nome do operador. Quem respondia não era quem sabia. O banco herdava dados que não conseguia defender, e a decisão mais fácil era sempre não.",
+ challenge_p1: "A RDC produz mais de 70% do cobalto do mundo. Até um terço é extraído à mão, num setor que sustenta cerca de 10 milhões de pessoas. Quase nenhuma delas consegue abrir uma conta bancária: pesquisas colocam o acesso bancário entre mineradores artesanais em 1 a 3%. A lacuna é preenchida por agiotas informais em termos predatórios, parte do motivo pelo qual o setor continua perigoso e informal.",
+ challenge_p2: "O bloqueio não é o minerador. É a papelada. Bancos precisam verificar identidade, origem de fundos e due diligence antes de dizer sim, e esse registro não existe onde não há sistema de arquivo, nem registro compartilhado, nem função de compliance. O processo rodava em formulários de papel, geralmente preenchidos por um agente do banco em nome do operador. Quem respondia não era quem sabia. O banco herdava dados que não conseguia defender, e a decisão mais fácil era sempre não.",
  challenge_p3: "Então o operador é julgado pelo que falta, e a informalidade que torna o compliance impossível vira a evidência contra ele.",
  solution_label: "A Solução",
  solution_title: "Mudar quem segura a caneta.",
- solution_p1: "O KOTA muda o ponto de partida: o operador se cadastra sozinho, responde às questões básicas e submete digitalmente. O banco recebe uma aplicação estruturada em vez de uma pilha de fichas manuscritas — e o operador recebe um score que mostra o caminho, não só o veredito.",
- solution_p2: "Um motor serve duas instituições — um banco comercial e um agregador de commodities mandatado pelo governo — vestindo vocabulários diferentes. Essas decisões de produto são do time; meu trabalho aconteceu um nível abaixo: dar a cada uma delas uma forma que pessoas conseguem usar.",
+ solution_p1: "O KOTA muda o ponto de partida: o operador se cadastra sozinho, responde às questões básicas e submete digitalmente. O banco recebe uma aplicação estruturada em vez de uma pilha de fichas manuscritas, e o operador recebe um score que mostra o caminho, não só o veredito.",
+ solution_p2: "Um motor serve duas instituições, um banco comercial e um agregador de commodities mandatado pelo governo, vestindo vocabulários diferentes. Essas decisões de produto são do time; meu trabalho aconteceu um nível abaixo: dar a cada uma delas uma forma que pessoas conseguem usar.",
  ph_hero_cap: "Visão geral da plataforma Kota, dashboard da instituição com um perfil de contraparte em foco.",
  ia_label: "Arquitetura da Informação",
  ia_title: "A pergunta que dividiu a arquitetura.",
- ia_intro: "O briefing tinha o lado do banco como uma landing única: uma view, todos os operadores, registro e avaliação no mesmo lugar. O que ele não definia era como as responsabilidades se organizavam ali dentro. Explorando o fluxo, esbarrei numa pergunta que eu não sabia responder: <strong>quem aprova um cadastro é a mesma pessoa que conduz a avaliação completa depois?</strong> Levei ao domain expert. A resposta era não — pessoas diferentes, momentos diferentes do workflow do banco. Então separei Registration e Evaluation em áreas distintas, cada uma com escopo na própria tarefa: seus formulários, seus indicadores, suas ações. Uma pergunta, feita antes de qualquer tela ser final, redesenhou a arquitetura de informação do produto.",
+ ia_intro: "O briefing tinha o lado do banco como uma landing única: uma view, todos os operadores, registro e avaliação no mesmo lugar. O que ele não definia era como as responsabilidades se organizavam ali dentro. Explorando o fluxo, esbarrei numa pergunta que eu não sabia responder: <strong>quem aprova um cadastro é a mesma pessoa que conduz a avaliação completa depois?</strong> Levei ao domain expert. A resposta era não, pessoas diferentes, momentos diferentes do workflow do banco. Então separei Registration e Evaluation em áreas distintas, cada uma com escopo na própria tarefa: seus formulários, seus indicadores, suas ações. Uma pergunta, feita antes de qualquer tela ser final, redesenhou a arquitetura de informação do produto.",
  sm_tier1: "O registro",
  sm_root: "A Contraparte",
  sm_kicker: "Um Subject durável · o registro do operador",
@@ -4538,7 +4538,7 @@
  ag_role: "O Agregador",
  inputs_label: "Os Inputs",
  inputs_title: "Nada chegou como design.",
- inputs_intro: "Três tipos de input moldaram cada decisão — e cada um exigiu uma forma diferente de fechar a lacuna entre o que estava especificado e o que alguém veria de fato na tela.",
+ inputs_intro: "Três tipos de input moldaram cada decisão, e cada um exigiu uma forma diferente de fechar a lacuna entre o que estava especificado e o que alguém veria de fato na tela.",
  input_1_step: "01 · O documento",
  input_1_t: "Uma especificação.",
  input_1_d: "Workflows, regras, requisitos. Precisa sobre o que o sistema faz; muda sobre o que alguém vê.",
@@ -4550,19 +4550,19 @@
  input_3_d: "Funcionalidades que viviam na cabeça do founder, contadas em conversa, nunca escritas.",
  method_label: "O Método",
  method_title: "Dois loops fecharam todas as lacunas.",
- loop_1_t: "O loop de perguntas — para documentos.",
- loop_1_d: "Ler o spec, achar o que ele não diz, formular a pergunta com precisão, levar ao domain expert — e escutar o que a resposta revela além da resposta. As perguntas eram o instrumento de pesquisa; cada uma era uma ferramenta de design, não uma clarificação.",
- loop_2_t: "O loop de tradução — para visões faladas.",
- loop_2_d: "Escutar, anotar, propor uma forma completa, iterar juntos. O Find Data — uma capacidade que o founder queria há anos — chegou até mim como conversa. Propus a forma inteira: a superfície de busca, as fontes, o fluxo de aquisição. Depois reduzi ao que dava pra entregar de verdade.",
+ loop_1_t: "O loop de perguntas: para documentos.",
+ loop_1_d: "Ler o spec, achar o que ele não diz, formular a pergunta com precisão, levar ao domain expert, e escutar o que a resposta revela além da resposta. As perguntas eram o instrumento de pesquisa; cada uma era uma ferramenta de design, não uma clarificação.",
+ loop_2_t: "O loop de tradução: para visões faladas.",
+ loop_2_d: "Escutar, anotar, propor uma forma completa, iterar juntos. O Find Data (uma capacidade que o founder queria há anos) chegou até mim como conversa. Propus a forma inteira: a superfície de busca, as fontes, o fluxo de aquisição. Depois reduzi ao que dava pra entregar de verdade.",
  gram_label: "Gramática de Navegação",
  gram_title: "Um padrão carrega todos os apps.",
- gram_intro: "A estrutura que fez a separação funcionar não é específica do KOTA. É uma gramática que criei e refinei em todos os apps da plataforma — e que segurou na minha ausência: a engenharia continuou construindo dentro dela, e dois anos depois a estrutura ainda carregava o produto.",
+ gram_intro: "A estrutura que fez a separação funcionar não é específica do KOTA. É uma gramática que criei e refinei em todos os apps da plataforma, e que segurou na minha ausência: a engenharia continuou construindo dentro dela, e dois anos depois a estrutura ainda carregava o produto.",
  gram_1_step: "Regra 01",
  gram_1_t: "A landing é sempre uma tabela.",
  gram_1_d: "Todo módulo abre numa lista de subjects. Sem dashboards fazendo papel de navegação, sem adivinhação sobre onde as coisas vivem.",
  gram_2_step: "Regra 02",
  gram_2_t: "Todo subject abre num hub.",
- gram_2_d: "Uma página que chamo de Details: tudo que dá pra fazer com um subject no estágio atual — formulários, indicadores, settings, caminhos pra outros estágios — num lugar só.",
+ gram_2_d: "Uma página que chamo de Details: tudo que dá pra fazer com um subject no estágio atual (formulários, indicadores, settings, caminhos pra outros estágios) num lugar só.",
  gram_3_step: "Regra 03",
  gram_3_t: "Ações têm escopo de estágio.",
  gram_3_d: "O que você pode fazer segue onde o subject vive. Convidar um operador ou abrir o summary só aparece na avaliação, porque é onde faz sentido.",
@@ -4594,13 +4594,13 @@
  mine_label: "Autoria",
  mine_statement: "O que foi meu, e o que <em>não foi</em>.",
  mine_1_label: "Não foi meu",
- mine_1_p: "As apostas conceituais — operadores se cadastrando sozinhos, o modelo de dados que mantém a cópia do banco e a do operador separadas, um motor servindo duas instituições, o sistema de score — pertencem aos founders do produto. Não vou reivindicá-las.",
+ mine_1_p: "As apostas conceituais, operadores se cadastrando sozinhos, o modelo de dados que mantém a cópia do banco e a do operador separadas, um motor servindo duas instituições, o sistema de score, pertencem aos founders do produto. Não vou reivindicá-las.",
  mine_2_label: "Foi meu",
- mine_2_p: "Tudo entre essas apostas e uma tela usável: a gramática de navegação, a pergunta que dividiu o workflow do banco, o application flow construído de uma frase, a forma do Find Data, a disciplina de estados. Essa é a camada do designer — e neste produto, ela foi minha.",
+ mine_2_p: "Tudo entre essas apostas e uma tela usável: a gramática de navegação, a pergunta que dividiu o workflow do banco, o application flow construído de uma frase, a forma do Find Data, a disciplina de estados. Essa é a camada do designer, e neste produto, ela foi minha.",
  refl_label: "Reflexão",
  refl_title: "O rigor não desaparece sem usuários. Ele muda de lugar.",
- refl_p1: "Trabalhar sem acesso a usuário não te dispensa do rigor; ele se move pras suas perguntas — o que você pergunta, pra quem, e com que honestidade você rastreia o que ainda é suposição.",
- refl_p2: "Também me ensinou o que um domain expert pode e não pode te dar. O meu sabia responder como um banco divide o trabalho; não sabia me dizer como um operador de primeira viagem lê uma barra de progresso. Essas partes eu desenhei com julgamento e repertório — e se começasse hoje, negociaria uma rodada de contato com usuários no escopo antes da primeira tela. Não porque o trabalho é fraco sem isso, mas porque uma conversa fecha lacunas que dois anos de documentos deixam abertas.",
+ refl_p1: "Trabalhar sem acesso a usuário não te dispensa do rigor; ele se move pras suas perguntas, o que você pergunta, pra quem, e com que honestidade você rastreia o que ainda é suposição.",
+ refl_p2: "Também me ensinou o que um domain expert pode e não pode te dar. O meu sabia responder como um banco divide o trabalho; não sabia me dizer como um operador de primeira viagem lê uma barra de progresso. Essas partes eu desenhei com julgamento e repertório, e se começasse hoje, negociaria uma rodada de contato com usuários no escopo antes da primeira tela. Não porque o trabalho é fraco sem isso, mas porque uma conversa fecha lacunas que dois anos de documentos deixam abertas.",
  brief_label: "O Briefing",
  brief_title: "Nada chegou como design.",
  brief_quote: "Vai ter etapas. Em cada etapa, eles enviam um formulário e alguns documentos. Depois esperam a aprovação. Depois recebem uma resposta.",
@@ -4632,7 +4632,7 @@
  gf_a1: "Revisar identidade", gf_a2: "Pedir documentos", gf_a3: "Convidar operador", gf_a4: "Abrir resumo", gf_a5: "Pontuar indicadores",
  sba_label: "A Disciplina dos Estados",
  sba_title: "Uma tela está pronta quando todos os estados estão.",
- sba_intro: "Meus entregáveis incluem matrizes de estado — boards mapeando cada empty state e cada resultado de uma ação, para que a engenharia nunca precise inventar o que acontece quando não há nada para mostrar. Um episódio na página de análise do banco mostra por que isso importa.",
+ sba_intro: "Meus entregáveis incluem matrizes de estado, boards mapeando cada empty state e cada resultado de uma ação, para que a engenharia nunca precise inventar o que acontece quando não há nada para mostrar. Um episódio na página de análise do banco mostra por que isso importa.",
  sba_before_tag: "Antes · adotado enquanto eu estava fora",
  sba_after_tag: "Depois · meu redesign na volta",
  sba_chrome: "Revisão de clientes",
@@ -4644,7 +4644,7 @@
  sba_banner_btn: "Criar",
  sba_before_cap: "Um ícone, uma frase, um botão que leva para outro lugar. A análise pela qual a página existe fica invisível.",
  sba_after_cap: "Um esqueleto da análise que vem, com um banner dizendo como preenchê-la. A tela vazia mostra a forma do seu futuro.",
- sba_p2: "O sistema pega o que me escapa, por desenho. Um desenvolvedor apontou um caso de borda nessa mesma tela — um tipo de sujeito com dados, o outro vazio — e perguntou como resolver. Ele estava certo, eu disse isso, e a correção foi para produção. A disciplina de estados deixa as lacunas visíveis o bastante para qualquer um pegar.",
+ sba_p2: "O sistema pega o que me escapa, por desenho. Um desenvolvedor apontou um caso de borda nessa mesma tela (um tipo de sujeito com dados, o outro vazio) e perguntou como resolver. Ele estava certo, eu disse isso, e a correção foi para produção. A disciplina de estados deixa as lacunas visíveis o bastante para qualquer um pegar.",
  held_label: "O Que Ficou",
  held_title: "O que o trabalho deixou.",
  held_1_b: "Uma <em>pergunta</em>",

@@ -16,7 +16,7 @@
  (function () {
  var saved = null;
  try { saved = localStorage.getItem('theme'); } catch (e) {}
- // Dark is the default landing state, same as the main site — the OS
+ // Dark is the default landing state, same as the main site, the OS
  // preference no longer decides it.
  document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
  })();
@@ -3722,7 +3722,7 @@
  // feed back on itself once it zooms.
 
  // A 1265px composition inside a 316px column is a quarter-size picture
- // however faithfully it is scaled — the arithmetic leaves no room. So on
+ // however faithfully it is scaled, the arithmetic leaves no room. So on
  // a phone the composition is broken apart instead: the embed takes the
  // real width and the bento stacks its tiles, each one full width, which
  // is the only way the photographs and charts come out big enough to read.

@@ -822,7 +822,7 @@
  align-items: baseline;
  gap: 0.35em;
  align-self: flex-start;
- font-size: clamp(1.375rem, 2.4cqi, 2.75rem);
+ font-size: clamp(1.25rem, 1.9cqi, 2.15rem);
  font-weight: 400;
  letter-spacing: -0.02em;
  line-height: 1.15;
@@ -1153,7 +1153,7 @@
  <div class="connect-main">
  <span class="connect-eyebrow r" data-i18n="connect_eyebrow">Get in touch</span>
  <h2 class="r" data-i18n="connect_h">Let's connect.</h2>
- <p class="r" data-i18n="connect_p1">I'm Pietra, a Senior Product Designer with 5+ years turning complex B2B SaaS — dense workflows, data-heavy interfaces, regulated domains — into products people find intuitive.</p>
+ <p class="r" data-i18n="connect_p1">I'm Pietra, a Senior Product Designer with 5+ years turning complex B2B SaaS (dense workflows, data-heavy interfaces, regulated domains) into products people find intuitive.</p>
  <p class="r" data-i18n="connect_p2">Climate tech, fintech and enterprise platforms, working with product and engineering from discovery to implementation.</p>
  <div class="connect-ask r">
  <span class="connect-ask-l" data-i18n="connect_p4">Working on something, hiring, or just saying hello?</span>
@@ -1194,7 +1194,7 @@
  seg_contact:"Get in touch",
  connect_eyebrow:"Get in touch",
  connect_h:"Let's connect.",
- connect_p1:"I'm Pietra, a Senior Product Designer with 5+ years turning complex B2B SaaS — dense workflows, data-heavy interfaces, regulated domains — into products people find intuitive.",
+ connect_p1:"I'm Pietra, a Senior Product Designer with 5+ years turning complex B2B SaaS (dense workflows, data-heavy interfaces, regulated domains) into products people find intuitive.",
  connect_p2:"Climate tech, fintech and enterprise platforms, working with product and engineering from discovery to implementation.",
  connect_p4:"Working on something, hiring, or just saying hello?",
  fact_mail_l:"Email", fact_based_l:"Based", fact_based_v:"Remote · LATAM & EU timezones", fact_lang_l:"Languages",
@@ -1230,7 +1230,7 @@
  pt: {
  connect_eyebrow:"Contato",
  connect_h:"Vamos conversar.",
- connect_p1:"Sou a Pietra, Senior Product Designer com mais de 5 anos transformando B2B SaaS complexo — fluxos densos, interfaces cheias de dados, domínios regulados — em produtos que as pessoas acham intuitivos.",
+ connect_p1:"Sou a Pietra, Senior Product Designer com mais de 5 anos transformando B2B SaaS complexo (fluxos densos, interfaces cheias de dados, domínios regulados) em produtos que as pessoas acham intuitivos.",
  connect_p2:"Climate tech, fintech e plataformas enterprise, lado a lado com produto e engenharia, da descoberta à implementação.",
  connect_p4:"Tem um projeto, uma vaga, ou só quer dizer oi?",
  fact_mail_l:"E-mail", fact_based_l:"Onde", fact_based_v:"Remoto · fusos LATAM e EU", fact_lang_l:"Idiomas",
@@ -1384,7 +1384,7 @@
  show(fromHash());
  })();
 
- // Nav scroll. The page is dark-native, so over-dark is the norm — but it
+ // Nav scroll. The page is dark-native, so over-dark is the norm, but it
  // has to come off when the light theme is on, or the nav keeps painting
  // light text on a light ground.
  const nav = document.querySelector('.nav');
@@ -1436,7 +1436,7 @@
  let W, H, particles, running = false;
 
  // Dot color follows the theme token. Cached per frame batch rather than
- // read per particle — getComputedStyle on 220 dots a frame is not free.
+ // read per particle, getComputedStyle on 220 dots a frame is not free.
  let dotCache = '', dotTheme = null, dotAlpha = 1, lineAlpha = 0.08;
  function readDotTokens() {
  const t = document.documentElement.getAttribute('data-theme');

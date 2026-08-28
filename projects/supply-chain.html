@@ -16,7 +16,7 @@
    (function () {
    var saved = null;
    try { saved = localStorage.getItem('theme'); } catch (e) {}
-   // Dark is the default landing state, same as the main site — the OS
+   // Dark is the default landing state, same as the main site, the OS
    // preference no longer decides it.
    document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
    })();
@@ -1981,14 +1981,14 @@
         <div class="cs-block cs-block--challenge r">
           <span class="cs-block-label">The Challenge</span>
           <h3>Due diligence was static, and the world wasn't.</h3>
-          <p>Sourcing commodities like copper, cobalt and gold from high-risk regions demands meticulous due diligence — OECD Annex II, AML/CFT checks, watchlist screening, site audits, ESG scoring. Traditional approaches were static: a supplier filled in a form, an analyst scored it, and six months later the risk profile was already out of date.</p>
-          <p>Compliance teams juggled disconnected tools for financial verification, watchlist cross-referencing, audit tracking and ESG reporting — with no way to triangulate evidence across sources or surface red flags automatically.</p>
+          <p>Sourcing commodities like copper, cobalt and gold from high-risk regions demands meticulous due diligence, OECD Annex II, AML/CFT checks, watchlist screening, site audits, ESG scoring. Traditional approaches were static: a supplier filled in a form, an analyst scored it, and six months later the risk profile was already out of date.</p>
+          <p>Compliance teams juggled disconnected tools for financial verification, watchlist cross-referencing, audit tracking and ESG reporting, with no way to triangulate evidence across sources or surface red flags automatically.</p>
         </div>
         <div class="cs-block cs-block--solution r">
           <span class="cs-block-label">The Solution</span>
           <h3>Living supplier profiles, always up to date.</h3>
-          <p>An integrated platform where each supplier is a continuously evolving record. Inherent risk, residual risk and audit performance are tracked as three independent dimensions. Triangulation from multiple sources — self-assessment, third-party audits, independent research — keeps every field current and traceable.</p>
-          <p>Red flags surface automatically when new information contradicts a supplier's record. Reports are generated on demand for any regulatory framework — OECD, LBMA, RMI — with full source-tracking baked in.</p>
+          <p>An integrated platform where each supplier is a continuously evolving record. Inherent risk, residual risk and audit performance are tracked as three independent dimensions. Triangulation from multiple sources (self-assessment, third-party audits, independent research) keeps every field current and traceable.</p>
+          <p>Red flags surface automatically when new information contradicts a supplier's record. Reports are generated on demand for any regulatory framework (OECD, LBMA, RMI) with full source-tracking baked in.</p>
         </div>
       </div>
     </div>
@@ -2016,7 +2016,7 @@
   </div><!-- /.shell -->
 
   <script>
-    // Minimal JS for Stage 1 — full version comes in Stage 3
+    // Minimal JS for Stage 1, full version comes in Stage 3
     const nav = document.querySelector('.nav');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', scrollY > 10);

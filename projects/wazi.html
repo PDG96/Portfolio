@@ -16,7 +16,7 @@
  (function () {
  var saved = null;
  try { saved = localStorage.getItem('theme'); } catch (e) {}
- // Dark is the default landing state, same as the main site — the OS
+ // Dark is the default landing state, same as the main site, the OS
  // preference no longer decides it.
  document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
  })();
