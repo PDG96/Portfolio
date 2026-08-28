@@ -861,6 +861,9 @@
  transition: padding-left 0.35s var(--ease);
  }
  .connect-row:hover { padding-left: 0.4rem; }
+ .connect-row--static { grid-template-columns: minmax(5.5em, auto) 1fr; cursor: default; }
+ .connect-row--static:hover { padding-left: 0; }
+ .connect-row--static:hover .connect-row-v { color: var(--text); }
  .connect-row-l {
  font-family: var(--mono);
  font-size: clamp(0.6875rem, 0.75cqi, 0.85rem);
@@ -1160,10 +1163,12 @@
  </div>
 
  <ul class="connect-list r-stagger">
- <li class="r"><a class="connect-row" href="mailto:pietragottardo@gmail.com">
- <span class="connect-row-l" data-i18n="fact_mail_l">Email</span>
- <span class="connect-row-v">pietragottardo@gmail.com</span>
- <span class="connect-row-a" aria-hidden="true">&#8599;</span></a></li>
+ <li class="r"><div class="connect-row connect-row--static">
+ <span class="connect-row-l" data-i18n="fact_based_l">Based</span>
+ <span class="connect-row-v" data-i18n="fact_based_v">Remote · LATAM &amp; EU timezones</span></div></li>
+ <li class="r"><div class="connect-row connect-row--static">
+ <span class="connect-row-l" data-i18n="fact_lang_l">Languages</span>
+ <span class="connect-row-v">EN · PT-BR</span></div></li>
  <li class="r"><a class="connect-row" href="https://www.linkedin.com/in/pietragotardo/" target="_blank" rel="noopener">
  <span class="connect-row-l" data-i18n="fact_li_l">LinkedIn</span>
  <span class="connect-row-v">/in/pietragotardo</span>
@@ -1193,7 +1198,7 @@
  connect_p1:"I'm Pietra, a Senior Product Designer with 5+ years turning complex B2B SaaS — dense workflows, data-heavy interfaces, regulated domains — into products people find intuitive.",
  connect_p2:"Climate tech, fintech and enterprise platforms, working with product and engineering from discovery to implementation.",
  connect_p4:"Working on something, hiring, or just saying hello?",
- fact_mail_l:"Email",
+ fact_mail_l:"Email", fact_based_l:"Based", fact_based_v:"Remote · LATAM & EU timezones", fact_lang_l:"Languages",
  nav_work:"Work", nav_contact:"Contact",
  hero_eyebrow:"Senior Product Designer",
  hero_h1:"I turn dense, regulated products<br>into <em>interfaces people trust</em>.",
@@ -1229,7 +1234,7 @@
  connect_p1:"Sou a Pietra, Senior Product Designer com mais de 5 anos transformando B2B SaaS complexo — fluxos densos, interfaces cheias de dados, domínios regulados — em produtos que as pessoas acham intuitivos.",
  connect_p2:"Climate tech, fintech e plataformas enterprise, lado a lado com produto e engenharia, da descoberta à implementação.",
  connect_p4:"Tem um projeto, uma vaga, ou só quer dizer oi?",
- fact_mail_l:"E-mail",
+ fact_mail_l:"E-mail", fact_based_l:"Onde", fact_based_v:"Remoto · fusos LATAM e EU", fact_lang_l:"Idiomas",
  nav_work:"Projetos", nav_contact:"Contato",
  hero_eyebrow:"Senior Product Designer",
  hero_h1:"Eu transformo produtos densos e regulados<br>em <em>interfaces em que as pessoas confiam</em>.",
