@@ -1241,6 +1241,8 @@
  }
 
 
+ .app-shot--board img { width: 100%; height: auto; display: block; border-radius: 14px; }
+
  /* ====== KOTA · THE BRIEF (pull quote) ====== */
  .brief { display: grid; grid-template-columns: 1fr; gap: clamp(2rem, 4vw, 3rem); }
  @media (min-width: 900px) {
@@ -3828,6 +3830,12 @@
  <div class="wrap">
    <!-- The dashboard bento. Screen capture at 2x; it scrolls down and back, and
         the last frame matches the first, so it loops with no visible seam. -->
+   <!-- Problem statement board: the ask in one sentence, three sourced numbers under it. -->
+   <figure class="app-shot app-shot--board r">
+   <img src="assets/kota-problem-statement.png" alt="Problem statement: cooperatives and small producers in extractive industries need a way to apply for banking with a record they own. Three cards: only 8.7% of firms in the DRC have a bank loan or line of credit; a bank loan is the exception, not the rule." loading="lazy">
+   <figcaption data-i18n="fig_problem">The problem in one sentence, and the numbers under it. Source: World Bank Enterprise Surveys, DRC 2024.</figcaption>
+   </figure>
+
    <figure class="app-shot app-shot--video r">
    <div class="video-frame">
    <video autoplay muted loop playsinline preload="metadata"
@@ -4376,6 +4384,7 @@
  scr6_t: "A spoken vision given form: search, sources, acquisition",
  hint_live: "Interactive · click and scroll inside",
  hint_tag: "Live",
+ fig_problem: "The problem in one sentence, and the numbers under it. Source: World Bank Enterprise Surveys, DRC 2024.",
  fig_bento: "The dashboard end to end: every reading of one applicant, in the order a reviewer needs them.",
  fig_signin: "Where it starts: the operator opens their own account.",
  fig_application: "The sentence, made navigable: stages, forms, documents, and what comes next.",
@@ -4576,6 +4585,7 @@
  scr6_t: "Uma visão falada ganhando forma: busca, fontes, aquisição",
  hint_live: "Interativo · clique e role aqui dentro",
  hint_tag: "Ao vivo",
+ fig_problem: "The problem in one sentence, and the numbers under it. Source: World Bank Enterprise Surveys, DRC 2024.",
  fig_bento: "O dashboard de ponta a ponta: cada leitura de um mesmo solicitante, na ordem em que o analista precisa delas.",
  fig_signin: "Onde começa: o operador abre a própria conta.",
  fig_application: "A frase, navegável: etapas, formulários, documentos e o que vem depois.",
