@@ -3889,7 +3889,7 @@
  </section>
 
  <!-- ====== WHO IT SERVES ====== -->
- <section class="case-section">
+ <section class="case-section case-section--alt">
  <div class="wrap">
  <div class="case-section-header r">
  <p class="case-section-label" data-i18n="actors_label">The People</p>
@@ -3936,107 +3936,9 @@
 
 
  <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
- <section class="case-section case-section--alt">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="ia_label">Information Architecture</p>
- <h2 data-i18n="ia_title">The question that split the architecture.</h2>
- <p class="explore-intro" data-i18n="ia_intro">The brief had the bank side as a single landing: one view, every operator, registration and evaluation in the same place. What it didn't define was how responsibilities were organized inside it. Exploring the flow, I hit a question I couldn't answer: <strong>is the person who approves a registration the same one who runs the full evaluation later?</strong> I took it to the domain expert. The answer was no, different people, different moments in the bank's workflow. So I separated Registration and Evaluation into distinct areas, each scoped to its own task: its own forms, its own indicators, its own actions. One question, asked before any screen was final, reshaped the product's information architecture.</p>
- </div>
- <!-- Inline IA sitemap diagram, vertical flow -->
- <div class="kota-sitemap r">
-
- <!-- Tier 1, the record -->
- <div class="sm-step">
- <div class="sm-step-tag"><span class="sm-step-n">01</span><span data-i18n="sm_tier1">The record</span></div>
- <div class="sm-record">
- <span class="sm-record-kicker" data-i18n="sm_kicker">One durable Subject · the operator's record</span>
- <span class="sm-record-name" data-i18n="sm_root">The Counterparty</span>
- <ul class="sm-attrs">
- <li data-i18n="sm_a_id">Identity</li>
- <li data-i18n="sm_a_legal">Legal form</li>
- <li data-i18n="sm_a_docs">Documents</li>
- <li data-i18n="sm_a_self">Self-assessment</li>
- </ul>
- </div>
- </div>
-
- <div class="sm-link" aria-hidden="true"></div>
-
- <!-- Tier 2, the cycle -->
- <div class="sm-step">
- <div class="sm-step-tag"><span class="sm-step-n">02</span><span data-i18n="sm_tier2">The cycle</span></div>
- <div class="sm-cycle">
- <div class="sm-stage">
- <span class="sm-stage-k">Stage 1</span>
- <span class="sm-stage-t" data-i18n="sm_s1">Registration &amp; identity review</span>
- </div>
- <span class="sm-arrow" aria-hidden="true">→</span>
- <div class="sm-stage">
- <span class="sm-stage-k">Stage 2</span>
- <span class="sm-stage-t" data-i18n="sm_s2">Evaluation &amp; monitoring</span>
- </div>
- </div>
- </div>
-
- <div class="sm-link" aria-hidden="true"></div>
-
- <!-- Tier 3, the views -->
- <div class="sm-step">
- <div class="sm-step-tag"><span class="sm-step-n">03</span><span data-i18n="sm_tier3">The views</span></div>
- <div class="sm-views">
- <div class="sm-view">
- <div class="sm-view-head"><span data-i18n="sm_inst">Institution</span><span class="sm-chips"><span class="sm-chip sm-chip--blue" data-i18n="bk_role">The Bank</span><span class="sm-chip sm-chip--pink" data-i18n="ag_role">The Aggregator</span></span></div>
- <ul class="sm-list">
- <li data-i18n="sm_n_dash">Portfolio dashboard</li>
- <li data-i18n="sm_n_reg">Registration record</li>
- <li data-i18n="sm_n_sum">Customer summary</li>
- </ul>
- </div>
- <div class="sm-view sm-view--mirror">
- <div class="sm-view-head"><span data-i18n="sm_op">Operator · the mirror</span><span class="sm-chips"><span class="sm-chip sm-chip--yellow" data-i18n="op_ctx">Counterparty</span></span></div>
- <ul class="sm-list">
- <li data-i18n="sm_n_prof">Own profile</li>
- <li data-i18n="sm_n_apps">Applications</li>
- <li data-i18n="sm_n_self">Self-assessment</li>
- </ul>
- </div>
- </div>
- </div>
-
- </div>
- </div>
- </section>
 
 
  <!-- ====== THE METHOD (two loops) ====== -->
- <section class="case-section case-section--insights">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="method_label">The Method</p>
- <h2 data-i18n="method_title">Two loops closed every gap.</h2>
- </div>
- <div class="insights-grid r-stagger">
-
- <div class="insight-item r">
- <span class="insight-num">01</span>
- <div class="insight-content">
- <h3 data-i18n="loop_1_t">The question loop: for documents.</h3>
- <p data-i18n="loop_1_d">Read the spec, find what it doesn't say, formulate the question precisely, bring it to the domain expert, and listen for what the answer reveals beyond the answer. The questions were the research instrument; each one was a design tool, not a clarification.</p>
- </div>
- </div>
-
- <div class="insight-item r">
- <span class="insight-num">02</span>
- <div class="insight-content">
- <h3 data-i18n="loop_2_t">The translation loop: for spoken visions.</h3>
- <p data-i18n="loop_2_d">Listen, write it down, propose a complete form, iterate together. Find Data (a capability the founder had wanted for years) reached me as a conversation. I proposed its entire form: the search surface, the sources, the acquisition flow. Then I scoped it down to what could realistically ship.</p>
- </div>
- </div>
-
- </div>
- </div>
- </section>
 
  <!-- ====== NAVIGATION GRAMMAR ====== -->
  <section class="case-section">
@@ -4137,109 +4039,10 @@
 
 
  <!-- ====== THE DISCIPLINE OF STATES (before / after) ====== -->
- <section class="case-section case-section--alt">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="sba_label">The Discipline of States</p>
- <h2 data-i18n="sba_title">A screen is done when every state is.</h2>
- <p class="explore-intro" data-i18n="sba_intro">My deliverables include state matrices, boards mapping every empty state and every outcome of an action, so engineering never has to invent what happens when there is nothing to show. One episode on the bank's analysis page shows why that matters.</p>
- </div>
- <div class="ba-grid r-stagger">
- <div class="ba-block r">
- <span class="ba-tag ba-tag--before" data-i18n="sba_before_tag">Before · adopted while I was away</span>
- <div class="sba" role="img" aria-label="A generic empty state: a centred icon, the words no customers to review yet, and a button leading to Registration">
- <div class="sba-chrome"><b data-i18n="sba_chrome">Customer review</b><span data-i18n="sba_chrome_s">Bank · Analysis</span></div>
- <div class="sba-body">
- <div class="sba-empty">
- <div>
- <div class="ico"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4zM4 10h16"/></svg></div>
- <p data-i18n="sba_empty_t">No customers to review yet</p>
- <small data-i18n="sba_empty_s">Customers will appear here once registered</small>
- <span class="sba-btn" data-i18n="sba_empty_btn">Go to Registration</span>
- </div>
- </div>
- </div>
- </div>
- <p class="ba-cap" data-i18n="sba_before_cap">An icon, a sentence, a button leading elsewhere. The analysis the page exists for is invisible.</p>
- </div>
- <div class="ba-block r">
- <span class="ba-tag ba-tag--after" data-i18n="sba_after_tag">After · my redesign on return</span>
- <div class="sba" role="img" aria-label="The same page as a skeleton of the analysis to come: a contextual banner with a create button, three ghost KPI cards, a ghost map and two ghost blocks">
- <div class="sba-chrome"><b data-i18n="sba_chrome">Customer review</b><span data-i18n="sba_chrome_s">Bank · Analysis</span></div>
- <div class="sba-body">
- <div class="sba-banner"><span data-i18n="sba_banner">Create a new customer to populate this analysis</span><span class="sba-btn pri" data-i18n="sba_banner_btn">Create</span></div>
- <div class="sba-kpis">
- <div class="ghost kpi"><div class="gl w40"></div><div class="gl big"></div></div>
- <div class="ghost kpi"><div class="gl w40"></div><div class="gl big"></div></div>
- <div class="ghost kpi"><div class="gl w40"></div><div class="gl big"></div></div>
- </div>
- <div class="sba-main">
- <div class="ghost map"></div>
- <div class="sba-blocks">
- <div class="ghost"><div class="gl w70"></div><div class="gl w40"></div></div>
- <div class="ghost"><div class="gl w70"></div><div class="gl w40"></div></div>
- </div>
- </div>
- </div>
- </div>
- <p class="ba-cap" data-i18n="sba_after_cap">A skeleton of the analysis to come, with a banner that says how to fill it. The empty screen shows the shape of its future.</p>
- </div>
- </div>
- <div class="cs-grid cs-grid--stack" style="margin-top: clamp(2rem, 4vw, 3rem);">
- <div class="cs-block r">
- <p data-i18n="sba_p2">The system catches what I miss, by design. A developer flagged an edge case on that same screen (one subject type with data, the other empty) and asked how to resolve it. He was right, I said so, and the fix shipped. State discipline makes gaps visible enough that anyone can catch them.</p>
- </div>
- </div>
- </div>
- </section>
 
  <!-- ====== WHAT HELD (evidence, in place of a screen gallery) ====== -->
- <section class="case-section">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="held_label">What Held</p>
- <h2 data-i18n="held_title">What the work left behind.</h2>
- </div>
- <div class="held r-stagger">
- <div class="held-item r">
- <b data-i18n="held_1_b">One <em>question</em></b>
- <p data-i18n="held_1_p">reshaped the bank's side into two areas, Registration and Evaluation, before any screen was final.</p>
- </div>
- <div class="held-item r">
- <b data-i18n="held_2_b">One <em>grammar</em></b>
- <p data-i18n="held_2_p">carries every app on the platform: a table to land on, a hub for each subject, actions scoped to its stage.</p>
- </div>
- <div class="held-item r">
- <b data-i18n="held_3_b">Two <em>years</em></b>
- <p data-i18n="held_3_p">away from the project. Engineering kept building inside the structure, and it was still carrying the product when I returned.</p>
- </div>
- <div class="held-item r">
- <b data-i18n="held_4_b">One <em>form</em></b>
- <p data-i18n="held_4_p">for Find Data, proposed whole from a vision that had only ever been spoken, then refined together and scoped to ship.</p>
- </div>
- </div>
- </div>
- </section>
 
  <!-- ====== OWNERSHIP ====== -->
- <section class="case-section case-section--alt">
- <div class="wrap">
- <div class="case-section-header r">
- <p class="case-section-label" data-i18n="mine_label">Ownership</p>
- <h2 class="outcome-statement" data-i18n="mine_statement">What was mine, and what <em>wasn't</em>.</h2>
- </div>
- <div class="cs-grid">
- <div class="cs-block cs-block--challenge r">
- <span class="cs-block-label" data-i18n="mine_1_label">Not mine</span>
- <p data-i18n="mine_1_p">The conceptual bets, operators registering themselves, the data model that keeps the bank's copy and the operator's copy separate, one engine serving two institutions, the scoring system, belong to the product's founders. I won't claim them.</p>
- </div>
- <div class="cs-block cs-block--solution r">
- <span class="cs-block-label" data-i18n="mine_2_label">Mine</span>
- <p data-i18n="mine_2_p">Everything between those bets and a usable screen: the navigation grammar, the question that split the bank's workflow, the application flow built from one sentence, the form of Find Data, the discipline of states. That's the designer's layer, and on this product, it was mine.</p>
- </div>
- </div>
- </div>
- </section>
 
  <!-- ====== REFLECTION ====== -->
  <section class="case-section case-section--dark">
