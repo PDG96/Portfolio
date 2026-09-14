@@ -229,7 +229,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
    there is no single frame height left to divide, so each band keeps the
    height it was drawn at and the page grows to whatever the pane needs. */
 .canvas{display:grid;grid-template-columns:998fr 316fr;gap:var(--gutter);align-content:start}
-.canvas--insights{grid-template-rows:auto 484px 467px 487px}
+.canvas--insights{grid-template-rows:auto 581px 467px 487px}
 .canvas--detailed{grid-template-rows:auto 488px}
 
 .block{background:var(--block);border-radius:var(--radius);padding:var(--pad);
@@ -502,26 +502,30 @@ body{margin:0;background:var(--ground);color:var(--ink);
    stand" or "what is holding it up". Those two are above and beside it, and
    both are read off the same five rows rather than typed in next to them. */
 .progstrip{grid-column:1/3;grid-row:1}
-.progstrip .lede{display:flex;align-items:center;gap:10px}
-/* The bar is the same sentence as the numbers, so it sits on their line and
-   takes the width they leave. It used to hang under them, which read as a
-   second, unrelated statement. */
-.progstrip .segbar{flex:1;min-width:180px;margin-left:14px}
-.progstrip .big{flex:none;font-size:26px;line-height:30px;font-weight:700;color:var(--ink)}
-.progstrip .lede > span:not(.big){flex:none;font-size:14px;color:var(--muted)}
-.progstrip .lede b{color:var(--ink-2);font-weight:600}
-/* Five segments, one per form, 2px of card showing between them so a boundary
-   is a gap and never a borrowed edge colour. */
-.segbar{display:flex;gap:2px;height:10px}
-.segbar i{flex:1;background:var(--track);border-radius:5px}
-.segbar i.ok{background:var(--good)}
-.segbar i.warn{background:var(--warn)}
-.segbar i.bad{background:var(--bad)}
-/* The legend came off, so each segment answers for itself: the form it
-   is and the state it is in, on hover, and it lifts so you can see
-   which one you are asking about. */
-.segbar i{cursor:default;transition:filter .15s ease,transform .15s ease}
-.segbar i:hover{filter:brightness(1.25);transform:scaleY(1.4);transition-duration:0s}
+.progstrip .head{align-items:center;margin-bottom:0}
+
+/* ---- the wheel ----
+   A part-to-whole read, so a ring rather than a bar: three states of the same
+   pile of answers, and the eye gets the split without reading a number. It is
+   counted in answers and not in sections, because four sections of different
+   sizes do not each stand for a quarter of the file.
+
+   The ring carries the confirmed share in its middle and the other two on
+   hover. The sentence that used to sit here said the same thing twice. */
+/* 120 and not 104: the word in the middle has to clear the inner edge of the
+   ring, and at the smaller size it ran under the stroke on both sides. */
+.donut{flex:none;width:120px;height:120px;position:relative}
+.donut svg{display:block;width:100%;height:100%;transform:rotate(-90deg)}
+.donut circle{fill:none;stroke-width:4.4;transition:stroke-width .15s ease}
+/* The hovered arc thickens rather than brightens: on a ring, weight says
+   "this one" without moving the colour off the state it encodes. */
+.donut circle[data-tip]{cursor:default}
+.donut circle[data-tip]:hover{stroke-width:6;transition-duration:0s}
+.donut .mid{position:absolute;inset:0;display:grid;place-items:center;
+  pointer-events:none;line-height:1}
+.donut .mid b{font-size:20px;font-weight:700;color:var(--ink)}
+.donut .mid span{display:block;margin-top:3px;font-size:9px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted)}
 
 .comments-card{grid-column:2;grid-row:2}
 .clist{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
@@ -1210,11 +1214,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
             <h2>Review progress</h2>
             <div class="sub">The four sections this desk received, counted</div>
           </div>
-        </div>
-        <div class="lede">
-          <span class="big" id="progBig">2 of 4</span>
-          <span>sections confirmed · <b id="progPct">88%</b> of answers given</span>
-          <div class="segbar" id="segbar"></div>
+          <div class="donut" id="progWheel"></div>
         </div>
       </section>
 
@@ -2498,38 +2498,79 @@ body{margin:0;background:var(--ground);color:var(--ink);
   var TONE = { ok:'Confirmed', warn:'Needs review', bad:'Declined', none:'Not started' };
 
   (function progress(){
-    var bar = document.getElementById('segbar');
-    if (!bar) return;
+    var wheel = document.getElementById('progWheel');
+    if (!wheel) return;
     var rows = [].slice.call(document.querySelectorAll('.tbody .tr'));
-    var counts = { ok:0, warn:0, bad:0, none:0 }, answered = 0, total = 0;
+    if (!rows.length) return;
+
+    /* Three states of one pile of answers, counted off the table rather than
+       written beside it, so the wheel cannot claim a number the rows
+       contradict. A section signed off puts its answers in "confirmed"; a
+       section answered but not signed off puts them in "with the reviewer";
+       everything still blank is the third arc. The three always sum to the
+       whole, which is what makes a ring the honest shape for this. */
+    var done = 0, waiting = 0, total = 0;
 
     rows.forEach(function(r){
-      var tag = r.querySelector('.tag'),
-          tone = tag.className.indexOf('tag--ok') > -1 ? 'ok'
-               : tag.className.indexOf('tag--warn') > -1 ? 'warn'
-               : tag.className.indexOf('tag--bad') > -1 ? 'bad' : 'none';
-      counts[tone]++;
-      /* Answers, not an average of percentages: four sections of different
-         sizes do not each count for a quarter of the file. The counts come
-         off the row itself, which is the same "5 of 7" the operator sees. */
+      var tag = r.querySelector('.tag');
+      var confirmed = tag && tag.className.indexOf('tag--ok') > -1;
       var m = /(\d+)\s+of\s+(\d+)/.exec(r.querySelector('.f-doc').textContent);
-      if (m){ answered += +m[1]; total += +m[2]; }
+      if (!m) return;
+      var given = +m[1], asked = +m[2];
+      total += asked;
+      if (confirmed) done += given; else waiting += given;
+    });
+    if (!total) return;
 
-      var seg = document.createElement('i');
-      seg.className = 'm-cell' + (tone !== 'none' ? ' ' + tone : '');
-      seg.style.setProperty('--i', rows.indexOf(r) * 2);
-      seg.setAttribute('data-tip',
-        r.querySelector('.f-name').textContent + ' · ' + tag.textContent.trim());
-      bar.appendChild(seg);
+    var missing = total - done - waiting;
+    var parts = [
+      { key:'done',    value:done,    color:'var(--good)',  label:'Confirmed' },
+      { key:'waiting', value:waiting, color:'var(--warn)',  label:'With the reviewer' },
+      { key:'missing', value:missing, color:'var(--track)', label:'Still to answer' }
+    ].filter(function(p){ return p.value > 0; });
+
+    /* r is 15.915 so the circumference is 100 and a dash length is a
+       percentage directly: no arithmetic between the data and the drawing. */
+    var R = 15.915494, NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 42 42');
+
+    var ring = document.createElementNS(NS, 'circle');
+    ring.setAttribute('cx', 21); ring.setAttribute('cy', 21); ring.setAttribute('r', R);
+    /* style and not setAttribute: a presentation attribute is XML, so var()
+       in one is a literal string and the stroke silently falls back. */
+    ring.style.stroke = 'var(--line)';
+    svg.appendChild(ring);
+
+    function pct(v){ return Math.round(v / total * 100); }
+    var offset = 0;
+    parts.forEach(function(p, i){
+      var share = p.value / total * 100;
+      var c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', 21); c.setAttribute('cy', 21); c.setAttribute('r', R);
+      c.style.stroke = p.color;
+      /* A 1 unit gap between arcs, so a boundary is card showing through and
+         never one state borrowing the edge of the next. */
+      c.setAttribute('stroke-dasharray', Math.max(share - 1, 0.5) + ' ' + (100 - Math.max(share - 1, 0.5)));
+      c.setAttribute('stroke-dashoffset', (100 - offset) % 100);
+      c.setAttribute('data-tip', '<b>' + pct(p.value) + '%</b> ' + p.label.toLowerCase() +
+                                 ' · ' + p.value + ' of ' + total + ' answers');
+      /* Not .m-arc: that rule holds a full-circle dasharray so a single gauge
+         can sweep, and it would flatten all three arcs into one ring. */
+      svg.appendChild(c);
+      offset += share;
     });
 
-    document.getElementById('progBig').textContent = counts.ok + ' of ' + rows.length;
-    document.getElementById('progPct').textContent =
-      (total ? Math.round(answered / total * 100) : 0) + '%';
-    bar.setAttribute('role','img');
-    bar.setAttribute('aria-label',
-      Object.keys(counts).filter(function(k){ return counts[k]; })
-        .map(function(k){ return counts[k] + ' ' + TONE[k].toLowerCase(); }).join(', '));
+    var mid = document.createElement('div');
+    mid.className = 'mid';
+    mid.innerHTML = '<div><b>' + pct(done) + '%</b><span>confirmed</span></div>';
+
+    wheel.appendChild(svg);
+    wheel.appendChild(mid);
+    wheel.setAttribute('role', 'img');
+    wheel.setAttribute('aria-label', parts.map(function(p){
+      return pct(p.value) + '% ' + p.label.toLowerCase();
+    }).join(', ') + ', of ' + total + ' answers');
   })();
   /* The same comment store the form writes to, listed beside the table: a
      reviewer coming back to this file sees what they flagged without opening
