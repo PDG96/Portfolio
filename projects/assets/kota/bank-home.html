@@ -134,7 +134,10 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 /* ---- map ---- */
 .locs{grid-column:1;grid-row:2}
-.map{flex:1;min-height:0;border-radius:4px;overflow:hidden;background:#E9E9E7;position:relative}
+/* The ground under the tiles matches the basemap the style paints, so the
+   card does not flash light before the map arrives. The style runs a dusk
+   preset now, and the fallback is dark-v11. */
+.map{flex:1;min-height:0;border-radius:4px;overflow:hidden;background:#14161A;position:relative}
 #opmap{position:absolute;inset:0}
 .mapboxgl-ctrl-logo,.mapboxgl-ctrl-attrib{display:none!important}
 .map-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
@@ -644,7 +647,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
     var map = new mapboxgl.Map({
       container: 'opmap',
-      style: 'mapbox://styles/pietragottardo/cmtrptqap00lf01s21m2n4gy4',
+      style: 'mapbox://styles/pietragottardo/cmu1pk042001b01qucobg1nxd',
       projection: 'mercator',
       center: [28.1, -2.2],
       zoom: 5.8,
@@ -685,15 +688,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
     setTimeout(function(){
       if (styled || !map.getContainer()) return;
       console.warn('[kota-map] the custom style did not load; falling back');
-      try { map.setStyle('mapbox://styles/mapbox/light-v11'); } catch (e) {}
+      try { map.setStyle('mapbox://styles/mapbox/dark-v11'); } catch (e) {}
     }, 4000);
-
-    map.on('style.load', function(){
-      try {
-        map.setConfigProperty('basemap','showPointOfInterestLabels',false);
-        map.setConfigProperty('basemap','showTransitLabels',false);
-      } catch (e) {}
-    });
 
     /* Plain teardrops, no glyph. Orange is the one file that exists; white is
        an operator who has been invited and has not finished registering, which
