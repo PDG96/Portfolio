@@ -1598,10 +1598,16 @@
  /* The section above already closes on 112px of its own padding, so a second
     112 here read as a hole between the image and this label. */
  .case-section--proto { padding-top: 0; }
+ /* clip-path and not overflow alone: the iframe inside is scaled, which puts
+    it on its own compositor layer, and a composited child walks straight
+    through an ancestor's rounded overflow clip. The corners stayed square
+    however the radius was written. clip-path is a real clip and the layer
+    honours it. */
  .app-shot--front .embed-frame {
  border: 0;
  border-radius: 13px 13px 0 0;
  overflow: hidden;
+ clip-path: inset(0 round 13px 13px 0 0);
  background: #151617;
  height: 620px;
  }
@@ -1658,6 +1664,7 @@
  border: 1px solid var(--border);
  border-radius: 14px;
  overflow: hidden;
+ clip-path: inset(0 round 14px);
  isolation: isolate;
  }
  /* The band is light in both themes, on purpose. --bg-alt follows the theme,
@@ -4209,6 +4216,16 @@
    </figure>
    -->
 
+ </div>
+ </section>
+
+ <!-- ====== THE PRODUCT ======
+      Its own section, not a second heading inside the one above. As a label
+      in the middle of another section's wrap it had no space above it at all:
+      the 112px that opens a section had already been spent on the section
+      this one was sharing. -->
+ <section class="case-section">
+ <div class="wrap">
  <p class="case-section-label r" data-i18n="prod_label">The Product</p>
  <h2 class="r" data-i18n="prod_title">What the screens do with it.</h2>
  <p class="explore-intro r" data-i18n="prod_intro">One record, filled once by the operator and read by every bank they apply to. Below: the file a reviewer opens, and the same bank screen at wireframe stage and at handover.</p>

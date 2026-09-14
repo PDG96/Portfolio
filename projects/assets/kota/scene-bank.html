@@ -32,12 +32,14 @@
 *{box-sizing:border-box}
 html,body{margin:0;background:#000;height:100%}
 
-/* The scene is drawn once at 2400x1400 and scaled to whatever window it is
-   opened in, so a screenshot at any size is the same composition. Nothing
-   inside reflows; only the whole thing gets smaller. */
-.fit{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
-.stage{position:relative;width:var(--stage-w);height:var(--stage-h);overflow:hidden;
-       background:var(--room);isolation:isolate;transform-origin:center center}
+/* The stage is the window, and everything in it is a share of the window, so
+   a screenshot at any size is the same composition. Scaling a fixed 2400px
+   stage instead would have been simpler to write and impossible to capture:
+   the transform leaves the layout box at full size and the screenshot keeps
+   framing that box rather than what you see. */
+.fit{position:fixed;inset:0;overflow:hidden}
+.stage{position:absolute;inset:0;overflow:hidden;
+       background:var(--room);isolation:isolate}
 
 /* ---- the room ----
    The wall is not flat black: a screen in a dark room lights the surface
@@ -60,28 +62,29 @@ html,body{margin:0;background:#000;height:100%}
 /* ---- the monitor ----
    Barely turned. The reference is close to straight on, and a big rotation
    on a screenful of 12px type costs more legibility than it buys depth. */
-.rig{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);
-     perspective:3200px}
-.monitor{position:relative;width:1880px;
+.rig{position:absolute;left:50%;top:50%;transform:translate(-50%,-53%);
+     perspective:calc(var(--u) * 3200);}
+.monitor{position:relative;width:var(--monitor-w);
   transform:rotateY(-1.1deg) rotateX(.8deg);transform-style:preserve-3d}
 
-.bezel{position:relative;padding:22px 22px 26px;border-radius:20px;
-  background:linear-gradient(170deg,#1C1E21 0%, var(--bezel) 30%, #0E0F11 100%);
+.bezel{position:relative;
+  padding:calc(var(--u) * 28) calc(var(--u) * 28) calc(var(--u) * 44);
+  border-radius:calc(var(--u) * 18);
+  background:linear-gradient(168deg,#3A3E43 0%, #22252A 20%, #16181B 58%, #0D0E10 100%);
   box-shadow:
-    0 0 0 1px var(--bezel-edge),
-    0 2px 0 rgba(255,255,255,.05) inset,
-    0 60px 120px -30px rgba(0,0,0,.9),
-    0 0 220px 40px rgba(60,108,168,.18);   /* the screen lighting its own frame */
+    0 0 0 calc(var(--u) * 2) #45494F,                      /* the machined edge catching the room */
+    0 1px 0 rgba(255,255,255,.14) inset,    /* the top lip, lit by the screen */
+    0 calc(var(--u) * 70) calc(var(--u) * 130) calc(var(--u) * -30) rgba(0,0,0,.92),
+    0 0 calc(var(--u) * 260) calc(var(--u) * 50) rgba(60,108,168,.20);
 }
 
 /* The glass. overflow hidden on the direct parent of the iframe, with the
    radius on that same element: a scaled child does not reliably honour a
    rounded clip two levels up. */
-.glass{position:relative;border-radius:8px;overflow:hidden;background:#151617;
-       isolation:isolate}
+.glass{position:relative;border-radius:calc(var(--u) * 8);overflow:hidden;
+       background:#151617;isolation:isolate}
 .glass iframe{display:block;width:1440px;height:900px;border:0;
-  transform-origin:0 0;transform:scale(var(--k));}
-.glass{width:1836px;height:calc(900px * var(--k))}
+  transform-origin:0 0;transform:scale(var(--k))}
 
 /* A screen is never perfectly even: a faint sheen across the top third, and a
    touch of falloff at the edges. Kept low, or it reads as dirt. */
@@ -93,13 +96,14 @@ html,body{margin:0;background:#000;height:100%}
 
 /* ---- the stand ---- */
 .neck{position:absolute;left:50%;top:100%;transform:translateX(-50%);
-  width:150px;height:92px;
+  width:calc(var(--u) * 150);height:calc(var(--u) * 92);
   background:linear-gradient(90deg,#0D0E10,#1A1C1F 42%,#0B0C0D);
   box-shadow:0 1px 0 rgba(255,255,255,.05) inset}
-.foot{position:absolute;left:50%;top:calc(100% + 92px);transform:translateX(-50%);
-  width:520px;height:16px;border-radius:0 0 10px 10px;
+.foot{position:absolute;left:50%;top:calc(100% + var(--u) * 92);transform:translateX(-50%);
+  width:calc(var(--u) * 520);height:calc(var(--u) * 16);
+  border-radius:0 0 calc(var(--u) * 10) calc(var(--u) * 10);
   background:linear-gradient(90deg,#0A0B0C,#191B1E 50%,#0A0B0C);
-  box-shadow:0 26px 50px -14px rgba(0,0,0,.95)}
+  box-shadow:0 calc(var(--u) * 26) calc(var(--u) * 50) calc(var(--u) * -14) rgba(0,0,0,.95)}
 
 /* ---- the foreground ----
    In the reference this is a person, close to the lens and far out of focus.
@@ -107,14 +111,9 @@ html,body{margin:0;background:#000;height:100%}
    in pure black with a heavy blur: at that distance a camera resolves an
    outline and nothing else, which is exactly what can be drawn honestly. Drop
    a cut-out photo in its place and keep the same position and blur. */
-.fg{position:absolute;left:0;bottom:0;width:38%;height:100%;pointer-events:none;
-  filter:blur(22px)}
-/* the shoulder */
-.fg::before{content:'';position:absolute;left:-30%;bottom:-18%;width:130%;height:62%;
-  border-radius:48% 52% 0 0 / 70% 62% 0 0;background:#000}
-/* the head */
-.fg::after{content:'';position:absolute;left:8%;bottom:30%;width:58%;height:46%;
-  border-radius:50% 50% 44% 44% / 56% 56% 44% 44%;background:#000}
+.fg{position:absolute;left:-7%;bottom:-3%;width:34%;height:82%;pointer-events:none;
+  filter:blur(calc(var(--u) * 40))}
+.fg svg{display:block;width:100%;height:100%}
 
 /* ---- the grade ----
    One vignette over everything, so the corners fall away and the eye lands on
@@ -143,27 +142,52 @@ html,body{margin:0;background:#000;height:100%}
     </div>
   </div>
 
-  <div class="fg"></div>
+  <!-- Head and shoulders, from behind and close to the lens. Drawn as one
+       outline rather than assembled from boxes, because at this blur the
+       only thing a viewer reads is the silhouette, and a silhouette with a
+       seam in it stops being a person. -->
+  <div class="fg" aria-hidden="true">
+    <svg viewBox="0 0 400 500" preserveAspectRatio="xMidYMax meet">
+      <path fill="#000" d="M0,500 L0,336 C34,302 78,284 122,278 C142,271 156,261 160,246
+                           C128,224 112,188 112,152 C112,98 150,62 200,62
+                           C250,62 288,98 288,152 C288,190 270,224 240,246
+                           C246,262 262,274 284,280 C338,294 384,330 400,384
+                           L400,500 Z"/>
+    </svg>
+  </div>
   <div class="grade"></div>
 </div>
 </div>
 
 <script>
 (function(){
-  /* The prototype is drawn for 1440. Rendering it at that width and scaling
-     the whole frame keeps every line where it was designed, which a narrower
-     iframe would not: the dashboard would reflow into a layout that does not
-     exist in the case study. */
-  var glass = document.getElementById('glass');
-  var k = 1836 / 1440;
-  glass.style.setProperty('--k', k);
-  glass.style.height = Math.round(900 * k) + 'px';
-
-  /* One composition, any window. */
   var stage = document.getElementById('stage');
+  var glass = document.getElementById('glass');
+
+  /* --u is what one pixel of the 2400x1400 drawing is worth in this window.
+     Every hard number in the CSS is written against that drawing and read
+     through --u, so the room, the bezel, the stand and the blur all keep
+     their proportions instead of one of them going coarse at small sizes. */
   function fit(){
-    var s = Math.min(innerWidth / 2400, innerHeight / 1400);
-    stage.style.transform = 'scale(' + s + ')';
+    var u = Math.min(innerWidth / 2400, innerHeight / 1400);
+    /* Carried as a length, not a number: calc() multiplies a length by a
+       number, and a unitless --u makes every calc() in the CSS invalid, which
+       browsers drop in silence. The bezel simply had no padding. */
+    stage.style.setProperty('--u', u + 'px');
+
+    /* The monitor is a fixed share of the frame; the glass is what is left
+       inside the bezel; the prototype is drawn for 1440 and scaled to fill
+       it. Rendering it at 1440 rather than at the glass width keeps every
+       line where it was designed: a narrower iframe would reflow the
+       dashboard into a layout the case study never shows. */
+    var monitorW = Math.round(innerWidth * 0.83);
+    var glassW   = monitorW - 2 * (u * 28);
+    var k        = glassW / 1440;
+
+    stage.style.setProperty('--monitor-w', monitorW + 'px');
+    glass.style.setProperty('--k', k);
+    glass.style.width  = Math.round(glassW) + 'px';
+    glass.style.height = Math.round(900 * k) + 'px';
   }
   fit();
   addEventListener('resize', fit);
