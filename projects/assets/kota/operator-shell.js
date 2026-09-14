@@ -156,7 +156,7 @@
       if (!el) return;
       var r = el.getBoundingClientRect(), rail = el.closest('.rail');
       tip.innerHTML = el.getAttribute('data-tip') +
-        (el.hasAttribute('data-tip-off') ? '<span class="tip-off">Disabled</span>' : '');
+        (el.hasAttribute('data-tip-off') ? '<span class="tip-off">Not available for demo</span>' : '');
       tip.classList.toggle('ctip--right', !!rail);
       tip.style.left = rail ? (r.right + 10) + 'px' : (r.left + r.width / 2) + 'px';
       tip.style.top  = rail ? (r.top + r.height / 2) + 'px' : (r.top - 8) + 'px';

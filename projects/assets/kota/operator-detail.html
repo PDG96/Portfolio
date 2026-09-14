@@ -2100,7 +2100,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
     var r = el.getBoundingClientRect(), rail = el.closest('.rail');
     /* A section that is off says so in the same breath as its name. */
     tip.innerHTML = el.getAttribute('data-tip') +
-      (el.hasAttribute('data-tip-off') ? '<span class="tip-off">Disabled</span>' : '');
+      (el.hasAttribute('data-tip-off') ? '<span class="tip-off">Not available for demo</span>' : '');
     tip.classList.toggle('ctip--right', !!rail);
     if (rail){
       tip.style.left = (r.right + 10) + 'px';

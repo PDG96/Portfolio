@@ -1246,18 +1246,10 @@
  color: var(--text-3);
  margin: 0;
  }
- /* Two lines: what it is, then what to look at. The mono label on its own is
-    a tag; a reader landing mid-page needs the second line to know why the
-    image is there at all. */
- .app-shot figcaption.cap { display: flex; flex-direction: column; gap: 0.3125rem; }
- .app-shot figcaption.cap b {
- font-family: var(--font);
- font-size: 0.9375rem;
- font-weight: 500;
- letter-spacing: 0;
- text-transform: none;
- color: var(--text);
- }
+ /* One line, in the page's own voice rather than the mono tag: a reader
+    landing mid-page needs to know why the image is there, and the heading
+    above it already says what it is. */
+ .app-shot figcaption.cap { display: flex; flex-direction: column; }
  .app-shot figcaption.cap span {
  font-family: var(--font);
  font-size: 0.875rem;
@@ -4198,7 +4190,7 @@
    src="assets/kota-problem-statement.mp4?v=13"
    aria-label="Problem statement board, animated: small producers in extractive industries need a better way to apply for banking. Applications arrived as handwritten forms completed by bank agents, making them difficult to verify and evaluate. Cards cycle through, including one where only 39% of adults in the DRC have a bank account. Sources: World Bank Global Findex 2025; EU Regulation 2017/821, in force since 1 January 2021."></video>
    </div>
-   <figcaption class="cap"><b data-i18n="cap1_t">The brief, and what it rests on</b><span data-i18n="cap1_d">One sentence, three numbers, and their sources.</span></figcaption>
+   <figcaption class="cap"><span data-i18n="cap1_d">One sentence, three numbers, and their sources.</span></figcaption>
    </figure>
 
    <figure class="app-shot app-shot--video r">
@@ -4207,7 +4199,7 @@
    src="assets/kota-users.mp4?v=4"
    aria-label="Application users, animated. Operator owns their own record: needs a way to apply, is held back by being judged by what's missing, and wants a record they own. Bank gets a defensible score: needs a verifiable application, is held back by data it can't defend, and wants a decision it can defend."></video>
    </div>
-   <figcaption class="cap"><b data-i18n="cap2_t">The two sides of one record</b><span data-i18n="cap2_d">What each side needs, and what holds it back.</span></figcaption>
+   <figcaption class="cap"><span data-i18n="cap2_d">What each side needs, and what holds it back.</span></figcaption>
    </figure>
 
    <!-- Removed for now, per Pietra's request — kept commented out, not
@@ -4229,7 +4221,7 @@
    src="assets/kota-bento.mp4?v=5"
    aria-label="Scrolling through the KOTA dashboard: declared settlement profile, declared volume by mineral, key risk indicators, score build-up, counterparties by grade, documentation status, overall risk score and trade relationships."></video>
    </div>
-   <figcaption class="cap"><b data-i18n="cap3_t">The file a reviewer reads</b><span data-i18n="cap3_d">Score, risk, documents and counterparties, in one read.</span></figcaption>
+   <figcaption class="cap"><span data-i18n="cap3_d">Score, risk, documents and counterparties, in one read.</span></figcaption>
    </figure>
 
    <!-- Lowfi/handover compare, before the interactive prototypes: same
@@ -4246,7 +4238,7 @@
        <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
      </div>
    </div>
-   <figcaption class="cap"><b data-i18n="cap4_t">Wireframe to handover</b><span data-i18n="cap4_d">The same screen at both ends of the work. Drag to compare.</span></figcaption>
+   <figcaption class="cap"><span data-i18n="cap4_d">The same screen at both ends of the work. Drag to compare.</span></figcaption>
    </figure>
 
  </div>
@@ -4295,7 +4287,7 @@
    <span aria-hidden="true"></span>
  </div>
  </div>
- <figcaption class="cap"><b data-i18n="cap5_t">The prototype</b><span data-i18n="fig_front">The same record, read from either seat.</span></figcaption>
+ <figcaption class="cap"><span data-i18n="fig_front">The same record, read from either seat.</span></figcaption>
  </figure>
  </div>
  </section>
@@ -4457,15 +4449,10 @@
  prod_label: "The Product",
  prod_title: "What the screens do with it.",
  prod_intro: "One record, filled once by the operator and read by every bank they apply to. Below: the file a reviewer opens, and the same bank screen at wireframe stage and at handover.",
- cap1_t: "The brief, and what it rests on",
  cap1_d: "One sentence, three numbers, and their sources.",
- cap2_t: "The two sides of one record",
  cap2_d: "What each side needs, and what holds it back.",
- cap3_t: "The file a reviewer reads",
  cap3_d: "Score, risk, documents and counterparties, in one read.",
- cap4_t: "Wireframe to handover",
  cap4_d: "The same screen at both ends of the work. Drag to compare.",
- cap5_t: "The prototype",
  seat_bank: "Be the bank",
  seat_op: "Be the operator",
  gf_1_tag: "Landing", gf_1_i: "A table",
@@ -4648,15 +4635,10 @@
  prod_label: "O Produto",
  prod_title: "O que as telas fazem com isso.",
  prod_intro: "Um registro, preenchido uma vez pelo operador e lido por todo banco a que ele se candidata. Abaixo: a ficha que um revisor abre, e a mesma tela do banco no wireframe e no handover.",
- cap1_t: "O briefing, e no que ele se apoia",
  cap1_d: "Uma frase, três números, e as fontes de cada um.",
- cap2_t: "Os dois lados de um mesmo registro",
  cap2_d: "O que cada lado precisa, e o que trava cada um.",
- cap3_t: "A ficha que um revisor lê",
  cap3_d: "Nota, risco, documentos e contrapartes, numa leitura.",
- cap4_t: "Do wireframe ao handover",
  cap4_d: "A mesma tela nas duas pontas do trabalho. Arraste para comparar.",
- cap5_t: "O protótipo",
  seat_bank: "Seja o banco",
  seat_op: "Seja o operador",
  gf_1_tag: "Landing", gf_1_i: "Uma tabela",

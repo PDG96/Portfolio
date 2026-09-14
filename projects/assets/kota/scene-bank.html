@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KOTA · scene</title>
+<style>
+/* ==========================================================================
+   KOTA — the dashboard on a screen, in a room.
+
+   A flat crop of a dashboard says "here is a file". The same dashboard on a
+   monitor, in a dark room, with someone in front of it, says "here is a desk
+   where a decision gets made" — which is what the case is actually about.
+
+   This is a render, not a photograph. The screen is the live prototype in an
+   iframe, so it never goes stale: the glass is real HTML, and everything
+   around it is drawn. What it cannot do is produce a real person, so the
+   foreground is treated as an out-of-focus mass rather than a fake figure.
+
+   Sized to 2400x1400 and captured at that size. Change --stage-w and the
+   whole scene scales with it.
+   ========================================================================== */
+:root{
+  --stage-w:2400px;
+  --stage-h:1400px;
+
+  --room:#0B0C0D;         /* the wall behind the desk */
+  --desk:#131416;
+  --bezel:#141517;
+  --bezel-edge:#26282B;
+  --glow:#3C6CA8;         /* what the screen throws onto the room */
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:#000;height:100%}
+
+/* The scene is drawn once at 2400x1400 and scaled to whatever window it is
+   opened in, so a screenshot at any size is the same composition. Nothing
+   inside reflows; only the whole thing gets smaller. */
+.fit{position:fixed;inset:0;display:grid;place-items:center;overflow:hidden}
+.stage{position:relative;width:var(--stage-w);height:var(--stage-h);overflow:hidden;
+       background:var(--room);isolation:isolate;transform-origin:center center}
+
+/* ---- the room ----
+   The wall is not flat black: a screen in a dark room lights the surface
+   behind it, and that spill is most of what makes the scene read as a place
+   rather than a cut-out. Two layers, because the near light is cooler and
+   tighter than the general lift. */
+.wall{position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 34%, rgba(60,108,168,.16) 0%, rgba(60,108,168,.05) 38%, transparent 66%),
+    radial-gradient(90% 70% at 50% 40%, rgba(255,255,255,.055) 0%, transparent 60%),
+    linear-gradient(180deg,#0A0B0C 0%, #0D0E10 55%, #0A0B0B 100%);
+}
+
+/* The desk catches the same light from a lower angle, so it is a band rather
+   than a pool. */
+.desk{position:absolute;left:0;right:0;bottom:0;height:20%;
+  background:linear-gradient(180deg, rgba(255,255,255,.05) 0%, rgba(0,0,0,0) 42%), var(--desk);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+
+/* ---- the monitor ----
+   Barely turned. The reference is close to straight on, and a big rotation
+   on a screenful of 12px type costs more legibility than it buys depth. */
+.rig{position:absolute;left:50%;top:50%;transform:translate(-50%,-52%);
+     perspective:3200px}
+.monitor{position:relative;width:1880px;
+  transform:rotateY(-1.1deg) rotateX(.8deg);transform-style:preserve-3d}
+
+.bezel{position:relative;padding:22px 22px 26px;border-radius:20px;
+  background:linear-gradient(170deg,#1C1E21 0%, var(--bezel) 30%, #0E0F11 100%);
+  box-shadow:
+    0 0 0 1px var(--bezel-edge),
+    0 2px 0 rgba(255,255,255,.05) inset,
+    0 60px 120px -30px rgba(0,0,0,.9),
+    0 0 220px 40px rgba(60,108,168,.18);   /* the screen lighting its own frame */
+}
+
+/* The glass. overflow hidden on the direct parent of the iframe, with the
+   radius on that same element: a scaled child does not reliably honour a
+   rounded clip two levels up. */
+.glass{position:relative;border-radius:8px;overflow:hidden;background:#151617;
+       isolation:isolate}
+.glass iframe{display:block;width:1440px;height:900px;border:0;
+  transform-origin:0 0;transform:scale(var(--k));}
+.glass{width:1836px;height:calc(900px * var(--k))}
+
+/* A screen is never perfectly even: a faint sheen across the top third, and a
+   touch of falloff at the edges. Kept low, or it reads as dirt. */
+.sheen{position:absolute;inset:0;pointer-events:none;
+  background:
+    linear-gradient(196deg, rgba(255,255,255,.055) 0%, rgba(255,255,255,.012) 26%, transparent 46%),
+    radial-gradient(120% 100% at 50% 50%, transparent 58%, rgba(0,0,0,.28) 100%);
+}
+
+/* ---- the stand ---- */
+.neck{position:absolute;left:50%;top:100%;transform:translateX(-50%);
+  width:150px;height:92px;
+  background:linear-gradient(90deg,#0D0E10,#1A1C1F 42%,#0B0C0D);
+  box-shadow:0 1px 0 rgba(255,255,255,.05) inset}
+.foot{position:absolute;left:50%;top:calc(100% + 92px);transform:translateX(-50%);
+  width:520px;height:16px;border-radius:0 0 10px 10px;
+  background:linear-gradient(90deg,#0A0B0C,#191B1E 50%,#0A0B0C);
+  box-shadow:0 26px 50px -14px rgba(0,0,0,.95)}
+
+/* ---- the foreground ----
+   In the reference this is a person, close to the lens and far out of focus.
+   A drawn figure would read as a drawn figure, so this is a head and shoulder
+   in pure black with a heavy blur: at that distance a camera resolves an
+   outline and nothing else, which is exactly what can be drawn honestly. Drop
+   a cut-out photo in its place and keep the same position and blur. */
+.fg{position:absolute;left:0;bottom:0;width:38%;height:100%;pointer-events:none;
+  filter:blur(22px)}
+/* the shoulder */
+.fg::before{content:'';position:absolute;left:-30%;bottom:-18%;width:130%;height:62%;
+  border-radius:48% 52% 0 0 / 70% 62% 0 0;background:#000}
+/* the head */
+.fg::after{content:'';position:absolute;left:8%;bottom:30%;width:58%;height:46%;
+  border-radius:50% 50% 44% 44% / 56% 56% 44% 44%;background:#000}
+
+/* ---- the grade ----
+   One vignette over everything, so the corners fall away and the eye lands on
+   the screen rather than wandering the room. */
+.grade{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(78% 68% at 50% 44%, transparent 42%, rgba(0,0,0,.55) 100%)}
+</style>
+</head>
+<body>
+
+<div class="fit">
+<div class="stage" id="stage">
+  <div class="wall"></div>
+  <div class="desk"></div>
+
+  <div class="rig">
+    <div class="monitor">
+      <div class="bezel">
+        <div class="glass" id="glass">
+          <iframe id="shot" src="bank-home.html" scrolling="no" title="Kota, the bank's dashboard"></iframe>
+          <div class="sheen"></div>
+        </div>
+      </div>
+      <div class="neck"></div>
+      <div class="foot"></div>
+    </div>
+  </div>
+
+  <div class="fg"></div>
+  <div class="grade"></div>
+</div>
+</div>
+
+<script>
+(function(){
+  /* The prototype is drawn for 1440. Rendering it at that width and scaling
+     the whole frame keeps every line where it was designed, which a narrower
+     iframe would not: the dashboard would reflow into a layout that does not
+     exist in the case study. */
+  var glass = document.getElementById('glass');
+  var k = 1836 / 1440;
+  glass.style.setProperty('--k', k);
+  glass.style.height = Math.round(900 * k) + 'px';
+
+  /* One composition, any window. */
+  var stage = document.getElementById('stage');
+  function fit(){
+    var s = Math.min(innerWidth / 2400, innerHeight / 1400);
+    stage.style.transform = 'scale(' + s + ')';
+  }
+  fit();
+  addEventListener('resize', fit);
+})();
+</script>
+</body>
+</html>
