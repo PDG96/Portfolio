@@ -1,5 +1,4 @@
-# Kota is held back: the Work card shows it as Coming soon and nothing links to
-# it, but the page itself still built and answered on a typed URL. Delete this
-# line to publish it — the case study is untouched in projects/kota.html.
-/projects/kota    /    302
-/projects/kota.html    /    302
+# Nothing held back. Kota was blocked here while its card said Coming soon:
+# the page built and answered on a typed URL even with nothing linking to it,
+# so the redirect was what actually kept it unpublished. Both its rules are
+# gone now that the Work card links to it.
