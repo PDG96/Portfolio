@@ -674,3 +674,40 @@ depender de um serviço que hoje falha de forma silenciosa e intermitente.
    diz "Registering · 100%, complete, not submitted". Não mexi porque virar o
    Kivu de "parado" pra "esperando você" muda a copy do card, e o card com o Kivu
    em primeiro foi pedido seu. Me diz e ajusto.
+
+## 18. Publicado (2026-09-14)
+
+Dez commits foram pro remoto depois que você liberou o token no secret
+scanning. Mas o Kota continuou caindo na home, e não era o deploy: havia um
+`_redirects` na raiz com duas regras que mandavam `/projects/kota` e
+`/projects/kota.html` pra `/` com 302. Elas foram postas lá quando o card era
+"Coming soon", porque a página buildava e respondia numa URL digitada mesmo sem
+nada linkando pra ela. Removidas, o Kota respondeu 200 na hora.
+
+Fica registrado porque a armadilha se repete: **tirar o "Coming soon" do card
+não publica a página**. Quem publica é o `_redirects`.
+
+O mesmo vale ao contrário pro Straatos, que voltou a ser "Coming soon" no card:
+a página dele continua respondendo 200 numa URL digitada, porque não tem regra
+nenhuma segurando. Diferente do Kota, o `straatos.html` já esteve publicado e
+pode estar indexado, então bloquear agora quebra link existente. É decisão sua.
+
+### Ainda em aberto
+
+1. **`projects/assets/kota-cover.jpg` está desatualizado** e agora é o primeiro
+   card do site. Mostra "Kivu Minerals" em quatro lugares e "KEMET" no grafo de
+   trade relationships. Precisa ser re-exportado da `operator-detail.html`, aba
+   Insights, no mesmo enquadramento.
+2. **O estilo do Mapbox** (`cmu1pk042001b01qucobg1nxd`) ainda importa o
+   Standard e trava; o fallback pro `dark-v11` é o que está no ar. Pra usar o
+   estilo dela de verdade, precisa ser criado de um template **Classic**.
+3. **Chevron e breadcrumb são redundantes.** A topbar lê `‹ Home › Applications`
+   e as duas coisas vão pro mesmo lugar, coladas. Proposta: tirar o "Home" do
+   breadcrumb e deixar `‹ Applications`.
+4. **`scene-bank.html`** é um render do dashboard num monitor, em HTML, com o
+   protótipo vivo dentro do frame. Exporta com Chrome headless:
+   `--headless=new --use-angle=swiftshader --enable-unsafe-swiftshader
+   --window-size=2400,1400 --virtual-time-budget=60000 --screenshot=x.png`.
+   O swiftshader é o que faz o Mapbox renderizar sem GPU. Parado a pedido dela;
+   falta encolher o monitor, resolver a silhueta e a altura fixa de 900px que
+   corta o último card.
