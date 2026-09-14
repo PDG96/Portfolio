@@ -1216,12 +1216,19 @@
  margin: 0;
  display: flex;
  flex-direction: column;
- gap: 0.875rem;
+ gap: 0.5rem;
  }
  /* Consistent 60px rhythm between stacked figures now that captions no
     longer carry that spacing on their own. */
  .app-shot + .app-shot {
  margin-top: 60px;
+ }
+ /* The first figure of a section follows a paragraph, not another figure, so
+    the rule above never reached it and it sat flush against the intro. Two
+    class names is enough specificity to also cover .app-shot--front, which
+    carried 36px of its own and was the only one escaping by accident. */
+ .explore-intro + .app-shot {
+ margin-top: 32px;
  }
  .app-shot img {
  width: 100%;
@@ -1252,13 +1259,16 @@
  .app-shot figcaption.cap { display: flex; flex-direction: column; }
  .app-shot figcaption.cap span {
  font-family: var(--font);
- font-size: 0.875rem;
+ font-size: 0.8125rem;
  font-weight: 400;
  letter-spacing: 0;
  text-transform: none;
  line-height: 1.55;
  color: var(--text-2);
- max-width: 62ch;
+ /* Runs the full sheet, like the figure above it. A measure cap made the
+    caption stop halfway across a full-width image and read as a stray
+    paragraph rather than that image's line. */
+ max-width: none;
  }
  @media (max-width: 640px) {
  .app-shot { gap: 0.625rem; }
@@ -4166,15 +4176,15 @@
  <div class="cs-block cs-block--challenge r">
  <span class="cs-block-label" data-i18n="challenge_label">The Challenge</span>
  <h3 data-i18n="challenge_title">Paper, filled in by the wrong hands.</h3>
- <p data-i18n="challenge_p1">The DRC produces over 70% of the world's cobalt, much of it dug by hand across a sector that sustains an estimated 10 million people. Almost none of them can open a bank account: banking access among artisanal miners sits at 1 to 3%, and the gap is filled by informal lenders on predatory terms.</p>
- <p data-i18n="challenge_p2">The blockage isn't the miner, it's the paperwork. Banks need to verify identity, source of funds and due diligence, and that record doesn't exist without a filing system or shared registry, so the process ran on paper forms, filled in by a bank agent on the operator's behalf. The person answering wasn't the person who knew, and the easiest decision was always no. The operator ends up judged by what's missing.</p>
+ <p data-i18n="challenge_p1">The DRC produces over 70% of the world's cobalt, much of it dug by hand in a sector that sustains an estimated 10 million people. Banking access among artisanal miners sits at 1 to 3%, and informal lenders fill the gap on predatory terms.</p>
+ <p data-i18n="challenge_p2">The blockage isn't the miner, it's the paperwork. Banks need identity, source of funds and due diligence, and no shared registry holds that record, so it ran on paper filled in by a bank agent on the operator's behalf. The person answering was never the person who knew, and the easiest decision was always no.</p>
  </div>
 
  <div class="cs-block cs-block--solution r">
  <span class="cs-block-label" data-i18n="solution_label">The Solution</span>
  <h3 data-i18n="solution_title">Change who holds the pen.</h3>
- <p data-i18n="solution_p1">KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally, in their own words. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward, not just the verdict. The record now belongs to the person it describes.</p>
- <p data-i18n="solution_p2">One engine serves two institutions (a commercial bank and a government-mandated commodity aggregator) wearing different vocabulary for the same underlying record. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can actually use, and a score they can stand behind.</p>
+ <p data-i18n="solution_p1">KOTA moves the starting point: the operator registers themselves and submits digitally, in their own words. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward. The record belongs to the person it describes.</p>
+ <p data-i18n="solution_p2">One engine serves two institutions, a commercial bank and a government-mandated commodity aggregator, wearing different vocabulary for the same record. Those product decisions belong to the team; my work happened one level down: a form people can actually use, and a score they can stand behind.</p>
  </div>
  </div>
  </div>
@@ -4356,12 +4366,12 @@
  con_p2: "Beyond usability: the product operates across DRC regulation, OECD guidance, and EU conflict minerals rules, each with different vocabulary. It runs in English and French. And the trust deficit is structural: operators have good reasons to distrust a system that collects sensitive data about their business. The two-copy data model, the bank inherits a copy when it edits, never mutating the operator's record, is one answer. The design is another.",
  challenge_label: "The Challenge",
  challenge_title: "Paper, filled in by the wrong hands.",
- challenge_p1: "The DRC produces over 70% of the world's cobalt, much of it dug by hand across a sector that sustains an estimated 10 million people. Almost none of them can open a bank account: banking access among artisanal miners sits at 1 to 3%, and the gap is filled by informal lenders on predatory terms.",
- challenge_p2: "The blockage isn't the miner, it's the paperwork. Banks need to verify identity, source of funds and due diligence, and that record doesn't exist without a filing system or shared registry, so the process ran on paper forms, filled in by a bank agent on the operator's behalf. The person answering wasn't the person who knew, and the easiest decision was always no. The operator ends up judged by what's missing.",
+ challenge_p1: "The DRC produces over 70% of the world's cobalt, much of it dug by hand in a sector that sustains an estimated 10 million people. Banking access among artisanal miners sits at 1 to 3%, and informal lenders fill the gap on predatory terms.",
+ challenge_p2: "The blockage isn't the miner, it's the paperwork. Banks need identity, source of funds and due diligence, and no shared registry holds that record, so it ran on paper filled in by a bank agent on the operator's behalf. The person answering was never the person who knew, and the easiest decision was always no.",
  solution_label: "The Solution",
  solution_title: "Change who holds the pen.",
- solution_p1: "KOTA moves the starting point: the operator registers themselves, answers the basic questions, and submits digitally, in their own words. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward, not just the verdict. The record now belongs to the person it describes.",
- solution_p2: "One engine serves two institutions (a commercial bank and a government-mandated commodity aggregator) wearing different vocabulary for the same underlying record. Those product decisions belong to the team; my work happened one level down: giving every one of them a form people can actually use, and a score they can stand behind.",
+ solution_p1: "KOTA moves the starting point: the operator registers themselves and submits digitally, in their own words. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward. The record belongs to the person it describes.",
+ solution_p2: "One engine serves two institutions, a commercial bank and a government-mandated commodity aggregator, wearing different vocabulary for the same record. Those product decisions belong to the team; my work happened one level down: a form people can actually use, and a score they can stand behind.",
  ph_hero_cap: "Kota platform overview, institution dashboard with a counterparty profile in focus.",
  ia_label: "Information Architecture",
  ia_title: "The question that split the architecture.",
@@ -4542,12 +4552,12 @@
  con_p2: "Além da usabilidade: o produto opera sob a regulação da RDC, as diretrizes da OCDE e as regras europeias de minerais de conflito, cada uma com vocabulário diferente. Roda em inglês e francês. E o déficit de confiança é estrutural: os operadores têm boas razões para desconfiar de um sistema que coleta dados sensíveis sobre seus negócios. O modelo de dados de cópia dupla, o banco herda uma cópia ao editar, sem nunca mutar o registro do operador, é uma resposta. O design é outra.",
  challenge_label: "O Desafio",
  challenge_title: "Papel, preenchido pelas mãos erradas.",
- challenge_p1: "A RDC produz mais de 70% do cobalto do mundo, boa parte extraída à mão num setor que sustenta cerca de 10 milhões de pessoas. Quase nenhuma delas consegue abrir uma conta bancária: o acesso bancário entre mineradores artesanais fica entre 1 e 3%, e a lacuna é preenchida por agiotas informais em termos predatórios.",
- challenge_p2: "O bloqueio não é o minerador, é a papelada. Bancos precisam verificar identidade, origem de fundos e due diligence, e esse registro não existe onde não há sistema de arquivo nem registro compartilhado, então o processo rodava em formulários de papel, preenchidos por um agente do banco em nome do operador. Quem respondia não era quem sabia, e a decisão mais fácil era sempre não. O operador acaba julgado pelo que falta.",
+ challenge_p1: "A RDC produz mais de 70% do cobalto do mundo, boa parte extraída à mão num setor que sustenta cerca de 10 milhões de pessoas. O acesso bancário entre mineradores artesanais fica entre 1 e 3%, e agiotas informais preenchem a lacuna em termos predatórios.",
+ challenge_p2: "O bloqueio não é o minerador, é a papelada. Bancos precisam de identidade, origem de fundos e due diligence, e nenhum registro compartilhado guarda isso, então o processo rodava em papel preenchido por um agente do banco em nome do operador. Quem respondia nunca era quem sabia, e a decisão mais fácil era sempre não.",
  solution_label: "A Solução",
  solution_title: "Mudar quem segura a caneta.",
- solution_p1: "O KOTA muda o ponto de partida: o operador se cadastra sozinho, responde às questões básicas e submete digitalmente, com as próprias palavras. O banco recebe uma aplicação estruturada em vez de uma pilha de fichas manuscritas, e o operador recebe um score que mostra o caminho, não só o veredito. O registro agora pertence a quem ele descreve.",
- solution_p2: "Um motor serve duas instituições (um banco comercial e um agregador de commodities mandatado pelo governo) vestindo vocabulários diferentes para o mesmo registro. Essas decisões de produto são do time; meu trabalho aconteceu um nível abaixo: dar a cada uma delas uma forma que as pessoas realmente conseguem usar, e um score em que podem confiar.",
+ solution_p1: "O KOTA muda o ponto de partida: o operador se cadastra sozinho e submete digitalmente, com as próprias palavras. O banco recebe uma aplicação estruturada em vez de uma pilha de fichas manuscritas, e o operador recebe um score que mostra o caminho. O registro pertence a quem ele descreve.",
+ solution_p2: "Um motor serve duas instituições, um banco comercial e um agregador de commodities mandatado pelo governo, vestindo vocabulários diferentes para o mesmo registro. Essas decisões de produto são do time; meu trabalho aconteceu um nível abaixo: uma forma que as pessoas realmente conseguem usar, e um score em que podem confiar.",
  ph_hero_cap: "Visão geral da plataforma Kota, dashboard da instituição com um perfil de contraparte em foco.",
  ia_label: "Arquitetura da Informação",
  ia_title: "A pergunta que dividiu a arquitetura.",
