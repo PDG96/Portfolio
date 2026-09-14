@@ -1,0 +1,222 @@
+/* ==========================================================================
+   KOTA — the same product, on a phone.
+
+   Loaded last on every app screen, so it overrides each page's own layout
+   without those pages having to know about it. The class names are shared
+   across the seven screens, which is what makes one file enough.
+
+   Three decisions carry most of it:
+
+   1. The rail becomes a bottom bar. A 54px column is 14% of a 390px screen,
+      and the items are out of thumb reach up there. At the bottom it is the
+      same six destinations, in the same order, in the place a hand already
+      is.
+
+   2. Every grid collapses to one column, in reading order. The desktop
+      screens are already written so the first column is the argument and the
+      second is the aside, so stacking keeps the meaning.
+
+   3. Tables stop being tables. Each row becomes a block with the name first
+      and its values under it — the values are self-describing (a tag says
+      its state, a bar shows a share, a date is a date), so no invented
+      labels are needed.
+   ========================================================================== */
+
+@media (max-width: 1180px){
+
+  /* The desktop floor goes: below it the page is allowed to reflow rather
+     than scroll sideways. */
+  .app{min-width:0;padding-left:0;padding-bottom:76px}
+
+  /* ---- the rail, now a bar ---- */
+  .rail{top:auto;bottom:0;left:0;right:0;width:100%;height:auto;
+        flex-direction:row;align-items:center;justify-content:space-around;
+        gap:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+        border-right:0;border-top:1px solid var(--line);
+        background:rgba(21,22,23,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+        z-index:40}
+  .navgroup{flex-direction:row;align-items:center;gap:2px}
+  .rail .spacer{display:none}
+  .nav{width:44px;height:44px}
+  .nav.active::before{left:50%;top:auto;bottom:-8px;width:20px;height:2px;margin-left:-10px;
+    border-radius:2px 2px 0 0}
+  .rail .me{width:34px;height:34px}
+  /* The greyed-out sections stay in the bar. They are part of what the product
+     says about itself, and dropping them on a phone would make the two
+     versions disagree about how big the product is. */
+
+  /* The popovers hang off the bar instead of the column. */
+  .seatpop,.notifpop{left:12px;right:12px;width:auto;bottom:84px}
+  .notifpop{bottom:84px}
+  .seatpop{bottom:84px}
+
+  /* ---- page frame ---- */
+  .main{padding:0 16px 16px}
+  .stickyhead.is-stuck{margin:0 -16px;padding:0 16px}
+  .ophead{flex-wrap:wrap;gap:12px;padding-bottom:14px}
+  .opname{font-size:19px;line-height:25px}
+  .headacts,.headmeta{margin-left:0;width:100%}
+  .headacts{flex-wrap:wrap}
+  .headacts .btn{flex:1 1 auto}
+  .wordmark{font-size:15px}
+
+  /* ---- every grid becomes one column ---- */
+  .canvas,
+  .canvas--insights,.canvas--detailed,.canvas--settings{grid-template-columns:1fr;
+    grid-template-rows:none;gap:16px;padding-top:16px;grid-auto-flow:row}
+  .canvas > *,
+  .stats,.kpis,.state,.charts,.trade,.loc,.score,.forms,.queue,.risk,.locs,
+  .feed-card,.curve,.watch-card,.progstrip,.comments-card,.ident,.sent,.side,
+  .sections,.pane,.apps,.asks,.filecard,.vol-card,.set-col{grid-column:1 !important;
+    grid-row:auto !important}
+
+  /* Containers that carry a grid of their own, not just a slot in .canvas. */
+  .charts{grid-template-columns:1fr !important;grid-template-rows:none !important}
+
+  /* Counts stack two by two, which is the most a phone reads at a glance. */
+  .kpis,.stats,.state{grid-template-columns:1fr 1fr;gap:12px}
+  .kpi,.stat{padding:16px}
+  .kpi b,.stat .v{font-size:24px;line-height:28px}
+  .kpi .row{flex-wrap:wrap;gap:6px}
+
+  .block{padding:18px 16px}
+  .block h2{font-size:18px;line-height:25px}
+  .block .sub{font-size:14px}
+  /* A title and its key do not share a line here: the key wins the space and
+     the title comes back as a four-line column. */
+  .block .head{flex-wrap:wrap;gap:10px}
+  .block .head > *{min-width:0}
+  .block .head > .legend,.block .head > .keys{width:100%}
+
+  /* Six fields spread edge to edge only reads while they all fit on one line.
+     Once they wrap, the leftovers should sit under the first, not drift to
+     opposite corners. */
+  .ident .row{justify-content:flex-start;gap:20px 36px}
+
+  /* "1 of 5" is one token, not three words to wrap. */
+  .progstrip .lede{flex-wrap:wrap;gap:4px 10px}
+  .progstrip .big{white-space:nowrap}
+
+  /* A question and its answer button do not share a line at this width. */
+  .ask{flex-wrap:wrap}
+  .ask > div{flex:1 1 180px;min-width:0}   /* stays beside the icon; only the button wraps */
+  .ask .go{margin-left:0;width:100%}
+  .ask .go .btn-sm{width:100%;height:36px}
+
+  /* The applications table becomes one block per application: the same move
+     the other tables make, and the reason the columns were chosen to be
+     self-describing in the first place. */
+  .tablecard .head{padding:18px 16px 14px}
+  .toolbar{padding:0 16px 14px}
+  .search{max-width:none;flex:1 1 100%}
+  .chips{flex-wrap:wrap}
+  .count{margin-left:0;width:100%}
+  .athead{display:none}
+  .atr{grid-template-columns:1fr !important;gap:10px;padding:16px}
+  .atrow{min-height:0;border-bottom:1px solid var(--line)}
+  .a-file .bar{max-width:none}
+  .a-go{justify-self:stretch}
+  .a-go .btn-sm{display:block;width:100%;height:36px;line-height:34px;text-align:center}
+
+  /* ---- tables become blocks ---- */
+  .tbl{overflow-x:visible}
+  .thead{display:none}
+  .thead,.tbody{min-width:0}
+  .tbody .tr{grid-template-columns:1fr !important;gap:10px;padding:16px 0;align-items:start}
+  .tbody .tr > :last-child{justify-self:stretch}
+  .tbody .tr .btn-sm{width:100%;height:36px}
+  .o-sub,.b-sub,.f-doc{margin-left:0}
+  /* The bar takes the room the row gained; the number keeps its own. */
+  .prog{width:100%}
+  .prog .bar{flex:1 1 auto;width:auto;min-width:0}
+  .prog .pct{flex:none}
+
+  /* ---- charts and maps get a height a phone can hold ---- */
+  .map{min-height:300px}
+  .chart{height:150px}
+  .vol,.plot,.waffle{min-height:220px}
+  /* Twelve months across a phone: the labels have to step down or they touch. */
+  .xaxis span,.vol .ticks span,.vol .xname{font-size:11px}
+  .waffle .cell{width:16px;height:13px;flex-basis:13px}
+  .graph{padding:0;grid-template-columns:1fr;gap:14px}
+  .graph .wires{display:none}          /* wires between stacked nodes say nothing */
+  .graph .stack{max-width:none}
+  .graph .stack--mid{order:-1}         /* the operator leads, then its counterparties */
+  /* Side by side, position says which way the trade runs. Stacked, it has to
+     be written, or the two groups become one undifferentiated list. */
+  #tUp::before,#tDown::before{font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:-14px}
+  #tUp::before{content:"Upstream"}
+  #tDown::before{content:"Downstream"}
+  .tcard{position:static;width:100%;margin-top:10px;opacity:1;transform:none;pointer-events:auto}
+
+  /* Settings drops its two columns; each one is already a stack. */
+  .canvas--settings{grid-template-columns:1fr !important}
+
+  /* ---- the form ----
+     Stacked, the rail is just the first block on the page: it has the whole
+     column to be as tall as it is, and nothing to stick to. */
+  .sections{position:static;max-height:none;display:block}
+  #seclist{overflow:visible;max-height:none}
+  .sec{padding:12px}
+  .panefoot{flex-wrap:wrap;gap:10px}
+  .panefoot .acts{width:100%}
+  .panefoot .acts .btn{flex:1}
+
+  /* ---- dialogs ---- */
+  .fm,.cm{width:calc(100% - 24px);max-height:88%}
+  .fm-head,.cm-head{padding:16px 16px 12px}
+  .fm-body{padding:4px 16px 8px}
+  .cm-body{padding:14px 16px 4px}
+  .fm-foot,.cm-foot{padding:14px 16px;flex-wrap:wrap;gap:10px}
+  .cm-foot .btn{flex:1}
+  .zone-card,.tcard{width:auto;left:12px !important;right:12px;max-width:none}
+
+  /* Two seats side by side do not fit; they stack. */
+  .seats{grid-template-columns:1fr}
+}
+
+/* Phones proper: the second column of counts goes too, and type steps down. */
+@media (max-width: 640px){
+  /* Counts stay two-up even here: four full-width cards would be 400px of
+     scroll before the page says anything. What gives instead is the row
+     inside the card, which unstacks onto two lines. */
+  .kpis,.state{grid-template-columns:1fr 1fr;gap:12px}
+  .kpi{padding:14px 16px}
+  .kpi .row{flex-wrap:wrap;row-gap:8px}
+  .kpi .val{width:100%}
+  .kpi .spark{width:100%}
+  .kpi .m{width:100%}
+  .cards{grid-template-columns:1fr}
+  /* Two buttons side by side here means two two-line labels. */
+  .card .acts{flex-direction:column}
+  .card .acts .btn{width:100%}
+  .main{padding:0 14px 14px}
+  .stickyhead.is-stuck{margin:0 -14px;padding:0 14px}
+  .ophead .logo{width:40px;height:40px}
+  .opname{font-size:18px}
+  .opaddr{font-size:13px}
+  /* The explainer hangs right of a title that now starts at the card edge. */
+  .info-pop{right:auto;left:-4px;width:min(252px,calc(100vw - 48px))}
+  .seg{width:100%;overflow-x:auto;scrollbar-width:none}
+  .seg::-webkit-scrollbar{display:none}
+  .segb{flex:0 0 auto}
+  .ident .row{gap:16px 24px}
+  .ident .field{min-width:calc(50% - 12px)}
+  .roster .rgrid{grid-template-columns:1fr;gap:6px;padding:0 12px}
+  .roster .rhead{display:none}
+  .roster .rrow{padding:12px}
+  .rdoc{flex-wrap:wrap}
+  .rdel{position:absolute;top:8px;right:8px}
+  .roster .rrow{position:relative}
+  .decide-bar{flex-wrap:wrap}
+  .decide-bar .actions{width:100%}
+  .decide-bar .actions .btn{flex:1}
+  .lede{font-size:26px;line-height:33px}
+}
+
+/* Coarse pointers do not hover; the states that depend on it stop pretending. */
+@media (hover: none){
+  .tbody .tr:hover,.feed .e:hover,.watch .row:hover{background:transparent}
+  .ctip{display:none}
+}

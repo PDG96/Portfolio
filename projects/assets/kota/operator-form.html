@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>KOTA · Your information</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="operator-shell.css?v=1">
+<style>
+/* ==========================================================================
+   KOTA — the operator's own form.
+
+   This is the screen the whole product turns on: the compliance record
+   filled in by the people it describes. The bank reads it as evidence; here
+   it is work, and the two questions a reviewer left are not notifications
+   somewhere else — they sit on the exact answers they are about.
+
+   Layout: sections down the left with their own progress, one section at a
+   time on the right. A long form that shows everything at once is a form
+   nobody finishes.
+   ========================================================================== */
+.canvas{grid-template-columns:300fr 1014fr}
+
+/* ---- the section rail ----
+   Two groups, because the file answers two different questions. KYC is who
+   the organisation is, which a registry can mostly vouch for. Management
+   systems is how it runs its supply chain, which only the organisation can
+   answer. Running them as one flat list of nine hid that, and hid why the
+   second half is the one with work left in it. */
+/* The rail travels with the page while the fields scroll past it. With four
+   sections it simply fitted; with nine plus the file bar it is taller than the
+   window, and a sticky box taller than its viewport does not stick, it just
+   scrolls away. So the column is capped at the height it actually has and the
+   list scrolls inside it, which keeps the file bar and its button on screen at
+   every scroll position. */
+.sections{grid-column:1;align-self:start;position:sticky;top:calc(var(--topbar) + 96px);
+  max-height:calc(100svh - var(--topbar) - 96px - var(--pad));
+  display:flex;flex-direction:column;min-height:0}
+#seclist{min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;scrollbar-color:#3A3C3E transparent}
+/* When the list is taller than the column, the last row fades instead of
+   being cut clean, so it reads as "more below" rather than as the end. */
+#seclist.has-more{-webkit-mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent);
+  mask-image:linear-gradient(to bottom,#000 calc(100% - 28px),transparent)}
+#seclist::-webkit-scrollbar{width:6px}
+#seclist::-webkit-scrollbar-thumb{background:#3A3C3E;border-radius:3px}
+#seclist::-webkit-scrollbar-track{background:transparent}
+.filebar{flex:none}
+.secgroup + .secgroup{margin-top:24px}
+.seclbl{display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+  padding:0 14px 10px;font-size:11px;line-height:15px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--muted)}
+.seclbl b{flex:none;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;
+  color:var(--ink-2)}
+.sec{width:100%;display:flex;align-items:flex-start;gap:12px;padding:14px;border:0;border-radius:10px;
+  background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer;
+  transition:background .15s ease}
+.sec:hover{background:#202122;transition-duration:0s}
+.sec.is-on{background:#26282A}
+.sec .n{width:24px;height:24px;flex:none;border-radius:50%;display:grid;place-items:center;
+  background:#2B2C2D;color:var(--muted);font-size:12px;font-weight:700}
+.sec.is-on .n{background:var(--accent);color:#fff}
+.sec.is-done .n{background:#16311F;color:var(--good-2)}
+.sec .t{display:block;font-size:15px;line-height:20px;font-weight:600;color:var(--ink)}
+.sec .m{display:block;margin-top:3px;font-size:13px;line-height:18px;color:var(--muted)}
+.sec .ask{margin-top:6px;display:inline-flex;align-items:center;gap:5px;font-size:12px;
+  font-weight:600;color:var(--accent)}
+.sec .ask svg{width:12px;height:12px}
+.filebar{margin-top:18px;padding:16px;border-radius:10px;background:#1A1B1C;border:1px solid var(--line)}
+.filebar .t{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:13px;color:var(--muted)}
+.filebar .t b{font-size:15px;color:var(--ink)}
+.filebar .bar{margin-top:8px;height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.filebar .bar i{display:block;height:100%;border-radius:4px;background:var(--accent)}
+.filebar .m{margin-top:10px;font-size:12px;line-height:1.5;color:#5E6062}
+
+/* ---- the fields ---- */
+.pane{grid-column:2}
+.pane .head{align-items:center}
+.fields{display:flex;flex-direction:column;gap:20px}
+.field{display:flex;flex-direction:column}
+.flabel{display:flex;align-items:center;gap:8px;font-size:14px;line-height:20px;color:var(--ink-2)}
+.flabel .req{color:var(--accent)}
+/* One control height across the pane: the input, the Yes/No pair and the two
+   buttons in the footer are all 36, the same height every other control in the
+   product uses. They were 46, 40 and 36, which read as three different scales
+   stacked in one column. */
+.finput{margin-top:8px;width:100%;min-height:36px;padding:6px 14px;border-radius:8px;
+  background:#232425;border:1px solid #343638;color:var(--ink);font:inherit;font-size:15px;
+  line-height:22px;outline:none;transition:border-color .15s ease}
+.finput:focus{border-color:var(--accent)}
+.finput::placeholder{color:#5E6062}
+select.finput{appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,#898B8D 50%),linear-gradient(135deg,#898B8D 50%,transparent 50%);
+  background-position:calc(100% - 17px) 16px,calc(100% - 12px) 16px;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat}
+/* Derived from the registry, so it is shown and not asked. */
+.locked{margin-top:8px;display:flex;align-items:center;gap:9px;min-height:36px;padding:6px 14px;
+  border-radius:8px;background:#1A1B1C;border:1px solid var(--line);font-size:15px;color:var(--ink-2)}
+.locked svg{width:14px;height:14px;flex:none;color:var(--muted)}
+.hint{margin-top:7px;font-size:13px;line-height:19px;color:var(--muted)}
+
+/* A question from a bank, on the answer it is about. This is the one place
+   in the product where the two sides are in the same box. */
+.field--asked:not(.field--resolved) .finput{border-color:#5A3526;background:#231C19}
+/* Answered: the question stays on the page, because the reviewer's words are
+   the reason the field was filled, but it stops asking. */
+.field--resolved .asked{background:#16201A;border-color:#254232}
+.field--resolved .asked .who{color:var(--good-2)}
+.field--resolved .asked .txt{color:var(--muted)}
+.asked .done{display:none}
+.field--resolved .asked .done{margin-top:9px;padding-top:9px;border-top:1px solid #254232;
+  display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:var(--good-2)}
+.asked .done svg{width:13px;height:13px}
+.asked{margin-top:10px;padding:13px 14px;border-radius:8px;background:#1F1A17;border:1px solid #3A2A22}
+.asked .who{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--accent)}
+.asked .who svg{width:13px;height:13px}
+.asked .txt{margin-top:6px;font-size:14px;line-height:20px;color:var(--ink-2)}
+.asked .when{margin-top:6px;font-size:12px;color:var(--muted)}
+
+.choice{margin-top:8px;display:flex;gap:8px}
+/* Yes/No is the smallest answer on the page and was wearing the largest
+   control: at 40px it read as the primary action of the section rather than
+   as a two-word reply. */
+.opt{height:36px;padding:0 16px;border-radius:8px;border:1px solid #343638;background:#232425;
+  color:var(--ink-2);font:inherit;font-size:14px;font-weight:500;cursor:pointer;
+  transition:background .15s ease,border-color .15s ease,color .15s ease}
+.opt:hover{background:#2E3033;transition-duration:0s}
+.opt.picked{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.docs{margin-top:8px;border-radius:8px;border:1px solid var(--line);overflow:hidden}
+.docs .row{display:flex;align-items:center;gap:12px;padding:13px 14px;background:#1A1B1C}
+.docs .row + .row{border-top:1px solid var(--line)}
+.docs .ic{width:30px;height:30px;flex:none;border-radius:7px;display:grid;place-items:center;
+  background:#2B2C2D;color:var(--ink-2)}
+.docs .ic svg{width:15px;height:15px}
+.docs .n{display:block;font-size:14px;color:var(--ink)}
+.docs .s{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+.docs .add{margin-left:auto}
+.docs .empty{padding:16px 14px;background:#1A1B1C;font-size:13px;color:#5E6062}
+/* A document that is asked for and not there yet is still a row: it keeps the
+   shape of the answer, so the gap is visible rather than absent. */
+.docs .ic--off{background:#232425;color:#4A4C4E}
+.docs .none{font-size:14px;color:#5E6062}
+
+/* ---- a roster ----
+   Some answers are a list of people, not a value: the board, and later the
+   suppliers. It is a table because that is what it is, and every cell is
+   edited in place rather than behind a dialog. The inputs are transparent
+   until touched, so five rows read as a list and not as fifteen boxes. */
+.roster{margin-top:8px;border-radius:8px;border:1px solid var(--line);overflow:hidden}
+.rgrid{display:grid;grid-template-columns:minmax(140px,1.3fr) minmax(120px,1fr) minmax(180px,1.5fr) 34px;
+  gap:10px;align-items:center;padding:0 12px}
+.rhead{height:34px;background:#202122;border-bottom:1px solid var(--line);
+  font-size:12px;letter-spacing:.04em;color:var(--muted)}
+.rrow{min-height:46px;padding-top:6px;padding-bottom:6px;background:#1A1B1C}
+.rrow + .rrow{border-top:1px solid var(--line)}
+.rinput{width:100%;min-width:0;height:32px;padding:0 10px;border-radius:6px;
+  border:1px solid transparent;background:transparent;color:var(--ink);font:inherit;
+  font-size:14px;outline:none;transition:background .15s ease,border-color .15s ease}
+.rinput:hover{background:#232425;transition-duration:0s}
+.rinput:focus{background:#232425;border-color:var(--accent)}
+.rinput::placeholder{color:#4A4C4E}
+.rdoc{display:flex;align-items:center;gap:8px;min-width:0}
+.rdoc .f{min-width:0;font-size:13px;color:var(--ink-2);overflow:hidden;
+  text-overflow:ellipsis;white-space:nowrap}
+.rdoc .s{font-size:12px;color:var(--muted);white-space:nowrap}
+.rdoc .btn-sm{margin-left:auto;flex:none}
+/* Smaller than the row's own cross, and next to the file it removes rather
+   than at the end of the row, so the two are never mistaken for each other:
+   one takes off a paper, the other takes off a person. */
+.rx{margin-left:auto;width:22px;height:22px;flex:none;border:0;border-radius:5px;
+  background:transparent;color:#5E6062;display:grid;place-items:center;cursor:pointer;
+  transition:background .15s ease,color .15s ease}
+.rx:hover{background:#2E3033;color:var(--bad-2);transition-duration:0s}
+.rx svg{width:12px;height:12px}
+.rdel{width:28px;height:28px;border:0;border-radius:6px;background:transparent;color:#5E6062;
+  display:grid;place-items:center;cursor:pointer;font-size:18px;line-height:1;
+  transition:background .15s ease,color .15s ease}
+.rdel:hover{background:#2E3033;color:var(--bad-2);transition-duration:0s}
+.rdel svg{width:15px;height:15px}
+.radd{width:100%;height:40px;border:0;border-top:1px solid var(--line);background:#1F2021;
+  color:var(--ink-2);font:inherit;font-size:13px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:background .15s ease,color .15s ease}
+.radd:hover{background:#282A2C;color:var(--ink);transition-duration:0s}
+.radd:disabled{opacity:.4;cursor:not-allowed}
+.radd:disabled:hover{background:#1F2021;color:var(--ink-2)}
+.radd svg{width:14px;height:14px}
+/* With the highlight on, the empty cells are the ones that say so. */
+.field--missing .rinput:placeholder-shown{border-color:#5A4A22;border-style:dashed}
+.field--missing .rdoc .btn-sm{border-color:#5A4A22;border-style:dashed;color:var(--warn-2)}
+
+/* The pane says which half of the file the reader is in, so a section never
+   arrives without its context. */
+.pill--ok{color:var(--good-2)}
+.pill--ok .dot{background:var(--good-2)}
+.pane .eyebrow{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.pane h2{margin-top:5px}
+
+/* ---- show what is missing ----
+   A blank answer is not an error, it is work not done yet, so it gets amber
+   and a dashed edge rather than the red of something wrong. The accent orange
+   stays reserved for a question a bank actually asked: where the two land on
+   the same field, the bank's question wins, because it says more.
+
+   Off by default. A form that shouts about every gap from the first second
+   is a form that reads as a list of failures before anyone has typed. */
+/* It lives under the progress bar, not up in the header: the thing it acts on
+   is the number right above it, and the header is for what you do with the
+   file, not for how you look at it. */
+.gapbtn{margin-top:14px;width:100%;height:34px;display:flex;align-items:center;
+  justify-content:center;padding:0 12px;border-radius:8px;border:1px solid #343638;
+  background:#232425;color:var(--ink-2);font:inherit;font-size:13px;font-weight:600;
+  cursor:pointer;transition:background .15s ease,border-color .15s ease,color .15s ease}
+.gapbtn:hover{background:#2E3033;border-color:#44474A;color:var(--ink);transition-duration:0s}
+.gapbtn:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.gapbtn.is-on{background:#2C2718;border-color:#5A4A22;color:var(--warn-2)}
+.gapbtn.is-on:hover{background:#37301D;border-color:#6B5928;color:var(--warn-2)}
+.gapbtn:disabled{opacity:.45;cursor:default;pointer-events:none}
+.gapbtn .n{margin-left:8px;padding:1px 7px;border-radius:9px;background:rgba(255,255,255,.10);
+  font-size:12px;font-weight:600;line-height:16px}
+.gapbtn.is-on .n{background:rgba(253,176,34,.20)}
+.gapbtn .n[hidden]{display:none}
+
+.field--missing:not(.field--asked) .finput{border-color:#5A4A22;border-style:dashed;background:#221F18}
+.field--missing:not(.field--asked) .opt{border-color:#5A4A22;border-style:dashed}
+.field--missing:not(.field--asked) .docs{border-color:#5A4A22;border-style:dashed}
+.miss{margin-top:8px;display:inline-flex;align-items:center;gap:6px;font-size:12px;
+  font-weight:600;color:var(--warn-2)}
+.miss svg{width:12px;height:12px}
+
+/* The rail answers the next question the button raises: where else. */
+.sec--gap .m{color:var(--warn-2)}
+
+.panefoot{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);
+  display:flex;align-items:center;gap:12px}
+.panefoot .m{font-size:13px;color:var(--muted)}
+.panefoot .acts{margin-left:auto;display:flex;gap:8px}
+
+/* ---- the send dialog ----
+   Sending is the one action on this screen that leaves the building: a
+   reviewer at a bank gets a notification and reads the file as it stands.
+   A toast after the fact tells you what already happened; this asks first,
+   and shows exactly what is about to go, which is the difference between a
+   confirmation and a receipt.
+
+   Same anatomy as the dialogs on the bank's side, so a decision looks like a
+   decision whichever seat you are in. */
+.modal{position:fixed;inset:0;z-index:80;display:none}
+.modal.is-on{display:block}
+.scrim{position:absolute;inset:0;background:rgba(10,11,11,.62);
+  -webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px)}
+.cm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:min(480px,88%);max-height:84%;display:flex;flex-direction:column;
+  background:var(--block);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 24px 48px rgba(0,0,0,.5);overflow:hidden}
+.cm-head{flex:none;display:flex;align-items:flex-start;gap:12px;padding:20px 20px 0}
+.cm-i{width:40px;height:40px;flex:none;border-radius:10px;display:grid;place-items:center;
+  background:#2E2118;color:var(--accent)}
+.cm-i svg{width:20px;height:20px}
+.cm-title{margin:0;font-size:17px;line-height:24px;font-weight:600;color:var(--ink)}
+.cm-sub{margin-top:3px;font-size:13px;line-height:19px;color:var(--muted)}
+.cm-close{margin-left:auto;width:30px;height:30px;flex:none;display:grid;place-items:center;
+  border:0;padding:0;border-radius:6px;background:transparent;color:var(--muted);cursor:pointer}
+.cm-close:hover{background:#34363A;color:var(--ink)}
+.cm-close svg{width:15px;height:15px}
+.cm-body{flex:1;min-height:0;overflow-y:auto;padding:18px 20px 4px;
+  display:flex;flex-direction:column;gap:16px}
+.cm-kv{display:flex;flex-direction:column;gap:9px}
+.cm-kv .r{display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:13px}
+.cm-kv .k{color:var(--muted)}
+.cm-kv .v{color:var(--ink);font-weight:600}
+.cm-kv .v.good{color:var(--good-2)}
+.cm-kv .v.warn{color:var(--warn-2)}
+/* What is actually in the envelope, named. "Your changes" is not a list. */
+.cm-lbl{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.cm-list{margin-top:8px;border-radius:8px;border:1px solid var(--line);overflow:hidden;
+  max-height:172px;overflow-y:auto}
+.cm-list .i{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#1A1B1C;
+  font-size:13px;line-height:18px;color:var(--ink-2)}
+.cm-list .i + .i{border-top:1px solid var(--line)}
+.cm-list .i svg{width:13px;height:13px;flex:none;color:var(--good-2)}
+.cm-list .i .w{margin-left:auto;flex:none;font-size:12px;color:var(--muted)}
+.cm-list .none{padding:14px 12px;background:#1A1B1C;font-size:13px;color:#5E6062}
+.cm-field label{display:block;margin-bottom:6px;font-size:13px;font-weight:500;color:var(--ink-2)}
+.cm-field .input{width:100%;padding:10px 12px;border-radius:8px;background:#232425;
+  border:1px solid #343638;color:var(--ink);font:inherit;font-size:14px;line-height:1.45;
+  outline:none;resize:vertical;min-height:72px}
+.cm-field .input:focus{border-color:var(--accent)}
+.cm-note{margin:0;font-size:12px;line-height:1.5;color:#5E6062}
+.cm-foot{flex:none;display:flex;justify-content:flex-end;gap:8px;padding:18px 20px 20px}
+.cm-foot .btn{width:auto;padding:0 16px}
+
+.toast{position:fixed;left:50%;bottom:26px;z-index:70;display:flex;align-items:center;gap:9px;
+  padding:11px 16px;border-radius:8px;background:#F0F0F0;color:#151617;font-size:13px;font-weight:500;
+  box-shadow:0 12px 24px rgba(0,0,0,.45);transform:translate(-50%,16px);opacity:0;pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease}
+.toast.is-on{opacity:1;transform:translate(-50%,0)}
+.toast svg{width:16px;height:16px}
+</style>
+<link rel="stylesheet" href="motion.css?v=2">
+<link rel="stylesheet" href="responsive.css?v=5">
+<script src="page-transition.js?v=3"></script>
+</head>
+<body>
+<div class="app">
+
+  <nav class="rail" aria-label="Primary" id="rail"></nav>
+
+  <div class="main">
+    <div class="stickyhead" id="stickyhead">
+      <header class="topbar">
+        <a href="operator-home.html">Home</a><span class="sep"></span>
+        <span class="here">Your information</span>
+      </header>
+      <div class="ophead">
+        <div>
+          <div class="opname">Your information
+            <span class="pill" id="askPill"><span class="dot"></span>2 questions open</span>
+          </div>
+          <div class="opaddr">Answer once. Every bank you apply to reads the same file.</div>
+        </div>
+        <div class="headacts">
+          <button class="btn btn--ghost" type="button" id="saveBtn">Save draft</button>
+          <button class="btn btn--primary" type="button" id="sendBtn">Send updates</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas">
+      <div class="sections">
+        <div id="seclist"></div>
+        <div class="filebar">
+          <div class="t"><span>Your file</span><b id="filePct">64%</b></div>
+          <div class="bar"><i id="fileBar" style="width:64%"></i></div>
+          <p class="m" id="fileNote"></p>
+          <button class="gapbtn" type="button" id="gapBtn" aria-pressed="false">
+            <span id="gapLabel">Show what’s missing</span><span class="n" id="gapN">13</span>
+          </button>
+        </div>
+      </div>
+
+      <section class="block pane" id="pane">
+        <div class="head">
+          <div>
+            <div class="eyebrow" id="paneGroup">KYC</div>
+            <h2 id="paneTitle">Identification</h2>
+            <div class="sub" id="paneSub">Who this record is</div>
+          </div>
+          <span class="tag" id="paneTag"></span>
+        </div>
+        <div class="fields" id="fields"></div>
+        <div class="panefoot">
+          <span class="m" id="footNote"></span>
+          <div class="acts">
+            <button class="btn btn--ghost" type="button" id="prevBtn">Back</button>
+            <button class="btn btn--primary" type="button" id="nextBtn">Next section</button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="seatpop" id="seatpop" role="menu" aria-label="Change seat">
+  <div class="lbl">You are viewing as</div>
+  <button type="button" data-seat="operator" role="menuitem">Tulivu Cooperative <span class="r">Operator · current</span></button>
+  <button type="button" data-seat="bank" role="menuitem">Banque Orimu <span class="r">Bank</span></button>
+  <div class="sep"></div>
+  <button type="button" data-seat="start" role="menuitem">Back to the front door</button>
+</div>
+<input type="file" id="filePick" hidden
+       accept=".pdf,.png,.jpg,.jpeg,.csv,.xlsx,.xls,.doc,.docx">
+<!-- What is about to leave the building, before it does. -->
+<div class="modal" id="sendModal" role="dialog" aria-modal="true" aria-labelledby="sendTitle">
+  <div class="scrim" data-close></div>
+  <div class="cm">
+    <div class="cm-head">
+      <span class="cm-i" id="sendIcon"></span>
+      <div>
+        <h3 class="cm-title" id="sendTitle">Send updates to Banque Orimu</h3>
+        <div class="cm-sub">N. Okonkwo is notified and reads the file as it stands</div>
+      </div>
+      <button class="cm-close" type="button" data-close aria-label="Close" id="sendX"></button>
+    </div>
+    <div class="cm-body">
+      <div class="cm-kv" id="sendKv"></div>
+      <div>
+        <div class="cm-lbl">What is going</div>
+        <div class="cm-list" id="sendList"></div>
+      </div>
+      <div class="cm-field">
+        <label for="sendNote">Message to the reviewer <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+        <textarea class="input" id="sendNote" rows="3"
+          placeholder="Anything the reviewer should read alongside the answers"></textarea>
+      </div>
+      <p class="cm-note">Banque Sefali is still a draft and is not sent by this.</p>
+    </div>
+    <div class="cm-foot">
+      <button class="btn btn--ghost" type="button" data-close>Cancel</button>
+      <button class="btn btn--primary" type="button" id="sendGo">Send updates</button>
+    </div>
+  </div>
+</div>
+<div class="ctip" id="ctip" role="status" aria-live="polite"></div>
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+  <span id="toastText"></span>
+</div>
+
+<script src="operator-shell.js?v=1"></script>
+<script>
+/* ==========================================================================
+   The same four sections the bank reads in its read-only view, with the same
+   answers — this file is the source, that one is the copy. The two comments
+   the reviewer left are attached to their fields here, which is the only
+   reason this screen can be answered rather than just filled.
+   ========================================================================== */
+(function(){
+  buildOperatorRail('form');
+
+  var LOCK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M17 11V8A5 5 0 0 0 7 8v3m1 10h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Z"/></svg>';
+  var CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l.9-5.4A8 8 0 1 1 21 12Z"/></svg>';
+  var CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+  var CROSS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" ' +
+    'stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+  var PLUS = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" ' +
+    'stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>';
+  var SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2.5 11 13M21.5 2.5l-6.7 19-3.8-8.5' +
+    'L2.5 9.2l19-6.7Z"/></svg>';
+  var ALERT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/>' +
+    '<path d="M12 8v4.5M12 16h.01"/></svg>';
+  var FILE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M13 2v6a2 2 0 0 0 2 2h6M15 2H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5l-3-3Z"/></svg>';
+
+  /* Two groups. KYC is the half a registry can mostly vouch for; management
+     systems is the half only the organisation can answer, which is why it is
+     the half still being filled in.
+
+     The management-systems sections are the five points of Step 1 of the OECD
+     Due Diligence Guidance for Responsible Supply Chains of Minerals from
+     Conflict-Affected and High-Risk Areas: a policy, an internal structure,
+     controls and traceability, supplier engagement, and a grievance mechanism.
+     That is the framework EU Regulation 2017/821 requires importers to work
+     to, which is why the bank asks an operator for it at all. */
+  var GROUPS = [
+    { id:'kyc', t:'KYC', m:'Who the organisation is' },
+    { id:'ms',  t:'Management systems', m:'How it runs its supply chain' }
+  ];
+
+  var SECTIONS = [
+    { g:0, id:'identification', t:'Identification', m:'Who this record is',
+      note:'Derived from the registry. Nothing here can be edited, and nothing here is asked of you.',
+      fields:[
+        { label:'Country',            value:'Democratic Republic of the Congo', locked:true },
+        { label:'Category',           value:'Civil Society', locked:true },
+        { label:'Subcategory',        value:'Cooperative', locked:true },
+        { label:'Organisation name',  value:'Tulivu Cooperative', req:true },
+        { label:'Registered name',    value:'Tulivu Cooperative SARL', locked:true }
+      ]},
+    { g:0, id:'registration', t:'Registration', m:'The legal footprint',
+      note:'Two answers are holding this section up. Both were asked by Banque Orimu today.',
+      fields:[
+        { label:'Registration date',   value:'12 Mar 2014', req:true },
+        { label:'Registration number', value:'CD/GOM/RCCM/14-B-0921', req:true },
+        { label:'National identification number', value:'01-93-N40100B' },
+        { label:'Tax identification number', value:'', placeholder:'Type the number on the certificate',
+          req:true,
+          ask:{ who:'N. Okonkwo · Banque Orimu', when:'Today',
+                txt:'This answer is blank. Attach the tax certificate so this section can be confirmed.' } },
+        { label:'VAT registration number', value:'', placeholder:'Type your VAT number', req:true,
+          ask:{ who:'N. Okonkwo · Banque Orimu', when:'Today',
+                txt:'A VAT number is mandatory for exporters. Add it before the next review.' } },
+        { label:'Registration certificate', docs:[
+            { n:'Registration certificate · Tulivu Cooperative SARL', s:'PDF · 2014 · 1.2 MB' } ] },
+        { label:'Is the organisation currently active?', choice:['No','Yes'], picked:1 }
+      ]},
+    { g:0, id:'governance', t:'Governance', m:'Structure and oversight',
+      note:'The board is a list, not a document: the bank reads the people, and each one carries their own identity paper.',
+      fields:[
+        { label:'Does the organisation have a management structure?', choice:['No','Yes'], picked:1 },
+        { label:'Is the organisation supervised by a board?', choice:['No','Yes'], picked:1 },
+        /* A roster, not one attachment. A board is several people, each with a
+           name, a role and a paper of their own, and a single PDF called
+           "5 members" made the bank open a file to learn who they are. */
+        { label:'Board members', people:[
+            { n:'J. Kambale',     r:'Chair',      doc:{ n:'ID · J. Kambale',     s:'PDF · 2023 · 240 KB' } },
+            { n:'L. Mwamba',      r:'Vice-chair', doc:{ n:'ID · L. Mwamba',      s:'PDF · 2023 · 236 KB' } },
+            { n:'C. Bahati',      r:'Secretary',  doc:{ n:'ID · C. Bahati',      s:'PDF · 2024 · 251 KB' } },
+            { n:'P. Ndagijimana', r:'Treasurer',  doc:{ n:'ID · P. Ndagijimana', s:'PDF · 2022 · 228 KB' } },
+            { n:'S. Furaha',      r:'Member',     doc:{ n:'ID · S. Furaha',      s:'PDF · 2024 · 244 KB' } }
+          ]}
+      ]},
+    { g:0, id:'scrutiny', t:'Scrutiny', m:'Public track record',
+      note:'Answering No here does not close the question: the bank screens these lists itself.',
+      fields:[
+        { label:'Has the organisation been involved in any significant dispute or litigation?',
+          choice:['No','Yes'], picked:0 },
+        { label:'Is the organisation mentioned on an international watchlist?',
+          choice:['No','Yes'], picked:0 }
+      ]},
+
+    { g:1, id:'policy', t:'Supply chain policy', m:'What the company committed to',
+      note:'The policy is the document every other answer in this half refers back to.',
+      fields:[
+        { label:'Has the organisation adopted a supply chain policy?', choice:['No','Yes'], picked:1 },
+        { label:'Policy document', docs:[
+            { n:'Supply chain policy · Tulivu Cooperative SARL', s:'PDF · 2024 · 780 KB' } ] },
+        { label:'Is the policy aligned with the OECD Due Diligence Guidance?',
+          choice:['No','Yes'], picked:null },
+        { label:'Date the policy was last reviewed', value:'',
+          placeholder:'Type the date of the last review', req:true }
+      ]},
+
+    { g:1, id:'structure', t:'Internal structure', m:'Who runs due diligence',
+      note:'A named person, not a department: the bank needs someone to write to.',
+      fields:[
+        { label:'Is there a named person responsible for supply chain due diligence?',
+          choice:['No','Yes'], picked:1 },
+        { label:'Name of the responsible person', value:'A. Byamungu', req:true },
+        { label:'Role in the organisation', value:'', placeholder:'Type their role', req:true },
+        { label:'Does the team receive training on the policy?', choice:['No','Yes'], picked:null }
+      ]},
+
+    { g:1, id:'custody', t:'Chain of custody', m:'What is recorded for each lot',
+      note:'The OECD guidance asks for these records to be kept for at least five years.',
+      fields:[
+        { label:'Is each lot recorded from the mine site to the point of sale?',
+          choice:['No','Yes'], picked:1 },
+        { label:'What identifies a lot?', value:'Tag number issued at the mine site', req:true },
+        { label:'Are the records kept for at least five years?', choice:['No','Yes'], picked:null },
+        { label:'Lot register, last 12 months', docs:[] }
+      ]},
+
+    { g:1, id:'suppliers', t:'Supplier engagement', m:'How the upstream is managed',
+      note:'This is the section Banque Orimu reads next, once the two questions above are answered.',
+      fields:[
+        { label:'How many direct suppliers does the organisation buy from?', value:'',
+          placeholder:'Type the number', req:true },
+        { label:'Do supplier contracts include the supply chain policy?',
+          choice:['No','Yes'], picked:1 },
+        /* The same table the board uses, with its own column names. The three
+           names are the upstream counterparties the bank already reads in the
+           trade graph, so the two screens describe one set of relationships
+           rather than two unrelated lists. The contracts are missing on
+           purpose: this half of the file is where the work is left. */
+        { label:'List of direct suppliers',
+          cols:['Supplier', 'What they supply', 'Signed contract'],
+          ph:['Supplier name', 'Mineral or service'],
+          add:'Add a supplier',
+          people:[
+            { n:'Amani Bethem', r:'Coltan ore',        doc:null },
+            { n:'Matoro',       r:'Coltan ore',        doc:null },
+            { n:'Mweka',        r:'Transport to Goma', doc:null }
+          ]},
+        { label:'Are suppliers screened before the first purchase?', choice:['No','Yes'], picked:null }
+      ]},
+
+    { g:1, id:'grievance', t:'Grievance mechanism', m:'How a concern gets raised',
+      note:'A mechanism with no way in is not a mechanism, which is why the second answer matters.',
+      fields:[
+        { label:'Is there a way for workers and communities to raise a concern?',
+          choice:['No','Yes'], picked:1 },
+        { label:'How is a concern received?', value:'',
+          placeholder:'In person, by phone, in writing' },
+        { label:'Is the person raising it protected from retaliation?',
+          choice:['No','Yes'], picked:null }
+      ]}
+  ];
+
+  /* Counts are read off the fields, never written down beside them. A number
+     typed next to the data it describes is a number that drifts the first
+     time a field is added. */
+  function canAdd(f){
+    if (!f.people || !f.people.length) return true;
+    var last = f.people[f.people.length - 1];
+    return String(last.n || '').trim() !== '';
+  }
+  function syncAdd(el, f){
+    var b = el.querySelector('[data-add]');
+    if (!b) return;
+    var ok = canAdd(f);
+    b.disabled = !ok;
+    b.title = ok ? '' : 'Name the last member before adding another';
+  }
+
+  function whole(p){
+    return String(p.n || '').trim() !== '' && String(p.r || '').trim() !== '' && !!p.doc;
+  }
+  function isAnswered(f){
+    if (f.locked) return true;
+    if (f.choice) return typeof f.picked === 'number';
+    if (f.docs)   return f.docs.length > 0;
+    /* One half-filled row leaves the whole list unanswered: a board with a
+       name and no paper is not a board the bank can check. */
+    if (f.people)  return f.people.length > 0 && f.people.every(whole);
+    return String(f.value || '').trim() !== '';
+  }
+  function recount(){
+    SECTIONS.forEach(function(s){
+      s.total = s.fields.length;
+      s.done  = s.fields.filter(isAnswered).length;
+      /* A question is open while the answer under it is blank. Give the
+         answer and it is resolved, here and in every count that quotes it. */
+      s.asked = s.fields.filter(function(f){ return f.ask && !isAnswered(f); }).length;
+    });
+  }
+  recount();
+
+  function tally(list){
+    return list.reduce(function(a, s){
+      a.done += s.done; a.total += s.total; return a;
+    }, { done:0, total:0 });
+  }
+
+  var current = 1;   /* opens on Registration: it is where the questions are */
+  var showGaps = false;
+
+  function secButton(s, i){
+    var done = s.done === s.total;
+    return '<button class="sec' + (i === current ? ' is-on' : '') + (done && !s.asked ? ' is-done' : '') +
+      (showGaps && !done ? ' sec--gap' : '') +
+      '" type="button" data-sec="' + i + '">' +
+      '<span class="n">' + (done && !s.asked ? '✓' : (i + 1)) + '</span>' +
+      '<span><span class="t">' + s.t + '</span>' +
+      '<span class="m">' + s.done + ' of ' + s.total + ' answered</span>' +
+      (s.asked ? '<span class="ask">' + CHAT + 'Banque Orimu asked ' + s.asked + '</span>' : '') +
+      '</span></button>';
+  }
+
+  function drawSections(){
+    document.getElementById('seclist').innerHTML = GROUPS.map(function(g, gi){
+      var mine = SECTIONS.filter(function(s){ return s.g === gi; });
+      var n = tally(mine);
+      /* The group heading carries its own count, so each half can be read as
+         finished or not without adding up four rows by eye. */
+      return '<div class="secgroup">' +
+        '<div class="seclbl">' + g.t + '<b>' + n.done + ' of ' + n.total + '</b></div>' +
+        mine.map(function(s){ return secButton(s, SECTIONS.indexOf(s)); }).join('') +
+        '</div>';
+    }).join('');
+    [].forEach.call(document.querySelectorAll('[data-sec]'), function(b){
+      b.addEventListener('click', function(){ current = +b.getAttribute('data-sec'); draw(); });
+    });
+    fadeList();
+  }
+
+  /* The fade belongs to the state, not to the stylesheet: it is only true
+     while there is something below the fold, and it lifts at the bottom. */
+  function fadeList(){
+    var el = document.getElementById('seclist');
+    var more = el.scrollHeight - el.clientHeight - el.scrollTop > 4;
+    el.classList.toggle('has-more', more);
+  }
+  document.getElementById('seclist').addEventListener('scroll', fadeList);
+  addEventListener('resize', fadeList);
+
+  /* The tag beside the section title, kept out of drawPane so answering a
+     field can refresh it without the fields being rebuilt underneath the
+     cursor. */
+  function drawTag(){
+    var s = SECTIONS[current], tag = document.getElementById('paneTag');
+    tag.className = 'tag tag--' + (s.asked ? 'now' : (s.done === s.total ? 'ok' : 'none'));
+    tag.innerHTML = '<span class="dot"></span>' +
+      (s.asked ? s.asked + ' from the bank'
+               : (s.done === s.total ? 'Complete' : s.done + ' of ' + s.total));
+  }
+
+  /* The pill in the header is the same count as the rail, from the top of the
+     page: once nothing is open it stops asking and points at the next move. */
+  function drawPill(){
+    var open = SECTIONS.reduce(function(a, s){ return a + s.asked; }, 0);
+    var pill = document.getElementById('askPill');
+    pill.classList.toggle('pill--ok', open === 0);
+    pill.innerHTML = '<span class="dot"></span>' +
+      (open === 0 ? 'Questions answered · send your updates'
+                  : open + ' question' + (open > 1 ? 's' : '') + ' open');
+  }
+
+  /* The bar under the rail is the whole file, both halves together. */
+  function drawFile(){
+    var n = tally(SECTIONS), pct = Math.round(n.done / n.total * 100);
+    document.getElementById('filePct').textContent = pct + '%';
+    document.getElementById('fileBar').style.width = pct + '%';
+    document.getElementById('fileNote').textContent =
+      'You have answered ' + n.done + ' of ' + n.total +
+      '. KYC is what opens a review; management systems is where the work is left.';
+  }
+
+  /* ---- attaching ---- */
+  var picker = document.getElementById('filePick'), pending = null;
+
+  function sizeOf(bytes){
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+
+  picker.addEventListener('change', function(){
+    var file = picker.files && picker.files[0];
+    if (!file || !pending) return;
+    var ext = (file.name.split('.').pop() || '').toUpperCase();
+    var doc = {
+      n: file.name,
+      s: [ext, new Date(file.lastModified).getFullYear(), sizeOf(file.size)].join(' · ')
+    };
+    if (pending.person) pending.person.doc = doc;
+    else pending.field.docs = [doc];
+    pending.field.touched = true;
+    pending = null;
+    recount();
+    draw();
+    say('Attached in this browser · the prototype has nowhere to upload it');
+  });
+
+  /* Answering a field clears its own mark without redrawing the pane, which
+     would take the cursor out of the input mid-sentence. */
+  function settle(el, f){
+    f.touched = true;
+    var done = isAnswered(f);
+    if (f.ask) el.classList.toggle('field--resolved', done);
+    el.classList.toggle('field--missing', showGaps && !done);
+    var miss = el.querySelector('.miss');
+    if (done && miss) miss.remove();
+    else if (!done && showGaps && !miss && !f.ask)
+      el.insertAdjacentHTML('beforeend', '<span class="miss">' + ALERT + 'Not answered yet</span>');
+    recount();
+    drawSections();
+    drawFile();
+    drawGapBtn();
+    drawPill();
+    drawTag();
+  }
+
+  function drawPane(){
+    var s = SECTIONS[current];
+    document.getElementById('paneGroup').textContent = GROUPS[s.g].t;
+    document.getElementById('paneTitle').textContent = s.t;
+    document.getElementById('paneSub').textContent = s.m;
+    drawTag();
+    document.getElementById('footNote').textContent = s.note;
+
+    document.getElementById('fields').innerHTML = s.fields.map(function(f){
+      var body;
+      if (f.locked){
+        body = '<div class="locked">' + LOCK + f.value + '</div>' +
+               '<p class="hint">From the national registry. Ask your registrar to change it.</p>';
+      } else if (f.choice){
+        body = '<div class="choice">' + f.choice.map(function(o, i){
+          return '<button class="opt' + (i === f.picked ? ' picked' : '') + '" type="button">' + o + '</button>';
+        }).join('') + '</div>';
+      } else if (f.people){
+        /* The same table serves a board and a supplier list: only the column
+           names change, so neither borrows the other's vocabulary. */
+        var C = f.cols || ['Name', 'Role', 'Identity document'],
+            P = f.ph   || ['Full name', 'Role on the board'],
+            ADD = f.add || 'Add a member';
+        body = '<div class="roster">' +
+          '<div class="rgrid rhead"><span>' + C[0] + '</span><span>' + C[1] + '</span>' +
+            '<span>' + C[2] + '</span><span></span></div>' +
+          f.people.map(function(p, i){
+            return '<div class="rgrid rrow" data-p="' + i + '">' +
+              '<input class="rinput" data-k="n" value="' + (p.n || '') + '" placeholder="' + P[0] + '">' +
+              '<input class="rinput" data-k="r" value="' + (p.r || '') + '" placeholder="' + P[1] + '">' +
+              /* Empty, the cell is the invitation: a new member arrives with nothing
+                 attached, so the cell says what to do rather than offering to
+                 replace something that is not there. Filled, the paper is the
+                 content and the only control it needs is a way to take it off. */
+              '<span class="rdoc">' +
+                (p.doc ? '<span class="f">' + p.doc.n + '</span><span class="s">' + p.doc.s + '</span>' +
+                         '<button class="rx" type="button" data-docdel ' +
+                           'aria-label="Remove ' + p.doc.n + '">' + CROSS + '</button>'
+                       : '<button class="btn-sm" type="button" data-doc>Upload document</button>') +
+              '</span>' +
+              '<button class="rdel" type="button" data-del aria-label="Remove ' +
+                (p.n || 'this row') + '">' + CROSS + '</button>' +
+              '</div>';
+          }).join('') +
+          /* A second empty row before the first one has a name is a list that
+             looks longer than it is, and nothing to attach a paper to. */
+          '<button class="radd" type="button" data-add' + (canAdd(f) ? '' : ' disabled') +
+            ' title="' + (canAdd(f) ? '' : 'Name the last member before adding another') + '">' +
+            PLUS + ADD + '</button>' +
+          '</div>';
+      } else if (f.docs && !f.docs.length){
+        body = '<div class="docs"><div class="row">' +
+          '<span class="ic ic--off">' + FILE + '</span>' +
+          '<span class="none">Nothing attached yet</span>' +
+          '<button class="btn-sm add" type="button">Attach</button></div></div>';
+      } else if (f.docs){
+        body = '<div class="docs">' + f.docs.map(function(d){
+          return '<div class="row"><span class="ic">' + FILE + '</span>' +
+            '<span><span class="n">' + d.n + '</span><span class="s">' + d.s + '</span></span>' +
+            '<button class="btn-sm add" type="button">Replace</button></div>';
+        }).join('') + '</div>';
+      } else {
+        body = '<input class="finput" value="' + f.value + '"' +
+               (f.placeholder ? ' placeholder="' + f.placeholder + '"' : '') + '>';
+      }
+      var gap = showGaps && !isAnswered(f);
+      var solved = f.ask && isAnswered(f);
+      return '<div class="field' + (f.ask ? ' field--asked' : '') +
+        (solved ? ' field--resolved' : '') + (gap ? ' field--missing' : '') +
+        '" data-f="' + s.fields.indexOf(f) + '">' +
+        '<label class="flabel">' + f.label + (f.req ? '<span class="req">*</span>' : '') + '</label>' +
+        body +
+        /* Only where the bank has not already said it: two notices on one
+           field is one notice too many. */
+        (gap && !f.ask ? '<span class="miss">' + ALERT + 'Not answered yet</span>' : '') +
+        (f.ask ? '<div class="asked"><div class="who">' + CHAT + f.ask.who + '</div>' +
+                 '<div class="txt">' + f.ask.txt + '</div>' +
+                 '<div class="when">' + f.ask.when + '</div>' +
+                 '<div class="done">' + CHECK +
+                   'Answered · goes back to Banque Orimu with your next update</div>' +
+                 '</div>' : '') +
+        '</div>';
+    }).join('');
+
+    /* Answers land back in the data, so the counts beside them are live: the
+       rail, the group tallies and the bar all move as the form is filled. */
+    [].forEach.call(document.querySelectorAll('#fields .field'), function(el){
+      var f = s.fields[+el.getAttribute('data-f')];
+
+      [].forEach.call(el.querySelectorAll('.choice .opt'), function(o, i){
+        o.addEventListener('click', function(){
+          [].forEach.call(el.querySelectorAll('.choice .opt'), function(x){ x.classList.remove('picked'); });
+          o.classList.add('picked');
+          f.picked = i;
+          settle(el, f);
+        });
+      });
+
+      var input = el.querySelector('.finput');
+      if (input) input.addEventListener('input', function(){
+        f.value = input.value;
+        settle(el, f);
+      });
+
+      /* One roster row is one person: the cells write straight back, the cross
+         removes, and the last button adds an empty row that the counts
+         immediately register as unanswered. */
+      [].forEach.call(el.querySelectorAll('.rrow'), function(row){
+        var person = f.people[+row.getAttribute('data-p')];
+        [].forEach.call(row.querySelectorAll('.rinput'), function(inp){
+          inp.addEventListener('input', function(){
+            person[inp.getAttribute('data-k')] = inp.value;
+            settle(el, f);
+            /* The add button unlocks as the name is typed, without redrawing
+               the pane under the cursor. */
+            syncAdd(el, f);
+          });
+        });
+        var doc = row.querySelector('[data-doc]');
+        if (doc) doc.addEventListener('click', function(){
+          pending = { person:person, field:f };
+          picker.value = '';
+          picker.click();
+        });
+        var docdel = row.querySelector('[data-docdel]');
+        if (docdel) docdel.addEventListener('click', function(){
+          person.doc = null;
+          recount(); draw();
+        });
+        var del = row.querySelector('[data-del]');
+        if (del) del.addEventListener('click', function(){
+          f.people.splice(f.people.indexOf(person), 1);
+          recount(); draw();
+        });
+      });
+      var add = el.querySelector('[data-add]');
+      if (add) add.addEventListener('click', function(){
+        if (!canAdd(f)) return;
+        f.people.push({ n:'', r:'', doc:null });
+        recount(); draw();
+        /* The new row is the one you came for, so it takes the cursor. */
+        var rows = document.querySelectorAll('#fields .rrow');
+        var last = rows[rows.length - 1];
+        if (last) last.querySelector('.rinput').focus();
+      });
+
+      /* Attach and Replace open the real picker. The file never leaves the
+         browser, which is the honest limit of a prototype, but the row that
+         comes back is the actual name, type, year and size of what was
+         chosen, and the counts move with it. A button that says Attach and
+         does nothing is worse than no button. */
+      [].forEach.call(el.querySelectorAll('.docs .add'), function(b){
+        b.addEventListener('click', function(){
+          pending = { field:f };
+          picker.value = '';
+          picker.click();
+        });
+      });
+    });
+
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').textContent =
+      current === SECTIONS.length - 1 ? 'Back to the top' : 'Next section';
+  }
+
+/* ---- show what is missing ----
+     A toggle, not a jump-to-next: with nine sections the reader wants the whole
+     shape of what is left, not a guided tour of it one field at a time.
+
+     Turning it on from a finished section would look like a broken button, so
+     it lands the reader on the first section that actually has a gap. */
+  function drawGapBtn(){
+    var n = tally(SECTIONS), left = n.total - n.done;
+    var btn = document.getElementById('gapBtn'),
+        num = document.getElementById('gapN');
+    /* Nothing left to point at: the button has done its job and says so
+       rather than sitting there offering to highlight nothing. */
+    btn.disabled = left === 0;
+    num.hidden = left === 0;
+    num.textContent = left;
+    document.getElementById('gapLabel').textContent =
+      left === 0 ? 'Nothing left to answer'
+                 : (showGaps ? 'Hide what\u2019s missing' : 'Show what\u2019s missing');
+    btn.classList.toggle('is-on', showGaps && left > 0);
+    btn.setAttribute('aria-pressed', showGaps && left > 0 ? 'true' : 'false');
+  }
+
+  document.getElementById('gapBtn').addEventListener('click', function(){
+    showGaps = !showGaps;
+    if (showGaps && SECTIONS[current].done === SECTIONS[current].total){
+      for (var i = 0; i < SECTIONS.length; i++){
+        if (SECTIONS[i].done < SECTIONS[i].total){ current = i; break; }
+      }
+    }
+    draw();
+  });
+
+  function draw(){
+    drawSections(); drawPane(); drawFile(); drawGapBtn(); drawPill();
+    window.scrollTo({ top:0 });
+  }
+  draw();
+
+  document.getElementById('prevBtn').addEventListener('click', function(){
+    if (current > 0){ current--; draw(); }
+  });
+  document.getElementById('nextBtn').addEventListener('click', function(){
+    current = (current + 1) % SECTIONS.length; draw();
+  });
+
+  /* Saving is the only thing on this screen that pretends: the prototype has
+     nowhere to put the answer, so it says so by only confirming the action. */
+  var toast = document.getElementById('toast'), toastText = document.getElementById('toastText'), t;
+  function say(msg){
+    toastText.textContent = msg;
+    toast.classList.add('is-on');
+    clearTimeout(t);
+    t = setTimeout(function(){ toast.classList.remove('is-on'); }, 3600);
+  }
+  document.getElementById('saveBtn').addEventListener('click', function(){ say('Draft saved'); });
+
+  /* ---- sending ----
+     Sending is the one action here that leaves the building, so it asks
+     first. And it asks with the actual envelope: what changed in this
+     session, and which of the bank's questions it closes. A dialog that only
+     says "are you sure" adds a click and no information. */
+  var modal = document.getElementById('sendModal');
+
+  function changed(){
+    var out = [];
+    SECTIONS.forEach(function(sec){
+      sec.fields.forEach(function(f){
+        if (f.touched) out.push({ s:sec.t, f:f.label, ask:!!f.ask });
+      });
+    });
+    return out;
+  }
+
+  document.getElementById('sendX').innerHTML = CROSS;
+
+  function openSend(){
+    var list = changed(),
+        open = SECTIONS.reduce(function(a, x){ return a + x.asked; }, 0),
+        closed = list.filter(function(i){ return i.ask; }).length,
+        n = tally(SECTIONS);
+
+    document.getElementById('sendIcon').innerHTML = SEND;
+    document.getElementById('sendKv').innerHTML =
+      '<div class="r"><span class="k">Answers changed now</span>' +
+        '<span class="v">' + list.length + '</span></div>' +
+      '<div class="r"><span class="k">Questions this closes</span>' +
+        '<span class="v' + (closed ? ' good' : '') + '">' + closed + ' of ' + (closed + open) + '</span></div>' +
+      '<div class="r"><span class="k">File after sending</span>' +
+        '<span class="v">' + Math.round(n.done / n.total * 100) + '% · ' +
+        n.done + ' of ' + n.total + '</span></div>';
+
+    document.getElementById('sendList').innerHTML = list.length
+      ? list.map(function(i){
+          return '<div class="i">' + CHECK + i.f +
+            '<span class="w">' + i.s + '</span></div>';
+        }).join('')
+      : '<div class="none">Nothing has changed since your last update. ' +
+        'Sending now tells the reviewer the file is ready as it stands.</div>';
+
+    document.getElementById('sendGo').textContent =
+      list.length ? 'Send ' + list.length + ' update' + (list.length > 1 ? 's' : '')
+                  : 'Send anyway';
+
+    modal.classList.add('is-on');
+    document.getElementById('sendNote').focus();
+  }
+
+  function closeSend(){ modal.classList.remove('is-on'); }
+
+  document.getElementById('sendBtn').addEventListener('click', openSend);
+  [].forEach.call(modal.querySelectorAll('[data-close]'), function(b){
+    b.addEventListener('click', closeSend);
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && modal.classList.contains('is-on')) closeSend();
+  });
+  document.getElementById('sendGo').addEventListener('click', function(){
+    var n = changed().length;
+    closeSend();
+    /* Sent is sent: what went stops counting as a pending change. */
+    SECTIONS.forEach(function(sec){ sec.fields.forEach(function(f){ f.touched = false; }); });
+    say(n ? n + ' update' + (n > 1 ? 's' : '') + ' sent to Banque Orimu · the reviewer is notified'
+          : 'Banque Orimu is notified that the file is ready as it stands');
+  });
+
+})();
+</script>
+<script src="motion.js?v=1"></script>
+</body>
+</html>

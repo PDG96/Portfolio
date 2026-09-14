@@ -10,6 +10,9 @@
  <link rel="alternate icon" type="image/png" href="favicon.svg">
  <link rel="apple-touch-icon" href="favicon.svg">
 
+ <link rel="preload" href="assets/fonts/TWKLausanne-300.woff2" as="font" type="font/woff2" crossorigin>
+ <link rel="preload" href="assets/fonts/TWKLausanne-300Italic.woff2" as="font" type="font/woff2" crossorigin>
+ <link rel="preload" href="assets/fonts/TWKLausanne-400.woff2" as="font" type="font/woff2" crossorigin>
  <link rel="stylesheet" href="assets/fonts/lausanne.css">
 
  <!-- Stamped before first paint so a light-theme reload doesn't flash dark.
@@ -56,8 +59,8 @@
  --accent-blue: #c5e9ff;
  --accent-pink: #eee1ea;
 
- --font: 'TWKLausanne', system-ui, sans-serif;
- --mono: 'TWKLausanne', system-ui, sans-serif;
+ --font: 'TWKLausanne', 'TWKLausanne Fallback', system-ui, sans-serif;
+ --mono: 'TWKLausanne', 'TWKLausanne Fallback', system-ui, sans-serif;
  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
  /* Dot color for the hero canvas, read by the animation at draw time. */
@@ -270,8 +273,9 @@
  .nav {
  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
  background: transparent;
- backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
- transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease);
+ backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+ -webkit-backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+ transition: background 0.4s var(--ease), box-shadow 0.4s var(--ease), backdrop-filter 0.4s var(--ease);
  }
  .nav.over-dark .nav-logo { color: var(--gray-true-25); }
  .nav.over-dark .nav-links a { color: rgba(252,252,252,0.7); }
@@ -281,12 +285,14 @@
  .nav.over-dark .theme-btn.active { background: var(--gray-true-25); color: var(--gray-true-900); }
  .nav.over-dark .nav-toggle span { background: var(--gray-true-25); }
  .nav.scrolled {
- background: rgba(252,252,252,0.85);
+ background: rgba(252,252,252,0.72);
  box-shadow: 0 1px 0 var(--border);
  }
  .nav.scrolled.over-dark {
- background: rgba(20,20,20,0.75);
- box-shadow: 0 1px 0 rgba(252,252,252,0.08);
+ background: rgba(20,20,20,0.55);
+ backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+ -webkit-backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+ box-shadow: 0 1px 0 rgba(255,255,255,0.14);
  }
 
  .nav-inner {
@@ -578,9 +584,10 @@
  .case-thumb-overlay {
  position: absolute;
  inset: 0;
- background: rgba(12, 14, 13, 0.62);
- backdrop-filter: blur(1.5px);
- -webkit-backdrop-filter: blur(1.5px);
+ border-radius: 12px;
+ background: rgba(14, 14, 12, 0.5);
+ backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+ -webkit-backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
  display: flex;
  align-items: center;
  justify-content: center;
@@ -651,6 +658,35 @@
  object-fit: cover;
  display: block;
  }
+
+ /* Hover reveal: the whole image frosts, the copy that's already in the
+    i18n dict (tag/title/description/link) sits low over it. Same glass
+    recipe as the nav and the embed-hint. */
+ .case-panel {
+ position: absolute; inset: 0; z-index: 2; border-radius: 12px;
+ display: flex; flex-direction: column; justify-content: flex-end;
+ padding: clamp(1rem, 2cqi, 1.5rem);
+ background: rgba(20, 20, 18, 0.46);
+ backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+ -webkit-backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+ opacity: 0;
+ transition: opacity 0.4s var(--ease);
+ }
+ .case-card:hover .case-panel, .case-card-link:focus-visible .case-panel { opacity: 1; }
+ .case-panel .cp-tag {
+ display: inline-flex; align-self: flex-start;
+ font-family: var(--mono); font-size: 0.625rem; font-weight: 600;
+ letter-spacing: 0.1em; text-transform: uppercase; color: #fff;
+ background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.24);
+ border-radius: 999px; padding: 3px 10px; margin-bottom: 10px;
+ }
+ .case-panel .cp-title { font-size: clamp(0.95rem, 1.4cqi, 1.15rem); font-weight: 500; color: #fff; margin: 0 0 4px; line-height: 1.3; }
+ .case-panel .cp-title b { font-weight: 600; }
+ .case-panel .cp-desc {
+ font-size: 0.8rem; color: rgba(255,255,255,0.72); line-height: 1.5; margin: 0 0 10px;
+ display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+ }
+ .case-panel .cp-link { font-size: 0.8rem; font-weight: 500; color: var(--accent-yellow); display: inline-flex; align-items: center; gap: 5px; }
 
  /* Abstract placeholder shapes */
  .case-shape {
@@ -768,14 +804,21 @@
  .connect {
  /* Matches the Work grid up to 1440, then stops (a single column of prose
     does not want to grow past what was signed off there). cqi units size
-    everything against this block's own width. */
+    everything against this block's own width.
+
+    The cap is deliberate; being pinned to the left of it was not. Past 1440
+    the wrap keeps growing and the block does not, so without the auto margins
+    the whole section drifted off the page's axis while Work and About stayed
+    on it: 300px of dead air on one side at 1740. */
  width: min(100%, 86rem);
+ margin-inline: auto;
  container-type: inline-size;
  display: grid;
  grid-template-columns: 1fr;
- gap: clamp(2.5rem, 5cqi, 5rem);
- align-items: end;
+ gap: 0 clamp(2.5rem, 5cqi, 5rem);
+ align-items: start;
  }
+ .connect-head { grid-column: 1 / -1; }
  @media (min-width: 900px) {
  .connect { grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); }
  }
@@ -822,9 +865,9 @@
  align-items: baseline;
  gap: 0.35em;
  align-self: flex-start;
- font-size: clamp(1.25rem, 1.9cqi, 2.15rem);
+ font-size: clamp(1.0625rem, 1.35cqi, 1.6rem);
  font-weight: 400;
- letter-spacing: -0.02em;
+ letter-spacing: normal;
  line-height: 1.15;
  color: var(--text);
  text-decoration: none;
@@ -846,7 +889,9 @@
  list-style: none;
  margin: 0;
  padding: 0;
- border-top: 1px solid var(--border);
+ }
+ .connect-list li:last-child .connect-row {
+ border-bottom: 0;
  }
  .connect-row {
  display: grid;
@@ -1113,6 +1158,12 @@
  <article class="case-card r">
  <div class="case-thumb case-thumb--hero">
  <img src="projects/assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI Shipments view on a tablet held in two hands, over a warm gold gradient backdrop">
+ <div class="case-panel">
+ <span class="cp-tag" data-i18n="c2_tag">Responsible Sourcing</span>
+ <p class="cp-title" data-i18n="c2_t">WAZI, Digital gold ecosystem</p>
+ <p class="cp-desc" data-i18n="c2_d">Trust and transparency for artisanal gold mining, a shared evidence base built with sovereignty by design.</p>
+ <span class="cp-link"><span data-i18n="c2_l">Read case study</span><span aria-hidden="true">&nbsp;&#8599;</span></span>
+ </div>
  </div>
  </article>
  </a>
@@ -1121,6 +1172,12 @@
  <article class="case-card r">
  <div class="case-thumb case-thumb--hero">
  <img src="projects/assets/straatos-hero.jpg" alt="Straatos, Saloum Delta mangrove restoration project">
+ <div class="case-panel">
+ <span class="cp-tag" data-i18n="c1_tag">Carbon Tech</span>
+ <p class="cp-title" data-i18n="c1_t">Straatos, Climate action infrastructure</p>
+ <p class="cp-desc" data-i18n="c1_d">The single platform for carbon project developers, from plot registration to Verra submission, adapted to each stage.</p>
+ <span class="cp-link"><span data-i18n="c1_l">Read case study</span><span aria-hidden="true">&nbsp;&#8599;</span></span>
+ </div>
  </div>
  </article>
  </a>
@@ -1128,7 +1185,7 @@
  <div class="case-card-link case-card-link--soon" aria-disabled="true">
  <article class="case-card case-card--soon r">
  <div class="case-thumb case-thumb--hero case-thumb--kota">
- <img src="projects/assets/kota-cover.jpg" alt="Kota, Counterparty due-diligence infrastructure. Coming soon">
+ <img src="projects/assets/kota-cover.jpg?v=3" alt="Kota, Counterparty due-diligence infrastructure. Coming soon">
  <span class="case-thumb-overlay"><span data-i18n="c4_overlay">Coming soon</span></span>
  </div>
  </article>
@@ -1138,6 +1195,12 @@
  <article class="case-card r">
  <div class="case-thumb case-thumb--hero">
  <img src="projects/assets/supply-chain/card.jpg" alt="Supply chain flow map on a laptop, the cobalt route from artisanal mine sites in the DRC up through refiners and cathode makers to the battery pack manufacturer">
+ <div class="case-panel">
+ <span class="cp-tag" data-i18n="c5_tag">Supply Chain Due Diligence</span>
+ <p class="cp-title" data-i18n="c5_t">Continuous due diligence for commodity supply chains</p>
+ <p class="cp-desc" data-i18n="c5_d">Supplier assessment as a living graph, ESG risk, audit performance and watchlist screening in one workspace.</p>
+ <span class="cp-link"><span data-i18n="c5_l">Read case study</span><span aria-hidden="true">&nbsp;&#8599;</span></span>
+ </div>
  </div>
  </article>
  </a>
@@ -1150,9 +1213,11 @@
  <section class="contact view" id="contact">
  <div class="wrap">
  <div class="connect">
- <div class="connect-main">
+ <div class="connect-head">
  <span class="connect-eyebrow r" data-i18n="connect_eyebrow">Get in touch</span>
  <h2 class="r" data-i18n="connect_h">Let's connect.</h2>
+ </div>
+ <div class="connect-main">
  <p class="r" data-i18n="connect_p1">I'm Pietra, a Senior Product Designer with 5+ years turning complex B2B SaaS (dense workflows, data-heavy interfaces, regulated domains) into products people find intuitive.</p>
  <p class="r" data-i18n="connect_p2">Climate tech, fintech and enterprise platforms, working with product and engineering from discovery to implementation.</p>
  <div class="connect-ask r">
@@ -1162,6 +1227,10 @@
  </div>
 
  <ul class="connect-list r-stagger">
+ <li class="r"><a class="connect-row" href="mailto:pietragottardo@gmail.com">
+ <span class="connect-row-l" data-i18n="fact_mail_l">Email</span>
+ <span class="connect-row-v">pietragottardo@gmail.com</span>
+ <span class="connect-row-a" aria-hidden="true">&#8599;</span></a></li>
  <li class="r"><div class="connect-row connect-row--static">
  <span class="connect-row-l" data-i18n="fact_based_l">Based</span>
  <span class="connect-row-v" data-i18n="fact_based_v">Remote · LATAM &amp; EU timezones</span></div></li>
@@ -1639,5 +1708,6 @@
 
  </script>
 
+<script defer src="https://cloud.umami.is/script.js" data-website-id="fb0010c7-011d-4984-8c5a-075500cf715c" data-domains="pietragottardo.com"></script>
 </body>
 </html>

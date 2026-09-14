@@ -1,0 +1,665 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>document.documentElement.setAttribute('data-theme','dark');</script>
+<title>KOTA — Application to Meridian Bank</title>
+<link rel="stylesheet" href="tokens.css?v=8">
+<link rel="stylesheet" href="components.css?v=8">
+<link rel="stylesheet" href="shell.css?v=10">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Every element on this screen scaled to 75%, uniformly, without
+     touching the shared px-based tokens/components. */
+  body{zoom:.75}
+  /* height:100vh is measured against the real screen, not the screen as
+     seen through the zoom above, so a naive 100vh now falls 25% short of
+     the visible viewport. Scaling by 1/.75 puts it back to a full screen. */
+  .app{min-height:133.334vh}
+  .rail{height:133.334vh}
+  /* The operator's application flow — the one-sentence brief made navigable:
+     stages, a form and documents at each, waiting, then an answer. */
+  .stagecard .body{padding:20px 24px 24px}
+  .sections{display:flex;flex-direction:column}
+  .sec{display:grid;grid-template-columns:28px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-top:1px solid var(--border-soft);cursor:pointer}
+  .sec:first-child{border-top:0}
+  .sec .st{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--border);color:var(--faint);font-size:var(--t-xs);font-weight:600}
+  .sec.done .st{background:var(--good-bg);border-color:var(--good-bd);color:var(--good)}
+  .sec.now .st{border-color:var(--accent);color:var(--accent);background:var(--accent-tint)}
+  .sec b{display:block;font-size:var(--t-md);line-height:var(--t-md-lh);font-weight:500;color:var(--title)}
+  .sec .m{font-size:var(--t-sm);color:var(--muted)}
+  .sec .right{display:flex;align-items:center;gap:14px;min-width:190px;justify-content:flex-end}
+  .sec .progress{width:120px}
+  .sec .pct{font-size:var(--t-sm);color:var(--muted);width:3ch;text-align:right}
+  .docs{display:flex;flex-direction:column}
+  .doc{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--border-soft)}
+  .doc:first-child{border-top:0}
+  .doc b{display:block;font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .doc .m{font-size:var(--t-xs);color:var(--muted)}
+  .upload{border:1.5px dashed var(--border);border-radius:8px;padding:16px;text-align:center;color:var(--muted);font-size:var(--t-sm);margin-top:16px;background:var(--surface-2)}
+  .upload b{color:var(--accent);font-weight:500}
+  .next{display:flex;flex-direction:column;gap:12px}
+  .next .n{display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start;font-size:var(--t-sm);color:var(--text-2)}
+  .next .n .ic{color:var(--accent);width:18px;height:18px;margin-top:1px}
+  .submitbar{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--surface);border-radius:var(--radius);box-shadow:0 1px 2px rgba(16,24,40,.04),0 1px 3px rgba(16,24,40,.06);padding:16px 24px}
+  .submitbar .hint{font-size:var(--t-sm)}
+  .doc{cursor:pointer}
+  .upload{cursor:pointer}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,16px);background:var(--text);color:var(--surface);padding:10px 14px;border-radius:10px;
+    box-shadow:var(--shadow-lg);font-weight:500;font-size:var(--t-sm);display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:.25s;z-index:50;max-width:90vw}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast .ic{stroke:var(--surface);width:16px;height:16px}
+  .secform{grid-column:1/-1;background:var(--surface-2);border:1px solid var(--border-soft);border-radius:10px;padding:4px 16px;margin:2px 0 6px;display:flex;flex-direction:column}
+  .fld{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--border-soft)}
+  .fld:first-child{border-top:0}
+  .fld b{display:block;font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .fld .m{font-size:var(--t-xs);color:var(--muted)}
+  .fld .val{display:flex;align-items:center;gap:8px;font-size:var(--t-sm);color:var(--text-2)}
+  .fld .val .ok{color:var(--good);width:16px;height:16px}
+  .opts{display:flex;gap:8px}
+  .opt{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 14px;font-size:var(--t-sm);color:var(--text-2);cursor:pointer}
+  .opt:hover{border-color:var(--accent)}
+  .opt.picked{border-color:var(--accent);background:var(--accent-tint);color:var(--accent);font-weight:500}
+  .opgrid{display:grid;grid-template-columns:336px minmax(0,1fr);gap:24px;align-items:start}
+  .opside{position:sticky;top:24px}
+  .bankhead{display:flex;align-items:center;gap:12px}
+  .bankhead .av{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-weight:600;color:var(--accent);background:var(--accent-tint);font-size:var(--t-md)}
+  .bankhead b{display:block;font-size:var(--t-md);line-height:var(--t-md-lh);font-weight:600;color:var(--title)}
+  .bankhead span{font-size:var(--t-sm);color:var(--muted)}
+  .vs{display:flex;flex-direction:column}
+  .vstep{display:grid;grid-template-columns:28px 1fr;gap:12px;align-items:start;position:relative;padding-bottom:18px}
+  .vstep:last-child{padding-bottom:0}
+  .vstep::before{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:1.5px;background:var(--border)}
+  .vstep:last-child::before{display:none}
+  .vdot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;border:1.5px solid var(--border);color:var(--faint);font-size:var(--t-xs);font-weight:600;background:var(--surface)}
+  .vstep.done .vdot{background:var(--good-bg);border-color:var(--good-bd);color:var(--good)}
+  .vstep.now .vdot{border-color:var(--accent);color:var(--accent);background:var(--accent-tint)}
+  .vstep b{display:block;font-size:var(--t-sm);font-weight:500;color:var(--title);padding-top:4px}
+  .vstep .m{font-size:var(--t-xs);color:var(--muted)}
+  .fileprog .row{display:flex;justify-content:space-between;align-items:baseline;font-size:var(--t-sm);color:var(--muted);margin-bottom:8px}
+  .fileprog .row b{color:var(--title);font-weight:600}
+  .opmain{display:flex;flex-direction:column;gap:20px}
+  @media(max-width:560px){.opgrid{grid-template-columns:1fr}.opside{position:static}}
+  .frow{padding:12px 0;display:flex;flex-direction:column;gap:7px}
+  .frow:first-child{border-top:0}
+  .frow label{font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .frow .m{font-size:var(--t-xs);color:var(--muted);margin-top:-4px}
+  .frow .input{width:100%;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:9px 12px;font-size:var(--t-sm);color:var(--text);outline:0}
+  .frow .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .secform[hidden]{display:none}
+  html,body{height:100%}
+  .main{height:133.334vh;display:flex;flex-direction:column;min-width:0}
+  .topbar{flex:none}
+  .canvas{flex:1;min-height:0;overflow:hidden}
+  .opgrid{height:100%;align-items:stretch}
+  .opside{position:static;height:100%;overflow-y:auto}
+  .opside .card{min-height:100%;display:flex;flex-direction:column}
+  /* The body's own gap carries all the vertical rhythm now (dividers sit
+     flush inside it, no margin of their own) so the sections spread evenly
+     across whatever height the embed frame gives the sidebar, instead of
+     clumping at the top with one dead gap below or, worse, one gap doing
+     all the stretching. Still bounded enough that it never forces scroll. */
+  .opside .card .body{padding:16px;flex:1;display:flex;flex-direction:column;gap:14px}
+  .opside .divider{margin:0}
+  .opside .kv{gap:8px}
+  .opside .vs{gap:8px}
+  .opside .vstep{padding-bottom:0}
+  .opside .vstep::before{bottom:-8px}
+  .opside .subs{margin-top:6px}
+  .opside .substep{padding:3px 0}
+  .opside .subnav{margin:3px 0 4px 17px}
+  .opside .subnav .substep{padding:2px 0;font-size:var(--t-xs)}
+  .opmain{height:100%;overflow-y:auto;min-width:0;padding-right:2px}
+  .submitbar{position:sticky;bottom:0;z-index:5;box-shadow:0 -4px 16px rgba(16,24,40,.06)}
+  .subs{display:flex;flex-direction:column;margin-top:8px}
+  .substep{display:flex;gap:10px;align-items:center;border:0;background:none;font-size:var(--t-sm);color:var(--muted);padding:5px 0;cursor:pointer;text-align:left;font-family:inherit}
+  .substep .sdot{width:7px;height:7px;border-radius:50%;background:var(--border);flex:none}
+  .substep.now{color:var(--title);font-weight:600}
+  .substep.now .sdot{background:var(--accent)}
+  .substep.done{color:var(--text-2)}
+  .substep.done .sdot{background:var(--good)}
+  /* ---- Componentes do form KYC (candidatos a design system) ---- */
+  .field{padding:12px 0;display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center}
+  .field > .fmain{display:flex;flex-direction:column;gap:7px;min-width:0}
+  .field label{font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .field label .req{color:var(--accent);margin-left:2px}
+  .field .m{font-size:var(--t-xs);color:var(--muted);margin-top:-4px}
+  .field .input{width:100%;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:9px 12px;font-size:var(--t-sm);color:var(--text);outline:0}
+  .field .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-tint)}
+  .charcount{font-size:var(--t-xs);color:var(--muted-2);text-align:right}
+  .field--locked .lockedval{display:flex;align-items:center;gap:8px;border:1px solid var(--border-soft);border-radius:8px;background:var(--surface-2);padding:9px 12px;font-size:var(--t-sm);color:var(--text-2)}
+  .field--locked .lockedval .ic{width:14px;height:14px;color:var(--muted-2);flex:none}
+  .q .opts{margin-top:2px}
+  .reveal{margin:4px 0 8px;padding:12px 14px;background:var(--surface-2);border:1px solid var(--border-soft);border-radius:10px}
+  .reveal[hidden]{display:none}
+  .step-chip{font-size:var(--t-xs);font-weight:500;color:var(--muted);background:var(--surface-2);border:1px solid var(--border-soft);border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .step-chip.done{color:var(--good);background:var(--good-bg);border-color:var(--good-bd)}
+  .dtable{border:1px solid var(--border-soft);border-radius:10px;overflow:hidden;margin-top:4px}
+  .dtable-toolbar{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--surface-2);border-bottom:1px solid var(--border-soft)}
+  .dtable-toolbar b{font-size:var(--t-sm);font-weight:600;color:var(--title)}
+  .dtable-toolbar .count{font-size:var(--t-xs);color:var(--muted)}
+  .dtable-toolbar .dsearch{margin-left:auto;display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:0 10px;height:32px;color:var(--muted)}
+  .dtable-toolbar .dsearch input{border:0;outline:0;background:transparent;font-size:var(--t-xs);color:var(--text);width:130px}
+  .dtable-toolbar .dsearch .ic{width:14px;height:14px}
+  .dtable-add{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:8px;background:var(--surface);padding:0 12px;height:32px;font-size:var(--t-xs);font-weight:500;color:var(--text-2);cursor:pointer;white-space:nowrap}
+  .dtable-add:hover{border-color:var(--accent);color:var(--accent)}
+  .dtable table{width:100%;border-collapse:collapse}
+  .dtable th{font-size:var(--t-xs);font-weight:500;color:var(--muted);text-align:left;padding:8px 14px;border-bottom:1px solid var(--border-soft);background:var(--surface)}
+  .dtable td{font-size:var(--t-sm);color:var(--text-2);padding:9px 14px;border-bottom:1px solid var(--border-soft)}
+  .dtable tr:last-child td{border-bottom:0}
+  .dtable-empty{padding:22px 16px;text-align:center;font-size:var(--t-sm);color:var(--muted)}
+  .dtable-empty .dtable-add{margin-top:10px}
+  .dtable-foot{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;font-size:var(--t-xs);color:var(--muted);background:var(--surface)}
+  .dtable-foot .pager{display:inline-flex;gap:4px}
+  .dtable-foot .pager button{min-width:26px;height:26px;border-radius:6px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);cursor:pointer;font-size:var(--t-xs)}
+  .dtable-foot .pager button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+  .policy-list{display:flex;flex-direction:column;margin-top:4px}
+  .policy{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:11px 0;border-top:1px solid var(--border-soft)}
+  .policy:first-child{border-top:0}
+  .policy b{font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .policy .pcount{font-size:var(--t-xs);color:var(--muted)}
+  .policy .pcount.has{color:var(--good)}
+  .subnav{display:flex;flex-direction:column;margin:4px 0 6px 17px;border-left:1.5px solid var(--border);padding-left:12px}
+  .subnav .substep{padding:4px 0}
+  .etapa .head{align-items:center}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Primary">
+    <div class="brand"><div class="logo">K</div><span class="wordmark">KOTA</span></div>
+    <button class="nav" title="Dashboard"><svg class="ic" viewBox="0 0 24 24"><path d="M9 21V13.6C9 13.0399 9 12.7599 9.10899 12.546C9.20487 12.3578 9.35785 12.2049 9.54601 12.109C9.75992 12 10.0399 12 10.6 12H13.4C13.9601 12 14.2401 12 14.454 12.109C14.6422 12.2049 14.7951 12.3578 14.891 12.546C15 12.7599 15 13.0399 15 13.6V21M11.0177 2.764L4.23539 8.03912C3.78202 8.39175 3.55534 8.56806 3.39203 8.78886C3.24737 8.98444 3.1396 9.20478 3.07403 9.43905C3 9.70352 3 9.9907 3 10.5651V17.8C3 18.9201 3 19.4801 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.07989 21 6.2 21H17.8C18.9201 21 19.4802 21 19.908 20.782C20.2843 20.5903 20.5903 20.2843 20.782 19.908C21 19.4801 21 18.9201 21 17.8V10.5651C21 9.9907 21 9.70352 20.926 9.43905C20.8604 9.20478 20.7526 8.98444 20.608 8.78886C20.4447 8.56806 20.218 8.39175 19.7646 8.03913L12.9823 2.764C12.631 2.49075 12.4553 2.35412 12.2613 2.3016C12.0902 2.25526 11.9098 2.25526 11.7387 2.3016C11.5447 2.35412 11.369 2.49075 11.0177 2.764Z"/></svg><span class="lbl">Dashboard</span></button>
+    <button class="nav active" title="Applications"><svg class="ic" viewBox="0 0 24 24"><path d="M14 11H8M10 15H8M16 7H8M20 6.8V17.2C20 18.8802 20 19.7202 19.673 20.362C19.3854 20.9265 18.9265 21.3854 18.362 21.673C17.7202 22 16.8802 22 15.2 22H8.8C7.11984 22 6.27976 22 5.63803 21.673C5.07354 21.3854 4.6146 20.9265 4.32698 20.362C4 19.7202 4 18.8802 4 17.2V6.8C4 5.11984 4 4.27976 4.32698 3.63803C4.6146 3.07354 5.07354 2.6146 5.63803 2.32698C6.27976 2 7.11984 2 8.8 2H15.2C16.8802 2 17.7202 2 18.362 2.32698C18.9265 2.6146 19.3854 3.07354 19.673 3.63803C20 4.27976 20 5.11984 20 6.8Z"/></svg><span class="lbl">Applications</span></button>
+    <button class="nav" title="Self assessment"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11.4999L11 13.4999L15.5 8.99987M20 11.9999C20 16.9083 14.646 20.4783 12.698 21.6147C12.4766 21.7439 12.3659 21.8085 12.2097 21.842C12.0884 21.868 11.9116 21.868 11.7903 21.842C11.6341 21.8085 11.5234 21.7439 11.302 21.6147C9.35396 20.4783 4 16.9083 4 11.9999V7.21747C4 6.41796 4 6.0182 4.13076 5.67457C4.24627 5.37101 4.43398 5.10015 4.67766 4.8854C4.9535 4.64231 5.3278 4.50195 6.0764 4.22122L11.4382 2.21054C11.6461 2.13258 11.75 2.0936 11.857 2.07815C11.9518 2.06444 12.0482 2.06444 12.143 2.07815C12.25 2.0936 12.3539 2.13258 12.5618 2.21054L17.9236 4.22122C18.6722 4.50195 19.0465 4.64231 19.3223 4.8854C19.566 5.10015 19.7537 5.37101 19.8692 5.67457C20 6.0182 20 6.41796 20 7.21747V11.9999Z"/></svg><span class="lbl">Self assessment</span></button>
+    <div class="spacer"></div>
+    <button class="nav" title="Settings"><svg class="ic" viewBox="0 0 24 24"><path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z M18.7273 14.7273C18.6063 15.0015 18.5702 15.3056 18.6236 15.6005C18.6771 15.8954 18.8177 16.1676 19.0273 16.3818L19.0818 16.4364C19.2509 16.6052 19.385 16.8057 19.4765 17.0265C19.568 17.2472 19.6151 17.4838 19.6151 17.7227C19.6151 17.9617 19.568 18.1983 19.4765 18.419C19.385 18.6397 19.2509 18.8402 19.0818 19.0091C18.913 19.1781 18.7124 19.3122 18.4917 19.4037C18.271 19.4952 18.0344 19.5423 17.7955 19.5423C17.5565 19.5423 17.3199 19.4952 17.0992 19.4037C16.8785 19.3122 16.678 19.1781 16.5091 19.0091L16.4545 18.9545C16.2403 18.745 15.9682 18.6044 15.6733 18.5509C15.3784 18.4974 15.0742 18.5335 14.8 18.6545C14.5311 18.7698 14.3018 18.9611 14.1403 19.205C13.9788 19.4489 13.8921 19.7347 13.8909 20.0273V20.1818C13.8909 20.664 13.6994 21.1265 13.3584 21.4675C13.0174 21.8084 12.5549 22 12.0727 22C11.5905 22 11.1281 21.8084 10.7871 21.4675C10.4461 21.1265 10.2545 20.664 10.2545 20.1818V20.1C10.2475 19.7991 10.1501 19.5073 9.97501 19.2625C9.79991 19.0176 9.55521 18.8312 9.27273 18.7273C8.99853 18.6063 8.69437 18.5702 8.39947 18.6236C8.10456 18.6771 7.83244 18.8177 7.61818 19.0273L7.56364 19.0818C7.39478 19.2509 7.19425 19.385 6.97353 19.4765C6.7528 19.568 6.51621 19.6151 6.27727 19.6151C6.03834 19.6151 5.80174 19.568 5.58102 19.4765C5.36029 19.385 5.15977 19.2509 4.99091 19.0818C4.82186 18.913 4.68775 18.7124 4.59626 18.4917C4.50476 18.271 4.45766 18.0344 4.45766 17.7955C4.45766 17.5565 4.50476 17.3199 4.59626 17.0992C4.68775 16.8785 4.82186 16.678 4.99091 16.5091L5.04545 16.4545C5.25503 16.2403 5.39562 15.9682 5.4491 15.6733C5.50257 15.3784 5.46647 15.0742 5.34545 14.8C5.23022 14.5311 5.03887 14.3018 4.79497 14.1403C4.55107 13.9788 4.26526 13.8921 3.97273 13.8909H3.81818C3.33597 13.8909 2.87351 13.6994 2.53253 13.3584C2.19156 13.0174 2 12.5549 2 12.0727C2 11.5905 2.19156 11.1281 2.53253 10.7871C2.87351 10.4461 3.33597 10.2545 3.81818 10.2545H3.9C4.2009 10.2475 4.49273 10.1501 4.73754 9.97501C4.98236 9.79991 5.16883 9.55521 5.27273 9.27273C5.39374 8.99853 5.42984 8.69437 5.37637 8.39947C5.3229 8.10456 5.18231 7.83244 4.97273 7.61818L4.91818 7.56364C4.74913 7.39478 4.61503 7.19425 4.52353 6.97353C4.43203 6.7528 4.38493 6.51621 4.38493 6.27727C4.38493 6.03834 4.43203 5.80174 4.52353 5.58102C4.61503 5.36029 4.74913 5.15977 4.91818 4.99091C5.08704 4.82186 5.28757 4.68775 5.50829 4.59626C5.72901 4.50476 5.96561 4.45766 6.20455 4.45766C6.44348 4.45766 6.68008 4.50476 6.9008 4.59626C7.12152 4.68775 7.32205 4.82186 7.49091 4.99091L7.54545 5.04545C7.75971 5.25503 8.03183 5.39562 8.32674 5.4491C8.62164 5.50257 8.9258 5.46647 9.2 5.34545H9.27273C9.54161 5.23022 9.77093 5.03887 9.93245 4.79497C10.094 4.55107 10.1807 4.26526 10.1818 3.97273V3.81818C10.1818 3.33597 10.3734 2.87351 10.7144 2.53253C11.0553 2.19156 11.5178 2 12 2C12.4822 2 12.9447 2.19156 13.2856 2.53253C13.6266 2.87351 13.8182 3.33597 13.8182 3.81818V3.9C13.8193 4.19253 13.906 4.47834 14.0676 4.72224C14.2291 4.96614 14.4584 5.15749 14.7273 5.27273C15.0015 5.39374 15.3056 5.42984 15.6005 5.37637C15.8954 5.3229 16.1676 5.18231 16.3818 4.97273L16.4364 4.91818C16.6052 4.74913 16.8057 4.61503 17.0265 4.52353C17.2472 4.43203 17.4838 4.38493 17.7227 4.38493C17.9617 4.38493 18.1983 4.43203 18.419 4.52353C18.6397 4.61503 18.8402 4.74913 19.0091 4.91818C19.1781 5.08704 19.3122 5.28757 19.4037 5.50829C19.4952 5.72901 19.5423 5.96561 19.5423 6.20455C19.5423 6.44348 19.4952 6.68008 19.4037 6.9008C19.3122 7.12152 19.1781 7.32205 19.0091 7.49091L18.9545 7.54545C18.745 7.75971 18.6044 8.03183 18.5509 8.32674C18.4974 8.62164 18.5335 8.9258 18.6545 9.2V9.27273C18.7698 9.54161 18.9611 9.77093 19.205 9.93245C19.4489 10.094 19.7347 10.1807 20.0273 10.1818H20.1818C20.664 10.1818 21.1265 10.3734 21.4675 10.7144C21.8084 11.0553 22 11.5178 22 12C22 12.4822 21.8084 12.9447 21.4675 13.2856C21.1265 13.6266 20.664 13.8182 20.1818 13.8182H20.1C19.8075 13.8193 19.5217 13.906 19.2778 14.0676C19.0339 14.2291 18.8425 14.4584 18.7273 14.7273Z"/></svg><span class="lbl">Settings</span></button>
+    <div class="me">RC</div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumbs">
+        <span class="crumb">Applications</span><svg class="ic" viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"/></svg>
+        <span class="crumb">Meridian Bank</span><svg class="ic" viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"/></svg>
+        <span class="crumb here">Application</span>
+      </div>
+      <div class="right">
+        <button class="iconbtn" id="themeBtn" aria-label="Toggle dark mode"><svg class="ic sm" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg></button>
+        <button class="iconbtn" aria-label="Notifications"><svg class="ic sm" viewBox="0 0 24 24"><path d="M9.35419 21C10.0593 21.6224 10.9856 22 12 22C13.0145 22 13.9407 21.6224 14.6458 21M18 8C18 6.4087 17.3679 4.88258 16.2427 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.8826 2.63214 7.75738 3.75736C6.63216 4.88258 6.00002 6.4087 6.00002 8C6.00002 11.0902 5.22049 13.206 4.34968 14.6054C3.61515 15.7859 3.24788 16.3761 3.26134 16.5408C3.27626 16.7231 3.31488 16.7926 3.46179 16.9016C3.59448 17 4.19261 17 5.38887 17H18.6112C19.8074 17 20.4056 17 20.5382 16.9016C20.6852 16.7926 20.7238 16.7231 20.7387 16.5408C20.7522 16.3761 20.3849 15.7859 19.6504 14.6054C18.7795 13.206 18 11.0902 18 8Z"/></svg></button>
+      </div>
+    </header>
+
+    <div class="canvas">
+      <div class="opgrid">
+        <aside class="opside">
+          <section class="card">
+            <div class="body">
+              <div class="bankhead">
+                <span class="av">MB</span>
+                <div><b>Meridian Bank</b><span>Responsible minerals facility</span></div>
+              </div>
+              <div class="divider"></div>
+              <div class="kv">
+                <div class="r"><span class="k">Status</span><span class="v"><span class="pill warn dot" id="sidePill">In progress</span></span></div>
+                <div class="r"><span class="k">Stage</span><span class="v" id="kvStage">Compile information</span></div>
+                <div class="r"><span class="k">Started</span><span class="v">4 days ago</span></div>
+                <div class="r"><span class="k">Application expires</span><span class="v">In 26 days</span></div>
+                <div class="r"><span class="k">Reference</span><span class="v">MRB-2026-0147</span></div>
+              </div>
+              <div class="divider"></div>
+              <div class="vs">
+                <div class="vstep now" id="vs1"><span class="vdot">1</span><div><b>Compile information</b>
+                  <div class="subs">
+                    <button class="substep now" data-goto="grpKyc"><span class="sdot"></span>KYC</button>
+                    <div class="subnav">
+                      <button class="substep" data-goto="et1"><span class="sdot"></span>Identification</button>
+                      <button class="substep" data-goto="et2"><span class="sdot"></span>Registration</button>
+                      <button class="substep" data-goto="et3"><span class="sdot"></span>Governance</button>
+                      <button class="substep" data-goto="et4"><span class="sdot"></span>Scrutiny</button>
+                      <button class="substep" data-goto="et5"><span class="sdot"></span>Compliance</button>
+                      <button class="substep" data-goto="et6"><span class="sdot"></span>Organisation policies</button>
+                    </div>
+                    <button class="substep" data-goto="grpMs"><span class="sdot"></span>Management systems</button>
+                    <button class="substep" data-goto="grpAdd"><span class="sdot"></span>Additional information</button>
+                  </div>
+                </div></div>
+                <div class="vstep" id="vs2"><span class="vdot">2</span><div><b>Submit application</b><span class="m">One structured file to the bank</span></div></div>
+                <div class="vstep" id="vs3"><span class="vdot">3</span><div><b>Await confirmation</b><span class="m">Follow the review from here</span></div></div>
+              </div>
+              <div class="divider"></div>
+              <div class="fileprog">
+                <div class="row"><span>Your file</span><b id="filePct">27%</b></div>
+                <span class="progress"><i id="fileBar" style="width:27%"></i></span>
+              </div>
+            </div>
+          </section>
+        </aside>
+        <div class="opmain">
+<div id="grpKyc" style="display:flex;flex-direction:column;gap:20px">
+        <section class="card etapa" id="et1">
+          <div class="head"><div><h2 class="title">Identification</h2><div class="sub">Who this record is</div></div><span class="step-chip" data-chip></span></div>
+          <div class="body" style="padding-top:12px">
+            <div class="field field--locked"><div class="fmain"><label>Country</label><span class="lockedval" title="Derived from the record"><svg class="ic" viewBox="0 0 24 24"><path d="M17 11V8A5 5 0 0 0 7 8v3m1 10h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Z"/></svg>Democratic Republic of the Congo</span></div></div>
+            <div class="field field--locked"><div class="fmain"><label>Category</label><span class="lockedval" title="Derived from the record"><svg class="ic" viewBox="0 0 24 24"><path d="M17 11V8A5 5 0 0 0 7 8v3m1 10h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Z"/></svg>Civil Society</span></div></div>
+            <div class="field field--locked"><div class="fmain"><label>Subcategory</label><span class="lockedval" title="Derived from the record"><svg class="ic" viewBox="0 0 24 24"><path d="M17 11V8A5 5 0 0 0 7 8v3m1 10h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Z"/></svg>Cooperative</span></div></div>
+            <div class="field"><div class="fmain"><label>Full name<span class="req">*</span></label><input class="input" data-field data-req id="fullname" maxlength="60" placeholder="Type" value="Riverbend cooperative"><span class="charcount" data-cc="fullname">21/60</span></div></div>
+            <div class="field field--locked"><div class="fmain"><label>Name</label><span class="lockedval" title="Derived from the record"><svg class="ic" viewBox="0 0 24 24"><path d="M17 11V8A5 5 0 0 0 7 8v3m1 10h8a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Z"/></svg>Riverbend cooperative</span></div></div>
+          </div>
+        </section>
+        <section class="card etapa" id="et2">
+          <div class="head"><div><h2 class="title">Registration</h2><div class="sub">The legal footprint</div></div><span class="step-chip" data-chip></span></div>
+          <div class="body" style="padding-top:12px">
+            <div class="field"><div class="fmain"><label>Registration date<span class="req">*</span></label><input class="input" type="date" data-field data-req id="regdate" value="2014-03-12"></div></div>
+            <div class="field"><div class="fmain"><label>Registration certificate</label>
+              <div class="dtable" data-field data-dtable id="tCert">
+                <div class="dtable-toolbar"><b>Documents</b><span class="count" data-count></span><button class="dtable-add" data-add>+ Add certificate</button></div>
+                <table><thead><tr><th>ID</th><th>Title</th><th>Year</th></tr></thead><tbody><tr><td>RC-01</td><td>Registration certificate - Riverbend cooperative</td><td>2014</td></tr></tbody></table>
+                <div class="dtable-empty" hidden>No certificate attached yet. Add the registry extract.<br><button class="dtable-add" data-add>+ Add certificate</button></div>
+              </div>
+            </div></div>
+            <div class="field"><div class="fmain"><label>Registration number<span class="req">*</span></label><input class="input" data-field data-req id="regno" maxlength="60" placeholder="Type" value="CD/GOM/RCCM/14-B-0921"><span class="charcount" data-cc="regno">21/60</span></div></div>
+            <div class="field"><div class="fmain"><label>National identification number</label><input class="input" data-field id="natid" maxlength="60" placeholder="Type" value="01-93-N40100B"><span class="charcount" data-cc="natid">13/60</span></div></div>
+            <div class="field"><div class="fmain"><label>Tax identification number</label><input class="input" data-field id="taxid" maxlength="60" placeholder="Type" value=""><span class="charcount" data-cc="taxid">0/60</span></div></div>
+            <div class="field"><div class="fmain"><label>VAT registration number</label><input class="input" data-field id="vatid" maxlength="60" placeholder="Type" value=""><span class="charcount" data-cc="vatid">0/60</span></div></div>
+            <div class="field q"><div class="fmain"><label>Is the organisation currently active?</label><span class="opts" data-field data-single id="qActive"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+          </div>
+        </section>
+        <section class="card etapa" id="et3">
+          <div class="head"><div><h2 class="title">Governance</h2><div class="sub">Structure and oversight</div></div><span class="step-chip" data-chip></span></div>
+          <div class="body" style="padding-top:12px">
+            <div class="field q"><div class="fmain"><label>Does the organisation have a management structure?</label><span class="opts" data-field data-single id="qMgmt"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+            <div class="field q"><div class="fmain"><label>Is the organisation supervised by a board?</label><span class="opts" data-field data-single data-target="rBoard" id="qBoard"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+            <div class="reveal" id="rBoard">
+              <div class="dtable" data-field data-board id="tBoard">
+                <div class="dtable-toolbar"><b>Board members</b><span class="count" data-count></span><span class="dsearch"><svg class="ic" viewBox="0 0 24 24"><path d="M21 21L17.5 17.5M20 11.5C20 16.19 16.19 20 11.5 20C6.8 20 3 16.19 3 11.5C3 6.8 6.8 3 11.5 3C16.19 3 20 6.8 20 11.5Z"/></svg><input placeholder="Search members" data-bsearch></span><button class="dtable-add" data-badd>+ Add board member</button></div>
+                <table><thead><tr><th>ID</th><th>Name</th><th>Country</th></tr></thead><tbody></tbody></table>
+                <div class="dtable-foot"><span data-brange></span><span class="pager" data-bpager></span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="card etapa" id="et4">
+          <div class="head"><div><h2 class="title">Scrutiny</h2><div class="sub">Public track record</div></div><span class="step-chip" data-chip></span></div>
+          <div class="body" style="padding-top:12px">
+            <div class="field q"><div class="fmain"><label>Has the organisation been involved in any significant dispute or litigation?</label><span class="opts" data-field data-single data-target="rLitig" id="qLitig"><button class="opt picked">No</button><button class="opt">Yes</button></span></div></div>
+            <div class="reveal" id="rLitig" hidden>
+              <div class="field"><div class="fmain"><label>Track record associated to the organisation</label><span class="m">Pick every one that applies</span><span class="chips" data-field><button class="opt">Conflict minerals</button><button class="opt">Corruption</button><button class="opt">Fraud</button><button class="opt">Human rights abuses</button><button class="opt">Money laundering</button><button class="opt">None</button><button class="opt">Other</button><button class="opt">Suspicious business relations</button><button class="opt">Terrorism financing</button></span></div></div>
+              <div class="field"><div class="fmain"><label>Status of litigations and polemics</label><select class="input" data-field><option value="">Select one option</option><option>Concluded</option><option>Ongoing</option></select></div></div>
+            </div>
+            <div class="field q"><div class="fmain"><label>Is the organisation mentioned on international watchlist?</label><span class="opts" data-field data-single data-target="rWatch" id="qWatch"><button class="opt picked">No</button><button class="opt">Yes</button></span></div></div>
+            <div class="reveal" id="rWatch" hidden>
+              <div class="dtable" data-field data-dtable id="tWatch">
+                <div class="dtable-toolbar"><b>International watchlist mentions</b><span class="count" data-count></span><button class="dtable-add" data-add>+ Add mention</button></div>
+                <table><thead><tr><th>ID</th><th>List</th><th>Stance</th></tr></thead><tbody></tbody></table>
+                <div class="dtable-empty">No mentions recorded. Add one if the organisation appears on a list.<br><button class="dtable-add" data-add>+ Add mention</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="card etapa" id="et5">
+          <div class="head"><div><h2 class="title">Compliance</h2><div class="sub">Controls and financial posture</div></div><span class="step-chip" data-chip></span></div>
+          <div class="body" style="padding-top:12px">
+            <div class="field q"><div class="fmain"><label>Does the organisation comply with national law?</label><span class="opts" data-field data-single id="qNat"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+            <div class="field q"><div class="fmain"><label>Does the organisation comply with international law?</label><span class="opts" data-field data-single id="qInt"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+            <div class="field q"><div class="fmain"><label>Does the organisation have access to funding derived from criminal activities?</label><span class="opts" data-field data-single id="qCrim"><button class="opt picked">No</button><button class="opt">Yes</button></span></div></div>
+            <div class="field q"><div class="fmain"><label>Does the organisation make cash withdrawals?</label><span class="opts" data-field data-single data-target="rCash" id="qCash"><button class="opt">No</button><button class="opt">Yes</button></span></div></div>
+            <div class="reveal" id="rCash" hidden>
+              <div class="field"><div class="fmain"><label>Maximum cash transaction amount</label><div style="display:grid;grid-template-columns:1fr 220px;gap:10px"><input class="input" type="number" data-field placeholder="Type number"><select class="input" data-field><option value="">Select currency</option><option>USD (United States Dollar)</option><option>CDF (Congolese Franc)</option><option>EUR (Euro)</option><option>AED (United Arab Emirates Dirham)</option><option>GBP (Pound Sterling)</option><option>ZAR (South African Rand)</option></select></div></div></div>
+            </div>
+            <div class="field q"><div class="fmain"><label>Does the organisation have an anomalous or complex entity's ownership structure?</label><span class="opts" data-field data-single id="qOwn"><button class="opt picked">No</button><button class="opt">Yes</button></span></div></div>
+            <div class="field q"><div class="fmain"><label>Is the organisation regularly subject to financial audits?</label><span class="opts" data-field data-single data-target="rAudit" id="qAudit"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+            <div class="reveal" id="rAudit">
+              <div class="field"><div class="fmain"><label>Date of the last financial audit</label><input class="input" type="date" data-field id="auditdate" value=""></div></div>
+            </div>
+            <div class="field q"><div class="fmain"><label>Does the organisation maintain an internal accounting system?</label><span class="opts" data-field data-single id="qAcc"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+            <div class="field q"><div class="fmain"><label>Is the organisation mentioned on the FATF black list?</label><span class="opts" data-field data-single data-target="rFatf" id="qFatf"><button class="opt picked">No</button><button class="opt">Yes</button></span></div></div>
+            <div class="reveal" id="rFatf" hidden>
+              <div class="dtable" data-field data-dtable id="tFatf">
+                <div class="dtable-toolbar"><b>FATF black list mentions</b><span class="count" data-count></span><button class="dtable-add" data-add>+ Add mention</button></div>
+                <table><thead><tr><th>ID</th><th>Title</th><th>Year</th></tr></thead><tbody></tbody></table>
+                <div class="dtable-empty">No mentions recorded.<br><button class="dtable-add" data-add>+ Add mention</button></div>
+              </div>
+            </div>
+            <div class="field"><div class="fmain"><label>Annual turnover</label><div style="display:grid;grid-template-columns:1fr 220px;gap:10px"><input class="input" type="number" data-field id="turnover" placeholder="Type number"><select class="input" data-field><option value="">Select currency</option><option>USD (United States Dollar)</option><option>CDF (Congolese Franc)</option><option>EUR (Euro)</option><option>AED (United Arab Emirates Dirham)</option><option>GBP (Pound Sterling)</option><option>ZAR (South African Rand)</option></select></div></div></div>
+            <div class="field q"><div class="fmain"><label>Does the organisation have banking records?</label><span class="opts" data-field data-single data-target="rBank" id="qBank"><button class="opt">No</button><button class="opt picked">Yes</button></span></div></div>
+            <div class="reveal" id="rBank">
+              <div class="dtable" data-field data-dtable id="tBank">
+                <div class="dtable-toolbar"><b>Banking records</b><span class="count" data-count></span><button class="dtable-add" data-add>+ Add banking record</button></div>
+                <table><thead><tr><th>ID</th><th>Title</th><th>Year</th></tr></thead><tbody></tbody></table>
+                <div class="dtable-empty">No records attached. Add a bank statement or account confirmation.<br><button class="dtable-add" data-add>+ Add banking record</button></div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="card etapa" id="et6">
+          <div class="head"><div><h2 class="title">Organisation policies</h2><div class="sub">One pattern, nine policies</div></div><span class="step-chip" data-chip></span></div>
+          <div class="body" style="padding-top:12px">
+            <div class="policy-list" data-field id="policyList">
+              <div class="policy" data-policy><b>Business code of conduct</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>Human rights policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>Supply chain policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>Anti-corruption policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>AML / CFT policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>Human resources policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>Health &amp; safety policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>Environment policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+              <div class="policy" data-policy><b>Community &amp; society policy</b><span class="pcount" data-pcount>0 documents</span><button class="dtable-add" data-padd>+ Add</button></div>
+            </div>
+          </div>
+        </section>
+        </div>
+
+        <section class="card" id="grpMs">
+          <div class="head"><div><h2 class="title">Management systems</h2><div class="sub">How the cooperative operates and trades</div></div></div>
+          <div class="body" style="padding-top:12px">
+            <div class="sections">
+              <div class="sec" data-acc><span class="st">3</span><div><b>Activities</b><span class="m">Sites, minerals and monthly output</span></div><div class="right"><span class="progress"><i style="width:0%"></i></span><span class="pct">0%</span></div></div>
+              <div class="secform" hidden>
+                <div class="frow"><label>Mine sites</label><span class="m">Where you operate</span><input class="input" data-field placeholder="e.g. Rubaya sector, 2 sites"></div>
+                <div class="frow"><label>Minerals mined</label><span class="m">Pick every one that applies</span><span class="chips" data-field><button class="opt">Tin</button><button class="opt">Tantalum</button><button class="opt">Tungsten</button><button class="opt">Gold</button></span></div>
+                <div class="frow"><label>Monthly output</label><input class="input" data-field placeholder="e.g. 12 tonnes"></div>
+              </div>
+              <div class="sec" data-acc><span class="st">4</span><div><b>Trade partners</b><span class="m">Who you buy from and sell to</span></div><div class="right"><span class="progress"><i style="width:0%"></i></span><span class="pct">0%</span></div></div>
+              <div class="secform" hidden>
+                <div class="frow"><label>Main buyer</label><input class="input" data-field placeholder="Who you sell to most"></div>
+                <div class="frow"><label>Do you sell through an aggregator?</label><span class="opts" data-field data-single><button class="opt">Yes</button><button class="opt">No</button></span></div>
+                <div class="frow"><label>Years trading</label><select class="input" data-field><option value="">Choose</option><option>Under 1 year</option><option>1 to 3 years</option><option>3 to 10 years</option><option>10+ years</option></select></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+<section class="card" id="grpAdd">
+            <div class="head"><div><h2 class="title">Additional information</h2><div class="sub" id="docsSub">4 of 7 documents received</div></div></div>
+            <div class="body" style="padding-top:12px">
+              <div class="docs">
+                <div class="doc"><div><b>RCCM extract</b><span class="m">Uploaded 4 days ago</span></div><span class="pill good dot">Verified</span></div>
+                <div class="doc"><div><b>ID. NAT. certificate</b><span class="m">Uploaded 4 days ago</span></div><span class="pill good dot">Verified</span></div>
+                <div class="doc"><div><b>Articles of association</b><span class="m">Uploaded yesterday</span></div><span class="pill warn dot">Pending</span></div>
+                <div class="doc"><div><b>Mining export licence</b><span class="m">Uploaded yesterday</span></div><span class="pill warn dot">Pending</span></div>
+                <div class="doc"><div><b>Beneficial ownership declaration</b><span class="m">Required</span></div><span class="pill neutral">Missing</span></div>
+              </div>
+              <div class="upload"><b>Upload a document</b> or take a photo with your phone</div>
+            </div>
+          </section>
+
+<section class="card">
+            <div class="head"><div><h2 class="title">What happens next</h2></div></div>
+            <div class="body" style="padding-top:12px">
+              <div class="next">
+                <div class="n"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12H19M12 19L19 12L12 5"/></svg><span>When every section is complete, you submit and the bank receives your file as one structured application.</span></div>
+                <div class="n"><svg class="ic" viewBox="0 0 24 24"><path d="M12 6V12L16 14M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"/></svg><span>The bank reviews it. You can follow the stage here at any time.</span></div>
+                <div class="n"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11.4999L11 13.4999L15.5 8.99987M20 11.9999C20 16.9083 14.646 20.4783 12.698 21.6147C12.4766 21.7439 12.3659 21.8085 12.2097 21.842C12.0884 21.868 11.9116 21.868 11.7903 21.842C11.6341 21.8085 11.5234 21.7439 11.302 21.6147C9.35396 20.4783 4 16.9083 4 11.9999V7.21747C4 6.41796 4 6.0182 4.13076 5.67457C4.24627 5.37101 4.43398 5.10015 4.67766 4.8854C4.9535 4.64231 5.3278 4.50195 6.0764 4.22122L11.4382 2.21054C11.6461 2.13258 11.75 2.0936 11.857 2.07815C11.9518 2.06444 12.0482 2.06444 12.143 2.07815C12.25 2.0936 12.3539 2.13258 12.5618 2.21054L17.9236 4.22122C18.6722 4.50195 19.0465 4.64231 19.3223 4.8854C19.566 5.10015 19.7537 5.37101 19.8692 5.67457C20 6.0182 20 6.41796 20 7.21747V11.9999Z"/></svg><span>You get an answer with a score — and what to improve.</span></div>
+              </div>
+            </div>
+          </section>
+
+<div class="submitbar">
+        <span class="hint">2 sections and 1 document to go before you can submit.</span>
+        <button class="btn primary" disabled>Submit application</button>
+      </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"><svg class="ic" viewBox="0 0 24 24"><path d="M20 6L9 17L4 12"/></svg><span id="toastText"></span></div>
+<script>
+(function(){
+  var $=function(s,c){return (c||document).querySelector(s)}, $$=function(s,c){return Array.prototype.slice.call((c||document).querySelectorAll(s))};
+  var toast=$('#toast'), tt=$('#toastText'), th;
+  function say(m){tt.textContent=m;toast.classList.add('show');clearTimeout(th);th=setTimeout(function(){toast.classList.remove('show')},2400)}
+
+  /* ---- tema ---- */
+  var tb=$('#themeBtn');
+  if(tb)tb.addEventListener('click',function(){var r=document.documentElement;r.setAttribute('data-theme',r.getAttribute('data-theme')==='dark'?'light':'dark')});
+
+  /* ---- contador de caracteres ---- */
+  $$('input[maxlength]').forEach(function(inp){
+    var cc=document.querySelector('[data-cc="'+inp.id+'"]');
+    if(!cc)return;
+    inp.addEventListener('input',function(){cc.textContent=inp.value.length+'/'+inp.getAttribute('maxlength')});
+  });
+
+  /* ---- respostas (opts single / chips multi) + reveals ---- */
+  function bindOpts(scope){
+    $$('.opts[data-single]',scope).forEach(function(g){
+      $$('.opt',g).forEach(function(o){
+        o.addEventListener('click',function(e){
+          e.stopPropagation();
+          $$('.opt',g).forEach(function(x){x.classList.remove('picked')});
+          o.classList.add('picked');
+          var t=g.getAttribute('data-target');
+          if(t){var r=document.getElementById(t);if(r)r.hidden=(o.textContent.trim()!=='Yes')}
+          updateAll();
+        });
+      });
+    });
+    $$('.chips',scope).forEach(function(g){
+      $$('.opt',g).forEach(function(o){
+        o.addEventListener('click',function(e){e.stopPropagation();o.classList.toggle('picked');updateAll()});
+      });
+    });
+  }
+  bindOpts(document);
+  $$('input.input,select.input').forEach(function(f){
+    f.addEventListener('input',updateAll);f.addEventListener('change',updateAll);
+  });
+
+  /* ---- preenchimento ---- */
+  function filled(f){
+    if(f.classList.contains('opts'))return !!f.querySelector('.opt.picked');
+    if(f.classList.contains('chips'))return !!f.querySelector('.opt.picked');
+    if(f.hasAttribute('data-dtable')||f.hasAttribute('data-board'))return f.querySelector('tbody').children.length>0;
+    if(f.classList.contains('policy-list'))return !!f.querySelector('.pcount.has');
+    if(f.value!==undefined)return String(f.value).trim()!=='';
+    return false;
+  }
+  function visibleFields(scope){
+    return $$('[data-field]',scope).filter(function(f){
+      var r=f.closest('.reveal');return !(r&&r.hidden);
+    });
+  }
+
+  /* ---- Management systems (accordion, como antes) ---- */
+  var secs2=$$('#grpMs .sec[data-acc]');
+  function updateSec(sec,announce){
+    var form=sec.nextElementSibling;
+    if(!form||!form.classList.contains('secform'))return;
+    var fields=$$('[data-field]',form), n=fields.filter(filled).length;
+    var pct=Math.round(n/fields.length*100);
+    sec.querySelector('.progress i').style.width=pct+'%';
+    sec.querySelector('.pct').textContent=pct+'%';
+    var was=sec.classList.contains('done');
+    if(pct===100){
+      sec.classList.remove('now');sec.classList.add('done');
+      sec.querySelector('.st').textContent='✓';
+      if(!was){sec.querySelector('.m').textContent='Completed just now';if(announce)say(sec.querySelector('b').textContent+' complete')}
+    } else if(was){
+      sec.classList.remove('done');
+      sec.querySelector('.st').textContent=String(secs2.indexOf(sec)+1);
+      sec.querySelector('.m').textContent=n+' of '+fields.length+' answered';
+    }
+  }
+  secs2.forEach(function(sec){
+    var form=sec.nextElementSibling;
+    sec.addEventListener('click',function(){form.hidden=!form.hidden});
+    $$('input.input,select.input',form).forEach(function(f){
+      f.addEventListener('input',function(){updateSec(sec,true);updateAll()});
+      f.addEventListener('change',function(){updateSec(sec,true);updateAll()});
+    });
+    $$('.opts[data-single] .opt, .chips .opt',form).forEach(function(o){
+      o.addEventListener('click',function(){setTimeout(function(){updateSec(sec,true)},0)});
+    });
+  });
+
+  /* ---- documentos (Additional information) ---- */
+  var docs=$$('#grpAdd .doc');
+  function completeDoc(doc){
+    if(doc.querySelector('.pill.good'))return false;
+    doc.querySelector('.m').textContent='Uploaded just now';
+    var p=doc.querySelector('.pill');p.className='pill good dot';p.textContent='Verified';
+    return true;
+  }
+  docs.forEach(function(d){d.addEventListener('click',function(){if(completeDoc(d)){say('Document received and verified');updateAll()}})});
+  var up=$('#grpAdd .upload');
+  if(up)up.addEventListener('click',function(){
+    var next=docs.filter(function(x){return !x.querySelector('.pill.good')})[0];
+    if(next&&completeDoc(next)){say('Document received and verified');updateAll()}
+  });
+
+  /* ---- Board members: 100 membros, busca, paginacao ---- */
+  var FN=['Amani','Chantal','Didier','Esperance','Faustin','Gloria','Henri','Irene','Josephine','Kalala','Lydie','Moise','Nadege','Olivier','Pascaline','Remy','Solange','Tresor','Viviane','Yves'];
+  var LN=['Mwamba','Ilunga','Kasongo','Mutombo','Ngalula','Tshiala','Mbuyi','Kanku','Lukusa','Mukendi','Kalonji','Beya','Tshibangu','Mulamba','Nzuzi','Makiese','Matondo','Phaka','Lutete','Samba'];
+  var CTY=['DR Congo','DR Congo','DR Congo','DR Congo','DR Congo','DR Congo','Rwanda','Zambia','Belgium'];
+  var members=[];
+  for(var i=0;i<100;i++){
+    members.push({id:'BM-'+String(i+1).padStart(3,'0'),name:FN[i%20]+' '+LN[(i*7+3)%20],country:CTY[(i*5)%9]});
+  }
+  var bPage=1,bQuery='',B_PER=8;
+  var bTable=$('#tBoard');
+  function renderBoard(){
+    if(!bTable)return;
+    var list=members.filter(function(m){return m.name.toLowerCase().indexOf(bQuery)>-1||m.id.toLowerCase().indexOf(bQuery)>-1});
+    var pages=Math.max(1,Math.ceil(list.length/B_PER));
+    if(bPage>pages)bPage=pages;
+    var start=(bPage-1)*B_PER, slice=list.slice(start,start+B_PER);
+    bTable.querySelector('tbody').innerHTML=slice.map(function(m){return '<tr><td>'+m.id+'</td><td>'+m.name+'</td><td>'+m.country+'</td></tr>'}).join('');
+    bTable.querySelector('[data-count]').textContent=list.length+(list.length===1?' member':' members');
+    $('[data-brange]',bTable).textContent=list.length?('Showing '+(start+1)+' to '+Math.min(start+B_PER,list.length)+' of '+list.length):'No members match';
+    var pg=$('[data-bpager]',bTable), html='';
+    function pb(n){return '<button'+(n===bPage?' class="on"':'')+' data-pg="'+n+'">'+n+'</button>'}
+    if(pages<=7){for(var p=1;p<=pages;p++)html+=pb(p)}
+    else{
+      html+=pb(1);
+      if(bPage>3)html+='<button disabled>…</button>';
+      for(var p=Math.max(2,bPage-1);p<=Math.min(pages-1,bPage+1);p++)html+=pb(p);
+      if(bPage<pages-2)html+='<button disabled>…</button>';
+      html+=pb(pages);
+    }
+    pg.innerHTML=html;
+    $$('button[data-pg]',pg).forEach(function(b){b.addEventListener('click',function(){bPage=+b.dataset.pg;renderBoard()})});
+  }
+  if(bTable){
+    $('[data-bsearch]',bTable).addEventListener('input',function(){bQuery=this.value.trim().toLowerCase();bPage=1;renderBoard()});
+    $('[data-badd]',bTable).addEventListener('click',function(){
+      var n={id:'BM-'+String(members.length+1).padStart(3,'0'),name:FN[(members.length*3)%20]+' '+LN[(members.length*11+5)%20],country:'DR Congo'};
+      members.unshift(n);bPage=1;bQuery='';$('[data-bsearch]',bTable).value='';
+      renderBoard();say('Board member added: '+n.name);updateAll();
+    });
+    renderBoard();
+  }
+
+  /* ---- dtables de documentos (cert, watchlist, FATF, banking) ---- */
+  var addRows={
+    tCert:function(n){return ['RC-'+String(n).padStart(2,'0'),'Registration certificate - Riverbend cooperative','2014']},
+    tWatch:function(n){return ['WL-'+String(n).padStart(2,'0'),'EU Terrorism List','Contest veracity']},
+    tFatf:function(n){return ['FB-'+String(n).padStart(2,'0'),'FATF black list mention - Riverbend cooperative','2025']},
+    tBank:function(n){return ['BK-'+String(n).padStart(2,'0'),'Banking record - Riverbend cooperative','2026']}
+  };
+  var addMsg={tCert:'Registration certificate added',tWatch:'Watchlist mention recorded',tFatf:'FATF black list mention - Riverbend cooperative added',tBank:'Banking record - Riverbend cooperative added'};
+  $$('[data-dtable]').forEach(function(t){
+    function refreshCount(){
+      var n=t.querySelector('tbody').children.length;
+      t.querySelector('[data-count]').textContent=n+(n===1?' item':' items');
+      var e=t.querySelector('.dtable-empty');if(e)e.hidden=n>0;
+    }
+    $$('[data-add]',t).forEach(function(b){
+      b.addEventListener('click',function(){
+        var body=t.querySelector('tbody'), n=body.children.length+1;
+        var cells=(addRows[t.id]||function(){return ['ID-'+n,'Item','']})(n);
+        var tr=document.createElement('tr');tr.innerHTML=cells.map(function(c){return '<td>'+c+'</td>'}).join('');
+        body.appendChild(tr);refreshCount();say(addMsg[t.id]||'Item added');updateAll();
+      });
+    });
+    refreshCount();
+  });
+
+  /* ---- politicas: nove, mesmo padrao, titulo especifico ---- */
+  var pnames=['Business code of conduct','Human rights policy','Supply chain policy','Anti-corruption policy','AML / CFT policy','Human resources policy','Health & safety policy','Environment policy','Community & society policy'];
+  $$('[data-policy]').forEach(function(row,i){
+    var count=0, chip=$('[data-pcount]',row);
+    $('[data-padd]',row).addEventListener('click',function(){
+      count++;chip.textContent=count+(count===1?' document':' documents');chip.classList.add('has');
+      say(pnames[i]+' - Riverbend cooperative attached');updateAll();
+    });
+  });
+
+  /* ---- progresso: etapas, substeps, arquivo, gating ---- */
+  var etapas=$$('.etapa');
+  var hint=$('.submitbar .hint'), btn=$('.submitbar .btn');
+  function updateAll(){
+    var totAll=0, filledAll=0;
+    var etStates=[];
+    etapas.forEach(function(card){
+      var fs=visibleFields(card), n=fs.filter(filled).length;
+      totAll+=fs.length;filledAll+=n;
+      var chip=$('[data-chip]',card);
+      chip.textContent=n+' of '+fs.length+' answered';
+      chip.classList.toggle('done',n===fs.length);
+      etStates.push(n===fs.length);
+    });
+    var msFields=$$('#grpMs .secform [data-field]');
+    var msFilled=msFields.filter(filled).length;
+    totAll+=msFields.length;filledAll+=msFilled;
+    var dl=docs.filter(function(d){return !d.querySelector('.pill.good')}).length;
+    totAll+=docs.length;filledAll+=docs.length-dl;
+    $('#docsSub').textContent=(7-dl)+' of 7 documents received';
+    var pct=totAll?Math.round(filledAll/totAll*100):0;
+    $('#filePct').textContent=pct+'%';$('#fileBar').style.width=pct+'%';
+    /* substeps: 6 etapas + os 3 grupos */
+    var etBtns=$$('.subnav .substep');
+    var nowSet=false;
+    etBtns.forEach(function(b,i){
+      b.classList.toggle('done',etStates[i]);b.classList.remove('now');
+      if(!etStates[i]&&!nowSet){b.classList.add('now');nowSet=true}
+    });
+    var groups=$$('.subs > .substep');
+    var kycDone=etStates.every(Boolean);
+    var msDone=msFilled===msFields.length;
+    var addDone=dl===0;
+    var gs=[kycDone,msDone,addDone], gNow=false;
+    groups.forEach(function(b,i){
+      b.classList.toggle('done',gs[i]);b.classList.remove('now');
+      if(!gs[i]&&!gNow){b.classList.add('now');gNow=true}
+    });
+    /* gating honesto: obrigatorios + management + documentos */
+    var reqLeft=$$('[data-req]').filter(function(f){return !filled(f)}).length;
+    var msLeft=msFields.length-msFilled;
+    var parts=[];
+    if(reqLeft)parts.push(reqLeft+' required field'+(reqLeft>1?'s':''));
+    if(msLeft)parts.push(msLeft+' management answer'+(msLeft>1?'s':''));
+    if(dl)parts.push(dl+' document'+(dl>1?'s':''));
+    if(parts.length){hint.textContent=parts.join(', ')+' to go before you can submit.';btn.disabled=true}
+    else{hint.textContent='Everything the bank needs is in. Review once more, then submit.';btn.disabled=false}
+  }
+  window.updateAll=updateAll;
+
+  /* ---- navegacao por substeps ---- */
+  $$('.substep').forEach(function(sb){
+    sb.addEventListener('click',function(){
+      var t=document.getElementById(sb.dataset.goto);
+      if(t)t.scrollIntoView({block:'start'});
+    });
+  });
+
+  /* ---- submit ---- */
+  btn.addEventListener('click',function(){
+    if(btn.disabled)return;
+    ['vs1','vs2'].forEach(function(id){var v=document.getElementById(id);v.classList.remove('now');v.classList.add('done');v.querySelector('.vdot').textContent='✓'});
+    document.getElementById('vs3').classList.add('now');
+    document.getElementById('kvStage').textContent='Await confirmation';
+    var pill=$('#sidePill');pill.className='pill good dot';pill.textContent='Submitted';
+    hint.textContent='Submitted to Meridian Bank as one structured application. You can follow the stage here at any time.';
+    btn.style.display='none';
+    say('Application sent to Meridian Bank');
+  });
+
+  updateAll();
+})();
+</script>
+</body>
+</html>

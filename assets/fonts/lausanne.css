@@ -78,3 +78,15 @@
   font-style: italic;
   font-display: swap;
 }
+
+/* Metric-matched fallback: Arial ajustada pras metricas da Lausanne
+   (medido com fontTools: largura 100.39%, hhea 1866/-410 @2048upem).
+   Com ela no stack, o swap da webfont nao desloca layout (CLS). */
+@font-face {
+  font-family: 'TWKLausanne Fallback';
+  src: local('Arial');
+  size-adjust: 100.39%;
+  ascent-override: 90.76%;
+  descent-override: 19.94%;
+  line-gap-override: 0%;
+}

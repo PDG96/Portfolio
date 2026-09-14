@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>KOTA · Banque Orimu application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="operator-shell.css?v=1">
+<style>
+/* ==========================================================================
+   KOTA — one application, as the bank received it.
+
+   The form is where the operator writes; this is what was handed over. Same
+   answers, no inputs: an operator looking at this is not editing, they are
+   checking what a stranger is about to judge them on.
+
+   It is deliberately the same shape as the bank's own read-only view of the
+   file. If the two ever disagree, one of them is lying.
+   ========================================================================== */
+.canvas{grid-template-columns:998fr 316fr}
+
+/* ---- what the bank is doing with it ---- */
+.state{grid-column:1/3;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gutter)}
+.kpi{background:var(--block);border-radius:var(--radius);padding:18px var(--pad)}
+.kpi .eyebrow{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.kpi .row{margin-top:10px;display:flex;align-items:baseline;gap:10px}
+.kpi b{font-size:28px;line-height:32px;font-weight:700;color:var(--ink)}
+.kpi .m{font-size:12px;line-height:17px;color:var(--muted)}
+.kpi--warn b{color:var(--warn-2)}
+
+/* ---- the answers, read-only ---- */
+.sent{grid-column:1}
+.sec{padding-top:22px}
+.sec + .sec{margin-top:22px;border-top:1px solid var(--line)}
+.sec .h{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}
+.sec h3{margin:0;font-size:17px;line-height:24px;font-weight:500;color:var(--ink)}
+.chip{height:22px;padding:0 10px;border-radius:11px;background:var(--line);font-size:12px;
+  font-weight:600;color:var(--muted);display:grid;place-items:center}
+.chip--full{color:var(--good-2)}
+.chip--ask{color:#FF9C6E}
+.pair{padding:10px 0 0}
+.pair .k{display:flex;align-items:center;gap:8px;font-size:13px;line-height:18px;color:var(--muted)}
+.pair .v{margin-top:6px;min-height:44px;display:flex;align-items:center;padding:11px 14px;
+  border-radius:8px;background:#232425;border:1px solid #2B2C2D;font-size:15px;line-height:22px;
+  color:var(--ink)}
+.pair .v--empty{color:#5E6062;font-style:italic}
+.pair .v--yes{gap:8px}
+.pair .v--yes .mark{color:var(--good-2)}
+.pair--ask .v{border-color:#3A2A22;background:#231C19}
+.asked{margin-top:9px;padding:12px 14px;border-radius:8px;background:#1F1A17;border:1px solid #3A2A22}
+.asked .who{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--accent)}
+.asked .who svg{width:13px;height:13px}
+.asked .txt{margin-top:5px;font-size:14px;line-height:20px;color:var(--ink-2)}
+.asked .act{margin-top:10px}
+
+/* ---- the side column: who sees it, and what happened ---- */
+.side{grid-column:2;display:flex;flex-direction:column;gap:var(--gutter)}
+.who-list{display:flex;flex-direction:column;gap:14px}
+.who-row{display:flex;align-items:center;gap:10px}
+.who-row .av{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;
+  background:#2B2C2D;color:var(--ink-2);font-size:11px;font-weight:700}
+.who-row .n{font-size:14px;color:var(--ink)}
+.who-row .r{margin-left:auto;font-size:12px;color:var(--muted)}
+.trail{display:flex;flex-direction:column}
+.ev{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.ev:last-child{border-bottom:0}
+.ev .mark{width:8px;height:8px;flex:none;margin-top:6px;border-radius:50%;background:var(--track)}
+.ev--now .mark{background:var(--accent)}
+.ev .what{font-size:14px;line-height:20px;color:var(--ink)}
+.ev .when{margin-top:3px;font-size:12px;color:var(--muted)}
+.note{margin:16px 0 0;font-size:12px;line-height:1.5;color:#5E6062}
+</style>
+<link rel="stylesheet" href="motion.css?v=2">
+<link rel="stylesheet" href="responsive.css?v=2">
+<script src="page-transition.js?v=3"></script>
+</head>
+<body>
+<div class="app">
+
+  <nav class="rail" aria-label="Primary" id="rail"></nav>
+
+  <div class="main">
+    <div class="stickyhead" id="stickyhead">
+      <header class="topbar">
+        <a href="operator-home.html">Home</a><span class="sep"></span>
+        <a href="operator-applications.html">Applications</a><span class="sep"></span>
+        <span class="here">Banque Orimu</span>
+      </header>
+      <div class="ophead">
+        <svg class="logo" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect x="0.6" y="0.6" width="46.8" height="46.8" rx="13.4" fill="#1E1F21" stroke="#3A3C3E" stroke-width="1.2"/>
+          <text x="21" y="32" text-anchor="middle" font-family="Inter,-apple-system,sans-serif" font-size="22" font-weight="600" fill="#F6F6F6">O</text>
+          <circle cx="35" cy="16.8" r="3.2" fill="#E8723F"/>
+        </svg>
+        <div>
+          <div class="opname">Banque Orimu
+            <span class="pill"><span class="dot"></span>In review</span>
+          </div>
+          <div class="opaddr">What you sent, and what the North Kivu desk has done with it</div>
+        </div>
+        <div class="headacts">
+          <button class="btn btn--ghost" type="button" data-form>Answer the questions</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas">
+
+      <div class="state" id="state"></div>
+
+      <section class="block sent">
+        <div class="head">
+          <div>
+            <h2>What was sent</h2>
+            <div class="sub">The KYC half, as Banque Orimu received it. Management systems is still being filled in and has not been sent.</div>
+          </div>
+        </div>
+        <div id="sections"></div>
+      </section>
+
+      <div class="side">
+        <section class="block">
+          <div class="head">
+            <div>
+              <h2>Who can read it</h2>
+              <div class="sub">At Banque Orimu</div>
+            </div>
+          </div>
+          <div class="who-list">
+            <div class="who-row"><span class="av">NO</span><span class="n">N. Okonkwo</span><span class="r">Reviewer</span></div>
+            <div class="who-row"><span class="av">CD</span><span class="n">Compliance desk</span><span class="r">Always</span></div>
+            <div class="who-row"><span class="av">NK</span><span class="n">North Kivu desk</span><span class="r">While open</span></div>
+          </div>
+          <p class="note">You can see who holds your file because they can see your file. The same
+            list is on their side of this screen.</p>
+        </section>
+
+        <section class="block">
+          <div class="head">
+            <div>
+              <h2>What happened</h2>
+              <div class="sub">This application only</div>
+            </div>
+          </div>
+          <div class="trail" id="trail"></div>
+        </section>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="seatpop" id="seatpop" role="menu" aria-label="Change seat">
+  <div class="lbl">You are viewing as</div>
+  <button type="button" data-seat="operator" role="menuitem">Tulivu Cooperative <span class="r">Operator · current</span></button>
+  <button type="button" data-seat="bank" role="menuitem">Banque Orimu <span class="r">Bank</span></button>
+  <div class="sep"></div>
+  <button type="button" data-seat="start" role="menuitem">Back to the front door</button>
+</div>
+<div class="ctip" id="ctip" role="status" aria-live="polite"></div>
+
+<script src="operator-shell.js?v=1"></script>
+<script>
+/* ==========================================================================
+   The same four sections, the same answers and the same two questions the
+   form holds — with every input taken out. One record, two readings.
+   ========================================================================== */
+(function(){
+  buildOperatorRail('applications');
+
+  var CHAT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l.9-5.4A8 8 0 1 1 21 12Z"/></svg>';
+
+  document.getElementById('state').innerHTML = [
+    { k:'State', v:'In review', m:'Since 10 Aug 2025' },
+    { k:'Questions open', v:'2', m:'Both on Registration', warn:true },
+    { k:'Their score for you', v:'62', m:'of 100 · Documentation 20, Geography 26, Network 16' },
+    { k:'Sections confirmed', v:'2 of 4', m:'Two still need review' }
+  ].map(function(x){
+    return '<div class="kpi' + (x.warn ? ' kpi--warn' : '') + '">' +
+      '<span class="eyebrow">' + x.k + '</span>' +
+      '<div class="row"><b>' + x.v + '</b><span class="m">' + x.m + '</span></div></div>';
+  }).join('');
+
+  var SECTIONS = [
+    { t:'Identification', chip:'5/5', full:true, pairs:[
+      ['Country','Democratic Republic of the Congo'],
+      ['Category','Civil Society'],
+      ['Subcategory','Cooperative'],
+      ['Organisation name','Tulivu Cooperative'],
+      ['Registered name','Tulivu Cooperative SARL']
+    ]},
+    { t:'Registration', chip:'4/7', ask:true, pairs:[
+      ['Registration date','12 Mar 2014'],
+      ['Registration number','CD/GOM/RCCM/14-B-0921'],
+      ['National identification number','01-93-N40100B'],
+      ['Tax identification number','', { txt:'This answer is blank. Attach the tax certificate so this section can be confirmed.',
+        who:'N. Okonkwo · Banque Orimu · today' }],
+      ['VAT registration number','', { txt:'A VAT number is mandatory for exporters. Add it before the next review.',
+        who:'N. Okonkwo · Banque Orimu · today' }],
+      ['Registration certificate','1 document attached'],
+      ['Is the organisation currently active?','Yes', null, true]
+    ]},
+    { t:'Governance', chip:'2/2', full:true, pairs:[
+      ['Does the organisation have a management structure?','Yes', null, true],
+      ['Is the organisation supervised by a board?','Yes, 5 members declared', null, true]
+    ]},
+    { t:'Scrutiny', chip:'2/2', full:true, pairs:[
+      ['Has the organisation been involved in any significant dispute or litigation?','No'],
+      ['Is the organisation mentioned on an international watchlist?','No']
+    ]}
+  ];
+
+  document.getElementById('sections').innerHTML = SECTIONS.map(function(s){
+    return '<div class="sec"><div class="h"><h3>' + s.t + '</h3>' +
+      '<span class="chip' + (s.full ? ' chip--full' : (s.ask ? ' chip--ask' : '')) + '">' + s.chip + '</span></div>' +
+      s.pairs.map(function(p){
+        var empty = !p[1], ask = p[2], yes = p[3];
+        return '<div class="pair' + (ask ? ' pair--ask' : '') + '">' +
+          '<div class="k">' + p[0] + '</div>' +
+          '<div class="v' + (empty ? ' v--empty' : '') + (yes ? ' v--yes' : '') + '">' +
+            (yes ? '<span class="mark">✓</span>' : '') + (empty ? 'Not provided' : p[1]) + '</div>' +
+          (ask ? '<div class="asked"><div class="who">' + CHAT + ask.who + '</div>' +
+                 '<div class="txt">' + ask.txt + '</div>' +
+                 '<div class="act"><button class="btn-sm btn-sm--now" type="button" data-form>Answer this</button></div></div>' : '') +
+          '</div>';
+      }).join('') + '</div>';
+  }).join('');
+
+  document.getElementById('trail').innerHTML = [
+    { what:'Two questions were asked about your registration', when:'Today · N. Okonkwo', now:true },
+    { what:'You uploaded 2 documents', when:'12 Aug 2025' },
+    { what:'Your file was received and assigned to N. Okonkwo', when:'10 Aug 2025' },
+    { what:'You sent your file to Banque Orimu', when:'10 Aug 2025' },
+    { what:'Banque Orimu invited you to apply', when:'12 Jul 2025' }
+  ].map(function(e){
+    return '<div class="ev' + (e.now ? ' ev--now' : '') + '"><span class="mark"></span>' +
+      '<div><div class="what">' + e.what + '</div><div class="when">' + e.when + '</div></div></div>';
+  }).join('');
+
+  document.addEventListener('click', function(e){
+    if (e.target.closest && e.target.closest('[data-form]')) KOTA.go('operator-form.html');
+  });
+})();
+</script>
+<script src="motion.js?v=1"></script>
+</body>
+</html>

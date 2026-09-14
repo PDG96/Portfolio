@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KOTA — Home (lowfi)</title>
+<style>
+  /* ==========================================================================
+     Lowfi stage of the bank landing dashboard, rebuilt on the Figma layout
+     spec (layout.svg): 54px rail, 24px page padding, a five-column grid of
+     248.4px on a 24px gutter (1338px of content at a 1440 frame), 7px block
+     radius, and a 36px breadcrumb strip with no chrome of its own.
+
+     It stays light on purpose. The dark palette in the chart exports is the
+     finished UI; this is the stage before it, and the slider it feeds needs
+     the two ends to read as different fidelities rather than two themes.
+     What it borrows from the reference is the geometry, not the colour.
+
+     Every structural number is shared verbatim with bank-home.html, so a
+     screenshot of each at the same viewport lands every block edge on the
+     same pixel — which is what the case study's reveal slider needs.
+     ========================================================================== */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  /* The real dashboard renders at zoom:.75 (see bank-home.html) — every
+     number here is written in its un-zoomed source units, so the same zoom
+     has to apply or every box would render 33% larger than its counterpart. */
+  body{margin:0;background:#EDEDEB;color:#5C5E60;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45;zoom:.75}
+
+  /* ---- layout spec, lifted from layout.svg ---- */
+  :root{
+    --rail:54px;
+    --pad:24px;
+    --gutter:24px;
+    --radius:7px;
+    --topbar:36px;
+    /* light wireframe ramp: paper, not white */
+    --ground:#EDEDEB;
+    --rail-bg:#E4E4E1;
+    --ink:#5C5E60;
+    --stroke:#B9BAB7;
+    --hairline:#DFE0DD;
+    --bar:#C9CAC7;
+    --bar-faint:#DBDCD9;
+    --fill:#E3E3E1;
+  }
+
+  .app{display:flex;min-height:133.334vh}
+
+  /* ---- rail: 54px per the layout spec, plain blocks instead of icons ---- */
+  .rail{width:var(--rail);flex:none;background:var(--rail-bg);display:flex;flex-direction:column;align-items:center;gap:14px;padding:22px 0}
+  .rail .logo{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--stroke);display:grid;place-items:center;font-weight:700;font-size:12px;color:var(--ink)}
+  .rail .nav{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--stroke)}
+  .rail .nav.active{background:var(--fill);border-color:var(--ink)}
+  .rail .spacer{margin-top:auto}
+  .rail .me{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--stroke)}
+
+  .main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 var(--pad) var(--pad)}
+
+  /* ---- breadcrumb strip: 36px, no background, no rule ---- */
+  .topbar{height:var(--topbar);flex:none;display:flex;align-items:center;gap:8px}
+  .crumb{display:flex;align-items:center;gap:8px}
+  .crumb .seg{height:9px;width:62px;background:var(--bar-faint);border-radius:2px}
+  .crumb .seg.here{background:var(--bar);width:46px}
+  .crumb .sep{width:5px;height:5px;border-right:1.5px solid var(--stroke);border-top:1.5px solid var(--stroke);transform:rotate(45deg)}
+  .topbar .right{margin-left:auto;display:flex;gap:10px}
+  .topbar .ph-btn{width:28px;height:28px;border:1.5px solid var(--stroke);border-radius:var(--radius)}
+
+  /* ---- page head: same box as the hi-fi's, so the grid below it starts at
+     the same y in both and the reveal slider lines up ---- */
+  .pagehead{grid-column:span 5;padding:4px 0 0}
+  .pagehead h1{font-size:20px;line-height:28px;font-weight:600;letter-spacing:-.01em;color:var(--ink);margin:0}
+  .pagehead .sub{margin-top:4px;height:20px;width:280px;display:flex;align-items:center}
+  .pagehead .sub::before{content:"";display:block;height:9px;width:100%;background:var(--bar);border-radius:2px}
+
+  /* ---- the grid: five 248.4px columns on a 24px gutter ---- */
+  .canvas{flex:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--gutter);align-content:start}
+  .span-1{grid-column:span 1}
+  .span-4{grid-column:span 4}
+  .span-5{grid-column:span 5}
+
+  /* ---- block: flush with the ground per the reference, with a hairline
+     outline so the wireframe still reads as blocks. inset, so it costs no
+     layout space and can't drift the box against its hi-fi counterpart. ---- */
+  .block{background:transparent;border-radius:var(--radius);box-shadow:inset 0 0 0 1.5px var(--stroke);padding:24px;display:flex;flex-direction:column}
+  .block .head{margin-bottom:20px}
+  .block .title{font-size:16px;line-height:24px;font-weight:500;margin:0;color:var(--ink)}
+  .block .sub{margin-top:4px;height:20px;display:flex;align-items:center}
+  .block .sub::before{content:"";display:block;height:9px;width:100%;background:var(--bar);border-radius:2px}
+
+  /* ---- placeholder primitives ---- */
+  .bar{height:8px;background:var(--bar);border-radius:2px}
+  .bar.faint{background:var(--bar-faint)}
+  .tline{display:flex;align-items:center}
+  .tline.xs{height:18px}
+  .tline.sm{height:20px}
+  .hatch{background-image:repeating-linear-gradient(45deg,var(--fill) 0,var(--fill) 1px,transparent 1px,transparent 9px);border:1.5px dashed var(--bar);border-radius:6px;display:flex;align-items:center;justify-content:center;flex:1}
+  .hatch .lbl{background:var(--ground);border:1px solid var(--stroke);padding:3px 10px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--stroke)}
+
+  /* ---- KPI strip: four blocks across the full 1338, which is the 314px
+     export width in the reference set ---- */
+  .kpis{grid-column:span 5;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gutter)}
+  .kpi{border-radius:var(--radius);box-shadow:inset 0 0 0 1.5px var(--stroke);padding:20px 24px;display:flex;flex-direction:column;gap:6px}
+  .kpi .row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .kpi .valgroup{display:flex;align-items:center;gap:8px}
+  .kpi .num{font-size:28px;line-height:32px;font-weight:600;color:var(--ink)}
+  .kpi .spark{width:72px;height:26px;flex:none}
+
+  /* ---- map block: 4 columns, per the wide/narrow split in the reference ---- */
+  .map-ph{min-height:340px}
+
+  /* ---- latest updates: the 1-column narrow tall block ---- */
+  .tl{flex:1;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  .tl::before{content:"";position:absolute;left:4px;top:10px;bottom:-24px;width:1px;background:var(--hairline)}
+  .tl .e{display:grid;grid-template-columns:8px 1fr;gap:12px;align-items:start}
+  .tl .dot{position:relative;z-index:1;width:8px;height:8px;border-radius:50%;border:1.5px solid var(--stroke);background:var(--ground);margin-top:6px}
+  .tl .txt{display:flex;flex-direction:column}
+
+  /* ---- chart block: the SVG's own layout script pins it to 190px tall
+     regardless of width, so the placeholder matches that, not a ratio ---- */
+  .chart-ph{height:190px;flex:none}
+
+  /* ---- needs attention rows ---- */
+  .watch{display:flex;flex-direction:column}
+  .watch .row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--hairline)}
+  .watch .row:first-child{border-top:0;padding-top:0}
+  .watch .row:last-child{padding-bottom:0}
+  .watch .who{display:flex;align-items:center;gap:12px}
+  .watch .av{width:36px;height:36px;border-radius:var(--radius);border:1.5px solid var(--stroke);flex:none}
+  .watch .txt{display:flex;flex-direction:column}
+  .watch .ph-btn-lg{border:1.5px solid var(--stroke);border-radius:var(--radius);height:34px;width:110px}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Primary">
+    <div class="logo">K</div>
+    <div class="nav active"></div>
+    <div class="nav"></div>
+    <div class="nav"></div>
+    <div class="nav"></div>
+    <div class="spacer"></div>
+    <div class="nav"></div>
+    <div class="me"></div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumb">
+        <span class="seg"></span><span class="sep"></span>
+        <span class="seg"></span><span class="sep"></span>
+        <span class="seg here"></span>
+      </div>
+      <div class="right">
+        <div class="ph-btn"></div>
+        <div class="ph-btn"></div>
+      </div>
+    </header>
+
+    <div class="canvas">
+      <div class="pagehead">
+        <h1>Good afternoon, Meridian Bank</h1>
+        <div class="sub"></div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="tline xs"><span class="bar" style="width:60%"></span></div>
+          <div class="row"><div class="valgroup"><span class="num">0</span><span class="tline xs"><span class="bar faint" style="width:60px"></span></span></div><div class="hatch spark"></div></div>
+        </div>
+        <div class="kpi">
+          <div class="tline xs"><span class="bar" style="width:60%"></span></div>
+          <div class="row"><div class="valgroup"><span class="num">0</span><span class="tline xs"><span class="bar faint" style="width:60px"></span></span></div><div class="hatch spark"></div></div>
+        </div>
+        <div class="kpi">
+          <div class="tline xs"><span class="bar" style="width:60%"></span></div>
+          <div class="row"><div class="valgroup"><span class="num">0</span><span class="tline xs"><span class="bar faint" style="width:60px"></span></span></div><div class="hatch spark"></div></div>
+        </div>
+        <div class="kpi">
+          <div class="tline xs"><span class="bar" style="width:60%"></span></div>
+          <div class="row"><div class="valgroup"><span class="num">0<small style="font-size:14px;font-weight:400">%</small></span></div><div class="hatch spark"></div></div>
+        </div>
+      </div>
+
+      <section class="block span-4">
+        <div class="head">
+          <h2 class="title">Operators by location</h2>
+          <div class="sub" style="width:45%"></div>
+        </div>
+        <div class="hatch map-ph"><span class="lbl">Map — operator pins</span></div>
+      </section>
+
+      <section class="block span-1">
+        <div class="head">
+          <h2 class="title">Latest updates</h2>
+          <div class="sub" style="width:70%"></div>
+        </div>
+        <div class="tl">
+          <div class="e"><span class="dot"></span><div class="txt">
+            <div class="tline sm"><span class="bar" style="width:100%"></span></div>
+            <div class="tline sm"><span class="bar" style="width:55%"></span></div>
+            <div class="tline xs"><span class="bar faint" style="width:45%"></span></div>
+          </div></div>
+          <div class="e"><span class="dot"></span><div class="txt">
+            <div class="tline sm"><span class="bar" style="width:85%"></span></div>
+            <div class="tline xs"><span class="bar faint" style="width:40%"></span></div>
+          </div></div>
+          <div class="e"><span class="dot"></span><div class="txt">
+            <div class="tline sm"><span class="bar" style="width:90%"></span></div>
+            <div class="tline xs"><span class="bar faint" style="width:38%"></span></div>
+          </div></div>
+          <div class="e"><span class="dot"></span><div class="txt">
+            <div class="tline sm"><span class="bar faint" style="width:75%"></span></div>
+            <div class="tline xs"><span class="bar faint" style="width:42%"></span></div>
+          </div></div>
+          <div class="e"><span class="dot"></span><div class="txt">
+            <div class="tline sm"><span class="bar faint" style="width:95%"></span></div>
+            <div class="tline sm"><span class="bar faint" style="width:35%"></span></div>
+            <div class="tline xs"><span class="bar faint" style="width:36%"></span></div>
+          </div></div>
+        </div>
+      </section>
+
+      <section class="block span-5">
+        <div class="head">
+          <h2 class="title">Applicants &amp; verified clients</h2>
+          <div class="sub" style="width:22%"></div>
+        </div>
+        <div class="hatch chart-ph"><span class="lbl">Line chart — cumulative, 12mo</span></div>
+      </section>
+
+      <section class="block span-5">
+        <div class="head">
+          <h2 class="title">Needs attention</h2>
+          <div class="sub" style="width:18%"></div>
+        </div>
+        <div class="watch">
+          <div class="row">
+            <div class="who"><span class="av"></span><div class="txt">
+              <div class="tline sm"><span class="bar" style="width:200px"></span></div>
+              <div class="tline xs"><span class="bar faint" style="width:260px"></span></div>
+            </div></div>
+            <span class="ph-btn-lg"></span>
+          </div>
+          <div class="row">
+            <div class="who"><span class="av"></span><div class="txt">
+              <div class="tline sm"><span class="bar" style="width:90px"></span></div>
+              <div class="tline xs"><span class="bar faint" style="width:220px"></span></div>
+            </div></div>
+            <span class="ph-btn-lg"></span>
+          </div>
+          <div class="row">
+            <div class="who"><span class="av"></span><div class="txt">
+              <div class="tline sm"><span class="bar" style="width:140px"></span></div>
+              <div class="tline xs"><span class="bar faint" style="width:240px"></span></div>
+            </div></div>
+            <span class="ph-btn-lg"></span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+</body>
+</html>

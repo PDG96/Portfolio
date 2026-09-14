@@ -43,7 +43,7 @@
 
 /* ---- Modal: confirmation and short forms. Scrim + centred sheet, Esc and
    scrim-click close, focus returns to the opener. Sized for embeds. ---- */
-.modal-scrim{position:fixed;inset:0;background:rgba(16,24,40,.45);display:none;align-items:center;justify-content:center;padding:24px;z-index:60}
+.modal-scrim{position:fixed;inset:0;background:rgba(17,18,20,.45);display:none;align-items:center;justify-content:center;padding:24px;z-index:60}
 .modal-scrim.open{display:flex}
 .modal{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-lg);width:min(480px,100%);max-height:calc(100vh - 48px);overflow:auto;
   transform:translateY(8px);opacity:0;transition:transform .18s ease,opacity .18s ease}
@@ -73,3 +73,14 @@
 .modal .mbtn.danger{background:var(--bad);border-color:var(--bad);color:#fff}
 .modal .mbtn.danger:hover{filter:brightness(.94)}
 @media (prefers-reduced-motion:reduce){.modal{transition:none}}
+
+/* Dark: .pill usa mix-blend-mode:multiply (bonito no claro, caixa preta no
+   escuro). Blend normal quando o tema escuro esta ativo. */
+:root[data-theme="dark"] .pill{ mix-blend-mode:normal }
+
+/* Dark: avatares de iniciais (.av nas tabelas/sidebars, .me no rail) ficavam
+   com letra apagada sobre tile escuro. Texto quente claro + tile um passo
+   acima do fundo. */
+:root[data-theme="dark"] .av{ color:#F58B5A; background:#26282D }
+:root[data-theme="dark"] .me{ color:#EDF0F4 }
+:root[data-theme="dark"] .pill.neutral{ background:#282A30; color:#C9CBCF }

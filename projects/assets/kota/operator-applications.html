@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+<title>KOTA · Your applications</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="operator-shell.css?v=1">
+<style>
+/* ==========================================================================
+   KOTA — the operator's applications.
+
+   The bank's list is every operator it is reviewing. This one is the mirror:
+   every bank reviewing this operator. One file, sent twice, at two different
+   points in two different processes — which is the whole reason the operator
+   needs a screen for it at all.
+   ========================================================================== */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);
+     font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;
+     font-variant-numeric:tabular-nums}
+:root{
+  --rail:54px; --pad:24px; --gutter:24px; --radius:8px; --topbar:52px;
+  --ground:#151617; --block:#1D1D1E; --line:#2B2C2D;
+  --ink:#F6F6F6; --ink-2:#D3D4D4; --muted:#898B8D; --track:#404244; --fill:#F0F0F0;
+  --accent:#E8723F; --good:#32D583; --good-2:#6CE9A6;
+  --warn:#FDB022; --warn-2:#FEDF89; --bad:#F97066; --bad-2:#F96666;
+  --info:#85A5FF;
+}
+.app{display:flex;width:100%;min-width:1440px;min-height:100svh;position:relative;padding-left:var(--rail)}
+.btn:hover,.btn-sm:hover,.nav:hover{transition-duration:0s}
+
+.rail{width:var(--rail);flex:none;background:var(--ground);display:flex;flex-direction:column;
+      align-items:center;gap:22px;padding:30px 0 22px;position:fixed;top:0;left:0;
+      height:100vh;height:100svh;z-index:10;border-right:1px solid #202122}
+.navgroup{display:flex;flex-direction:column;align-items:center;gap:6px}
+.nav{position:relative;width:36px;height:36px;border-radius:9px;border:0;padding:0;background:transparent;
+     color:#8C8E90;display:grid;place-items:center;cursor:pointer;transition:background .15s ease,color .15s ease}
+.nav svg{width:20px;height:20px}
+.nav:hover{background:#2E3033;color:var(--ink)}
+.nav:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.nav:disabled{color:#252525;cursor:not-allowed}
+.nav:disabled:hover{background:#202122;color:#7A7D80}
+.nav.active{background:rgba(255,255,255,.08);color:var(--ink)}
+.nav.active::before{content:"";position:absolute;left:-9px;top:8px;width:2px;height:20px;
+  border-radius:0 2px 2px 0;background:var(--accent)}
+.nav .badge{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 2px var(--ground)}
+.rail .spacer{margin-top:auto}
+.rail .me{width:32px;height:32px;display:block;border:0;padding:0;background:none;cursor:pointer}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 var(--pad) var(--pad)}
+.stickyhead{position:sticky;top:0;z-index:30;background:var(--ground);border-bottom:1px solid var(--line);
+  transition:margin .2s ease,padding .2s ease,box-shadow .2s ease}
+.stickyhead.is-stuck{margin:0 calc(var(--pad) * -1);padding:0 var(--pad);box-shadow:0 10px 20px rgba(10,11,11,.55)}
+.topbar{height:var(--topbar);flex:none;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted)}
+.topbar a{color:inherit;text-decoration:none;border-radius:4px;padding:2px 4px;margin:0 -4px}
+.topbar a:hover{color:var(--ink);background:#202122}
+.topbar .sep{width:5px;height:5px;border-right:1.5px solid var(--muted);border-top:1.5px solid var(--muted);
+             transform:rotate(45deg);opacity:.8}
+.topbar .here{color:var(--ink)}
+.ophead{display:flex;align-items:center;gap:16px;padding-bottom:16px}
+.ophead .logo{width:48px;height:48px;flex:none}
+.opname{font-size:22px;line-height:28px;font-weight:600;color:var(--ink)}
+.opaddr{margin-top:4px;font-size:14px;line-height:20px;color:var(--muted)}
+
+.canvas{padding-top:var(--gutter);display:grid;grid-template-columns:1fr;gap:var(--gutter);align-content:start}
+.block{background:var(--block);border-radius:var(--radius);padding:var(--pad);display:flex;flex-direction:column}
+.block .head{margin-bottom:20px}
+.block h2{font-size:20px;line-height:28px;font-weight:500;margin:0;color:var(--ink)}
+.block .sub{margin-top:4px;font-size:15px;line-height:20px;color:var(--muted)}
+
+/* ---- the applications table ----
+   This was two cards. Cards are for heterogeneous items you browse; these are
+   records of one type that get scanned and compared, which is what a table is
+   for (NN/g, Data Tables: adjacent values compare without the eye having to
+   re-orient, the way it must across cards).
+
+   Shopify's distinction is the one being built here: not an analytics data
+   table, but an index table, a collection of same-type objects you act on and
+   navigate from. So the row is the click target, the header sticks, and there
+   is one persistent action per row rather than a hover-only one, which would
+   not exist on touch.
+
+   There are two applications today. The pattern is built for the ten an
+   operator will have: search, a promoted filter, sortable columns, a count and
+   an empty state all work the same at either size.
+   ========================================================================== */
+.tablecard{padding:0;overflow:hidden}
+.tablecard .head{margin:0;padding:var(--pad) var(--pad) 18px}
+
+/* The toolbar: open search, not collapsed, because at ten rows it is the
+   first thing reached for. One promoted filter, which is Carbon's and
+   Polaris's advice against a wall of them. */
+.toolbar{display:flex;align-items:center;gap:12px;padding:0 var(--pad) 16px;flex-wrap:wrap}
+.search{position:relative;flex:1;min-width:200px;max-width:320px}
+.search svg{position:absolute;left:12px;top:50%;margin-top:-8px;width:16px;height:16px;
+  color:var(--muted);pointer-events:none}
+.search input{width:100%;height:36px;padding:0 12px 0 36px;border-radius:8px;background:#232425;
+  border:1px solid #343638;color:var(--ink);font:inherit;font-size:14px;outline:none;
+  transition:border-color .15s ease}
+.search input:focus{border-color:var(--accent)}
+.search input::placeholder{color:#5E6062}
+.chips{display:flex;gap:6px}
+.chip{height:36px;padding:0 14px;border-radius:8px;border:1px solid #343638;background:#232425;
+  color:var(--ink-2);font:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:background .15s ease,border-color .15s ease,color .15s ease}
+.chip:hover{background:#2E3033;transition-duration:0s}
+.chip.is-on{background:#2E2118;border-color:#5A3526;color:var(--accent)}
+.chip .c{font-size:12px;color:var(--muted)}
+.chip.is-on .c{color:var(--accent)}
+.count{margin-left:auto;flex:none;font-size:13px;color:var(--muted)}
+
+/* Seven columns would need horizontal scroll at this width; five carry the
+   questions actually asked of this screen: who, where it stands, how far the
+   file is, what to do next, when it last moved. */
+.atbl{display:flex;flex-direction:column}
+.atr{display:grid;grid-template-columns:minmax(200px,1.5fr) minmax(130px,.9fr) minmax(150px,1fr)
+     minmax(150px,1.1fr) minmax(110px,.8fr) 84px;gap:20px;align-items:center;
+     padding:0 var(--pad)}
+/* Sticky, so the column names survive a long list. */
+.athead{position:sticky;top:calc(var(--topbar) + 84px);z-index:2;height:38px;
+  background:#202122;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  font-size:12px;letter-spacing:.04em;color:var(--muted)}
+.athead button{display:inline-flex;align-items:center;gap:5px;border:0;padding:0;background:none;
+  color:inherit;font:inherit;cursor:pointer}
+.athead button:hover{color:var(--ink)}
+.athead .ar{width:10px;height:10px;opacity:0;transition:opacity .12s ease}
+.athead button:hover .ar{opacity:.5}
+.athead button.is-sorted{color:var(--ink)}
+.athead button.is-sorted .ar{opacity:1}
+.athead .desc .ar{transform:rotate(180deg)}
+
+/* The row is a button, so it has to be told it is not one: the user agent
+   hands a <button> a light face, its own font and a border. */
+.atrow{width:100%;min-height:64px;padding-top:12px;padding-bottom:12px;cursor:pointer;
+  text-align:left;background:transparent;color:inherit;font:inherit;
+  border:0;border-bottom:1px solid var(--line);transition:background .15s ease}
+.atrow:hover{background:#232425;transition-duration:0s}
+.atrow:focus-visible{outline:2px solid var(--info);outline-offset:-2px}
+.atrow:last-child{border-bottom:0}
+
+.a-bank{display:flex;align-items:center;gap:11px;min-width:0}
+.a-bank .mk{width:30px;height:30px;flex:none;border-radius:8px;overflow:hidden}
+.a-bank .mk svg{width:100%;height:100%;display:block}
+.a-bank > span:last-child{min-width:0}
+.a-bank .n{display:block;font-size:15px;line-height:20px;font-weight:600;color:var(--ink);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.a-bank .d{display:block;margin-top:2px;font-size:13px;line-height:17px;color:var(--muted)}
+
+/* One chip, colour plus dot plus label, and the vocabulary names who is
+   holding the file rather than leaving that to a second column. Six values
+   is the ceiling Carbon puts on a status set. */
+.tag{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 11px;
+     border-radius:12px;background:var(--line);font-size:13px;font-weight:500;white-space:nowrap}
+.tag .dot{width:6px;height:6px;border-radius:50%;flex:none}
+.tag--you{color:#FF9C6E}        .tag--you .dot{background:#FF9C6E}
+.tag--bank{color:var(--info-2)} .tag--bank .dot{background:var(--info)}
+.tag--draft{color:var(--muted)} .tag--draft .dot{background:var(--muted)}
+.tag--ok{color:var(--good-2)}   .tag--ok .dot{background:var(--good)}
+.tag--bad{color:var(--bad-2)}   .tag--bad .dot{background:var(--bad)}
+
+/* The bar measures answers given, which is a quantity. The chip measures where
+   the review is, which is a stage. Two different questions, so they can share
+   a row without saying the same thing twice. */
+.a-file{display:flex;align-items:center;gap:10px;min-width:0}
+.a-file .bar{flex:1;min-width:48px;max-width:104px;height:6px;border-radius:3px;
+  background:var(--track);overflow:hidden}
+.a-file .bar i{display:block;height:100%;border-radius:3px;background:var(--fill)}
+.a-file .bar i.soft{background:var(--accent-soft)}
+.a-file .p{flex:none;font-size:13px;color:var(--ink-2)}
+
+.a-next{display:block;font-size:14px;line-height:19px;color:var(--ink-2);min-width:0}
+.a-next.is-now{color:var(--accent);font-weight:600}
+.a-next .s{display:block;margin-top:2px;font-size:12px;color:#5E6062}
+.a-when{display:block;font-size:14px;color:var(--ink-2)}
+.a-when .s{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+.a-go{justify-self:end}
+.btn-sm{height:30px;padding:0 13px;border-radius:7px;border:1px solid var(--line);
+  background:#202122;color:var(--ink);font:inherit;font-size:13px;font-weight:500;cursor:pointer;
+  white-space:nowrap;transition:background .15s ease,border-color .15s ease}
+.btn-sm:hover{background:#34363A;border-color:#4A4C50}
+.btn-sm--now{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-sm--now:hover{background:#F2884F;border-color:#F2884F}
+.atbl .empty{padding:44px var(--pad);text-align:center}
+.atbl .empty b{display:block;font-size:15px;color:var(--ink-2)}
+.atbl .empty span{display:block;margin-top:5px;font-size:13px;color:var(--muted)}
+
+.card .acts{margin-top:auto;display:flex;gap:8px}
+.btn{height:36px;padding:0 16px;border-radius:8px;border:1px solid transparent;font:inherit;font-size:14px;
+     font-weight:600;cursor:pointer;display:inline-grid;place-items:center;
+     transition:background .15s ease,border-color .15s ease}
+.btn--primary{background:var(--accent);color:#fff}
+.btn--primary:hover{background:#F2884F}
+.btn--ghost{background:#202122;border-color:var(--line);color:var(--ink)}
+.btn--ghost:hover{background:#34363A;border-color:#4A4C50}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+
+/* The one history on this page: what happened to the file, in order. */
+.trail{display:flex;flex-direction:column}
+.ev{display:flex;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.ev:last-child{border-bottom:0}
+.ev .when{width:120px;flex:none;font-size:13px;color:var(--muted)}
+.ev .what{font-size:15px;line-height:21px;color:var(--ink)}
+.ev .who{margin-top:3px;font-size:13px;color:var(--muted)}
+.ev .mark{width:8px;height:8px;flex:none;margin-top:7px;border-radius:50%;background:var(--track)}
+.ev--now .mark{background:var(--accent)}
+
+.seatpop{position:fixed;left:62px;bottom:20px;z-index:50;width:244px;padding:8px;border-radius:10px;
+  background:var(--block);border:1px solid var(--line);box-shadow:0 16px 28px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .16s ease,transform .16s ease}
+.seatpop.is-on{opacity:1;transform:none;pointer-events:auto}
+.seatpop .lbl{padding:8px 10px 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.seatpop button{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border:0;border-radius:8px;
+  background:transparent;color:var(--ink);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.seatpop button:hover{background:#26282A}
+.seatpop button .r{margin-left:auto;font-size:12px;color:var(--muted)}
+.seatpop .sep{height:1px;margin:6px 4px;background:var(--line)}
+.ctip{position:fixed;z-index:40;pointer-events:none;opacity:0;transform:translate(-50%,-100%);padding:6px 9px;
+  border-radius:6px;background:var(--block);border:1px solid var(--line);box-shadow:0 6px 12px rgba(0,0,0,.35);
+  font-size:12px;color:var(--ink);white-space:nowrap;transition:opacity .12s ease}
+.ctip.is-on{opacity:1}
+.ctip--right{transform:translate(0,-50%)}
+.ctip .tip-off{margin-left:8px;padding:1px 6px;border-radius:9px;background:#2B2C2D;color:var(--muted);
+  font-size:10px;font-weight:600;letter-spacing:.04em}
+</style>
+<link rel="stylesheet" href="motion.css?v=2">
+<link rel="stylesheet" href="responsive.css?v=4">
+<script src="page-transition.js?v=3"></script>
+</head>
+<body>
+<div class="app">
+
+  <nav class="rail" aria-label="Primary" id="rail"></nav>
+
+  <div class="main">
+    <div class="stickyhead" id="stickyhead">
+      <header class="topbar">
+        <a href="operator-home.html">Home</a><span class="sep"></span>
+        <span class="here">Applications</span>
+      </header>
+      <div class="ophead">
+        <div>
+          <div class="opname">Your applications</div>
+          <div class="opaddr">One file, sent to two banks, at two different points</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="canvas">
+      <section class="block tablecard">
+        <div class="head">
+          <div>
+            <h2>Applications</h2>
+            <div class="sub">One file. Each bank reads it at its own point in its own process.</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <label class="search">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+            <input type="search" id="q" placeholder="Search a bank or a desk"
+                   aria-label="Search applications">
+          </label>
+          <div class="chips" id="chips" role="group" aria-label="Filter by status"></div>
+          <div class="count" id="count"></div>
+        </div>
+        <div class="atbl" id="atbl"></div>
+      </section>
+
+      <section class="block">
+        <div class="head">
+          <div>
+            <h2>What has happened</h2>
+            <div class="sub">Across both applications</div>
+          </div>
+        </div>
+        <div class="trail" id="trail"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<div class="seatpop" id="seatpop" role="menu" aria-label="Change seat">
+  <div class="lbl">You are viewing as</div>
+  <button type="button" data-seat="operator" role="menuitem">Tulivu Cooperative <span class="r">Operator · current</span></button>
+  <button type="button" data-seat="bank" role="menuitem">Banque Orimu <span class="r">Bank</span></button>
+  <div class="sep"></div>
+  <button type="button" data-seat="start" role="menuitem">Back to the front door</button>
+</div>
+<div class="ctip" id="ctip" role="status" aria-live="polite"></div>
+
+<script src="operator-shell.js"></script>
+<script>
+(function(){
+  buildOperatorRail('applications');
+
+  /* The bank's own mark, the same one Home, the seat card and the operator's
+     overview use, so a bank looks like itself everywhere in the product. */
+  var MARKS = {
+    'Banque Orimu':
+      '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">' +
+      '<rect width="48" height="48" rx="12" fill="#1E1F21"/>' +
+      '<text x="21" y="32" text-anchor="middle" font-family="Inter,sans-serif" ' +
+      'font-size="22" font-weight="600" fill="#F6F6F6">O</text>' +
+      '<circle cx="35" cy="16.8" r="3.2" fill="#E8723F"/></svg>',
+    'Banque Sefali':
+      '<svg viewBox="0 0 48 48" fill="none" aria-hidden="true">' +
+      '<rect width="48" height="48" rx="12" fill="#1E1F21"/>' +
+      '<text x="24" y="30" text-anchor="middle" font-family="Inter,sans-serif" font-size="16" ' +
+      'font-weight="700" fill="#D3D4D4">BS</text></svg>'
+  };
+
+  /* The status vocabulary names who is holding the file, rather than leaving
+     that to a column of its own: "awaiting user" is how Sumsub and Alloy write
+     the same state, and it answers "whose move" in the chip itself. Six values
+     is the ceiling, which is all a pipeline like this needs. */
+  var STATES = {
+    you:   { t:'Awaiting you',  tone:'you' },
+    bank:  { t:'In review',     tone:'bank' },
+    draft: { t:'Draft',         tone:'draft' },
+    ok:    { t:'Approved',      tone:'ok' },
+    bad:   { t:'Declined',      tone:'bad' },
+    sent:  { t:'Submitted',     tone:'bank' }
+  };
+
+  var applications = [
+    { bank:'Banque Orimu', desk:'North Kivu desk', state:'you', pct:64,
+      next:'Answer 2 questions', nextSub:'Asked today by N. Okonkwo', now:true,
+      when:'12 Aug 2025', ago:'2 days ago', sort:2, go:'Open' },
+    { bank:'Banque Sefali', desk:'Kinshasa desk', state:'draft', pct:31,
+      next:'Finish and send', nextSub:'Not sent yet',
+      when:'28 Jul 2025', ago:'3 weeks ago', sort:1, go:'Continue' }
+  ];
+
+  var COLS = [
+    { k:'bank',  t:'Bank' },
+    { k:'state', t:'Status' },
+    { k:'pct',   t:'Your file' },
+    { k:'next',  t:'Next action' },
+    { k:'sort',  t:'Last activity' }
+  ];
+
+  var ARROW = '<svg class="ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+    'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>';
+
+  /* Most recently moved first: in a queue, the default sort is the one that
+     puts what needs you at the top. */
+  var sortKey = 'sort', sortDir = -1, query = '', filter = 'all';
+
+  function shown(){
+    var q = query.trim().toLowerCase();
+    return applications.filter(function(a){
+      if (filter !== 'all' && a.state !== filter) return false;
+      if (!q) return true;
+      return (a.bank + ' ' + a.desk).toLowerCase().indexOf(q) > -1;
+    }).sort(function(x, y){
+      var a = x[sortKey], b = y[sortKey];
+      if (typeof a === 'string') return a.localeCompare(b) * sortDir;
+      return (a - b) * sortDir;
+    });
+  }
+
+  function drawChips(){
+    var counts = { all: applications.length };
+    applications.forEach(function(a){ counts[a.state] = (counts[a.state] || 0) + 1; });
+    /* Only the statuses this operator actually has, so the filter never offers
+       a door that opens on nothing. */
+    var keys = ['all'].concat(Object.keys(STATES).filter(function(k){ return counts[k]; }));
+    document.getElementById('chips').innerHTML = keys.map(function(k){
+      return '<button class="chip' + (filter === k ? ' is-on' : '') + '" type="button" ' +
+        'data-filter="' + k + '" aria-pressed="' + (filter === k) + '">' +
+        (k === 'all' ? 'All' : STATES[k].t) + '<span class="c">' + counts[k] + '</span></button>';
+    }).join('');
+    [].forEach.call(document.querySelectorAll('[data-filter]'), function(b){
+      b.addEventListener('click', function(){ filter = b.getAttribute('data-filter'); draw(); });
+    });
+  }
+
+  function draw(){
+    drawChips();
+    var rows = shown();
+    document.getElementById('count').textContent =
+      rows.length === applications.length
+        ? applications.length + (applications.length === 1 ? ' application' : ' applications')
+        : rows.length + ' of ' + applications.length;
+
+    var head = '<div class="atr athead">' + COLS.map(function(c){
+      return '<span><button type="button" data-sort="' + c.k + '" class="' +
+        (sortKey === c.k ? 'is-sorted ' : '') + (sortKey === c.k && sortDir < 0 ? 'desc' : '') +
+        '">' + c.t + ARROW + '</button></span>';
+    }).join('') + '<span></span></div>';
+
+    var body = rows.length ? rows.map(function(a){
+      var st = STATES[a.state];
+      return '<button class="atr atrow" type="button" data-open="' + a.bank + '">' +
+        '<span class="a-bank"><span class="mk">' + (MARKS[a.bank] || '') + '</span>' +
+          '<span><span class="n">' + a.bank + '</span>' +
+          '<span class="d">' + a.desk + '</span></span></span>' +
+        '<span><span class="tag tag--' + st.tone + '"><span class="dot"></span>' +
+          st.t + '</span></span>' +
+        '<span class="a-file"><span class="bar"><i class="' + (a.pct < 60 ? 'soft' : '') +
+          '" style="width:' + a.pct + '%"></i></span><span class="p">' + a.pct + '%</span></span>' +
+        '<span class="a-next' + (a.now ? ' is-now' : '') + '">' + a.next +
+          '<span class="s">' + a.nextSub + '</span></span>' +
+        '<span class="a-when">' + a.when + '<span class="s">' + a.ago + '</span></span>' +
+        '<span class="a-go"><span class="btn-sm' + (a.now ? ' btn-sm--now' : '') + '">' +
+          a.go + '</span></span>' +
+        '</button>';
+    }).join('')
+      : '<div class="empty"><b>No application matches</b>' +
+        '<span>Clear the search or the filter to see all ' + applications.length + '.</span></div>';
+
+    document.getElementById('atbl').innerHTML = head + body;
+
+    [].forEach.call(document.querySelectorAll('[data-sort]'), function(b){
+      b.addEventListener('click', function(){
+        var k = b.getAttribute('data-sort');
+        if (sortKey === k) sortDir = -sortDir; else { sortKey = k; sortDir = 1; }
+        draw();
+      });
+    });
+    [].forEach.call(document.querySelectorAll('[data-open]'), function(b){
+      b.addEventListener('click', function(){
+        KOTA.go(b.getAttribute('data-open') === 'Banque Orimu'
+          ? 'application-detail.html' : 'operator-form.html');
+      });
+    });
+  }
+
+  document.getElementById('q').addEventListener('input', function(){
+    query = this.value; draw();
+  });
+  draw();
+
+  /* The trail is the same events both sides can see, in one order. */
+  var trail = [
+    { when:'Today',       what:'Banque Orimu asked two questions about your registration',
+      who:'N. Okonkwo · Banque Orimu', now:true },
+    { when:'12 Aug 2025', what:'You uploaded 2 documents', who:'Tulivu Cooperative' },
+    { when:'10 Aug 2025', what:'Your file was sent to Banque Orimu', who:'Tulivu Cooperative' },
+    { when:'28 Jul 2025', what:'You started a draft for Banque Sefali', who:'Tulivu Cooperative' },
+    { when:'12 Jul 2025', what:'Banque Orimu invited you to apply', who:'N. Okonkwo · Banque Orimu' }
+  ];
+  document.getElementById('trail').innerHTML = trail.map(function(e){
+    return '<div class="ev' + (e.now ? ' ev--now' : '') + '"><span class="when">' + e.when + '</span>' +
+      '<span class="mark"></span><div><div class="what">' + e.what + '</div>' +
+      '<div class="who">' + e.who + '</div></div></div>';
+  }).join('');
+
+  document.addEventListener('click', function(e){
+    if (e.target.closest && e.target.closest('[data-open]')) KOTA.go('application-detail.html');
+    if (e.target.closest && e.target.closest('[data-form]')) KOTA.go('operator-form.html');
+  });
+})();
+</script>
+<script src="motion.js?v=1"></script>
+</body>
+</html>

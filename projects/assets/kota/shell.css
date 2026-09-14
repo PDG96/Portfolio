@@ -8,13 +8,26 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font,'Int
 .ic.sm{width:16px;height:16px}
 button,input,select{font:inherit}
 .app{display:flex;min-height:100vh}
-.rail{width:72px;flex:none;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 0;position:sticky;top:0;height:100vh}
-.logo{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:#fff;background:var(--accent);font-weight:700;font-size:18px;margin-bottom:10px;box-shadow:var(--shadow)}
-.nav{width:44px;height:44px;border-radius:8px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+/* Collapsed (icon-only) is the default rail everywhere — the same shell
+   every Kota screen has always used. .rail.expanded is an opt-in modifier
+   for the one screen that needs labels, not a new baseline. */
+.rail{width:72px;flex:none;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 0;position:sticky;top:0;height:100vh;transition:width .15s var(--ease,ease)}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.logo{width:40px;height:40px;border-radius:10px;display:grid;place-items:center;color:#fff;background:var(--accent);font-weight:700;font-size:18px;box-shadow:var(--shadow);flex:none}
+.wordmark{display:none;font-size:16px;font-weight:600;letter-spacing:.01em;color:var(--title);white-space:nowrap}
+.nav{width:44px;height:44px;border-radius:8px;border:0;background:transparent;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:12px;padding:0;cursor:pointer;text-align:left}
 .nav:hover{background:var(--border-soft);color:var(--text-2)}
 .nav.active{background:var(--accent-tint);color:var(--accent)}
+.nav .lbl{display:none;font-size:var(--t-sm);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rail .spacer{margin-top:auto}
 .rail .me{width:40px;height:40px;border-radius:50%;background:var(--border);display:grid;place-items:center;color:var(--muted);font-weight:600;font-size:12px}
+
+.rail.expanded{width:216px;align-items:stretch;padding:16px 12px}
+.rail.expanded .brand{justify-content:flex-start;padding:0 4px;margin-bottom:16px}
+.rail.expanded .wordmark{display:inline}
+.rail.expanded .nav{width:100%;justify-content:flex-start;padding:0 12px}
+.rail.expanded .nav .lbl{display:inline}
+.rail.expanded .me{margin:0 4px}
 .main{flex:1;min-width:0;display:flex;flex-direction:column}
 .topbar{height:64px;flex:none;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:0 24px;position:sticky;top:0;z-index:5}
 .crumbs{display:flex;align-items:center;gap:8px;color:var(--muted);min-width:0;font-size:var(--t-sm)}

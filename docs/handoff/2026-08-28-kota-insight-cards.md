@@ -157,3 +157,8 @@ Linha → radar refeito com dados de firma (DRC vs SSA, 2024):
 - Uses supplier or customer credit: 10.1 vs 26.0
 - Access to finance is the biggest obstacle: 35 vs 29 (eixo invertido: maior é pior)
 Linha possível: só há um ponto no tempo (2024) pra RDC nesses indicadores; a linha do morph pode ser o tamanho da firma (small 47 → medium 68 → large 81 com conta), que é honesta e conta a história "quanto menor, mais fora".
+
+## Cobalto RDC, série 2013-2024 (USGS)
+Produção de mina, conteúdo de cobalto, toneladas métricas. Fonte: USGS Minerals Yearbook (cobalt 2017 e 2022) + Mineral Commodity Summaries 2025/2026. Obs: é PRODUÇÃO, não exportação; a RDC exporta praticamente tudo (refino majoritariamente na China). Não existe série pública de exportação ano a ano tão consistente quanto essa.
+2013 56.000 · 2014 62.000 · 2015 66.000 · 2016 63.000 · 2017 73.000 · 2018 104.000 · 2019 107.000 · 2020 100.000 · 2021 118.000 · 2022 144.000 · 2023 175.000 · 2024 226.000 (MCS2026; MCS2025 estimava 220.000) · 2025 est. 230.000.
+Contexto recente: fev/2025 a RDC suspendeu exportações de cobalto; regime de cotas em seguida (Fastmarkets).

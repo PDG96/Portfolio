@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script>document.documentElement.setAttribute('data-theme','dark');</script>
+<title>KOTA — Home</title>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.6.0/mapbox-gl.css" rel="stylesheet" />
+<link rel="stylesheet" href="tokens.css?v=8">
+<link rel="stylesheet" href="components.css?v=8">
+<link rel="stylesheet" href="shell.css?v=10">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Every element on this screen scaled to 75%, uniformly, without
+     touching the shared px-based tokens/components. */
+  body{zoom:.75}
+  /* height:100vh is measured against the real screen, not the screen as
+     seen through the zoom above, so a naive 100vh now falls 25% short of
+     the visible viewport. Scaling by 1/.75 puts it back to a full screen. */
+  .app{display:flex;height:133.334vh}
+  .rail{height:133.334vh}
+  html,body{height:100%}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .topbar{flex:none}
+  .canvas{flex:1;min-height:0;overflow-y:auto}
+
+  /* ======================================================================
+     New UI direction, from the Figma reference set (layout.svg + the chart
+     exports). Scoped to this screen rather than pushed into the shared
+     tokens/components, because the other seven story screens still wear
+     the old shell and the case study embeds them side by side.
+
+     Layout spec (layout.svg, 1440x840): 54px rail, 24px page padding,
+     five 248.4px columns on a 24px gutter (1338px of content), 7px block
+     radius, 36px breadcrumb strip with no chrome of its own.
+
+     Palette (sampled from the chart exports): rail #151617, ground and
+     block both #202122 — blocks sit flush with the page and are read by
+     spacing and the #2B2C2D hairline, not by a surface of their own.
+     ====================================================================== */
+  :root{
+    --nu-rail:54px;
+    --nu-pad:24px;
+    --nu-gutter:24px;
+    --nu-radius:7px;
+    --nu-topbar:36px;
+    --nu-ground:#202122;
+    --nu-rail-bg:#151617;
+    --nu-hairline:#2B2C2D;
+    --nu-ink:#F6F6F6;
+    --nu-ink-2:#D3D4D4;
+    --nu-muted:#898B8D;
+    --nu-track:#404244;
+  }
+  body{background:var(--nu-ground)}
+  .rail{width:var(--nu-rail);background:var(--nu-rail-bg);border-right:0;gap:14px;padding:22px 0}
+  .rail .logo{width:28px;height:28px;border-radius:50%;font-size:12px;box-shadow:none}
+  .rail .nav{width:28px;height:28px;border-radius:50%}
+  .rail .nav .ic{width:16px;height:16px}
+  .rail .me{width:28px;height:28px;font-size:10px}
+  /* The breadcrumb strip carries no fill and no rule — it reads as part of
+     the canvas, the way the reference frames it. */
+  .topbar{height:var(--nu-topbar);background:transparent;border-bottom:0;padding:0 var(--nu-pad)}
+  .canvas{background:var(--nu-ground);padding:0 var(--nu-pad) var(--nu-pad);gap:var(--nu-gutter)}
+  .card{background:transparent;box-shadow:none;border-radius:var(--nu-radius)}
+  .card > .head{padding:0 0 20px}
+  .card .body{padding:0}
+  .card .title{color:var(--nu-ink)}
+  .card .sub{color:var(--nu-muted)}
+  /* Blocks are flush, so each one needs its own padding box rather than
+     inheriting the card surface's. */
+  .card{padding:24px;box-shadow:inset 0 0 0 1px var(--nu-hairline)}
+
+  /* No page header: the reference goes straight from the breadcrumb strip
+     into the grid (content starts at y=35.67 of an 840 frame), so the
+     greeting that used to sit here is gone. */
+  .pagehead{display:none}
+
+  /* Block heights come from the reference set rather than from content:
+     short/KPI 187, tall 489, medium 261 — the three sizes every export in
+     the folder is cut to. Fixing them is what makes the proportions read
+     as the Figma frame instead of as whatever the content happened to
+     need. */
+  .kpis{height:187px}
+  .kpis .kpi{height:187px;justify-content:space-between}
+  .row-map{height:489px}
+  .hero-chart{height:261px}
+  .needs-block{height:261px}
+
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--nu-gutter)}
+  .kpi{background:transparent;border-radius:var(--nu-radius);box-shadow:inset 0 0 0 1px var(--nu-hairline);padding:20px 24px;display:flex;flex-direction:column;gap:6px}
+  .kpi .eyebrow{font-size:var(--t-xs)}
+  .kpi .row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  /* Delta sits beside the number instead of on its own line below, so a
+     card without one (Framework coverage) doesn't end up a row shorter
+     than the other three — same two rows (eyebrow, number row) either way. */
+  .kpi .valgroup{display:flex;align-items:center;gap:8px}
+  .kpi b{font-size:28px;line-height:32px;font-weight:600;letter-spacing:-.02em;color:var(--title)}
+  .kpi b small{font-size:var(--t-sm);font-weight:400;color:var(--muted-2);margin-left:4px}
+  .kpi .spark{width:72px;height:26px;flex:none}
+  .kpi .delta{font-size:var(--t-xs);font-weight:500;display:inline-flex;align-items:center;gap:3px;width:fit-content}
+  .kpi .delta.up{color:var(--good)}
+  .kpi .delta.down{color:var(--muted)}
+  .kpi .delta svg{width:12px;height:12px}
+
+  .row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+  /* Latest updates is exactly the width of one KPI card — same 4-column
+     grid and gap as .kpis above it, so its right edge lines up with
+     Framework coverage's column instead of an independently-guessed ratio. */
+  /* Five columns per layout.svg: the map takes four, Latest updates the
+     fifth — the wide/narrow split the reference's 1007/314 export pair
+     describes. */
+  .row-map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--nu-gutter);align-items:stretch}
+  .row-map .card:first-child{grid-column:1/5}
+  .row-map .card:last-child{grid-column:5/6}
+  .row-map .card{display:flex;flex-direction:column}
+  .row-map .card .body{flex:1}
+
+  .legend{display:flex;flex-direction:column;gap:10px}
+  .legend .item{display:flex;align-items:center;gap:8px;font-size:var(--t-sm);color:var(--text-2)}
+  .legend .sw{width:9px;height:9px;border-radius:3px;flex:none}
+  .legend .k{flex:1}
+  .legend .v{font-weight:600;color:var(--title)}
+
+  /* Pipeline breakdown donut, same construction as the applicant review's
+     Risk distribution: rotate(-90) + pathLength=100 stroke-dasharray. */
+  .donut-wrap{display:flex;align-items:center;gap:28px}
+  .donut-wrap .donut{flex:none}
+  .donut-total{position:relative}
+  .donut-total .val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+  .donut-total .val b{font-size:26px;line-height:1;font-weight:600;color:var(--title)}
+  .donut-total .val span{font-size:var(--t-xs);color:var(--muted);margin-top:2px}
+
+  /* Framework coverage gauge, same construction as Confidence score. */
+  .gauge-wrap{display:flex;align-items:center;gap:24px}
+  .gauge-wrap .stat-side{display:flex;flex-direction:column;gap:8px}
+  .gauge-wrap .stat-side .big{font-size:var(--t-sm);color:var(--text-2)}
+  .gauge-wrap .stat-side .big b{color:var(--title);font-weight:600}
+
+  /* Operators by location: a real Mapbox map, same construction as the
+     Straatos project map (custom pinned markers, pulsing halo, popup on
+     click) — just recentred on the provinces the invite form already
+     lists, and pinned in Kota's own accent instead of Straatos' teal. */
+  .map-body{position:relative;height:340px;border-radius:6px;overflow:hidden}
+  #opmap{position:absolute;inset:0}
+  .mapboxgl-ctrl-logo{display:none!important}
+  .map-fallback{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:32px;text-align:center;background:var(--surface-2)}
+  .map-fallback strong{font-size:var(--t-md);color:var(--title)}
+  .map-fallback span{font-size:var(--t-sm);color:var(--muted);max-width:420px;line-height:1.6}
+  /* Same construction as the applicant review's own lineage-diagram zoom
+     control (business-overview.html #zoom): square 36px buttons stacked
+     with a hairline between them, not Straatos' narrow rounded strip. */
+  .nav-strip{position:absolute;right:12px;bottom:12px;z-index:5;display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);overflow:hidden}
+  .nav-strip button{width:28px;height:28px;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
+  .nav-strip button+button{border-top:1px solid var(--border)}
+  .nav-strip button:hover{background:var(--surface-2);color:var(--text)}
+  .nav-strip svg{width:15px;height:15px}
+  .mapboxgl-popup-content{border-radius:8px;padding:0;box-shadow:0 9px 14px rgba(16,24,40,.05),0 3px 3px rgba(16,24,40,.12),0 6px 8px rgba(16,24,40,.08);font-family:inherit;width:230px;overflow:hidden;background:var(--surface);color:var(--text)}
+  /* Mapbox's own stylesheet sets the tip's border-color per anchor class
+     (e.g. .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip), which is two
+     classes deep and beats a plain .mapboxgl-popup-tip rule on specificity
+     alone regardless of load order — hence the white corner. Matching that
+     same two-class specificity (rather than forcing all four border sides
+     with !important, which paints the other three "transparent" sides
+     opaque too and turns the triangle into a solid diamond) fixes the
+     visible side only, per anchor position, and leaves the rest transparent. */
+  .mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+  .mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+  .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip{border-bottom-color:var(--surface)}
+  .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+  .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+  .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip{border-top-color:var(--surface)}
+  .mapboxgl-popup-anchor-left .mapboxgl-popup-tip{border-right-color:var(--surface)}
+  .mapboxgl-popup-anchor-right .mapboxgl-popup-tip{border-left-color:var(--surface)}
+  .mapboxgl-popup-close-button{display:none}
+  .map-tt-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 10px 10px 14px}
+  .map-tt-title{font-size:var(--t-sm);font-weight:600;color:var(--title);margin:0}
+  .map-tt-divider{height:1px;background:var(--border-soft);margin:0 14px}
+  .map-tt-body{padding:10px 14px 14px;display:flex;flex-direction:column;gap:6px}
+  .map-tt-row{display:flex;justify-content:space-between;align-items:center;font-size:var(--t-xs)}
+  .map-tt-row .k{color:var(--muted)}
+  .map-tt-row .v{color:var(--text-2);font-weight:500}
+  /* Access button: same treatment on the map tooltip and each Latest
+     updates row, so "go to the operator" reads as one control, not two. */
+  .access-btn{width:26px;height:26px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex:none;text-decoration:none}
+  .access-btn:hover{color:var(--accent);border-color:var(--accent-soft);background:var(--surface-2)}
+  .access-btn svg{width:14px;height:14px}
+  .pin{position:relative;width:34px;height:37px;cursor:pointer}
+  .pin img{position:relative;z-index:2;width:100%;height:100%;display:block;filter:drop-shadow(0 0 6px rgba(240,116,63,.7)) drop-shadow(0 2px 4px rgba(16,24,40,.35))}
+  .pin:hover{transform:scale(1.08);transform-origin:bottom center}
+  .pin::before{content:"";position:absolute;left:50%;bottom:1px;width:19.8px;height:19.8px;margin-left:-9.9px;margin-bottom:-9.9px;border-radius:50%;background:radial-gradient(circle,rgba(240,116,63,.55) 0%,rgba(240,116,63,0) 70%);animation:pin-pulse 2.2s ease-out infinite;z-index:1}
+  @keyframes pin-pulse{0%{transform:scale(1);opacity:.9}70%{transform:scale(3.2);opacity:0}100%{transform:scale(3.2);opacity:0}}
+
+  /* Hero: same 2-line chart construction as the applicant review's Data
+     reliability over time — cumulative applicants and verified clients. */
+  .hero-chart .body{padding-top:0}
+  /* The viewBox (1900×190) is drawn at the card's actual width, not a
+     narrower design size stretched to fit — so type and line weight
+     render at their real px size instead of scaling up with the card. */
+  .hero-chart .chart{width:100%;display:block}
+  .hero-chart .grid line{stroke:var(--border-soft)}
+  .hero-chart .axis text{font-size:11px;fill:var(--muted)}
+  .hero-chart .xlab text{font-size:11px;fill:var(--muted);text-anchor:middle}
+
+  /* Timeline connector: one line through the dot column instead of a
+     divider between every row. flex:1 + space-between on .tl (its parent
+     .body is a flex column too, so .tl's height is the full available
+     card height, not just its own content) spreads the rows to fill the
+     card exactly — no leftover gap under the last row — and since that
+     stretches the GAPS between rows rather than the rows themselves, a
+     single absolutely-positioned line from the first dot's center to the
+     last dot's center spans every gap automatically, at any list length. */
+  .row-map .card:last-child .body{display:flex;flex-direction:column}
+  .tl{flex:1;display:flex;flex-direction:column;justify-content:space-between;position:relative}
+  /* Bottom left unclipped (not mirrored to the top's 10px inset) and
+     pushed past .tl's own box by the card body's 24px padding, so the
+     line runs to the card's actual bottom edge, not just to where the
+     padding starts — reading as "more below" instead of a line that
+     visibly ends inside the card. */
+  .tl::before{content:"";position:absolute;left:4px;top:10px;bottom:-24px;width:1px;background:var(--nu-hairline)}
+  .tl .e{display:grid;grid-template-columns:8px 1fr auto;gap:12px;align-items:start;padding:0}
+  .tl .e .access-btn{align-self:center}
+  .tl .dot{position:relative;z-index:1;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px}
+  .tl .e.muted .dot{background:var(--border)}
+  .tl .t{font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .tl .m{font-size:var(--t-xs);color:var(--muted)}
+
+  .watch{display:flex;flex-direction:column}
+  .watch .row{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--nu-hairline)}
+  .watch .row:first-child{border-top:0;padding-top:0}
+  .watch .row:last-child{padding-bottom:0}
+  .watch .who{display:flex;align-items:center;gap:12px}
+  .watch .av{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-weight:600;font-size:var(--t-sm);color:var(--accent);background:var(--accent-tint);flex:none}
+  .watch .who b{display:block;font-size:var(--t-sm);font-weight:500;color:var(--title)}
+  .watch .who span{font-size:var(--t-xs);color:var(--muted)}
+  .watch .nudge{border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 12px;font-size:var(--t-xs);font-weight:500;color:var(--text-2);cursor:pointer;white-space:nowrap}
+  .watch .nudge:hover{border-color:var(--accent);color:var(--accent)}
+
+  .iconbtn{position:relative}
+  .nbadge{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+  .notif{position:absolute;top:56px;right:16px;width:340px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:40;display:none;overflow:hidden}
+  .notif.open{display:block}
+  .notif .nh{font-size:var(--t-xs);font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:14px 16px 8px}
+  .notif .ni{display:grid;grid-template-columns:8px 1fr;gap:12px;align-items:start;width:100%;text-align:left;border:0;background:transparent;padding:12px 16px 14px;cursor:pointer}
+  .notif .ni:hover{background:var(--surface-2)}
+  .notif .ni .nd{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px}
+  .notif .ni b{display:block;font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .notif .ni span{font-size:var(--t-xs);color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Primary">
+    <div class="brand"><div class="logo">K</div><span class="wordmark">KOTA</span></div>
+    <button class="nav active" title="Dashboard"><svg class="ic" viewBox="0 0 24 24"><path d="M9 21V13.6C9 13.0399 9 12.7599 9.10899 12.546C9.20487 12.3578 9.35785 12.2049 9.54601 12.109C9.75992 12 10.0399 12 10.6 12H13.4C13.9601 12 14.2401 12 14.454 12.109C14.6422 12.2049 14.7951 12.3578 14.891 12.546C15 12.7599 15 13.0399 15 13.6V21M11.0177 2.764L4.23539 8.03912C3.78202 8.39175 3.55534 8.56806 3.39203 8.78886C3.24737 8.98444 3.1396 9.20478 3.07403 9.43905C3 9.70352 3 9.9907 3 10.5651V17.8C3 18.9201 3 19.4801 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.07989 21 6.2 21H17.8C18.9201 21 19.4802 21 19.908 20.782C20.2843 20.5903 20.5903 20.2843 20.782 19.908C21 19.4801 21 18.9201 21 17.8V10.5651C21 9.9907 21 9.70352 20.926 9.43905C20.8604 9.20478 20.7526 8.98444 20.608 8.78886C20.4447 8.56806 20.218 8.39175 19.7646 8.03913L12.9823 2.764C12.631 2.49075 12.4553 2.35412 12.2613 2.3016C12.0902 2.25526 11.9098 2.25526 11.7387 2.3016C11.5447 2.35412 11.369 2.49075 11.0177 2.764Z"/></svg><span class="lbl">Dashboard</span></button>
+    <button class="nav" title="Evaluation"><svg class="ic" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20V14"/></svg><span class="lbl">Evaluation</span></button>
+    <button class="nav" title="Registration"><svg class="ic" viewBox="0 0 24 24"><path d="M22 21V19C22 17.1362 20.7252 15.5701 19 15.126M15.5 3.29076C16.9659 3.88415 18 5.32131 18 7C18 8.67869 16.9659 10.1159 15.5 10.7092M17 21C17 19.1362 17 18.2044 16.6955 17.4693C16.2895 16.4892 15.5108 15.7105 14.5307 15.3045C13.7956 15 12.8638 15 11 15H8C6.13623 15 5.20435 15 4.46927 15.3045C3.48915 15.7105 2.71046 16.4892 2.30448 17.4693C2 18.2044 2 19.1362 2 21M13.5 7C13.5 9.20914 11.7091 11 9.5 11C7.29086 11 5.5 9.20914 5.5 7C5.5 4.79086 7.29086 3 9.5 3C11.7091 3 13.5 4.79086 13.5 7Z"/></svg><span class="lbl">Registration</span></button>
+    <button class="nav" title="Reports"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11.4999L11 13.4999L15.5 8.99987M20 11.9999C20 16.9083 14.646 20.4783 12.698 21.6147C12.4766 21.7439 12.3659 21.8085 12.2097 21.842C12.0884 21.868 11.9116 21.868 11.7903 21.842C11.6341 21.8085 11.5234 21.7439 11.302 21.6147C9.35396 20.4783 4 16.9083 4 11.9999V7.21747C4 6.41796 4 6.0182 4.13076 5.67457C4.24627 5.37101 4.43398 5.10015 4.67766 4.8854C4.9535 4.64231 5.3278 4.50195 6.0764 4.22122L11.4382 2.21054C11.6461 2.13258 11.75 2.0936 11.857 2.07815C11.9518 2.06444 12.0482 2.06444 12.143 2.07815C12.25 2.0936 12.3539 2.13258 12.5618 2.21054L17.9236 4.22122C18.6722 4.50195 19.0465 4.64231 19.3223 4.8854C19.566 5.10015 19.7537 5.37101 19.8692 5.67457C20 6.0182 20 6.41796 20 7.21747V11.9999Z"/></svg><span class="lbl">Reports</span></button>
+    <div class="spacer"></div>
+    <button class="nav" title="Settings"><svg class="ic" viewBox="0 0 24 24"><path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z M18.7273 14.7273C18.6063 15.0015 18.5702 15.3056 18.6236 15.6005C18.6771 15.8954 18.8177 16.1676 19.0273 16.3818L19.0818 16.4364C19.2509 16.6052 19.385 16.8057 19.4765 17.0265C19.568 17.2472 19.6151 17.4838 19.6151 17.7227C19.6151 17.9617 19.568 18.1983 19.4765 18.419C19.385 18.6397 19.2509 18.8402 19.0818 19.0091C18.913 19.1781 18.7124 19.3122 18.4917 19.4037C18.271 19.4952 18.0344 19.5423 17.7955 19.5423C17.5565 19.5423 17.3199 19.4952 17.0992 19.4037C16.8785 19.3122 16.678 19.1781 16.5091 19.0091L16.4545 18.9545C16.2403 18.745 15.9682 18.6044 15.6733 18.5509C15.3784 18.4974 15.0742 18.5335 14.8 18.6545C14.5311 18.7698 14.3018 18.9611 14.1403 19.205C13.9788 19.4489 13.8921 19.7347 13.8909 20.0273V20.1818C13.8909 20.664 13.6994 21.1265 13.3584 21.4675C13.0174 21.8084 12.5549 22 12.0727 22C11.5905 22 11.1281 21.8084 10.7871 21.4675C10.4461 21.1265 10.2545 20.664 10.2545 20.1818V20.1C10.2475 19.7991 10.1501 19.5073 9.97501 19.2625C9.79991 19.0176 9.55521 18.8312 9.27273 18.7273C8.99853 18.6063 8.69437 18.5702 8.39947 18.6236C8.10456 18.6771 7.83244 18.8177 7.61818 19.0273L7.56364 19.0818C7.39478 19.2509 7.19425 19.385 6.97353 19.4765C6.7528 19.568 6.51621 19.6151 6.27727 19.6151C6.03834 19.6151 5.80174 19.568 5.58102 19.4765C5.36029 19.385 5.15977 19.2509 4.99091 19.0818C4.82186 18.913 4.68775 18.7124 4.59626 18.4917C4.50476 18.271 4.45766 18.0344 4.45766 17.7955C4.45766 17.5565 4.50476 17.3199 4.59626 17.0992C4.68775 16.8785 4.82186 16.678 4.99091 16.5091L5.04545 16.4545C5.25503 16.2403 5.39562 15.9682 5.4491 15.6733C5.50257 15.3784 5.46647 15.0742 5.34545 14.8C5.23022 14.5311 5.03887 14.3018 4.79497 14.1403C4.55107 13.9788 4.26526 13.8921 3.97273 13.8909H3.81818C3.33597 13.8909 2.87351 13.6994 2.53253 13.3584C2.19156 13.0174 2 12.5549 2 12.0727C2 11.5905 2.19156 11.1281 2.53253 10.7871C2.87351 10.4461 3.33597 10.2545 3.81818 10.2545H3.9C4.2009 10.2475 4.49273 10.1501 4.73754 9.97501C4.98236 9.79991 5.16883 9.55521 5.27273 9.27273C5.39374 8.99853 5.42984 8.69437 5.37637 8.39947C5.3229 8.10456 5.18231 7.83244 4.97273 7.61818L4.91818 7.56364C4.74913 7.39478 4.61503 7.19425 4.52353 6.97353C4.43203 6.7528 4.38493 6.51621 4.38493 6.27727C4.38493 6.03834 4.43203 5.80174 4.52353 5.58102C4.61503 5.36029 4.74913 5.15977 4.91818 4.99091C5.08704 4.82186 5.28757 4.68775 5.50829 4.59626C5.72901 4.50476 5.96561 4.45766 6.20455 4.45766C6.44348 4.45766 6.68008 4.50476 6.9008 4.59626C7.12152 4.68775 7.32205 4.82186 7.49091 4.99091L7.54545 5.04545C7.75971 5.25503 8.03183 5.39562 8.32674 5.4491C8.62164 5.50257 8.9258 5.46647 9.2 5.34545H9.27273C9.54161 5.23022 9.77093 5.03887 9.93245 4.79497C10.094 4.55107 10.1807 4.26526 10.1818 3.97273V3.81818C10.1818 3.33597 10.3734 2.87351 10.7144 2.53253C11.0553 2.19156 11.5178 2 12 2C12.4822 2 12.9447 2.19156 13.2856 2.53253C13.6266 2.87351 13.8182 3.33597 13.8182 3.81818V3.9C13.8193 4.19253 13.906 4.47834 14.0676 4.72224C14.2291 4.96614 14.4584 5.15749 14.7273 5.27273C15.0015 5.39374 15.3056 5.42984 15.6005 5.37637C15.8954 5.3229 16.1676 5.18231 16.3818 4.97273L16.4364 4.91818C16.6052 4.74913 16.8057 4.61503 17.0265 4.52353C17.2472 4.43203 17.4838 4.38493 17.7227 4.38493C17.9617 4.38493 18.1983 4.43203 18.419 4.52353C18.6397 4.61503 18.8402 4.74913 19.0091 4.91818C19.1781 5.08704 19.3122 5.28757 19.4037 5.50829C19.4952 5.72901 19.5423 5.96561 19.5423 6.20455C19.5423 6.44348 19.4952 6.68008 19.4037 6.9008C19.3122 7.12152 19.1781 7.32205 19.0091 7.49091L18.9545 7.54545C18.745 7.75971 18.6044 8.03183 18.5509 8.32674C18.4974 8.62164 18.5335 8.9258 18.6545 9.2V9.27273C18.7698 9.54161 18.9611 9.77093 19.205 9.93245C19.4489 10.094 19.7347 10.1807 20.0273 10.1818H20.1818C20.664 10.1818 21.1265 10.3734 21.4675 10.7144C21.8084 11.0553 22 11.5178 22 12C22 12.4822 21.8084 12.9447 21.4675 13.2856C21.1265 13.6266 20.664 13.8182 20.1818 13.8182H20.1C19.8075 13.8193 19.5217 13.906 19.2778 14.0676C19.0339 14.2291 18.8425 14.4584 18.7273 14.7273Z"/></svg><span class="lbl">Settings</span></button>
+    <div class="me">NO</div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="crumbs">
+        <span class="crumb here">Home</span>
+      </div>
+      <div class="right">
+        <button class="iconbtn" id="themeBtn" aria-label="Toggle dark mode"><svg class="ic sm" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg></button>
+        <button class="iconbtn" id="bell" aria-label="Notifications" aria-haspopup="true"><span class="nbadge" id="nbadge"></span><svg class="ic sm" viewBox="0 0 24 24"><path d="M9.35419 21C10.0593 21.6224 10.9856 22 12 22C13.0145 22 13.9407 21.6224 14.6458 21M18 8C18 6.4087 17.3679 4.88258 16.2427 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.8826 2.63214 7.75738 3.75736C6.63216 4.88258 6.00002 6.4087 6.00002 8C6.00002 11.0902 5.22049 13.206 4.34968 14.6054C3.61515 15.7859 3.24788 16.3761 3.26134 16.5408C3.27626 16.7231 3.31488 16.7926 3.46179 16.9016C3.59448 17 4.19261 17 5.38887 17H18.6112C19.8074 17 20.4056 17 20.5382 16.9016C20.6852 16.7926 20.7238 16.7231 20.7387 16.5408C20.7522 16.3761 20.3849 15.7859 19.6504 14.6054C18.7795 13.206 18 11.0902 18 8Z"/></svg></button>
+      </div>
+    </header>
+    <div class="notif" id="notifPop" role="menu" aria-label="Notifications">
+      <div class="nh">Notifications</div>
+      <button class="ni"><span class="nd"></span><div><b>Riverbend cooperative submitted their registration</b><span>Registration · today</span></div></button>
+    </div>
+
+    <div class="canvas">
+      <div class="pagehead">
+        <div><h1>Good afternoon, Meridian Bank</h1><div class="sub">Here's what's moving across your applicants and clients.</div></div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <span class="eyebrow">Active applicants</span>
+          <div class="row">
+            <div class="valgroup">
+              <b>18</b>
+              <span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 15l6-6 6 6"/></svg>3 this week</span>
+            </div>
+            <svg class="spark" viewBox="0 0 96 26"><polyline points="0,20 16,18 32,19 48,14 64,12 80,7 96,4" fill="none" stroke="var(--good)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="kpi">
+          <span class="eyebrow">Verified clients</span>
+          <div class="row">
+            <div class="valgroup">
+              <b>9</b>
+              <span class="delta up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 15l6-6 6 6"/></svg>1 this week</span>
+            </div>
+            <svg class="spark" viewBox="0 0 96 26"><polyline points="0,22 16,21 32,19 48,18 64,15 80,10 96,6" fill="none" stroke="var(--good)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="kpi">
+          <span class="eyebrow">Ready for evaluation</span>
+          <div class="row">
+            <div class="valgroup">
+              <b>4</b>
+              <span class="delta down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>1 this week</span>
+            </div>
+            <svg class="spark" viewBox="0 0 96 26"><polyline points="0,8 16,7 32,10 48,9 64,13 80,12 96,16" fill="none" stroke="var(--muted)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+        <div class="kpi">
+          <span class="eyebrow">Framework coverage</span>
+          <div class="row">
+            <div class="valgroup">
+              <b>82<small>%</small></b>
+            </div>
+            <svg class="spark" viewBox="0 0 96 26"><polyline points="0,17 16,15 32,16 48,12 64,10 80,8 96,7" fill="none" stroke="var(--c-line-b)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <div class="row-map">
+        <section class="card">
+          <div class="head"><div><h2 class="title">Operators by location</h2><div class="sub">Where the active book of business actually operates</div></div></div>
+          <div class="body">
+            <div class="map-body">
+              <div id="opmap"></div>
+              <div class="map-fallback" id="opmapFallback" style="display:none">
+                <strong>Map unavailable</strong>
+                <span>This preview needs to run over http, not opened directly from disk.</span>
+              </div>
+              <div class="nav-strip">
+                <button id="opZoomIn" title="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21L16.65 16.65M11 8V14M8 11H14M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"/></svg></button>
+                <button id="opZoomOut" title="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 21L16.65 16.65M8 11H14M19 11C19 15.4183 15.4183 19 11 19C6.58172 19 3 15.4183 3 11C3 6.58172 6.58172 3 11 3C15.4183 3 19 6.58172 19 11Z"/></svg></button>
+                <button id="opZoomReset" title="Reset view"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10L21 3M21 9V3H15M10 14L3 21M3 15L3 21H9"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="head"><div><h2 class="title">Latest updates</h2><div class="sub">Across all applicants</div></div></div>
+          <div class="body">
+            <div class="tl">
+              <div class="e"><span class="dot"></span><div><div class="t">Riverbend cooperative submitted their registration</div><div class="m">Registration · today</div></div><a class="access-btn" href="details-hub.html" title="View operator" aria-label="View operator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a></div>
+              <div class="e"><span class="dot"></span><div><div class="t">Kivu Minerals uploaded 2 documents</div><div class="m">Registration · yesterday</div></div><a class="access-btn" href="details-hub.html" title="View operator" aria-label="View operator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a></div>
+              <div class="e"><span class="dot"></span><div><div class="t">Tantalux marked ready for evaluation</div><div class="m">Registration · 2 days ago</div></div><a class="access-btn" href="details-hub.html" title="View operator" aria-label="View operator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a></div>
+              <div class="e muted"><span class="dot"></span><div><div class="t">Amani Bethem application updated</div><div class="m">Registration · 3 days ago</div></div><a class="access-btn" href="details-hub.html" title="View operator" aria-label="View operator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a></div>
+              <div class="e muted"><span class="dot"></span><div><div class="t">Meridian Holdings approved with a defensible score</div><div class="m">Evaluation · 4 days ago</div></div><a class="access-btn" href="details-hub.html" title="View operator" aria-label="View operator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card hero-chart">
+        <div class="head">
+          <div><h2 class="title">Applicants &amp; verified clients</h2><div class="sub">Cumulative, last 12 months</div></div>
+          <div class="legend" style="flex-direction:row;gap:16px">
+            <span class="item"><span class="sw" style="background:var(--c-line-a)"></span><span class="k">Applicants</span><span class="v">18</span></span>
+            <span class="item"><span class="sw" style="background:var(--c-line-b)"></span><span class="k">Verified clients</span><span class="v">9</span></span>
+          </div>
+        </div>
+        <div class="body">
+          <svg class="chart" id="homeChart" viewBox="0 0 1900 190" preserveAspectRatio="none" aria-label="Cumulative applicants and verified clients over 12 months, ending at 18 applicants and 9 verified clients">
+            <defs><linearGradient id="fillHome" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--c-line-a)" stop-opacity="0.16"/><stop offset="1" stop-color="var(--c-line-a)" stop-opacity="0"/></linearGradient></defs>
+            <g class="grid"><line x1="81" y1="20" x2="1819" y2="20"/><line x1="81" y1="63.3" x2="1819" y2="63.3"/><line x1="81" y1="106.7" x2="1819" y2="106.7"/><line x1="81" y1="150" x2="1819" y2="150"/></g>
+            <g class="axis" text-anchor="end"><text x="61" y="24">18</text><text x="61" y="67">12</text><text x="61" y="110">6</text><text x="61" y="154">0</text></g>
+            <path d="M81,128.3 239,113.9 397,106.7 555,92.2 713,85 871,77.8 1029,63.3 1187,56.1 1346,48.9 1504,34.4 1662,27.2 1819,20 L1819,150 L81,150 Z" fill="url(#fillHome)"/>
+            <polyline points="81,128.3 239,113.9 397,106.7 555,92.2 713,85 871,77.8 1029,63.3 1187,56.1 1346,48.9 1504,34.4 1662,27.2 1819,20" fill="none" stroke="var(--c-line-a)" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+            <polyline points="81,142.8 239,142.8 397,135.6 555,128.3 713,128.3 871,121.1 1029,113.9 1187,113.9 1346,106.7 1504,99.4 1662,92.2 1819,85" fill="none" stroke="var(--c-line-b)" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round"/>
+            <circle cx="1819" cy="20" r="4" fill="var(--surface)" stroke="var(--c-line-a)" stroke-width="1.8"/>
+            <circle cx="1819" cy="85" r="4" fill="var(--surface)" stroke="var(--c-line-b)" stroke-width="1.8"/>
+            <g class="xlab"><text x="81" y="170">Jan</text><text x="239" y="170">Feb</text><text x="397" y="170">Mar</text><text x="555" y="170">Apr</text><text x="713" y="170">May</text><text x="871" y="170">Jun</text><text x="1029" y="170">Jul</text><text x="1187" y="170">Aug</text><text x="1346" y="170">Sep</text><text x="1504" y="170">Oct</text><text x="1662" y="170">Nov</text><text x="1819" y="170">Dec</text></g>
+          </svg>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="head"><div><h2 class="title">Needs attention</h2><div class="sub">Stalled longer than usual</div></div></div>
+        <div class="body">
+          <div class="watch">
+            <div class="row">
+              <div class="who"><span class="av">MW</span><div><b>Mweka village association</b><span>Registration · 25% · 2 weeks, no progress</span></div></div>
+              <button class="nudge">Send reminder</button>
+            </div>
+            <div class="row">
+              <div class="who"><span class="av">MT</span><div><b>Matoro</b><span>Invited · 12% · 1 week, no progress</span></div></div>
+              <button class="nudge">Send reminder</button>
+            </div>
+            <div class="row">
+              <div class="who"><span class="av">KM</span><div><b>Kivu Minerals</b><span>Registration · 38% · 2 documents outstanding</span></div></div>
+              <button class="nudge">Send reminder</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var $=function(s,c){return (c||document).querySelector(s)};
+  var bell=$('#bell'), pop=$('#notifPop'), badge=$('#nbadge');
+  bell.addEventListener('click',function(e){e.stopPropagation();pop.classList.toggle('open')});
+  document.addEventListener('click',function(e){if(!pop.contains(e.target))pop.classList.remove('open')});
+  Array.prototype.slice.call(document.querySelectorAll('.nudge')).forEach(function(b){
+    b.addEventListener('click',function(){b.textContent='Reminder sent';b.disabled=true;b.style.opacity=.6;});
+  });
+  var tb=$('#themeBtn');
+  if(tb)tb.addEventListener('click',function(){
+    var r=document.documentElement;
+    r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'light':'dark');
+  });
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type==='theme'){document.documentElement.setAttribute('data-theme', e.data.value);}
+  });
+})();
+</script>
+
+<script>
+/* ---- Hero chart: viewBox matched to the card's real local width, not a
+   guessed design size. clientWidth (unlike getBoundingClientRect, which
+   returns post-zoom visual pixels) reads in the same pre-zoom local units
+   every other px value on this page is written in, so a viewBox equal to
+   it renders SVG text and strokes at the same scale as the rest of the
+   dashboard's type — flush against the card's real left/right padding
+   instead of a proportionally-guessed margin that drifts at any width
+   the guess didn't match. */
+(function(){
+  var svg = document.getElementById('homeChart');
+  if (!svg) return;
+  var applicants = [3,5,6,8,9,10,12,13,14,16,17,18];
+  var verified   = [1,1,2,3,3,4,5,5,6,7,8,9];
+  var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  var TOP = 20, BOTTOM = 150, LABEL_Y = 170, MAX_V = 18;
+
+  function yFor(v){ return BOTTOM - (v / MAX_V) * (BOTTOM - TOP); }
+
+  function layout(){
+    var w = svg.parentElement.clientWidth;
+    if (!w) return;
+    var left = 32, right = 14;
+    var plotW = w - left - right;
+    svg.setAttribute('viewBox', '0 0 ' + w + ' 190');
+
+    function xFor(i){ return left + plotW * (i / (months.length - 1)); }
+
+    var gridYs = [TOP, TOP + (BOTTOM - TOP) / 3, TOP + (BOTTOM - TOP) * 2 / 3, BOTTOM];
+    svg.querySelector('.grid').innerHTML = gridYs.map(function(y){
+      return '<line x1="' + left + '" y1="' + y + '" x2="' + (left + plotW) + '" y2="' + y + '"/>';
+    }).join('');
+
+    var axisVals = [MAX_V, Math.round(MAX_V * 2 / 3), Math.round(MAX_V / 3), 0];
+    svg.querySelector('.axis').innerHTML = axisVals.map(function(v, i){
+      return '<text x="' + (left - 12) + '" y="' + (gridYs[i] + 4) + '">' + v + '</text>';
+    }).join('');
+
+    var ptsA = applicants.map(function(v, i){ return xFor(i) + ',' + yFor(v).toFixed(1); });
+    var ptsB = verified.map(function(v, i){ return xFor(i) + ',' + yFor(v).toFixed(1); });
+    svg.querySelector('path').setAttribute('d', 'M' + ptsA.join(' ') + ' L' + (left + plotW) + ',' + BOTTOM + ' L' + left + ',' + BOTTOM + ' Z');
+    var polylines = svg.querySelectorAll('polyline');
+    polylines[0].setAttribute('points', ptsA.join(' '));
+    polylines[1].setAttribute('points', ptsB.join(' '));
+    var circles = svg.querySelectorAll('circle');
+    circles[0].setAttribute('cx', left + plotW); circles[0].setAttribute('cy', yFor(applicants[applicants.length - 1]).toFixed(1));
+    circles[1].setAttribute('cx', left + plotW); circles[1].setAttribute('cy', yFor(verified[verified.length - 1]).toFixed(1));
+
+    svg.querySelector('.xlab').innerHTML = months.map(function(m, i){
+      var x = xFor(i), anchor = i === 0 ? 'start' : (i === months.length - 1 ? 'end' : 'middle');
+      return '<text x="' + x + '" y="' + LABEL_Y + '" text-anchor="' + anchor + '">' + m + '</text>';
+    }).join('');
+  }
+
+  layout();
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(layout).observe(svg.parentElement);
+  } else {
+    window.addEventListener('resize', layout);
+  }
+})();
+</script>
+
+<script>
+/* ---- Operators by location: same construction as the Straatos project
+   map (custom pin element, pulsing halo, popup on click), recentred on
+   the DRC provinces the invite form already lists, pinned in Kota's own
+   accent instead of Straatos' teal. Wrapped so a Mapbox failure can't
+   take the rest of the dashboard with it. */
+(function(){
+  try {
+    mapboxgl.accessToken = "pk.eyJ1IjoicGlldHJhZ290dGFyZG8iLCJhIjoiY2x4YTh5a2hoMWQ0YjJxcjB6MGh0ZTVoYiJ9.cC6zYVd1cGSvF2_KpjLajw";
+
+    var operators = [
+      { id:'riverbend', name:'Riverbend cooperative', location:'North Kivu', center:[29.35,-1.25], stage:'Registration', progress:'72%' },
+      { id:'kivu-minerals', name:'Kivu Minerals', location:'North Kivu', center:[28.85,-1.45], stage:'Registration', progress:'38%' },
+      { id:'tantalux', name:'Tantalux', location:'Goma, North Kivu', center:[29.2247,-1.6792], stage:'Ready for evaluation', progress:'100%' },
+      { id:'amani-bethem', name:'Amani Bethem', location:'South Kivu', center:[28.86,-2.51], stage:'Registration', progress:'55%' },
+      { id:'matoro', name:'Matoro', location:'Maniema', center:[25.95,-2.95], stage:'Invited', progress:'12%' },
+      { id:'mweka', name:'Mweka village association', location:'Maniema', center:[26.35,-3.25], stage:'Registration', progress:'25%' },
+    ];
+
+    var map = new mapboxgl.Map({
+      container: 'opmap',
+      style: 'mapbox://styles/pietragottardo/cmtrptqap00lf01s21m2n4gy4',
+      // The style's own default is the globe projection Straatos uses for
+      // its world view — at a regional zoom that reads as a warped globe
+      // sliver instead of a flat map, and throws the pins into a vertical
+      // stack. This is a regional map, so it's pinned flat regardless of
+      // zoom level.
+      projection: 'mercator',
+      center: [28.1, -2.2],
+      zoom: 5.8,
+      attributionControl: false,
+      scrollZoom: false,
+    });
+
+    // resize() reads the container's size via getBoundingClientRect(),
+    // which is already post-zoom — then writes that number straight onto
+    // the canvas element's own CSS width/height. Since the canvas sits
+    // inside the same zoom:.75 body, that value gets shrunk a SECOND
+    // time on render, so the canvas paints at 0.75×0.75 of the container
+    // instead of matching it — the gap down the right and bottom edges.
+    // The fix has to touch only the bare <canvas> element's own CSS box:
+    // Mapbox positions markers by transform math tied to the container
+    // and its own internal transform state, not to the canvas's literal
+    // size, so correcting just the canvas leaves marker placement alone.
+    // (An earlier version resized the canvas's *container* div too, which
+    // does feed that transform math — that desynced marker positions from
+    // the map on every zoom, worse each time. Canvas only, never its
+    // parent.)
+    var PAGE_ZOOM = 0.75;
+    var opmapEl = document.getElementById('opmap');
+    function fixCanvasFill(){
+      var canvas = map.getCanvas();
+      if (!canvas) return;
+      var cw = canvas.getBoundingClientRect().width;
+      var wrapW = opmapEl.getBoundingClientRect().width;
+      if (!cw || !wrapW) return;
+      if (Math.abs(cw - wrapW) < 2) return; // already correct, leave it alone
+      var localW = parseFloat(canvas.style.width) || cw / PAGE_ZOOM;
+      var localH = parseFloat(canvas.style.height) || canvas.getBoundingClientRect().height / PAGE_ZOOM;
+      canvas.style.width = (localW / PAGE_ZOOM) + 'px';
+      canvas.style.height = (localH / PAGE_ZOOM) + 'px';
+    }
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(function(){ map.resize(); fixCanvasFill(); }).observe(opmapEl);
+    } else {
+      window.addEventListener('resize', function(){ map.resize(); fixCanvasFill(); });
+    }
+    map.once('load', function(){ map.resize(); fixCanvasFill(); });
+    setTimeout(function(){ map.resize(); fixCanvasFill(); }, 300);
+    setTimeout(function(){ map.resize(); fixCanvasFill(); }, 1000);
+
+    var mapEl = document.getElementById('opmap');
+    var scrollZoomTimer = null;
+    mapEl.addEventListener('mouseenter', function(){ scrollZoomTimer = setTimeout(function(){ map.scrollZoom.enable(); }, 600); });
+    mapEl.addEventListener('mouseleave', function(){ clearTimeout(scrollZoomTimer); map.scrollZoom.disable(); });
+
+    document.getElementById('opZoomIn').addEventListener('click', function(){ map.zoomIn(); });
+    document.getElementById('opZoomOut').addEventListener('click', function(){ map.zoomOut(); });
+    document.getElementById('opZoomReset').addEventListener('click', function(){ map.easeTo({ center: [28.1, -2.2], zoom: 5.8, bearing: 0, pitch: 0 }); });
+
+    function tooltipHtml(op){
+      return '<div class="map-tt-head"><p class="map-tt-title">' + op.name + '</p>' +
+        '<a class="access-btn" href="details-hub.html" title="View operator" aria-label="View operator"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg></a></div>' +
+        '<div class="map-tt-divider"></div>' +
+        '<div class="map-tt-body">' +
+          '<div class="map-tt-row"><span class="k">Location</span><span class="v">' + op.location + '</span></div>' +
+          '<div class="map-tt-row"><span class="k">Stage</span><span class="v">' + op.stage + '</span></div>' +
+          '<div class="map-tt-row"><span class="k">Progress</span><span class="v">' + op.progress + '</span></div>' +
+        '</div>';
+    }
+
+    var pinSvg = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg width="24" height="26" viewBox="0 0 24 26" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M5.4546 5.5745C8.9272 2.0259 14.5564 2.0233 18.0276 5.5703C21.328 8.9429 21.4886 14.3084 18.5119 17.879H18.5105C18.3463 18.0816 18.1738 18.2783 17.9914 18.4667L11.7466 24.8482L5.6643 18.6328L5.4512 18.422C1.9803 14.8749 1.9823 9.1231 5.4546 5.5745Z" fill="#F0743F" stroke="#B85A32" stroke-width="0.6"/>' +
+      '</svg>'
+    );
+
+    map.on('load', function(){
+      map.setConfigProperty('basemap', 'showPlaceLabels', true);
+      map.setConfigProperty('basemap', 'showRoadLabels', false);
+      map.setConfigProperty('basemap', 'showPointOfInterestLabels', false);
+      map.setConfigProperty('basemap', 'showTransitLabels', false);
+
+      // Admin boundary lines (province/state borders) come in pink from the
+      // shared Straatos style — overridden here, per-layer, at the map
+      // instance level so the shared style itself (and Straatos' own map)
+      // is untouched. Layer ids are matched by name rather than hardcoded,
+      // since the Standard style's basemap import doesn't expose them as
+      // a documented, stable id list.
+      try {
+        map.getStyle().layers.forEach(function(layer){
+          if (!/admin|boundary|border/i.test(layer.id)) return;
+          ['line-color', 'fill-outline-color', 'fill-color'].forEach(function(prop){
+            try { map.setPaintProperty(layer.id, prop, '#6B6E74'); } catch (e) {}
+          });
+        });
+      } catch (e) {}
+
+      operators.forEach(function(op){
+        // Mapbox hands the element passed here its own position:absolute
+        // marker styling directly — a plain wrapper takes that, and the
+        // pin (position:relative, needed so its ::before pulse halo can
+        // anchor to it) lives one level inside instead of colliding with
+        // it. Giving .pin straight to Marker({element}) once meant its
+        // position:relative overrode Mapbox's position:absolute on the
+        // very same element, and every marker fell back into normal
+        // document flow, stacking top to bottom instead of sitting on its
+        // coordinate.
+        var wrapper = document.createElement('div');
+        var el = document.createElement('div');
+        el.className = 'pin';
+        el.innerHTML = '<img src="' + pinSvg + '" alt="">';
+        wrapper.appendChild(el);
+        var popup = new mapboxgl.Popup({ offset: 20, closeButton: false }).setHTML(tooltipHtml(op));
+        new mapboxgl.Marker({ element: wrapper, anchor: 'bottom' }).setLngLat(op.center).setPopup(popup).addTo(map);
+      });
+    });
+  } catch (err) {
+    var mapEl = document.getElementById('opmap');
+    var fb = document.getElementById('opmapFallback');
+    if (fb) fb.style.display = 'flex';
+    if (mapEl) mapEl.style.display = 'none';
+  }
+})();
+</script>
+</body>
+</html>

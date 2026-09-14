@@ -32,14 +32,14 @@
 /* Light by default. Dark only when the host explicitly stamps data-theme="dark";
    the case study pins these screens to light whatever the page theme. */
 :root[data-theme="dark"]{
-  --bg:#151109; --surface:#211A12; --surface-2:#271F16;
-  --border:#352B20; --border-soft:#2C2318;
-  --text:#F6EFE7; --text-2:#DCD1C4; --muted:#A99C8C; --muted-2:#7E7161; --faint:#4C4133;
-  --accent:#F0743F; --accent-hover:#F5854F; --accent-soft:#F08F65; --accent-tint:#2B1B10; --accent-tint-2:#3A2416;
-  --good:#75E0A7; --good-bg:#0F241A; --good-bd:#1F4632;
-  --warn:#FDB750; --warn-bg:#2A2010; --warn-bd:#5A431A;
-  --bad:#FDA29B;  --bad-bg:#2A1512;  --bad-bd:#5A2723;
-  --info:#9DB0FF; --info-bg:#141B2E; --info-bd:#2C3859;
+  --bg:#111214; --surface:#17181B; --surface-2:#1D1F23;
+  --border:#2C2E33; --border-soft:#242629;
+  --text:#F0F1F2; --text-2:#C9CBCF; --muted:#8E9196; --muted-2:#6B6E74; --faint:#46484D;
+  --accent:#F0743F; --accent-hover:#F5854F; --accent-soft:#F08F65; --accent-tint:#2A211B; --accent-tint-2:#3A2B1F;
+  --good:#75E0A7; --good-bg:#142620; --good-bd:#1F4632;
+  --warn:#FDB750; --warn-bg:#282213; --warn-bd:#5A481F;
+  --bad:#FDA29B;  --bad-bg:#2A1917;  --bad-bd:#5A2A26;
+  --info:#9DB0FF; --info-bg:#181D2B; --info-bd:#2C3859;
   --approve:#12B76A; --approve-hover:#3BCB86;
   --reject:#F04438;
   --correct:#F79009;
@@ -58,8 +58,8 @@
   --sidebar-hover: rgba(255, 255, 255, 0.06);
 }
 :root[data-theme="dark"], :root:not([data-theme="light"]) {
-  --sidebar: #1B150E;
-  --sidebar-2: #241C13;
+  --sidebar: #121316;
+  --sidebar-2: #191A1E;
 }
 
 /* Type scale from the Figma bento (Text md/sm/xs). Titles are Gray/90, not
@@ -70,3 +70,7 @@
   --t-sm:14px; --t-sm-lh:20px;
   --t-xs:12px; --t-xs-lh:18px;
 }
+
+/* Dark: o bloco de type-scale declarava --title so no light; sem override os
+   titulos de card somem no dark. */
+:root[data-theme="dark"]{ --title:#EFF0F2 }

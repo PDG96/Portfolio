@@ -9,6 +9,9 @@
   <link rel="icon" type="image/svg+xml" href="../favicon.svg">
   <link rel="apple-touch-icon" href="../favicon.svg">
 
+  <link rel="preload" href="../assets/fonts/TWKLausanne-300.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/TWKLausanne-300Italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../assets/fonts/TWKLausanne-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/fonts/lausanne.css">
 
    <!-- Stamped before first paint so a dark-theme reload doesn't flash white. -->
@@ -112,8 +115,8 @@
     /* Terracotta "Challenge" label, per theme: 5.3:1 light, 5.9:1 dark. */
     --label-warn: #a04e2f;
 
-      --font: 'TWKLausanne', system-ui, sans-serif;
-      --mono: 'TWKLausanne', system-ui, sans-serif;
+      --font: 'TWKLausanne', 'TWKLausanne Fallback', system-ui, sans-serif;
+      --mono: 'TWKLausanne', 'TWKLausanne Fallback', system-ui, sans-serif;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
       --section-py: clamp(4.5rem, 9vw, 7rem);
@@ -304,10 +307,10 @@
     /* ====== NAV ====== */
     .nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-      background: rgba(252,252,252,0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      transition: box-shadow 0.4s var(--ease);
+      background: rgba(252,252,252,0.72);
+      backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+      -webkit-backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
+      transition: box-shadow 0.4s var(--ease), backdrop-filter 0.4s var(--ease);
     }
     .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
     .nav-inner {
@@ -512,7 +515,17 @@
     border-radius: 8px;
     overflow: hidden;
     background: var(--bg-alt);
-    transition: opacity 0.3s var(--ease);
+    transition: opacity 0.3s var(--ease), transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+    }
+    /* Same lift as the Work page's case cards: translateY + shadow on the
+       card, scale on the thumb image. */
+    .sidebar-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -16px rgba(0,0,0,0.5);
+    }
+    .sidebar-card--soon:hover {
+    transform: none;
+    box-shadow: none;
     }
     /* Coming-soon variant, same treatment as the case-next cards on the other
     pages: the thumb stays at full strength and only reveals a dark overlay
@@ -554,8 +567,14 @@
     height: 100%;
     object-fit: cover;
     display: block;
-    /* Nudged past the transparent rounded corners in the source art. */
+    transition: transform 0.7s var(--ease);
+    /* 1.02 nudges past the transparent rounded corners baked into the
+       source art; the hover below multiplies on top of that, same as the
+       Work page's case-card thumbs. */
     transform: scale(1.02);
+    }
+    .sidebar-card:hover .sidebar-card-thumb img {
+    transform: scale(1.06);
     }
 
     .main-sheet {
@@ -1944,7 +1963,7 @@
          </a>
          <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
           <div class="sidebar-card-thumb">
-           <img src="assets/kota-cover.jpg" alt="Kota, Counterparty due-diligence infrastructure">
+           <img src="assets/kota-cover.jpg?v=3" alt="Kota, Counterparty due-diligence infrastructure">
            <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
           </div>
          </div>
@@ -2136,5 +2155,6 @@
    <a class="seg-btn" href="../index.html#contact" data-i18n="seg_contact">Get in touch</a>
  </nav>
 
+<script defer src="https://cloud.umami.is/script.js" data-website-id="fb0010c7-011d-4984-8c5a-075500cf715c" data-domains="pietragottardo.com"></script>
 </body>
 </html>

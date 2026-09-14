@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<script>document.documentElement.setAttribute('data-theme','dark');</script>
 <title>KOTA — Registration</title>
 <link rel="stylesheet" href="tokens.css?v=8">
 <link rel="stylesheet" href="components.css?v=8">
@@ -10,6 +11,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+  /* Every element on this screen scaled to 75%, uniformly, without
+     touching the shared px-based tokens/components. */
+  body{zoom:.75}
+  /* height:100vh is measured against the real screen, not the screen as
+     seen through the zoom above, so a naive 100vh now falls 25% short of
+     the visible viewport. Scaling by 1/.75 puts it back to a full screen. */
+  .app{min-height:133.334vh}
+  .rail{height:133.334vh}
   /* Bank · Registration. The grammar's first rule: the landing is always a
      table. Every operator the bank is registering, one row each. */
   .tools{display:flex;gap:10px;align-items:center}
@@ -57,6 +66,32 @@
   .toast .ic{stroke:var(--surface);width:16px;height:16px}
   .empty{padding:36px 16px;text-align:center;color:var(--muted);font-size:var(--t-sm);display:none}
   .empty.show{display:block}
+  .iconbtn{position:relative}
+  .nbadge{position:absolute;top:7px;right:7px;width:9px;height:9px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+  .notif{position:absolute;top:56px;right:16px;width:340px;background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-lg);z-index:40;display:none;overflow:hidden}
+  .notif.open{display:block}
+  .notif .nh{font-size:var(--t-xs);font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);padding:14px 16px 8px}
+  .notif .ni{display:grid;grid-template-columns:8px 1fr;gap:12px;align-items:start;width:100%;text-align:left;border:0;background:transparent;padding:12px 16px 14px;cursor:pointer}
+  .notif .ni:hover{background:var(--surface-2)}
+  .notif .ni .nd{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:6px}
+  .notif .ni b{display:block;font-size:var(--t-sm);font-weight:500;color:var(--text)}
+  .notif .ni span{font-size:var(--t-xs);color:var(--muted)}
+  html,body{height:100%}
+  .main{height:133.334vh;display:flex;flex-direction:column;min-width:0}
+  .topbar{flex:none}
+  .canvas{flex:1;min-height:0;overflow:hidden}
+  /* Single column now that the Registration desk sidebar is gone — the
+     operators table takes the full canvas width. */
+  .bgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;height:100%;align-items:stretch}
+  /* Deliberate rhythm between the page title and the card, and the card
+     itself grows to the full available height instead of the page just
+     leaving dead air below the table: the pager pins to the card's own
+     bottom edge (margin-top:auto) whatever the row count. Falls back to a
+     contained scroll only if the table itself ever runs past that. */
+  .bmain{height:100%;min-width:0;display:flex;flex-direction:column;gap:24px}
+  .bmain .card{flex:1;display:flex;flex-direction:column;min-height:0}
+  .bmain .card .body{flex:1;display:flex;flex-direction:column;min-height:0;overflow-y:auto}
+  .bmain .card .foot{margin-top:auto;flex:none}
 </style>
 </head>
 <body>
@@ -80,24 +115,24 @@
         <span class="crumb here">Registration</span>
       </div>
       <div class="right">
-        <button class="iconbtn" aria-label="Notifications"><svg class="ic sm" viewBox="0 0 24 24"><path d="M9.35419 21C10.0593 21.6224 10.9856 22 12 22C13.0145 22 13.9407 21.6224 14.6458 21M18 8C18 6.4087 17.3679 4.88258 16.2427 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.8826 2.63214 7.75738 3.75736C6.63216 4.88258 6.00002 6.4087 6.00002 8C6.00002 11.0902 5.22049 13.206 4.34968 14.6054C3.61515 15.7859 3.24788 16.3761 3.26134 16.5408C3.27626 16.7231 3.31488 16.7926 3.46179 16.9016C3.59448 17 4.19261 17 5.38887 17H18.6112C19.8074 17 20.4056 17 20.5382 16.9016C20.6852 16.7926 20.7238 16.7231 20.7387 16.5408C20.7522 16.3761 20.3849 15.7859 19.6504 14.6054C18.7795 13.206 18 11.0902 18 8Z"/></svg></button>
+        <button class="iconbtn" id="themeBtn" aria-label="Toggle dark mode"><svg class="ic sm" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg></button>
+        <button class="iconbtn" id="bell" aria-label="Notifications" aria-haspopup="true"><span class="nbadge" id="nbadge"></span><svg class="ic sm" viewBox="0 0 24 24"><path d="M9.35419 21C10.0593 21.6224 10.9856 22 12 22C13.0145 22 13.9407 21.6224 14.6458 21M18 8C18 6.4087 17.3679 4.88258 16.2427 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.8826 2.63214 7.75738 3.75736C6.63216 4.88258 6.00002 6.4087 6.00002 8C6.00002 11.0902 5.22049 13.206 4.34968 14.6054C3.61515 15.7859 3.24788 16.3761 3.26134 16.5408C3.27626 16.7231 3.31488 16.7926 3.46179 16.9016C3.59448 17 4.19261 17 5.38887 17H18.6112C19.8074 17 20.4056 17 20.5382 16.9016C20.6852 16.7926 20.7238 16.7231 20.7387 16.5408C20.7522 16.3761 20.3849 15.7859 19.6504 14.6054C18.7795 13.206 18 11.0902 18 8Z"/></svg></button>
       </div>
     </header>
+    <div class="notif" id="notifPop" role="menu" aria-label="Notifications">
+      <div class="nh">Notifications</div>
+      <button class="ni" id="notifItem"><span class="nd"></span><div><b>Riverbend cooperative submitted their application</b><span>Registration · just now</span></div></button>
+    </div>
 
     <div class="canvas">
-      <div class="pagehead">
+      <div class="bgrid">
+        <div class="bmain">
+          <div class="pagehead">
         <div><h1>Registration</h1><div class="sub">Operators being registered, before evaluation opens</div></div>
         <button class="btn primary" id="invite"><svg class="ic" viewBox="0 0 24 24"><path d="M12 5V19M5 12H19"/></svg>Invite operator</button>
       </div>
 
-      <div class="kpis">
-        <div class="kpi"><span class="eyebrow">In registration</span><b>18</b></div>
-        <div class="kpi"><span class="eyebrow">Awaiting documents</span><b>7</b></div>
-        <div class="kpi"><span class="eyebrow">Ready for evaluation</span><b>4</b></div>
-        <div class="kpi"><span class="eyebrow">Median time to ready</span><b>9<small>days</small></b></div>
-      </div>
-
-      <section class="card">
+          <section class="card">
         <div class="head" style="align-items:center">
           <div><h2 class="title">Operators</h2><div class="sub">18 in registration · sorted by last update</div></div>
           <div class="tools">
@@ -120,10 +155,26 @@
           <div class="foot"><span id="count">Showing 6 of 18</span><span class="pager"><button class="on">1</button><button>2</button><button>3</button></span></div>
         </div>
       </section>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<div class="modal-scrim" id="mReview" role="dialog" aria-modal="true" aria-labelledby="mReviewT" aria-hidden="true">
+  <div class="modal">
+    <div class="mhead"><span class="mi good"><svg class="ic" viewBox="0 0 24 24"><path d="M9 11.4999L11 13.4999L15.5 8.99987M20 11.9999C20 16.9083 14.646 20.4783 12.698 21.6147C12.4766 21.7439 12.3659 21.8085 12.2097 21.842C12.0884 21.868 11.9116 21.868 11.7903 21.842C11.6341 21.8085 11.5234 21.7439 11.302 21.6147C9.35396 20.4783 4 16.9083 4 11.9999V7.21747C4 6.41796 4 6.0182 4.13076 5.67457C4.24627 5.37101 4.43398 5.10015 4.67766 4.8854C4.9535 4.64231 5.3278 4.50195 6.0764 4.22122L11.4382 2.21054C11.6461 2.13258 11.75 2.0936 11.857 2.07815C11.9518 2.06444 12.0482 2.06444 12.143 2.07815C12.25 2.0936 12.3539 2.13258 12.5618 2.21054L17.9236 4.22122C18.6722 4.50195 19.0465 4.64231 19.3223 4.8854C19.566 5.10015 19.7537 5.37101 19.8692 5.67457C20 6.0182 20 6.41796 20 7.21747V11.9999Z"/></svg></span><div><h3 class="mtitle" id="mReviewT">Evaluate Riverbend cooperative</h3><div class="msub">Registration complete · 7 of 7 documents verified</div></div><button class="mclose" data-close aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6L18 18"/></svg></button></div>
+    <div class="mbody">
+      <div class="kv">
+        <div class="r"><span class="k">Identity match</span><span class="v">92 · matches Guichet Unique</span></div>
+        <div class="r"><span class="k">Registry standing</span><span class="v">81</span></div>
+        <div class="r"><span class="k">Ownership transparency</span><span class="v">78</span></div>
+        <div class="r"><span class="k">Sanctions &amp; PEP screening</span><span class="v">Clear</span></div>
+      </div>
+    </div>
+    <div class="mfoot"><button class="mbtn" data-close>Not yet</button><button class="mbtn primary" id="approveBtn">Approve applicant</button></div>
+  </div>
+</div>
 <div class="modal-scrim" id="mInvite" role="dialog" aria-modal="true" aria-labelledby="mInviteT" aria-hidden="true">
   <div class="modal">
     <div class="mhead"><span class="mi"><svg class="ic" viewBox="0 0 24 24"><path d="M22 21V19C22 17.1362 20.7252 15.5701 19 15.126M15.5 3.29076C16.9659 3.88415 18 5.32131 18 7C18 8.67869 16.9659 10.1159 15.5 10.7092M17 21C17 19.1362 17 18.2044 16.6955 17.4693C16.2895 16.4892 15.5108 15.7105 14.5307 15.3045C13.7956 15 12.8638 15 11 15H8C6.13623 15 5.20435 15 4.46927 15.3045C3.48915 15.7105 2.71046 16.4892 2.30448 17.4693C2 18.2044 2 19.1362 2 21M13.5 7C13.5 9.20914 11.7091 11 9.5 11C7.29086 11 5.5 9.20914 5.5 7C5.5 4.79086 7.29086 3 9.5 3C11.7091 3 13.5 4.79086 13.5 7Z"/></svg></span><div><h3 class="mtitle" id="mInviteT">Invite an operator</h3><div class="msub">They get a link to register and start their file.</div></div><button class="mclose" data-close aria-label="Close"><svg class="ic" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6L18 18"/></svg></button></div>
@@ -184,6 +235,50 @@
     tr.querySelector('.who b').textContent=org; $('tbody').prepend(tr); rows.unshift(tr); tr.setAttribute('tabindex','0');
     tr.addEventListener('click',function(){rows.forEach(function(x){x.classList.remove('sel')});tr.classList.add('sel');say('Opening '+org+' · Details')});
     closeModal($('#mInvite')); $('#invOrg').value=''; $('#invPhone').value=''; $('#invMsg').value=''; apply(); say('Invite sent to '+org);
+  });
+  window.__bank={rows:rows,say:say,openModal:openModal,closeModal:closeModal};
+})();
+</script>
+<script>
+(function(){
+  var $=function(s,c){return (c||document).querySelector(s)};
+  var B=window.__bank;
+  var bell=$('#bell'), pop=$('#notifPop'), badge=$('#nbadge');
+  bell.addEventListener('click',function(e){e.stopPropagation();pop.classList.toggle('open')});
+  document.addEventListener('click',function(e){if(!pop.contains(e.target))pop.classList.remove('open')});
+  var applied=false, approved=false;
+  $('#notifItem').addEventListener('click',function(){
+    pop.classList.remove('open'); badge.style.display='none';
+    if(applied)return; applied=true;
+    var tr=B.rows[0];
+    var c=tr.cloneNode(true); tr.parentNode.replaceChild(c,tr); B.rows[0]=c;
+    var tds=c.querySelectorAll('td');
+    tds[1].innerHTML='<span class="pill good dot">Ready for evaluation</span>';
+    tds[2].querySelector('.pc i').style.width='100%';
+    tds[2].querySelector('.pc > span:last-child').textContent='100%';
+    tds[3].textContent='7 / 7';
+    tds[4].textContent='Just now';
+    c.classList.add('sel');
+    c.scrollIntoView({block:'center',behavior:'smooth'});
+    // The Registration desk sidebar this counter lived in was removed, so
+    // guard rather than throwing here and killing the rest of the step.
+    var kpiReady=document.getElementById('kpiReady');
+    if(kpiReady)kpiReady.textContent='5';
+    B.say('Riverbend cooperative is ready for evaluation · click the row to review');
+    c.addEventListener('click',function(){if(!approved)B.openModal('mReview',c)});
+  });
+  $('#approveBtn').addEventListener('click',function(){
+    approved=true;
+    B.closeModal(document.getElementById('mReview'));
+    var c=B.rows[0], tds=c.querySelectorAll('td');
+    tds[1].innerHTML='<span class="pill good dot">Approved</span>';
+    tds[4].textContent='Just now';
+    B.say('Riverbend cooperative approved · operator and aggregator notified');
+  });
+  var tb=document.getElementById('themeBtn');
+  if(tb)tb.addEventListener('click',function(){
+    var r=document.documentElement;
+    r.setAttribute('data-theme', r.getAttribute('data-theme')==='dark'?'light':'dark');
   });
 })();
 </script>
