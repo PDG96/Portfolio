@@ -47,7 +47,13 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 .app{display:flex;width:100%;min-width:1440px;min-height:100svh;
      position:relative;padding-left:var(--rail)}
-.btn-sm:hover,.nav:hover,.tbody .tr:hover{transition-duration:0s}
+.btn-sm:hover,.nav:hover,/* The hover band is a panel, not a stripe: it carries its own padding and
+   stops short of the card wall. The table is pulled out by the same amount the
+   rows are padded in, so the columns do not move. */
+.tbl{margin:0 -12px}
+.thead,.tbody .tr{padding-left:12px;padding-right:12px}
+.tbody .tr{border-radius:8px}
+.tbody .tr:hover{transition-duration:0s}
 
 /* ---- rail ---- */
 .rail{width:var(--rail);flex:none;background:var(--ground);display:flex;
@@ -84,6 +90,16 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .topbar a:hover{color:var(--ink);background:#202122}
 .topbar .sep{width:5px;height:5px;border-right:1.5px solid var(--muted);
              border-top:1.5px solid var(--muted);transform:rotate(45deg);opacity:.8}
+/* ---- back ----
+   The breadcrumb says where you are; this says how to leave. It goes to the
+   parent screen rather than to browser history, so it lands in the same place
+   whether you arrived by clicking through or by opening the URL cold. */
+.topbar .back{display:grid;place-items:center;width:24px;height:24px;flex:none;
+  margin:0 2px 0 -4px;padding:0;border-radius:6px;color:var(--muted);
+  transition:background .15s ease,color .15s ease}
+.topbar .back:hover{background:#26282A;color:var(--ink);transition-duration:0s}
+.topbar .back:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.topbar .back svg{width:14px;height:14px}
 .topbar .here{color:var(--ink)}
 .ophead{display:flex;align-items:center;gap:16px;padding-bottom:16px}
 .ophead .logo{width:48px;height:48px;flex:none}
@@ -126,7 +142,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
     gap:var(--gutter);align-items:center}
 
 .thead{padding-bottom:12px;border-bottom:1px solid var(--line);font-size:15px;color:var(--muted)}
-.tbody .tr{padding:14px 0;border-bottom:1px solid var(--line);transition:background .15s ease}
+.tbody .tr{padding:14px 12px;border-bottom:1px solid var(--line);transition:background .15s ease}
 .tbody .tr:last-child{border-bottom:0}
 .tbody .tr--open{cursor:pointer}
 .tbody .tr--open:hover{background:#242527}
@@ -254,6 +270,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
+        <a class="back" href="bank-home.html" aria-label="Back to Home" data-tip="Back to Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></a>
         <a href="bank-home.html">Home</a><span class="sep"></span>
         <span class="here">Evaluation</span>
       </header>
@@ -339,10 +356,6 @@ body{margin:0;background:var(--ground);color:var(--ink);
       state:'Registering',      progress:100, last:'2 days ago' }
   ];
 
-  /* Serandi Mining is at 100% but has not been submitted, so it is not reviewable
-     either: completeness is not the same as handed over. */
-  operators[5].note = 'complete, not submitted';
-
   var ready = operators.filter(function(o){ return o.ready; });
 
   /* ---- the counts ---- */
@@ -371,7 +384,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
       '<span><span class="tag tag--' + (o.ready ? 'now' : 'none') + '"><span class="dot"></span>' +
         o.state + '</span></span>' +
       '<div class="prog"><span class="bar"><i style="width:' + o.progress + '%"></i></span>' +
-        '<span class="pct">' + o.progress + '%' + (o.note ? ' · ' + o.note : '') + '</span></div>' +
+        '<span class="pct">' + o.progress + '%</span></div>' +
       (o.ready ? '<span class="cell"><b>' + o.score + '</b> <i>/ 100</i></span>'
                : '<span class="cell cell--off">Not scored</span>') +
       '<span class="cell' + (o.ready ? '' : ' cell--off') + '">' + o.last + '</span>' +

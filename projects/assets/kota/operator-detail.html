@@ -222,6 +222,16 @@ body{margin:0;background:var(--ground);color:var(--ink);
   margin:0 -4px;transition:color .15s ease,background .15s ease}
 .topbar a:hover{color:var(--ink);background:#202122;transition-duration:0s}
 .topbar a:focus-visible{outline:2px solid var(--info);outline-offset:1px}
+/* ---- back ----
+   The breadcrumb says where you are; this says how to leave. It goes to the
+   parent screen rather than to browser history, so it lands in the same place
+   whether you arrived by clicking through or by opening the URL cold. */
+.topbar .back{display:grid;place-items:center;width:24px;height:24px;flex:none;
+  margin:0 2px 0 -4px;padding:0;border-radius:6px;color:var(--muted);
+  transition:background .15s ease,color .15s ease}
+.topbar .back:hover{background:#26282A;color:var(--ink);transition-duration:0s}
+.topbar .back:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.topbar .back svg{width:14px;height:14px}
 .topbar .here{color:var(--ink)}
 
 /* ---- the grid ---- */
@@ -462,9 +472,15 @@ body{margin:0;background:var(--ground);color:var(--ink);
        font-size:15px;color:var(--muted)}
 /* 13, not 15: five rows plus the header are exactly what the band is tall,
    and at 15 the last row fell under the card's own scroll. */
-.tbody .tr{padding:13px 0;border-bottom:1px solid var(--line);transition:background .15s ease}
+.tbody .tr{padding:13px 12px;border-bottom:1px solid var(--line);transition:background .15s ease}
 /* The row is the target the action button belongs to; lighting it on
    hover tells you which form the button you are about to press is for. */
+/* The hover band is a panel, not a stripe: it carries its own padding and
+   stops short of the card wall. The table is pulled out by the same amount the
+   rows are padded in, so the columns do not move. */
+.tbl{margin:0 -12px}
+.thead,.tbody .tr{padding-left:12px;padding-right:12px}
+.tbody .tr{border-radius:8px}
 .tbody .tr:hover{background:#242527}
 .tbody .tr:last-child{border-bottom:0}
 .f-name{font-size:17px;line-height:22px;color:var(--ink)}
@@ -972,6 +988,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
          are", and when the page moves they hold the top as one bar. -->
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
+        <a class="back" href="evaluation.html" aria-label="Back to Evaluation" data-tip="Back to Evaluation"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></a>
         <a href="evaluation.html">Evaluation</a><span class="sep"></span>
         <a href="evaluation.html">Operators</a><span class="sep"></span>
         <span class="here">Tulivu Cooperative</span>

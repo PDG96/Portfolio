@@ -62,6 +62,16 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .topbar a:hover{color:var(--ink);background:#202122}
 .topbar .sep{width:5px;height:5px;border-right:1.5px solid var(--muted);border-top:1.5px solid var(--muted);
              transform:rotate(45deg);opacity:.8}
+/* ---- back ----
+   The breadcrumb says where you are; this says how to leave. It goes to the
+   parent screen rather than to browser history, so it lands in the same place
+   whether you arrived by clicking through or by opening the URL cold. */
+.topbar .back{display:grid;place-items:center;width:24px;height:24px;flex:none;
+  margin:0 2px 0 -4px;padding:0;border-radius:6px;color:var(--muted);
+  transition:background .15s ease,color .15s ease}
+.topbar .back:hover{background:#26282A;color:var(--ink);transition-duration:0s}
+.topbar .back:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.topbar .back svg{width:14px;height:14px}
 .topbar .here{color:var(--ink)}
 .ophead{display:flex;align-items:center;gap:16px;padding-bottom:16px}
 .ophead .logo{width:48px;height:48px;flex:none}
@@ -141,6 +151,10 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .atrow{width:100%;min-height:64px;padding-top:12px;padding-bottom:12px;cursor:pointer;
   text-align:left;background:transparent;color:inherit;font:inherit;
   border:0;border-bottom:1px solid var(--line);transition:background .15s ease}
+/* Same rule as the other tables: the band keeps its distance from the wall. */
+.atbl{margin:0 12px}
+.atr{padding-left:calc(var(--pad) - 12px);padding-right:calc(var(--pad) - 12px)}
+.atrow{border-radius:8px}
 .atrow:hover{background:#232425;transition-duration:0s}
 .atrow:focus-visible{outline:2px solid var(--info);outline-offset:-2px}
 .atrow:last-child{border-bottom:0}
@@ -241,6 +255,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
   <div class="main">
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
+        <a class="back" href="operator-home.html" aria-label="Back to Home" data-tip="Back to Home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></a>
         <a href="operator-home.html">Home</a><span class="sep"></span>
         <span class="here">Applications</span>
       </header>
