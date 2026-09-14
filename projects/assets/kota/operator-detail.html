@@ -1728,20 +1728,15 @@ body{margin:0;background:var(--ground);color:var(--ink);
         })
       }});
 
-      /* A soft continuous line under the dashes keeps the connection legible
-         when the dash gap is over a dark part of the basemap; the dashes on
-         their own flicker in and out of the ground. */
-      map.addLayer({ id:'flow-base', type:'line', source:'flow',
-        layout:{ 'line-cap':'round', 'line-join':'round' },
-        paint:{ 'line-color':'#E8723F', 'line-width':3.4, 'line-opacity':0.26, 'line-blur':1.5 } });
-
-      /* Lighter than the accent it comes from. At full accent the dashes sat
-         at the same value as the dark basemap under them and read as brown
-         specks; pulled up toward white they carry the hue and clear the
-         ground, which is what a line drawn over terrain has to do. */
+      /* One line, drawn flat. There used to be a blurred orange line under the
+         dashes to carry the run across the gaps, and between its 26% opacity
+         and its blur it was the thing reading as a dark smear: a soft mark at
+         low opacity over terrain takes the ground's value, not its own. No
+         casing, no blur, no opacity, and the colour is near white so it sits
+         above anything the basemap puts under it. */
       map.addLayer({ id:'flow-dash', type:'line', source:'flow',
         layout:{ 'line-cap':'butt', 'line-join':'round' },
-        paint:{ 'line-color':'#FFBF9E', 'line-width':1.9, 'line-opacity':1,
+        paint:{ 'line-color':'#FFE9DC', 'line-width':2.2, 'line-opacity':1,
                 'line-dasharray':[0,4,3] } });
 
       /* The dash pattern is stepped forward one frame at a time along the
