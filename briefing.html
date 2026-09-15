@@ -254,7 +254,7 @@
     display:flex;align-items:flex-start;gap:0.7rem;flex-wrap:wrap;
     border:1px solid var(--border);border-radius:6px;background:var(--surface);
     padding:0.7rem 0.9rem;font-size:0.9375rem;line-height:1.45;color:var(--text);
-    cursor:pointer;transition:border-color 0.3s var(--ease),background 0.3s var(--ease),color 0.3s var(--ease);
+    cursor:pointer;transition:border-color 0.3s var(--ease),background 0.3s var(--ease),color 0.3s var(--ease),opacity 0.3s var(--ease);
   }
   .opt:hover{border-color:var(--border-strong)}
   .opt-main{display:flex;align-items:flex-start;gap:0.7rem;flex:1;min-width:0;cursor:pointer}
@@ -280,6 +280,11 @@
   .opt input[type=radio]:checked::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--bg)}
   .opt input:focus-visible{outline:2px solid rgb(var(--dot-rgb));outline-offset:2px}
   .opt.on{border-color:var(--text);background:transparent}
+  /* Single choice, answered: the ones not taken step back, the chosen one
+     keeps its full weight. Hover brings any of them forward again. */
+  .field.done .opts[data-type="radio"] .opt:not(.on){opacity:0.5}
+  .field.done .opts[data-type="radio"] .opt:not(.on):hover,
+  .field.done .opts[data-type="radio"] .opt:not(.on):focus-within{opacity:1}
 
   /* ============================================================
      Review: label over value, ruled, grouped by section.
@@ -578,7 +583,7 @@
     } else if(f.type === "radio" || f.type === "checkbox"){
       forId = f.id + "_0";
       var cls = f.inline ? "opts inline" : ((f.type === "checkbox" || f.options.length > 5) ? "opts cols" : "opts");
-      ctrl = '<div class="'+cls+'" role="group" aria-labelledby="'+f.id+'_q" data-group="'+f.id+'">';
+      ctrl = '<div class="'+cls+'" role="group" aria-labelledby="'+f.id+'_q" data-group="'+f.id+'" data-type="'+f.type+'">';
       f.options.forEach(function(raw, i){
         var o = typeof raw === "string" ? raw : raw.t;
         var d = typeof raw === "string" ? "" : raw.d;
