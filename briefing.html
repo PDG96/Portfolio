@@ -382,10 +382,10 @@
     },
     {
       key:"negocio", title:"Negócio e objetivo", short:"Negócio", time:"2 min",
-      note:"O que vocês vendem, o que o site precisa provocar em quem chega, e por que agora.",
+      note:"O que você vende, o que o site precisa provocar em quem chega, e por que agora.",
       fields:[
         {id:"oferta", label:"O que a empresa faz, em uma frase", type:"textarea", required:true,
-         help:"Como você explicaria pra alguém que nunca ouviu falar de vocês."},
+         help:"Como você explicaria pra alguém que nunca ouviu falar da empresa."},
         {id:"objetivo_principal", label:"O que o site precisa fazer acontecer", type:"radio", required:true,
          options:["Gerar leads e agendar reuniões","Vender online","Passar credibilidade institucional","Captar investimento","Recrutar pessoas","Publicar conteúdo e ganhar audiência","Ainda não sei, quero ajuda pra definir"]},
         {id:"publico", label:"Quem precisa ser convencido", type:"text",
@@ -393,7 +393,7 @@
         {id:"porque_agora", label:"O que o site de hoje não resolve", type:"textarea",
          help:"É o que mais me ajuda a priorizar. Se é o primeiro site, diga o que está travando sem ele.",
          placeholder:"Ex.: não explica o produto novo, não converte quem chega do LinkedIn, parece de 2015"},
-        {id:"referencias", label:"Dois sites que vocês admiram, e por quê", type:"textarea",
+        {id:"referencias", label:"Dois sites que você admira, e por quê", type:"textarea",
          placeholder:"site.com: a clareza da home\nsite2.com: o tom da escrita"}
       ]
     },
@@ -415,7 +415,7 @@
       note:"Site trava mais por falta de texto e imagem do que por design.",
       fields:[
         {id:"textos", label:"Os textos do site", type:"radio",
-         options:["Já estão prontos","Temos rascunhos pra editar","Queremos que vocês escrevam","Ainda não pensamos nisso"]},
+         options:["Já estão prontos","Temos rascunhos pra editar","Quero que você escreva","Ainda não pensamos nisso"]},
         {id:"marca", label:"A identidade visual", type:"radio",
          options:["Manual de marca completo","Logo e cores, sem manual","Só o logo","Não temos nada","Temos, mas queremos repensar"]},
         {id:"imagens", label:"As imagens do site", type:"radio",
@@ -430,7 +430,7 @@
       key:"projeto", title:"Prazo e investimento", short:"Prazo e verba", time:"1 min",
       note:"Sem a faixa de verba, qualquer preço que eu mandar é chute.",
       fields:[
-        {id:"prazo", label:"Quando vocês querem no ar", type:"text",
+        {id:"prazo", label:"Quando você quer no ar", type:"text",
          placeholder:"Ex.: novembro, antes da conferência. Ou: sem data definida"},
         {id:"moeda", label:"Moeda", type:"radio", inline:true, options:["BRL","EUR","USD","GBP"]},
         {id:"faixa", label:"Faixa de investimento prevista", type:"radio", required:true,
@@ -443,11 +443,9 @@
       key:"tecnico", title:"Técnico e final", short:"Técnico", time:"1 min",
       note:"Tudo opcional. Responda só o que já estiver definido internamente.",
       fields:[
-        {id:"plataforma", label:"Preferência de plataforma", type:"radio",
-         options:["Webflow","Framer","WordPress","Site em código (Next.js ou similar)","Sem preferência, quero a recomendação"]},
         {id:"manutencao", label:"Quem cuida do site depois do lançamento", type:"radio",
-         help:"Muda a escolha da plataforma: um site que vocês editam pede uma ferramenta diferente de um que eu mantenho.",
-         options:["Nós mesmos, sem depender de ninguém","Queremos que vocês mantenham","Um dev interno","Ainda não sei"]},
+         help:"Muda a escolha da plataforma: um site que você edita pede uma ferramenta diferente de um que eu mantenho.",
+         options:["Eu mesmo, sem depender de ninguém","Quero que você mantenha","Um dev interno","Ainda não sei"]},
         {id:"compliance", label:"Requisitos de conformidade ou segurança", type:"checkbox",
          options:["LGPD","GDPR","Banner de cookies","Acessibilidade (WCAG)","Hospedagem em região específica","Revisão de segurança antes do lançamento","Nenhum ou não sei"]},
         {id:"integracoes", label:"Sistemas com que o site precisa conversar", type:"text",
