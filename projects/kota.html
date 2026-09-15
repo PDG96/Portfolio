@@ -84,7 +84,7 @@
  --page-max: 2272px;
  --view-pad-top: calc(var(--nav-h) + var(--grid-gap));
  --seg-band: calc(var(--edge) * 2 + var(--seg-h));
- --sidebar-w: 23%;
+ --sidebar-w: 19%;
 
  /* ====== THE MEASURE ======
     Same computation as the landing, so the case sheet sits on exactly the
@@ -1607,7 +1607,10 @@
     belongs to the frame and never gets swallowed by a control inside it. */
  /* The section above already closes on 112px of its own padding, so a second
     112 here read as a hole between the image and this label. */
- .case-section--proto { padding-top: 0; }
+ /* No exception on the top: with padding-top zeroed, the boundary above
+    this section measured 113px while every other boundary on the page
+    measured 224. The rhythm has to be the same wherever a section ends
+    and the next one names itself. */
  /* clip-path and not overflow alone: the iframe inside is scaled, which puts
     it on its own compositor layer, and a composited child walks straight
     through an ancestor's rounded overflow clip. The corners stayed square
