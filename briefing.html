@@ -219,7 +219,10 @@
      ============================================================ */
   .fields{border-top:1px solid var(--border)}
   .field{padding-block:1.6rem;border-bottom:1px solid var(--border)}
-  .q{display:block;font-size:1.0625rem;font-weight:400;color:var(--text);margin:0 0 0.35rem;line-height:1.4}
+  .q-row{display:flex;align-items:baseline;gap:0.6rem;margin:0 0 0.35rem}
+  .q-row .info{margin-top:0;align-self:center}
+  .q{display:block;font-size:1.0625rem;font-weight:400;color:var(--text);margin:0;line-height:1.4}
+  .q-desc{font-size:0.875rem;color:var(--text-2);margin:0.25rem 0 0.9rem;max-width:40em;line-height:1.5}
   .q .req{color:rgb(var(--dot-rgb));margin-left:0.25em;font-weight:500}
   .q .mark{
     display:inline-block;margin-left:0.5em;font-size:0.75em;color:rgb(var(--dot-rgb));
@@ -248,12 +251,22 @@
   .opts.inline{display:flex;flex-wrap:wrap}
   .opts.inline .opt{flex:none;padding-right:1.1rem}
   .opt{
-    display:flex;align-items:flex-start;gap:0.7rem;
+    display:flex;align-items:flex-start;gap:0.7rem;flex-wrap:wrap;
     border:1px solid var(--border);border-radius:6px;background:var(--surface);
     padding:0.7rem 0.9rem;font-size:0.9375rem;line-height:1.45;color:var(--text);
     cursor:pointer;transition:border-color 0.3s var(--ease),background 0.3s var(--ease),color 0.3s var(--ease);
   }
   .opt:hover{border-color:var(--border-strong)}
+  .opt-main{display:flex;align-items:flex-start;gap:0.7rem;flex:1;min-width:0;cursor:pointer}
+  .info{
+    flex:none;width:18px;height:18px;margin-top:0.2rem;border-radius:50%;
+    border:1px solid var(--border-strong);background:transparent;color:var(--text-3);
+    font-family:var(--font);font-size:11px;font-weight:500;line-height:1;font-style:italic;
+    display:grid;place-content:center;cursor:pointer;padding:0;
+    transition:border-color 0.3s var(--ease),color 0.3s var(--ease);
+  }
+  .info:hover,.info[aria-expanded="true"]{border-color:var(--text);color:var(--text)}
+  .opt-desc{flex-basis:100%;margin:0.35rem 0 0;padding-left:calc(15px + 0.7rem);font-size:0.8125rem;line-height:1.5;color:var(--text-2)}
   .opt input{
     appearance:none;-webkit-appearance:none;
     width:15px;height:15px;flex:none;margin:0.3rem 0 0;
@@ -337,7 +350,7 @@
       box-shadow:0 0 0 1px rgba(0,0,0,0.06),0 6px 20px rgba(0,0,0,0.12),inset 0 2px 3px rgba(255,255,255,0.35),inset 0 -2px 3px rgba(0,0,0,0.06);
     }
     .cursor.off{opacity:0}
-    a,button,.opt{cursor:none}
+    a,button,.opt-main{cursor:none}
   }
   @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -447,8 +460,18 @@
          help:"Muda a escolha da plataforma: um site que você edita pede uma ferramenta diferente de um que eu mantenho.",
          options:["Eu mesmo, sem depender de ninguém","Quero que você mantenha","Um dev interno","Ainda não sei"]},
         {id:"compliance", label:"Requisitos de conformidade ou segurança", type:"checkbox",
-         options:["LGPD","GDPR","Banner de cookies","Acessibilidade (WCAG)","Hospedagem em região específica","Revisão de segurança antes do lançamento","Nenhum ou não sei"]},
+         help:"Se nenhum desses nomes disser nada, o botão de informação explica cada um.",
+         options:[
+           {t:"LGPD", d:"Lei brasileira de proteção de dados. Vale se o site coleta qualquer dado pessoal de quem está no Brasil, até um formulário de contato. Pede aviso claro do que é coletado e pra quê."},
+           {t:"GDPR", d:"Equivalente europeu da LGPD. Vale se o site atende pessoas na União Europeia. Mais rígido no consentimento e no direito de apagar os dados."},
+           {t:"Banner de cookies", d:"O aviso que pede permissão antes de usar cookies de analytics ou anúncios. Obrigatório na União Europeia; no Brasil, recomendado se houver rastreamento."},
+           {t:"Acessibilidade (WCAG)", d:"Padrão internacional pra sites usáveis por pessoas com deficiência: contraste, leitor de tela, navegação por teclado. Exigido em licitações e por muitas empresas grandes."},
+           {t:"Hospedagem em região específica", d:"O site e os dados ficam em servidores de um país ou região definidos, por exemplo só no Brasil ou só na União Europeia. Costuma ser exigência jurídica ou de cliente corporativo."},
+           {t:"Revisão de segurança antes do lançamento", d:"Uma checagem de vulnerabilidades e configurações (formulários, integrações, cabeçalhos) antes de ir ao ar. Comum quando o site tem área logada ou pagamento."},
+           "Nenhum ou não sei"
+         ]},
         {id:"integracoes", label:"Sistemas com que o site precisa conversar", type:"text",
+         info:"Integração é quando o site conversa com outra ferramenta sozinho: o formulário cria o contato no CRM (HubSpot, RD Station, Pipedrive), a newsletter cadastra no Mailchimp, o Google Analytics mede as visitas, o agendamento abre na sua agenda, o pagamento passa pelo Stripe. Cada uma é um encaixe a mais no projeto, e algumas dependem de plano pago da ferramenta. Se você já usa algo e quer que o site alimente, lista aqui; se não sabe, deixa em branco que eu proponho.",
          placeholder:"Ex.: HubSpot, Mailchimp, Google Analytics, API interna"},
         {id:"livre", label:"Links de materiais ou algo que eu não perguntei", type:"textarea",
          placeholder:"Deck de vendas, manual de marca, pasta no Drive"}
@@ -556,20 +579,32 @@
       forId = f.id + "_0";
       var cls = f.inline ? "opts inline" : ((f.type === "checkbox" || f.options.length > 5) ? "opts cols" : "opts");
       ctrl = '<div class="'+cls+'" role="group" aria-labelledby="'+f.id+'_q" data-group="'+f.id+'">';
-      f.options.forEach(function(o, i){
+      f.options.forEach(function(raw, i){
+        var o = typeof raw === "string" ? raw : raw.t;
+        var d = typeof raw === "string" ? "" : raw.d;
         var on = f.type === "checkbox" ? (Array.isArray(val) && val.indexOf(o) > -1) : (val === o);
-        ctrl += '<label class="opt'+(on?" on":"")+'">'+
-          '<input type="'+f.type+'" name="'+f.id+'" id="'+f.id+'_'+i+'" value="'+esc(o)+'" data-f="'+f.id+'"'+(on?' checked':'')+'>'+
-          '<span>'+esc(o)+'</span></label>';
+        var did = f.id+'_'+i+'_d';
+        ctrl += '<div class="opt'+(on?" on":"")+'">'+
+          '<label class="opt-main">'+
+            '<input type="'+f.type+'" name="'+f.id+'" id="'+f.id+'_'+i+'" value="'+esc(o)+'" data-f="'+f.id+'"'+(on?' checked':'')+'>'+
+            '<span>'+esc(o)+'</span></label>'+
+          (d ? '<button type="button" class="info" aria-label="O que é '+esc(o)+'" aria-expanded="false" aria-controls="'+did+'">i</button>'+
+               '<p class="opt-desc" id="'+did+'" hidden>'+esc(d)+'</p>' : '')+
+        '</div>';
       });
       ctrl += '</div>';
     } else {
       var t = f.type === "email" ? "email" : "text";
       ctrl = '<input class="ctl" type="'+t+'" id="'+f.id+'" data-f="'+f.id+'" value="'+esc(val||"")+'"'+ph+(f.required?' aria-required="true"':'')+'>';
     }
+    var qid = f.id + '_info';
+    var qinfo = f.info
+      ? '<button type="button" class="info" aria-label="Sobre esta pergunta" aria-expanded="false" aria-controls="'+qid+'">i</button>'
+      : '';
+    var qdesc = f.info ? '<p class="q-desc" id="'+qid+'" hidden>'+esc(f.info)+'</p>' : '';
     return '<div class="field'+(answered(f) ? ' done' : '')+'" data-field="'+f.id+'">'+
-      '<label class="q" id="'+f.id+'_q" for="'+forId+'">'+esc(f.label)+req+'<span class="mark" aria-hidden="true">&#10003;</span></label>'+
-      help + ctrl + '</div>';
+      '<div class="q-row"><label class="q" id="'+f.id+'_q" for="'+forId+'">'+esc(f.label)+req+'<span class="mark" aria-hidden="true">&#10003;</span></label>'+qinfo+'</div>'+
+      qdesc + help + ctrl + '</div>';
   }
 
   /* ---------- views ---------- */
@@ -769,6 +804,14 @@
     window.scrollTo(0,0);
     try{ sessionStorage.setItem(STORE + ":idx", String(idx)); }catch(e){}
   }
+
+  main.addEventListener("click", function(e){
+    var b = e.target.closest(".info"); if(!b) return;
+    var d = document.getElementById(b.getAttribute("aria-controls")); if(!d) return;
+    var open = d.hidden;
+    d.hidden = !open;
+    b.setAttribute("aria-expanded", open ? "true" : "false");
+  });
 
   /* ---------- input ---------- */
   main.addEventListener("input", function(e){
