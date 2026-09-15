@@ -9,6 +9,18 @@
 
 const FROM_ADDRESS = 'Pietra Gottardo <contact@pietragottardo.com>';
 const TO_ADDRESS   = 'pietragottardo@gmail.com';
+const MAX_FILES    = 3;
+const MAX_BYTES    = 10 * 1024 * 1024;
+
+function toBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let bin = '';
+  const step = 0x8000;
+  for (let i = 0; i < bytes.length; i += step) {
+    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + step));
+  }
+  return btoa(bin);
+}
 
 function escapeHtml(str = '') {
   return String(str)
@@ -29,9 +41,21 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: false, error: 'missing_api_key' }, 500);
     }
 
+    // JSON when there is nothing to attach, multipart when the client added files.
     let payload;
+    let files = [];
     try {
-      payload = await request.json();
+      const contentType = request.headers.get('content-type') || '';
+      if (contentType.includes('multipart/form-data')) {
+        const form = await request.formData();
+        payload = {};
+        for (const [k, v] of form.entries()) {
+          if (k === 'files') { if (v && typeof v === 'object' && v.size > 0) files.push(v); }
+          else payload[k] = v;
+        }
+      } else {
+        payload = await request.json();
+      }
     } catch {
       return json({ ok: false, error: 'invalid_body' }, 400);
     }
@@ -54,7 +78,26 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: false, error: 'invalid_email' }, 400);
     }
 
-    const subject = `Briefing de site: ${empresa || nome}` + (missing ? ` (${missing} obrigatória${missing > 1 ? 's' : ''} em branco)` : '');
+    // Same caps the page enforces: 3 files, 10 MB together. Resend takes
+    // attachments as base64 and allows 40 MB per message, so this is safe.
+    if (files.length > MAX_FILES) {
+      return json({ ok: false, error: 'too_many_files' }, 400);
+    }
+    const totalBytes = files.reduce((a, f) => a + f.size, 0);
+    if (totalBytes > MAX_BYTES) {
+      return json({ ok: false, error: 'files_too_large' }, 400);
+    }
+    const attachments = [];
+    for (const f of files) {
+      attachments.push({
+        filename: (f.name || 'anexo').slice(0, 120),
+        content: toBase64(await f.arrayBuffer())
+      });
+    }
+
+    const subject = `Briefing de site: ${empresa || nome}`
+      + (missing ? ` (${missing} obrigatória${missing > 1 ? 's' : ''} em branco)` : '')
+      + (attachments.length ? ` · ${attachments.length} anexo${attachments.length > 1 ? 's' : ''}` : '');
     const body = `${text}\n\n---\nDe: ${nome} <${email}>`;
     const html = `
       <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:#141414;">
@@ -80,7 +123,8 @@ export async function onRequestPost({ request, env }) {
           reply_to: email,
           subject,
           text: body,
-          html
+          html,
+          attachments
         })
       });
     } catch (fetchErr) {

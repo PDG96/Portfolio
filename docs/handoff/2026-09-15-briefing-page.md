@@ -23,6 +23,12 @@ artifact não consegue guardar respostas de gente de fora da organização.
   como caminho de reserva.
 - Rascunho fica em `localStorage['briefing-v1']`; a seção aberta em
   `sessionStorage`. Tema lê a mesma chave `theme` do site.
+- **Anexos** (último campo de Técnico): até 3 arquivos, 10 MB no total,
+  vão como attachment do próprio e-mail via Resend (limite deles é 40 MB).
+  Nada é guardado em lugar nenhum. Os arquivos ficam só na memória da aba:
+  fechou, precisa escolher de novo (o resto do rascunho continua salvo).
+  Com anexo, a página manda `multipart/form-data`; sem, JSON. A function
+  aceita os dois.
 
 ## Decisões
 - Light-native como as case pages (`:root` claro, dark por sistema ou

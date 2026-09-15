@@ -303,6 +303,16 @@
   }
   .missing b{font-weight:500;color:var(--text);display:block;margin-bottom:0.15rem}
   .toast{font-size:0.875rem;color:var(--cta);min-height:1.4em;margin:0.75rem 0 0}
+  .files{display:flex;flex-direction:column;gap:0.5rem;align-items:flex-start}
+  .files .toast{margin:0;min-height:0}
+  .file-list{list-style:none;margin:0;padding:0;width:100%}
+  .file-list:empty{display:none}
+  .file-list li{display:flex;align-items:baseline;gap:1rem;padding:0.6rem 0;border-bottom:1px solid var(--border);font-size:0.9375rem}
+  .file-list li:last-child{border-bottom:0}
+  .file-list .fn{flex:1;min-width:0;overflow-wrap:anywhere}
+  .file-list .fs{color:var(--text-3);font-size:0.8125rem;white-space:nowrap}
+  .file-list .rm{border:0;background:transparent;font:inherit;font-size:0.8125rem;color:var(--text-3);cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:0.2em}
+  .file-list .rm:hover{color:rgb(var(--dot-rgb))}
   .saved{font-size:0.75rem;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase;transition:opacity 0.6s var(--ease)}
 
   /* ============================================================
@@ -482,13 +492,17 @@
         {id:"integracoes", label:"Sistemas com que o site precisa conversar", type:"text",
          info:"Integração é quando o site conversa com outra ferramenta sozinho: o formulário cria o contato no CRM (HubSpot, RD Station, Pipedrive), a newsletter cadastra no Mailchimp, o Google Analytics mede as visitas, o agendamento abre na sua agenda, o pagamento passa pelo Stripe. Cada uma é um encaixe a mais no projeto, e algumas dependem de plano pago da ferramenta. Se você já usa algo e quer que o site alimente, lista aqui; se não sabe, deixa em branco que eu proponho.",
          placeholder:"Ex.: HubSpot, Mailchimp, Google Analytics, API interna"},
-        {id:"livre", label:"Links de materiais ou algo que eu não perguntei", type:"textarea",
-         placeholder:"Deck de vendas, manual de marca, pasta no Drive"}
+        {id:"livre", label:"Links ou algo que eu não perguntei", type:"textarea",
+         placeholder:"Pasta no Drive, Figma, Instagram, site de referência"},
+        {id:"anexos", label:"Arquivos sobre o projeto", type:"files",
+         help:"Logo, manual de marca, deck, fotos, prints do site atual. Até 3 arquivos e 10 MB no total; vão anexados no e-mail. Coisa maior, manda o link no campo acima."}
       ]
     }
   ];
 
   var STORE = "briefing-v1";
+  var FILES = [];
+  var FILES_MAX = 3, FILES_BYTES = 10 * 1024 * 1024;
   var state = {};
   var idx = -1;
   var armed = false;
@@ -517,6 +531,7 @@
     return !f.showIf || state[f.showIf.id] === f.showIf.value;
   }
   function answered(f){
+    if(f.type === "files") return FILES.length > 0;
     var v = state[f.id];
     return f.type === "checkbox" ? (Array.isArray(v) && v.length > 0) : !!(v && String(v).trim());
   }
@@ -585,7 +600,14 @@
     var ctrl = "";
     var forId = f.id;
 
-    if(f.type === "textarea"){
+    if(f.type === "files"){
+      ctrl = '<div class="files" data-files="'+f.id+'">'+
+        '<label class="btn btn-ghost pick" for="'+f.id+'">Escolher arquivos</label>'+
+        '<input type="file" id="'+f.id+'" data-files-input="'+f.id+'" multiple accept="image/*,.pdf,.doc,.docx,.ppt,.pptx,.key,.txt,.md,.zip,.ai,.svg,.fig" hidden>'+
+        '<ul class="file-list" id="'+f.id+'_list"></ul>'+
+        '<p class="toast" id="'+f.id+'_msg" aria-live="polite"></p>'+
+      '</div>';
+    } else if(f.type === "textarea"){
       ctrl = '<textarea class="ctl" id="'+f.id+'" data-f="'+f.id+'"'+ph+(f.required?' aria-required="true"':'')+'>'+esc(val||"")+'</textarea>';
     } else if(f.type === "radio" || f.type === "checkbox"){
       forId = f.id + "_0";
@@ -651,6 +673,7 @@
       '</div>';
     document.getElementById("btnBack").addEventListener("click", function(){ go(i - 1); });
     document.getElementById("btnNext").addEventListener("click", function(){ go(i + 1); });
+    renderFiles();
   }
 
   function missingRequired(){
@@ -670,7 +693,7 @@
     var miss = missingRequired();
     var groups = STEPS.map(function(s, i){
       var rows = s.fields.filter(visible).map(function(f){
-        var v = state[f.id];
+        var v = f.type === "files" ? FILES.map(function(x){ return x.name; }) : state[f.id];
         var txt = Array.isArray(v) ? v.join(", ") : (v || "");
         var empty = !txt || !String(txt).trim();
         return '<div class="rv-row"><dt>'+esc(f.label)+'</dt><dd'+(empty?' class="empty"':'')+'>'+esc(empty ? "sem resposta" : txt)+'</dd></div>';
@@ -735,7 +758,7 @@
       L.push("## " + s.title);
       s.fields.forEach(function(f){
         if(!visible(f)) return;
-        var v = state[f.id];
+        var v = f.type === "files" ? FILES.map(function(x){ return x.name + " (" + fmtSize(x.size) + ")"; }) : state[f.id];
         var txt = Array.isArray(v) ? v.join("; ") : (v || "");
         if(!txt || !String(txt).trim()) return;
         L.push("- " + f.label + ": " + txt);
@@ -762,6 +785,40 @@
     }catch(e){ return false; }
   }
 
+  /* ---------- files: held in memory, attached to the e-mail ---------- */
+  function fmtSize(n){ return n < 1024*1024 ? Math.max(1, Math.round(n/1024)) + " KB" : (n/1024/1024).toFixed(1) + " MB"; }
+  function renderFiles(){
+    var box = main.querySelector("[data-files]"); if(!box) return;
+    var id = box.getAttribute("data-files");
+    var list = document.getElementById(id + "_list");
+    list.innerHTML = FILES.map(function(f, i){
+      return '<li><span class="fn">'+esc(f.name)+'</span><span class="fs">'+fmtSize(f.size)+'</span>'+
+        '<button type="button" class="rm" data-rm="'+i+'" aria-label="Remover '+esc(f.name)+'">Remover</button></li>';
+    }).join("");
+    var pick = box.querySelector(".pick");
+    if(pick) pick.hidden = FILES.length >= FILES_MAX;
+    var field = box.closest(".field");
+    if(field) field.classList.toggle("done", FILES.length > 0);
+  }
+  main.addEventListener("change", function(e){
+    var el = e.target; var id = el.getAttribute("data-files-input"); if(!id) return;
+    var msg = document.getElementById(id + "_msg"); msg.textContent = "";
+    var total = FILES.reduce(function(a, f){ return a + f.size; }, 0);
+    Array.prototype.forEach.call(el.files, function(f){
+      if(FILES.length >= FILES_MAX){ msg.textContent = "Até " + FILES_MAX + " arquivos."; return; }
+      if(total + f.size > FILES_BYTES){ msg.textContent = f.name + " passa dos 10 MB no total. Manda por link."; return; }
+      if(FILES.some(function(x){ return x.name === f.name && x.size === f.size; })) return;
+      FILES.push(f); total += f.size;
+    });
+    el.value = "";
+    renderFiles(); updateProgress();
+  });
+  main.addEventListener("click", function(e){
+    var b = e.target.closest("[data-rm]"); if(!b) return;
+    FILES.splice(parseInt(b.getAttribute("data-rm"), 10), 1);
+    renderFiles(); updateProgress();
+  });
+
   /* ---------- send ---------- */
   function sendBriefing(){
     var btn = document.getElementById("btnSend");
@@ -777,14 +834,20 @@
     }
     btn.disabled = true; btn.textContent = "Enviando";
     t.textContent = "";
-    fetch(ENDPOINT, {
-      method:"POST",
-      headers:{"content-type":"application/json"},
-      body:JSON.stringify({
-        nome:state.nome, email:state.email, empresa:state.empresa || "",
-        text:buildText(), missing:miss.length, website:""
-      })
-    }).then(function(r){ return r.json().catch(function(){ return {ok:false}; }); })
+    var payload = {
+      nome:state.nome, email:state.email, empresa:state.empresa || "",
+      text:buildText(), missing:miss.length, website:""
+    };
+    var req;
+    if(FILES.length){
+      var fd = new FormData();
+      Object.keys(payload).forEach(function(k){ fd.append(k, payload[k]); });
+      FILES.forEach(function(f){ fd.append("files", f, f.name); });
+      req = fetch(ENDPOINT, {method:"POST", body:fd});
+    } else {
+      req = fetch(ENDPOINT, {method:"POST", headers:{"content-type":"application/json"}, body:JSON.stringify(payload)});
+    }
+    req.then(function(r){ return r.json().catch(function(){ return {ok:false}; }); })
     .then(function(res){
       if(res && res.ok){
         main.innerHTML =
