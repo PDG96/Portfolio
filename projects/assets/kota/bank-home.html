@@ -135,8 +135,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
 /* ---- map ---- */
 .locs{grid-column:1;grid-row:2}
 /* The ground under the tiles matches the basemap the style paints, so the
-   card does not flash light before the map arrives. The style runs a dusk
-   preset now, and the fallback is dark-v11. */
+   card does not flash light before the map arrives. The basemap is
+   dark-v11, named outright rather than reached by timeout. */
 .map{flex:1;min-height:0;border-radius:4px;overflow:hidden;background:#14161A;position:relative}
 #opmap{position:absolute;inset:0}
 .mapboxgl-ctrl-logo,.mapboxgl-ctrl-attrib{display:none!important}
@@ -655,7 +655,15 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
     var map = new mapboxgl.Map({
       container: 'opmap',
-      style: 'mapbox://styles/pietragottardo/cmu1pk042001b01qucobg1nxd',
+      /* Dark by choice, not by timeout. The custom style
+         (mapbox://styles/pietragottardo/cmu1pk042001b01qucobg1nxd) imports
+         Mapbox Standard, which loads slowly enough that the fallback below
+         won the race on some loads and lost it on others: the same page
+         came back light or dark by accident. Naming dark-v11 outright
+         makes every load the same, and it is the ground the cards, the
+         pins and the white flow line were coloured against. Put the custom
+         style back here once it is rebuilt on a Classic template. */
+      style: 'mapbox://styles/mapbox/dark-v11',
       projection: 'mercator',
       center: [28.1, -2.2],
       zoom: 5.8,
@@ -691,13 +699,11 @@ body{margin:0;background:var(--ground);color:var(--ink);
        look is a step down from the designed one, and a working map is worth
        more than a designed blank. style.load fires on the new style, so the
        handler above runs and the zone and the lines come back with it. */
-    var styled = false;
-    map.on('style.load', function(){ styled = true; });
-    setTimeout(function(){
-      if (styled || !map.getContainer()) return;
-      console.warn('[kota-map] the custom style did not load; falling back');
-      try { map.setStyle('mapbox://styles/mapbox/dark-v11'); } catch (e) {}
-    }, 4000);
+    /* The four second fallback that used to sit here is gone with the custom
+       style: there is nothing left to fall back from, and keeping it meant a
+       style swap could still fire mid-draw. A style that genuinely fails to
+       load now leaves the card on its own ground colour, which is the same
+       dark the map would have painted. */
 
     /* Plain teardrops, no glyph. Orange is the one file that exists; white is
        an operator who has been invited and has not finished registering, which
