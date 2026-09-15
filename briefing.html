@@ -132,6 +132,13 @@
   a{color:inherit}
   a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid rgb(var(--dot-rgb));outline-offset:3px}
 
+  /* Progress: one hairline at the very top, filled by answered
+     questions over all questions, in the accent the eyebrows use. */
+  .progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:95;background:var(--border);pointer-events:none}
+  .progress > i{display:block;height:100%;width:0;background:rgb(var(--dot-rgb));transition:width 0.5s var(--ease)}
+  .count{color:var(--text-3)}
+  .count b{font-weight:500;color:var(--text)}
+
   /* ============================================================
      Nav: wordmark on the left edge, theme toggle on the right.
      ============================================================ */
@@ -184,6 +191,7 @@
   .index .n{font-size:0.6875rem;font-weight:500;letter-spacing:0.14em;color:var(--text-3);font-variant-numeric:tabular-nums}
   .index .t{font-size:1rem;color:var(--text)}
   .index .d{font-size:0.8125rem;color:var(--text-3);white-space:nowrap}
+  .index .d b{font-weight:500;color:rgb(var(--dot-rgb))}
   .index .k{font-size:0.8125rem;color:var(--text-3);display:block}
 
   /* ============================================================
@@ -213,6 +221,13 @@
   .field{padding-block:1.6rem;border-bottom:1px solid var(--border)}
   .q{display:block;font-size:1.0625rem;font-weight:400;color:var(--text);margin:0 0 0.35rem;line-height:1.4}
   .q .req{color:rgb(var(--dot-rgb));margin-left:0.25em;font-weight:500}
+  .q .mark{
+    display:inline-block;margin-left:0.5em;font-size:0.75em;color:rgb(var(--dot-rgb));
+    opacity:0;transform:translateY(2px);transition:opacity 0.35s var(--ease),transform 0.35s var(--ease);
+  }
+  .field.done .q .mark{opacity:1;transform:none}
+  .field.done .q{color:var(--text-2)}
+  .field.done .q .req{display:none}
   .help{font-size:0.875rem;color:var(--text-2);margin:0 0 0.9rem;max-width:40em;line-height:1.5}
   .q + .ctl,.q + .opts{margin-top:0.75rem}
 
@@ -330,6 +345,8 @@
 <body>
 
 <div class="cursor" id="cursor" aria-hidden="true"></div>
+
+<div class="progress" aria-hidden="true"><i id="bar"></i></div>
 
 <nav class="nav" aria-label="Topo">
   <div class="wrap">
@@ -466,6 +483,25 @@
   function requiredCount(){
     var n = 0; STEPS.forEach(function(s){ s.fields.forEach(function(f){ if(f.required) n++; }); }); return n;
   }
+  function answered(f){
+    var v = state[f.id];
+    return f.type === "checkbox" ? (Array.isArray(v) && v.length > 0) : !!(v && String(v).trim());
+  }
+  function progressOf(step){
+    var done = 0, total = 0;
+    (step ? [step] : STEPS).forEach(function(s){ s.fields.forEach(function(f){ total++; if(answered(f)) done++; }); });
+    return {done:done, total:total};
+  }
+  function updateProgress(){
+    var p = progressOf();
+    var bar = document.getElementById("bar");
+    if(bar) bar.style.width = (p.total ? p.done / p.total * 100 : 0).toFixed(1) + "%";
+    var c = document.getElementById("stepCount");
+    if(c && idx >= 0 && idx < STEPS.length){
+      var q = progressOf(STEPS[idx]);
+      c.innerHTML = ' &nbsp;·&nbsp; <b>' + q.done + '</b> de ' + q.total + (q.done === 1 ? ' respondida' : ' respondidas');
+    }
+  }
 
   /* ---------- theme ---------- */
   function applyTheme(t){
@@ -533,15 +569,17 @@
       var t = f.type === "email" ? "email" : "text";
       ctrl = '<input class="ctl" type="'+t+'" id="'+f.id+'" data-f="'+f.id+'" value="'+esc(val||"")+'"'+ph+(f.required?' aria-required="true"':'')+'>';
     }
-    return '<div class="field">'+
-      '<label class="q" id="'+f.id+'_q" for="'+forId+'">'+esc(f.label)+req+'</label>'+
+    return '<div class="field'+(answered(f) ? ' done' : '')+'" data-field="'+f.id+'">'+
+      '<label class="q" id="'+f.id+'_q" for="'+forId+'">'+esc(f.label)+req+'<span class="mark" aria-hidden="true">&#10003;</span></label>'+
       help + ctrl + '</div>';
   }
 
   /* ---------- views ---------- */
   function renderIntro(){
     var rows = STEPS.map(function(s,i){
-      return '<li><span class="n">'+String(i+1).padStart(2,"0")+'</span><span><span class="t">'+esc(s.title)+'</span><span class="k">'+esc(s.note)+'</span></span><span class="d">'+esc(s.time)+'</span></li>';
+      var q = progressOf(s);
+      var d = q.done ? '<b>'+q.done+'</b> de '+q.total : esc(s.time);
+      return '<li><span class="n">'+String(i+1).padStart(2,"0")+'</span><span><span class="t">'+esc(s.title)+'</span><span class="k">'+esc(s.note)+'</span></span><span class="d">'+d+'</span></li>';
     }).join("");
     main.innerHTML =
       '<h1 class="r">Briefing de projeto.</h1>'+
@@ -556,7 +594,7 @@
     var s = STEPS[i];
     var last = i === STEPS.length - 1;
     main.innerHTML =
-      '<span class="eyebrow r">Seção '+(i+1)+' de '+STEPS.length+'</span>'+
+      '<span class="eyebrow r">Seção '+(i+1)+' de '+STEPS.length+'<span class="count" id="stepCount"></span></span>'+
       '<h2 class="r">'+esc(s.title)+'.</h2>'+
       '<p class="lead r">'+esc(s.note)+'</p>'+
       '<div class="fields r">'+ s.fields.map(fieldHTML).join("") +'</div>'+
@@ -729,6 +767,7 @@
     else if(idx < STEPS.length) renderStep(idx);
     else renderReview();
     markSeg();
+    updateProgress();
     window.scrollTo(0,0);
     try{ sessionStorage.setItem(STORE + ":idx", String(idx)); }catch(e){}
   }
@@ -737,7 +776,7 @@
   main.addEventListener("input", function(e){
     var el = e.target; var id = el.getAttribute("data-f"); if(!id) return;
     if(el.type === "checkbox" || el.type === "radio") return;
-    state[id] = el.value; save();
+    state[id] = el.value; save(); markDone(id);
   });
   main.addEventListener("change", function(e){
     var el = e.target; var id = el.getAttribute("data-f"); if(!id) return;
@@ -747,8 +786,14 @@
       state[id] = vals;
     } else { state[id] = el.value; }
     if(g) g.querySelectorAll(".opt").forEach(function(lab){ lab.classList.toggle("on", lab.querySelector("input").checked); });
-    save();
+    save(); markDone(id);
   });
+  function markDone(id){
+    var field = main.querySelector('[data-field="'+id+'"]');
+    var f = null; STEPS.forEach(function(s){ s.fields.forEach(function(x){ if(x.id === id) f = x; }); });
+    if(field && f) field.classList.toggle("done", answered(f));
+    updateProgress();
+  }
 
   /* ---------- cursor ---------- */
   (function(){
