@@ -64,7 +64,11 @@
     --seg-h:40px;
     --nav-h:calc(var(--edge) * 2 + var(--header-h));
     --seg-band:calc(var(--edge) * 2 + var(--seg-h));
-    --measure:min(calc(100% - 2 * var(--edge)), 42rem);
+    /* The site's measure for the header, so the wordmark and the toggle
+       land where they land on every other page. The sheet itself is a
+       reading column inside it. */
+    --measure:min(calc(100% - 2 * var(--edge)), 2208px);
+    --column:min(calc(100% - 2 * var(--edge)), 42rem);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
@@ -151,7 +155,7 @@
      Sheet
      ============================================================ */
   main{
-    width:var(--measure);margin-inline:auto;
+    width:var(--column);margin-inline:auto;
     padding-block:calc(var(--nav-h) + 24px) calc(var(--seg-band) + 24px);
   }
   .eyebrow{
