@@ -853,6 +853,11 @@
  padding: var(--section-py) 0;
  position: relative;
  }
+ /* The space between two sections is one gap, not two stacked paddings. Left
+    doubled it measured 224px, which reads as a hole rather than a break; the
+    first section keeps its top space and the last keeps its bottom, and every
+    boundary in between is a single --section-py. */
+ .case-section + .case-section { padding-top: 0; }
  .case-section--alt { background: var(--bg-alt); }
  .case-section--dark {
  background: var(--gray-true-900);
