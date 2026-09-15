@@ -869,6 +869,15 @@
     first section keeps its top space and the last keeps its bottom, and every
     boundary in between is a single --section-py. */
  .case-section + .case-section { padding-top: 0; }
+ /* Unless the section above paints a box. Then its padding is inside that box
+    and buys the next section nothing: at zero the following label sat flush
+    against the box edge. Half a gap is enough to clear it, because the other
+    half is already there, on the other side of the line. */
+ .case-section--alt + .case-section,
+ .case-section--dark + .case-section,
+ .case-section--insights + .case-section,
+ .case-section--network + .case-section,
+ .case-section--showcase + .case-section { padding-top: calc(var(--section-py) / 2); }
  .case-section--alt { background: var(--bg-alt); }
  .case-section--dark {
  background: var(--gray-true-900);

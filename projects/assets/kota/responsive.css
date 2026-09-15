@@ -61,20 +61,26 @@
   .wordmark{font-size:15px}
 
   /* ---- every grid becomes one column ---- */
+  /* minmax(0,1fr) and not 1fr: a bare 1fr is minmax(auto,1fr), and that auto
+     floor is the largest min-content inside the column. One wide child, a
+     chart with a fixed width or a table that will not fold, and the column
+     grows past the viewport taking every card with it. The phone then scrolls
+     sideways and the text runs off the right edge of cards that had nothing
+     wrong with them. */
   .canvas,
-  .canvas--insights,.canvas--detailed,.canvas--settings{grid-template-columns:1fr;
+  .canvas--insights,.canvas--detailed,.canvas--settings{grid-template-columns:minmax(0,1fr);
     grid-template-rows:none;gap:16px;padding-top:16px;grid-auto-flow:row}
   .canvas > *,
   .stats,.kpis,.state,.charts,.trade,.loc,.score,.forms,.queue,.risk,.locs,
   .feed-card,.curve,.watch-card,.progstrip,.comments-card,.ident,.sent,.side,
   .sections,.pane,.apps,.asks,.filecard,.vol-card,.set-col{grid-column:1 !important;
-    grid-row:auto !important}
+    grid-row:auto !important;min-width:0}
 
   /* Containers that carry a grid of their own, not just a slot in .canvas. */
-  .charts{grid-template-columns:1fr !important;grid-template-rows:none !important}
+  .charts{grid-template-columns:minmax(0,1fr) !important;grid-template-rows:none !important}
 
   /* Counts stack two by two, which is the most a phone reads at a glance. */
-  .kpis,.stats,.state{grid-template-columns:1fr 1fr;gap:12px}
+  .kpis,.stats,.state{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
   .kpi,.stat{padding:16px}
   .kpi b,.stat .v{font-size:24px;line-height:28px}
   .kpi .row{flex-wrap:wrap;gap:6px}
@@ -196,8 +202,15 @@
   .ophead .logo{width:40px;height:40px}
   .opname{font-size:18px}
   .opaddr{font-size:13px}
-  /* The explainer hangs right of a title that now starts at the card edge. */
-  .info-pop{right:auto;left:-4px;width:min(252px,calc(100vw - 48px))}
+  /* The explainer is anchored to the card head, not to the 17px button. At
+     this width the head wraps and the button can land anywhere along the
+     line, so a pop that starts at the button ran 45px past the right edge of
+     the screen and put a horizontal scrollbar on the whole page. Pinned to
+     both edges of the head it is the width of the card, always, wherever the
+     button ends up. */
+  .block .head{position:relative}
+  .info{position:static}
+  .info-pop{top:calc(100% + 8px);left:0;right:0;width:auto}
   .seg{width:100%;overflow-x:auto;scrollbar-width:none}
   .seg::-webkit-scrollbar{display:none}
   .segb{flex:0 0 auto}
