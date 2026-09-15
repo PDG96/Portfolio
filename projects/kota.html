@@ -1622,7 +1622,10 @@
  overflow: hidden;
  clip-path: inset(0 round 13px 13px 0 0);
  background: #151617;
- height: 620px;
+ /* A ratio and not a height: the frame is as wide as the sheet lets it be,
+    and the height follows from it, so the crop of the app stays the same
+    shape on every screen. fitPreview reads the measured box either way. */
+ aspect-ratio: 600 / 350;
  }
  .proto-open {
  display: block;
@@ -1656,7 +1659,9 @@
  .app-shot--front .embed-iframe { transition: none; }
  }
  @media (max-width: 900px) {
- .app-shot--front .embed-frame { height: 460px; }
+ /* Taller than 600:350 down here: the column is narrow enough that the ratio
+    alone would leave a strip too short to read anything in. */
+ .app-shot--front .embed-frame { aspect-ratio: 4 / 3; }
  }
 
  /* ---- the seat switch ----
@@ -1763,8 +1768,8 @@
  left: 50%;
  top: 50%;
  transform: translate(-50%, -50%) scale(.955) translateY(10px);
- width: min(1560px, 96vw);
- height: min(940px, 92vh);
+ width: min(2000px, 96vw);
+ height: min(1240px, 94vh);
  display: flex;
  flex-direction: column;
  background: #151617;
@@ -4294,7 +4299,7 @@
  <button class="embed-frame proto-open" type="button" id="protoOpen"
          aria-label="Open the prototype full size">
   <iframe class="embed-iframe embed-iframe--app" id="protoFrame" src="assets/kota/bank-home.html?v=3"
- title="KOTA, the bank's seat: Meridian Bank's North Kivu desk, with its counts, its operators on a map, the latest movement and what has stalled."
+ title="KOTA, the bank's seat: Banque Orimu's North Kivu desk, with its counts, its operators on a map, the latest movement and what has stalled."
  loading="lazy" tabindex="-1" scrolling="no"></iframe>
   <span class="embed-hint" aria-hidden="true"><span class="hand">
     <svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-8 8M3 21l8-8"/></svg>
@@ -5141,7 +5146,7 @@ setLang(lang);
     built once, on first use, rather than sitting in the document unused. */
  (function () {
  var SEATS = {
- bank:     { src: 'assets/kota/bank-home.html',     t: 'KOTA · Meridian Bank' },
+ bank:     { src: 'assets/kota/bank-home.html',     t: 'KOTA · Banque Orimu' },
  operator: { src: 'assets/kota/operator-home.html', t: 'KOTA · Tulivu Cooperative' }
  };
  var seat = 'bank';
