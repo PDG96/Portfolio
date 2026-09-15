@@ -113,6 +113,7 @@
   @media (max-width:640px){ :root{ --edge:20px; } }
 
   *{box-sizing:border-box}
+  [hidden]{display:none!important}
   html{scroll-behavior:smooth}
   body{
     margin:0;
@@ -247,7 +248,6 @@
   .ctl:focus{outline:none;border-color:var(--text);background:transparent}
 
   .opts{display:grid;grid-template-columns:1fr;gap:0.5rem}
-  .opts.cols{grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))}
   .opts.inline{display:flex;flex-wrap:wrap}
   .opts.inline .opt{flex:none;padding-right:1.1rem}
   .opt{
@@ -390,27 +390,31 @@
   var STEPS = [
     {
       key:"contato", title:"Contato", short:"Contato", time:"30 seg",
-      note:"Quatro campos e seguimos.",
+      note:"Três campos e seguimos.",
       fields:[
         {id:"nome", label:"Seu nome", type:"text", required:true},
         {id:"empresa", label:"Empresa", type:"text"},
-        {id:"email", label:"E-mail", type:"email", required:true},
-        {id:"site_atual", label:"Site atual", type:"text", placeholder:"https://  ou  ainda não temos"}
+        {id:"email", label:"E-mail", type:"email", required:true}
       ]
     },
     {
       key:"negocio", title:"Negócio e objetivo", short:"Negócio", time:"2 min",
       note:"O que você vende, o que o site precisa provocar em quem chega, e por que agora.",
       fields:[
+        {id:"tem_site", label:"Já existe um site?", type:"radio", inline:true, required:true,
+         options:["Sim","Ainda não"]},
+        {id:"site_atual", label:"Endereço do site atual", type:"text", placeholder:"https://",
+         showIf:{id:"tem_site", value:"Sim"}},
+        {id:"porque_agora", label:"O que o site de hoje não resolve", type:"textarea",
+         help:"É o que mais me ajuda a priorizar.",
+         placeholder:"Ex.: não explica o produto novo, não converte quem chega do LinkedIn, parece de 2015",
+         showIf:{id:"tem_site", value:"Sim"}},
         {id:"oferta", label:"O que a empresa faz, em uma frase", type:"textarea", required:true,
          help:"Como você explicaria pra alguém que nunca ouviu falar da empresa."},
         {id:"objetivo_principal", label:"O que o site precisa fazer acontecer", type:"radio", required:true,
          options:["Gerar leads e agendar reuniões","Vender online","Passar credibilidade institucional","Captar investimento","Recrutar pessoas","Publicar conteúdo e ganhar audiência","Ainda não sei, quero ajuda pra definir"]},
         {id:"publico", label:"Quem precisa ser convencido", type:"text",
          placeholder:"Ex.: donos de restaurante em Florianópolis. Ou: gerentes de RH de empresas médias"},
-        {id:"porque_agora", label:"O que o site de hoje não resolve", type:"textarea",
-         help:"É o que mais me ajuda a priorizar. Se é o primeiro site, diga o que está travando sem ele.",
-         placeholder:"Ex.: não explica o produto novo, não converte quem chega do LinkedIn, parece de 2015"},
         {id:"referencias", label:"Dois sites que você admira, e por quê", type:"textarea",
          placeholder:"site.com: a clareza da home\nsite2.com: o tom da escrita"}
       ]
@@ -509,13 +513,16 @@
   function requiredCount(){
     var n = 0; STEPS.forEach(function(s){ s.fields.forEach(function(f){ if(f.required) n++; }); }); return n;
   }
+  function visible(f){
+    return !f.showIf || state[f.showIf.id] === f.showIf.value;
+  }
   function answered(f){
     var v = state[f.id];
     return f.type === "checkbox" ? (Array.isArray(v) && v.length > 0) : !!(v && String(v).trim());
   }
   function progressOf(step){
     var done = 0, total = 0;
-    (step ? [step] : STEPS).forEach(function(s){ s.fields.forEach(function(f){ total++; if(answered(f)) done++; }); });
+    (step ? [step] : STEPS).forEach(function(s){ s.fields.forEach(function(f){ if(!visible(f)) return; total++; if(answered(f)) done++; }); });
     return {done:done, total:total};
   }
   function updateProgress(){
@@ -582,7 +589,7 @@
       ctrl = '<textarea class="ctl" id="'+f.id+'" data-f="'+f.id+'"'+ph+(f.required?' aria-required="true"':'')+'>'+esc(val||"")+'</textarea>';
     } else if(f.type === "radio" || f.type === "checkbox"){
       forId = f.id + "_0";
-      var cls = f.inline ? "opts inline" : ((f.type === "checkbox" || f.options.length > 5) ? "opts cols" : "opts");
+      var cls = f.inline ? "opts inline" : "opts";
       ctrl = '<div class="'+cls+'" role="group" aria-labelledby="'+f.id+'_q" data-group="'+f.id+'" data-type="'+f.type+'">';
       f.options.forEach(function(raw, i){
         var o = typeof raw === "string" ? raw : raw.t;
@@ -607,7 +614,7 @@
       ? '<button type="button" class="info" aria-label="Sobre esta pergunta" aria-expanded="false" aria-controls="'+qid+'">i</button>'
       : '';
     var qdesc = f.info ? '<p class="q-desc" id="'+qid+'" hidden>'+esc(f.info)+'</p>' : '';
-    return '<div class="field'+(answered(f) ? ' done' : '')+'" data-field="'+f.id+'">'+
+    return '<div class="field'+(answered(f) ? ' done' : '')+'" data-field="'+f.id+'"'+(visible(f) ? '' : ' hidden')+'>'+
       '<div class="q-row"><label class="q" id="'+f.id+'_q" for="'+forId+'">'+esc(f.label)+req+'<span class="mark" aria-hidden="true">&#10003;</span></label>'+qinfo+'</div>'+
       qdesc + help + ctrl + '</div>';
   }
@@ -650,7 +657,7 @@
     var out = [];
     STEPS.forEach(function(s, i){
       s.fields.forEach(function(f){
-        if(!f.required) return;
+        if(!f.required || !visible(f)) return;
         var v = state[f.id];
         var empty = f.type === "checkbox" ? (!Array.isArray(v) || !v.length) : (!v || !String(v).trim());
         if(empty) out.push({step:i, label:f.label});
@@ -662,7 +669,7 @@
   function renderReview(){
     var miss = missingRequired();
     var groups = STEPS.map(function(s, i){
-      var rows = s.fields.map(function(f){
+      var rows = s.fields.filter(visible).map(function(f){
         var v = state[f.id];
         var txt = Array.isArray(v) ? v.join(", ") : (v || "");
         var empty = !txt || !String(txt).trim();
@@ -727,6 +734,7 @@
     STEPS.forEach(function(s){
       L.push("## " + s.title);
       s.fields.forEach(function(f){
+        if(!visible(f)) return;
         var v = state[f.id];
         var txt = Array.isArray(v) ? v.join("; ") : (v || "");
         if(!txt || !String(txt).trim()) return;
@@ -838,6 +846,11 @@
     var field = main.querySelector('[data-field="'+id+'"]');
     var f = null; STEPS.forEach(function(s){ s.fields.forEach(function(x){ if(x.id === id) f = x; }); });
     if(field && f) field.classList.toggle("done", answered(f));
+    STEPS.forEach(function(s){ s.fields.forEach(function(x){
+      if(!x.showIf || x.showIf.id !== id) return;
+      var el = main.querySelector('[data-field="'+x.id+'"]');
+      if(el) el.hidden = !visible(x);
+    }); });
     updateProgress();
   }
 
