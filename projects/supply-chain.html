@@ -110,7 +110,11 @@
     document huddled in the middle of a wide screen: on a short window it
     stopped growing around 1400px however much room there was. Here the only
     ceiling is --work-max. */
- --measure-case: min(calc(100% - 2 * var(--edge)), var(--work-max));
+ /* Its own ceiling, not Work's. --work-max is 2208 because that is where a
+    2:1 card stops being readable in the Work grid; a sheet of text and
+    screenshots has no such wall, so the case runs to 2400 before it stops. */
+ --case-max: 2400px;
+ --measure-case: min(calc(100% - 2 * var(--edge)), var(--case-max));
 
       --accent: #3d5a3e;
       --accent-light: #e8ede8;
