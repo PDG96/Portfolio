@@ -298,10 +298,14 @@
   .rv dd.empty{color:var(--text-3);font-style:italic}
   @media (max-width:560px){ .rv .rv-row{grid-template-columns:1fr;gap:0.15rem} }
   .missing{
-    border-left:2px solid rgb(var(--dot-rgb));padding:0.25rem 0 0.25rem 1rem;margin:0 0 1.5rem;
-    font-size:0.9375rem;color:var(--text-2);max-width:40em;
+    border-left:2px solid rgb(var(--dot-rgb));padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem;
+    font-size:0.9375rem;color:var(--text-2);
   }
   .missing b{font-weight:500;color:var(--text);display:block;margin-bottom:0.15rem}
+  .missing .help{margin-bottom:0.5rem}
+  .missing .fields{border-top:0}
+  .missing .field{padding-block:1.1rem}
+  .missing .field:last-child{border-bottom:0}
   .toast{font-size:0.875rem;color:var(--cta);min-height:1.4em;margin:0.75rem 0 0}
   .files{display:flex;flex-direction:column;gap:0.5rem;align-items:flex-start}
   .files .toast{margin:0;min-height:0}
@@ -676,6 +680,9 @@
     renderFiles();
   }
 
+  function missLabel(n){
+    return n === 0 ? "Tudo obrigatório respondido" : n + (n > 1 ? " respostas obrigatórias faltando" : " resposta obrigatória faltando");
+  }
   function missingRequired(){
     var out = [];
     STEPS.forEach(function(s, i){
@@ -696,15 +703,18 @@
         var v = f.type === "files" ? FILES.map(function(x){ return x.name; }) : state[f.id];
         var txt = Array.isArray(v) ? v.join(", ") : (v || "");
         var empty = !txt || !String(txt).trim();
-        return '<div class="rv-row"><dt>'+esc(f.label)+'</dt><dd'+(empty?' class="empty"':'')+'>'+esc(empty ? "sem resposta" : txt)+'</dd></div>';
+        return '<div class="rv-row" data-rv="'+f.id+'"><dt>'+esc(f.label)+'</dt><dd'+(empty?' class="empty"':'')+'>'+esc(empty ? "sem resposta" : txt)+'</dd></div>';
       }).join("");
       return '<section class="rv-group r"><span class="eyebrow muted">'+String(i+1).padStart(2,"0")+' · '+esc(s.title)+'</span><dl class="rv" style="margin:0">'+rows+'</dl></section>';
     }).join("");
 
     var missHTML = "";
     if(miss.length){
-      missHTML = '<div class="missing r"><b>'+miss.length+(miss.length>1?' respostas obrigatórias faltando':' resposta obrigatória faltando')+'</b>'+
-        esc(miss.map(function(m){ return m.label; }).join(" · "))+'. Dá pra enviar assim mesmo, mas o orçamento sai como estimativa, não como proposta fechada.</div>';
+      var missFields = [];
+      STEPS.forEach(function(s){ s.fields.forEach(function(f){ if(f.required && visible(f) && !answered(f)) missFields.push(f); }); });
+      missHTML = '<div class="missing r"><b id="missCount">'+missLabel(miss.length)+'</b>'+
+        '<p class="help">Dá pra enviar assim mesmo, mas o orçamento sai como estimativa, não como proposta fechada. Responde aqui mesmo:</p>'+
+        '<div class="fields">'+missFields.map(fieldHTML).join("")+'</div></div>';
     }
 
     var subject = encodeURIComponent("Briefing de site: " + (state.empresa || "nova empresa"));
@@ -909,6 +919,17 @@
     var field = main.querySelector('[data-field="'+id+'"]');
     var f = null; STEPS.forEach(function(s){ s.fields.forEach(function(x){ if(x.id === id) f = x; }); });
     if(field && f) field.classList.toggle("done", answered(f));
+    if(idx >= STEPS.length && f){
+      var row = main.querySelector('[data-rv="'+id+'"] dd');
+      if(row){
+        var v = state[id]; var txt = Array.isArray(v) ? v.join(", ") : (v || "");
+        var empty = !txt || !String(txt).trim();
+        row.textContent = empty ? "sem resposta" : txt;
+        row.classList.toggle("empty", empty);
+      }
+      var mc = document.getElementById("missCount");
+      if(mc) mc.textContent = missLabel(missingRequired().length);
+    }
     STEPS.forEach(function(s){ s.fields.forEach(function(x){
       if(!x.showIf || x.showIf.id !== id) return;
       var el = main.querySelector('[data-field="'+x.id+'"]');
