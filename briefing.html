@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+ <meta name="robots" content="noindex, nofollow">
+ <meta name="description" content="Briefing para orçamento de site.">
+ <meta name="theme-color" content="#fbfaf8">
+ <title>Briefing de site · Pietra Gottardo</title>
+ <link rel="icon" type="image/svg+xml" href="favicon.svg">
+ <link rel="apple-touch-icon" href="favicon.svg">
+
+ <link rel="preload" href="assets/fonts/TWKLausanne-300.woff2" as="font" type="font/woff2" crossorigin>
+ <link rel="preload" href="assets/fonts/TWKLausanne-300Italic.woff2" as="font" type="font/woff2" crossorigin>
+ <link rel="preload" href="assets/fonts/TWKLausanne-400.woff2" as="font" type="font/woff2" crossorigin>
+ <link rel="stylesheet" href="assets/fonts/lausanne.css">
+
+ <!-- Same key as the rest of the site, so a visitor who picked a theme on
+      the landing gets it here. Nothing saved: follow the system, this page
+      is light-native like the case studies. -->
+ <script>
+ (function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);}catch(e){}})();
+ </script>
+
+<style>
+
+  /* ============================================================
+     Tokens. Same set as pietragottardo.com. This page is light-native
+     (a client fills it in), so :root is the paper set and dark is the
+     override, the way the case-study pages are built.
+     ============================================================ */
+  :root{
+    --gray-true-25:#fcfcfc;
+    --gray-true-900:#141414;
+
+    --bg:#fbfaf8;
+    --surface:rgba(20,20,20,0.03);
+    --surface-2:rgba(20,20,20,0.06);
+    --text:var(--gray-true-900);
+    --text-2:#666666;
+    --text-3:#6b6b6b;
+    --border:rgba(20,20,20,0.12);
+    --border-strong:rgba(20,20,20,0.34);
+
+    --accent:#3d5a3e;
+    --accent-yellow:#f7fdb9;
+    /* Coral in light, sage in dark: the same token the hero dots read. */
+    --dot-rgb:255,122,69;
+    --cta:#AA4E0E;
+
+    --seg-on-bg:#2e2e2e;
+    --seg-on-fg:#fbfaf8;
+    --seg-bg:rgba(20,20,20,0.08);
+    --seg-hover:rgba(20,20,20,0.06);
+
+    --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.21'/%3E%3C/svg%3E");
+    --grain-blend:multiply;
+
+    --font:'TWKLausanne','TWKLausanne Fallback',system-ui,sans-serif;
+    --ease:cubic-bezier(0.16,1,0.3,1);
+
+    --edge:32px;
+    --header-h:24px;
+    --seg-h:40px;
+    --nav-h:calc(var(--edge) * 2 + var(--header-h));
+    --seg-band:calc(var(--edge) * 2 + var(--seg-h));
+    --measure:min(calc(100% - 2 * var(--edge)), 42rem);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#141414;
+      --surface:rgba(255,255,255,0.04);
+      --surface-2:rgba(255,255,255,0.08);
+      --text:var(--gray-true-25);
+      --text-2:rgba(252,252,252,0.62);
+      --text-3:rgba(252,252,252,0.50);
+      --border:rgba(255,255,255,0.10);
+      --border-strong:rgba(255,255,255,0.38);
+      --dot-rgb:142,196,138;
+      --cta:#f7fdb9;
+      --seg-on-bg:#fcfcfc;
+      --seg-on-fg:#141414;
+      --seg-bg:rgba(255,255,255,0.10);
+      --seg-hover:rgba(255,255,255,0.08);
+      --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+      --grain-blend:normal;
+      color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#141414;
+    --surface:rgba(255,255,255,0.04);
+    --surface-2:rgba(255,255,255,0.08);
+    --text:var(--gray-true-25);
+    --text-2:rgba(252,252,252,0.62);
+    --text-3:rgba(252,252,252,0.50);
+    --border:rgba(255,255,255,0.10);
+    --border-strong:rgba(255,255,255,0.38);
+    --dot-rgb:142,196,138;
+    --cta:#f7fdb9;
+    --seg-on-bg:#fcfcfc;
+    --seg-on-fg:#141414;
+    --seg-bg:rgba(255,255,255,0.10);
+    --seg-hover:rgba(255,255,255,0.08);
+    --grain:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
+    --grain-blend:normal;
+    color-scheme:dark;
+  }
+  @media (max-width:640px){ :root{ --edge:20px; } }
+
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background-color:var(--bg);
+    background-image:var(--grain);
+    background-size:200px;
+    background-attachment:fixed;
+    background-blend-mode:var(--grain-blend);
+    color:var(--text);
+    font-family:var(--font);
+    font-size:0.9375rem;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    min-height:100svh;
+  }
+  ::selection{background:var(--accent-yellow);color:var(--gray-true-900)}
+  a{color:inherit}
+  a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid rgb(var(--dot-rgb));outline-offset:3px}
+
+  /* ============================================================
+     Nav: wordmark on the left edge, theme toggle on the right.
+     ============================================================ */
+  .nav{position:fixed;top:0;left:0;right:0;z-index:80;padding-top:env(safe-area-inset-top,0px);pointer-events:none}
+  .nav > .wrap{width:var(--measure);margin-inline:auto;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;pointer-events:auto}
+  .nav-logo{
+    font-size:0.8125rem;font-weight:500;letter-spacing:-0.02em;color:var(--text);
+    text-decoration:none;display:inline-flex;align-items:center;gap:0.6em;min-height:44px;
+  }
+  .theme-toggle{display:flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;background-color:var(--bg)}
+  .theme-btn{
+    position:relative;display:flex;align-items:center;justify-content:center;
+    padding:5px 9px;border:none;cursor:pointer;background:transparent;color:var(--text-2);
+    transition:background 0.3s,color 0.3s;font:inherit;
+  }
+  .theme-btn::after{content:"";position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+  .theme-btn svg{width:14px;height:14px;display:block}
+  .theme-btn.active{background:var(--text);color:var(--bg)}
+
+  /* ============================================================
+     Sheet
+     ============================================================ */
+  main{
+    width:var(--measure);margin-inline:auto;
+    padding-block:calc(var(--nav-h) + 24px) calc(var(--seg-band) + 24px);
+  }
+  .eyebrow{
+    display:block;font-size:0.6875rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;
+    color:rgb(var(--dot-rgb));margin:0 0 1.25rem;
+  }
+  .eyebrow.muted{color:var(--text-3)}
+  h1{
+    font-size:clamp(2.25rem,5.5vw,4rem);font-weight:300;letter-spacing:-0.025em;line-height:1.04;
+    margin:0 0 1.5rem;text-wrap:balance;
+  }
+  h1 em,h2 em{font-style:italic;font-weight:300}
+  h2{
+    font-size:clamp(1.875rem,4vw,2.75rem);font-weight:300;letter-spacing:-0.02em;line-height:1.12;
+    margin:0 0 1rem;text-wrap:balance;
+  }
+  .lead{font-size:clamp(1.0625rem,1.4vw,1.25rem);color:var(--text-2);line-height:1.55;max-width:34em;margin:0 0 1.75rem}
+  .meta{font-size:0.6875rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-3);margin:0 0 2.5rem}
+  .meta b{font-weight:500;color:var(--text)}
+  .note{font-size:0.875rem;color:var(--text-3);max-width:40em;margin:1.5rem 0 0;line-height:1.55}
+  .note a{color:var(--text);text-decoration:none;border-bottom:1px solid var(--border)}
+
+  /* Intro: the six sections as a ruled list, the way Get in touch lists its routes. */
+  .index{list-style:none;margin:0 0 2.5rem;padding:0;border-top:1px solid var(--border)}
+  .index li{display:grid;grid-template-columns:2.5rem 1fr auto;align-items:baseline;gap:1rem;padding:0.9rem 0;border-bottom:1px solid var(--border)}
+  .index .n{font-size:0.6875rem;font-weight:500;letter-spacing:0.14em;color:var(--text-3);font-variant-numeric:tabular-nums}
+  .index .t{font-size:1rem;color:var(--text)}
+  .index .d{font-size:0.8125rem;color:var(--text-3);white-space:nowrap}
+  .index .k{font-size:0.8125rem;color:var(--text-3);display:block}
+
+  /* ============================================================
+     Buttons: the site's two, and nothing else.
+     ============================================================ */
+  .btn{
+    font-family:var(--font);font-size:0.875rem;font-weight:500;letter-spacing:0;
+    padding:0.875rem 1.5rem;border-radius:6px;border:none;cursor:pointer;
+    transition:background 0.35s var(--ease),color 0.35s var(--ease),border-color 0.35s var(--ease);
+    text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;line-height:1;
+  }
+  .btn-primary{background:var(--text);color:var(--bg)}
+  .btn-primary:hover{background:var(--accent-yellow);color:var(--gray-true-900)}
+  .btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .btn-ghost:hover{background:var(--accent-yellow);color:var(--gray-true-900);border-color:var(--accent-yellow)}
+  .btn:disabled{opacity:0.5;cursor:default}
+  .btn .arr{font-size:0.9em;transition:transform 0.35s var(--ease)}
+  .btn:hover .arr{transform:translate(0.12em,-0.12em)}
+  .actions{display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;margin-top:2.5rem}
+  .actions .grow{flex:1}
+
+  /* ============================================================
+     Fields: ruled, not boxed. One rule between questions, the control
+     underneath its label, help in the small grey.
+     ============================================================ */
+  .fields{border-top:1px solid var(--border)}
+  .field{padding-block:1.6rem;border-bottom:1px solid var(--border)}
+  .q{display:block;font-size:1.0625rem;font-weight:400;color:var(--text);margin:0 0 0.35rem;line-height:1.4}
+  .q .req{color:rgb(var(--dot-rgb));margin-left:0.25em;font-weight:500}
+  .help{font-size:0.875rem;color:var(--text-2);margin:0 0 0.9rem;max-width:40em;line-height:1.5}
+  .q + .ctl,.q + .opts{margin-top:0.75rem}
+
+  .ctl,textarea.ctl{
+    width:100%;font-family:var(--font);font-size:1rem;line-height:1.5;
+    color:var(--text);background:var(--surface);
+    border:1px solid var(--border);border-radius:6px;
+    padding:0.75rem 0.9rem;
+    transition:border-color 0.3s var(--ease),background 0.3s var(--ease);
+  }
+  textarea.ctl{min-height:6.5rem;resize:vertical}
+  .ctl::placeholder{color:var(--text-3)}
+  .ctl:hover{border-color:var(--border-strong)}
+  .ctl:focus{outline:none;border-color:var(--text);background:transparent}
+
+  .opts{display:grid;grid-template-columns:1fr;gap:0.5rem}
+  .opts.cols{grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))}
+  .opts.inline{display:flex;flex-wrap:wrap}
+  .opts.inline .opt{flex:none;padding-right:1.1rem}
+  .opt{
+    display:flex;align-items:flex-start;gap:0.7rem;
+    border:1px solid var(--border);border-radius:6px;background:var(--surface);
+    padding:0.7rem 0.9rem;font-size:0.9375rem;line-height:1.45;color:var(--text);
+    cursor:pointer;transition:border-color 0.3s var(--ease),background 0.3s var(--ease),color 0.3s var(--ease);
+  }
+  .opt:hover{border-color:var(--border-strong)}
+  .opt input{
+    appearance:none;-webkit-appearance:none;
+    width:15px;height:15px;flex:none;margin:0.3rem 0 0;
+    border:1px solid var(--border-strong);background:transparent;border-radius:3px;
+    display:grid;place-content:center;cursor:pointer;
+    transition:border-color 0.3s var(--ease),background 0.3s var(--ease);
+  }
+  .opt input[type=radio]{border-radius:50%}
+  .opt input:checked{background:var(--text);border-color:var(--text)}
+  .opt input[type=checkbox]:checked::after{content:"";width:9px;height:9px;background:var(--bg);clip-path:polygon(14% 45%,0 60%,39% 100%,100% 20%,85% 6%,38% 70%)}
+  .opt input[type=radio]:checked::after{content:"";width:5px;height:5px;border-radius:50%;background:var(--bg)}
+  .opt input:focus-visible{outline:2px solid rgb(var(--dot-rgb));outline-offset:2px}
+  .opt.on{border-color:var(--text);background:transparent}
+
+  /* ============================================================
+     Review: label over value, ruled, grouped by section.
+     ============================================================ */
+  .rv-group{margin-top:2.5rem}
+  .rv-group .eyebrow{margin-bottom:0.5rem}
+  .rv{list-style:none;margin:0;padding:0;border-top:1px solid var(--border)}
+  .rv .rv-row{display:grid;grid-template-columns:minmax(9em,13em) 1fr;gap:1.25rem;padding:0.85rem 0;border-bottom:1px solid var(--border);align-items:baseline}
+  .rv dt{font-size:0.8125rem;color:var(--text-3);margin:0}
+  .rv dd{margin:0;font-size:0.9375rem;color:var(--text);white-space:pre-wrap;overflow-wrap:anywhere}
+  .rv dd.empty{color:var(--text-3);font-style:italic}
+  @media (max-width:560px){ .rv .rv-row{grid-template-columns:1fr;gap:0.15rem} }
+  .missing{
+    border-left:2px solid rgb(var(--dot-rgb));padding:0.25rem 0 0.25rem 1rem;margin:0 0 1.5rem;
+    font-size:0.9375rem;color:var(--text-2);max-width:40em;
+  }
+  .missing b{font-weight:500;color:var(--text);display:block;margin-bottom:0.15rem}
+  .toast{font-size:0.875rem;color:var(--cta);min-height:1.4em;margin:0.75rem 0 0}
+  .saved{font-size:0.75rem;color:var(--text-3);letter-spacing:0.08em;text-transform:uppercase;transition:opacity 0.6s var(--ease)}
+
+  /* ============================================================
+     Segmented control at the foot. Each segment is a section; the
+     active one is the step on screen.
+     ============================================================ */
+  .seg::before{content:"";position:fixed;left:0;right:0;bottom:0;height:var(--seg-band);background:linear-gradient(to top,var(--bg) 0%,var(--bg) 62%,transparent 100%);z-index:-1;pointer-events:none}
+  .seg{
+    position:fixed;left:50%;bottom:calc(var(--edge) + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:90;
+    display:flex;align-items:center;gap:0;height:var(--seg-h);padding:0 3px;border-radius:999px;
+    background:var(--seg-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    max-width:calc(100vw - 2 * var(--edge));overflow-x:auto;scrollbar-width:none;
+  }
+  .seg::-webkit-scrollbar{display:none}
+  .seg-btn{
+    flex:none;border:0;cursor:pointer;background:transparent;color:var(--text);
+    font-family:var(--font);font-size:0.75rem;font-weight:500;letter-spacing:-0.005em;
+    display:inline-flex;align-items:center;height:calc(var(--seg-h) - 8px);padding:0 0.7rem;border-radius:999px;white-space:nowrap;
+    transition:background 0.3s var(--ease),color 0.3s var(--ease);
+  }
+  .seg-btn:not(.is-on):hover{background:var(--seg-hover)}
+  .seg-btn.is-on{background:var(--seg-on-bg);color:var(--seg-on-fg)}
+  .seg-btn .num{display:none}
+  @media (max-width:640px){
+    .seg-btn .lbl{display:none}
+    .seg-btn .num{display:inline}
+    .seg-btn.keep .lbl{display:inline}
+    .seg-btn.keep .num{display:none}
+    .seg-btn{padding:0 0.6rem}
+  }
+
+  /* Reveal: from a visible resting state, only the first rise. */
+  .r{animation:rise 0.7s var(--ease) both}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .r:nth-child(2){animation-delay:0.05s}.r:nth-child(3){animation-delay:0.1s}.r:nth-child(4){animation-delay:0.15s}.r:nth-child(5){animation-delay:0.2s}
+
+  /* Custom cursor, same as the site: inverting dot, glass lens over what is clickable. */
+  .cursor{display:none}
+  @media (hover:hover) and (pointer:fine){
+    .cursor{
+      display:block;position:fixed;top:0;left:0;width:28px;height:28px;border-radius:50%;
+      background:#fff;mix-blend-mode:difference;pointer-events:none;z-index:10000;
+      transform:translate3d(-100px,-100px,0);will-change:transform;
+      transition:width 0.35s var(--ease),height 0.35s var(--ease),opacity 0.2s;
+    }
+    .cursor.active{
+      width:64px;height:64px;mix-blend-mode:normal;background:transparent;
+      backdrop-filter:contrast(1.08) saturate(1.35) brightness(1.03);-webkit-backdrop-filter:contrast(1.08) saturate(1.35) brightness(1.03);
+      border:1.5px solid rgba(255,255,255,0.6);
+      box-shadow:0 0 0 1px rgba(0,0,0,0.06),0 6px 20px rgba(0,0,0,0.12),inset 0 2px 3px rgba(255,255,255,0.35),inset 0 -2px 3px rgba(0,0,0,0.06);
+    }
+    .cursor.off{opacity:0}
+    a,button,.opt{cursor:none}
+  }
+  @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Topo">
+  <div class="wrap">
+    <a class="nav-logo" href="/">Pietra Gottardo.</a>
+    <div class="theme-toggle" role="group" aria-label="Tema">
+      <button class="theme-btn" type="button" data-theme-set="dark" aria-pressed="false" aria-label="Tema escuro" title="Escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
+      <button class="theme-btn" type="button" data-theme-set="light" aria-pressed="false" aria-label="Tema claro" title="Claro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
+    </div>
+  </div>
+</nav>
+
+<main id="main"></main>
+
+<nav class="seg" id="seg" role="tablist" aria-label="Seções do briefing"></nav>
+
+<script>
+(function(){
+  "use strict";
+
+  var EMAIL = "pietragottardo@gmail.com";
+  var ENDPOINT = "/briefing";
+
+  var STEPS = [
+    {
+      key:"contato", title:"Contato", short:"Contato", time:"30 seg",
+      note:"Quatro campos e seguimos.",
+      fields:[
+        {id:"nome", label:"Seu nome", type:"text", required:true},
+        {id:"empresa", label:"Empresa", type:"text"},
+        {id:"email", label:"E-mail", type:"email", required:true},
+        {id:"site_atual", label:"Site atual", type:"text", placeholder:"https://  ou  ainda não temos"}
+      ]
+    },
+    {
+      key:"negocio", title:"Negócio e objetivo", short:"Negócio", time:"2 min",
+      note:"O que vocês vendem, o que o site precisa provocar em quem chega, e por que agora.",
+      fields:[
+        {id:"oferta", label:"O que a empresa faz, em uma frase", type:"textarea", required:true,
+         help:"Como você explicaria pra alguém que nunca ouviu falar de vocês."},
+        {id:"objetivo_principal", label:"O que o site precisa fazer acontecer", type:"radio", required:true,
+         options:["Gerar leads e agendar reuniões","Vender online","Passar credibilidade institucional","Captar investimento","Recrutar pessoas","Publicar conteúdo e ganhar audiência","Ainda não sei, quero ajuda pra definir"]},
+        {id:"publico", label:"Quem precisa ser convencido", type:"text",
+         placeholder:"Ex.: CISOs e heads de risco de fintechs entre 50 e 500 funcionários"},
+        {id:"porque_agora", label:"O que o site de hoje não resolve", type:"textarea",
+         help:"É o que mais me ajuda a priorizar. Se é o primeiro site, diga o que está travando sem ele.",
+         placeholder:"Ex.: não explica o produto novo, não converte quem chega do LinkedIn, parece de 2015"},
+        {id:"referencias", label:"Dois sites que vocês admiram, e por quê", type:"textarea",
+         placeholder:"site.com: a clareza da home\nsite2.com: o tom da escrita"}
+      ]
+    },
+    {
+      key:"escopo", title:"Tamanho e funcionalidades", short:"Escopo", time:"2 min",
+      note:"A parte que mais mexe no preço. Se não souber, marque a opção honesta.",
+      fields:[
+        {id:"formato", label:"Que formato você imagina", type:"radio", required:true,
+         options:["One page (uma página longa)","Site enxuto (3 a 6 páginas)","Site completo (7 a 15 páginas)","Site grande (mais de 15 páginas)","Landing page de campanha","Site + produto com área logada","Loja online","Não sei, quero uma recomendação"]},
+        {id:"funcionalidades", label:"Além das páginas, o site precisa de", type:"checkbox",
+         help:"Cada item é tempo de desenvolvimento. Marque só o que precisa existir no lançamento.",
+         options:["Agendamento de reunião (Calendly ou similar)","Newsletter","Área logada pra clientes","Assinatura ou pagamento","Material em troca de e-mail (PDF, planilha)","Blog que nós mesmos editamos","Mais de um idioma","Dashboard ou área com dados ao vivo","Nada além do básico"]},
+        {id:"complexo", label:"Se marcou área logada, assinatura ou dashboard: como funciona", type:"textarea",
+         placeholder:"Ex.: cliente entra e baixa relatórios mensais. Planos anuais cobrados por Stripe."}
+      ]
+    },
+    {
+      key:"conteudo", title:"Conteúdo e marca", short:"Conteúdo", time:"1 min",
+      note:"Site trava mais por falta de texto e imagem do que por design.",
+      fields:[
+        {id:"textos", label:"Os textos do site", type:"radio",
+         options:["Já estão prontos","Temos rascunhos pra editar","Queremos que vocês escrevam","Ainda não pensamos nisso"]},
+        {id:"marca", label:"A identidade visual", type:"radio",
+         options:["Manual de marca completo","Logo e cores, sem manual","Só o logo","Não temos nada","Temos, mas queremos repensar"]},
+        {id:"imagens", label:"As imagens do site", type:"radio",
+         help:"Não uso banco de imagem. O que não existir, a gente produz ou desenha.",
+         options:["Temos fotos e material próprio","Precisamos produzir (foto, ilustração, 3D)","Só telas do produto","Ainda não pensamos nisso"]},
+        {id:"dados", label:"O site precisa mostrar dados, números ou gráficos", type:"radio",
+         help:"Visualização de dados é o centro do meu trabalho. Se houver dados, o site muda de patamar.",
+         options:["Sim, e são centrais pra mensagem","Sim, alguns indicadores","Não","Talvez"]}
+      ]
+    },
+    {
+      key:"projeto", title:"Prazo e investimento", short:"Prazo e verba", time:"1 min",
+      note:"Sem a faixa de verba, qualquer preço que eu mandar é chute.",
+      fields:[
+        {id:"prazo", label:"Quando vocês querem no ar", type:"text",
+         placeholder:"Ex.: novembro, antes da conferência. Ou: sem data definida"},
+        {id:"moeda", label:"Moeda", type:"radio", inline:true, options:["BRL","EUR","USD","GBP"]},
+        {id:"faixa", label:"Faixa de investimento prevista", type:"radio", required:true,
+         help:"Os projetos começam em 1 mil. Com a faixa eu proponho o escopo que cabe nela, em vez de mandar um número no escuro.",
+         options:["1 a 3 mil","3 a 5 mil","5 a 10 mil","10 a 20 mil","20 a 40 mil","Acima de 40 mil","Não tenho ideia, preciso de referência"]},
+        {id:"decisores", label:"Quem aprova o projeto", type:"text", placeholder:"Ex.: eu e mais dois sócios"}
+      ]
+    },
+    {
+      key:"tecnico", title:"Técnico e final", short:"Técnico", time:"1 min",
+      note:"Tudo opcional. Responda só o que já estiver definido internamente.",
+      fields:[
+        {id:"plataforma", label:"Preferência de plataforma", type:"radio",
+         options:["Webflow","Framer","WordPress","Site em código (Next.js ou similar)","Sem preferência, quero a recomendação"]},
+        {id:"manutencao", label:"Quem cuida do site depois do lançamento", type:"radio",
+         help:"Muda a escolha da plataforma: um site que vocês editam pede uma ferramenta diferente de um que eu mantenho.",
+         options:["Nós mesmos, sem depender de ninguém","Queremos que vocês mantenham","Um dev interno","Ainda não sei"]},
+        {id:"compliance", label:"Requisitos de conformidade ou segurança", type:"checkbox",
+         options:["LGPD","GDPR","Banner de cookies","Acessibilidade (WCAG)","Hospedagem em região específica","Revisão de segurança antes do lançamento","Nenhum ou não sei"]},
+        {id:"integracoes", label:"Sistemas com que o site precisa conversar", type:"text",
+         placeholder:"Ex.: HubSpot, Mailchimp, Google Analytics, API interna"},
+        {id:"livre", label:"Links de materiais ou algo que eu não perguntei", type:"textarea",
+         placeholder:"Deck de vendas, manual de marca, pasta no Drive"}
+      ]
+    }
+  ];
+
+  var STORE = "briefing-v1";
+  var state = {};
+  var idx = -1;
+  var armed = false;
+
+  var main = document.getElementById("main");
+  var seg = document.getElementById("seg");
+
+  /* ---------- storage ---------- */
+  function load(){
+    try{ var raw = localStorage.getItem(STORE); if(raw) state = JSON.parse(raw) || {}; }catch(e){ state = {}; }
+  }
+  function save(){
+    try{
+      localStorage.setItem(STORE, JSON.stringify(state));
+      var s = document.getElementById("saved");
+      if(s){ s.textContent = "Rascunho salvo"; s.style.opacity = "1"; clearTimeout(save._t); save._t = setTimeout(function(){ s.style.opacity = "0"; }, 1800); }
+    }catch(e){}
+  }
+  function esc(s){
+    return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; });
+  }
+  function requiredCount(){
+    var n = 0; STEPS.forEach(function(s){ s.fields.forEach(function(f){ if(f.required) n++; }); }); return n;
+  }
+
+  /* ---------- theme ---------- */
+  function applyTheme(t){
+    if(t) document.documentElement.setAttribute("data-theme", t);
+    var current = document.documentElement.getAttribute("data-theme") ||
+      (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.querySelectorAll(".theme-btn").forEach(function(b){
+      var on = b.getAttribute("data-theme-set") === current;
+      b.classList.toggle("active", on); b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  document.querySelectorAll(".theme-btn").forEach(function(b){
+    b.addEventListener("click", function(){
+      var t = b.getAttribute("data-theme-set");
+      try{ localStorage.setItem("theme", t); }catch(e){}
+      applyTheme(t);
+    });
+  });
+  applyTheme();
+
+  /* ---------- seg ---------- */
+  function buildSeg(){
+    var h = '<button class="seg-btn keep" role="tab" data-go="-1"><span class="lbl">Início</span></button>';
+    STEPS.forEach(function(s,i){
+      h += '<button class="seg-btn" role="tab" data-go="'+i+'"><span class="lbl">'+esc(s.short)+'</span><span class="num">'+(i+1)+'</span></button>';
+    });
+    h += '<button class="seg-btn keep" role="tab" data-go="'+STEPS.length+'"><span class="lbl">Resumo</span></button>';
+    seg.innerHTML = h;
+    seg.addEventListener("click", function(e){
+      var b = e.target.closest("[data-go]"); if(!b) return;
+      go(parseInt(b.getAttribute("data-go"), 10));
+    });
+  }
+  function markSeg(){
+    seg.querySelectorAll(".seg-btn").forEach(function(b){
+      var on = parseInt(b.getAttribute("data-go"), 10) === idx;
+      b.classList.toggle("is-on", on); b.setAttribute("aria-selected", on ? "true" : "false");
+      if(on) b.scrollIntoView({block:"nearest", inline:"center"});
+    });
+  }
+
+  /* ---------- fields ---------- */
+  function fieldHTML(f){
+    var req = f.required ? '<span class="req" aria-hidden="true">*</span>' : '';
+    var help = f.help ? '<p class="help">'+esc(f.help)+'</p>' : '';
+    var val = state[f.id];
+    var ph = f.placeholder ? ' placeholder="'+esc(f.placeholder)+'"' : '';
+    var ctrl = "";
+    var forId = f.id;
+
+    if(f.type === "textarea"){
+      ctrl = '<textarea class="ctl" id="'+f.id+'" data-f="'+f.id+'"'+ph+(f.required?' aria-required="true"':'')+'>'+esc(val||"")+'</textarea>';
+    } else if(f.type === "radio" || f.type === "checkbox"){
+      forId = f.id + "_0";
+      var cls = f.inline ? "opts inline" : ((f.type === "checkbox" || f.options.length > 5) ? "opts cols" : "opts");
+      ctrl = '<div class="'+cls+'" role="group" aria-labelledby="'+f.id+'_q" data-group="'+f.id+'">';
+      f.options.forEach(function(o, i){
+        var on = f.type === "checkbox" ? (Array.isArray(val) && val.indexOf(o) > -1) : (val === o);
+        ctrl += '<label class="opt'+(on?" on":"")+'">'+
+          '<input type="'+f.type+'" name="'+f.id+'" id="'+f.id+'_'+i+'" value="'+esc(o)+'" data-f="'+f.id+'"'+(on?' checked':'')+'>'+
+          '<span>'+esc(o)+'</span></label>';
+      });
+      ctrl += '</div>';
+    } else {
+      var t = f.type === "email" ? "email" : "text";
+      ctrl = '<input class="ctl" type="'+t+'" id="'+f.id+'" data-f="'+f.id+'" value="'+esc(val||"")+'"'+ph+(f.required?' aria-required="true"':'')+'>';
+    }
+    return '<div class="field">'+
+      '<label class="q" id="'+f.id+'_q" for="'+forId+'">'+esc(f.label)+req+'</label>'+
+      help + ctrl + '</div>';
+  }
+
+  /* ---------- views ---------- */
+  function renderIntro(){
+    var rows = STEPS.map(function(s,i){
+      return '<li><span class="n">'+String(i+1).padStart(2,"0")+'</span><span><span class="t">'+esc(s.title)+'</span><span class="k">'+esc(s.note)+'</span></span><span class="d">'+esc(s.time)+'</span></li>';
+    }).join("");
+    main.innerHTML =
+      '<span class="eyebrow r">Briefing de site</span>'+
+      '<h1 class="r">Me conta o site.<br>Eu volto com<br><em>escopo e preço</em>.</h1>'+
+      '<p class="lead r">Seis seções, uns sete minutos. Com estas respostas a proposta vem com número, em vez de uma faixa vaga. Só '+requiredCount()+' campos são obrigatórios; o resto você responde se souber.</p>'+
+      '<p class="meta r"><b>'+STEPS.length+' seções</b> &nbsp;·&nbsp; 7 min &nbsp;·&nbsp; '+requiredCount()+' obrigatórios &nbsp;·&nbsp; salva sozinho</p>'+
+      '<ul class="index r">'+rows+'</ul>'+
+      '<div class="actions r" style="margin-top:0"><button type="button" class="btn btn-primary" id="btnStart">Começar <span class="arr" aria-hidden="true">&#8599;</span></button></div>'+
+      '<p class="note r">Nada é enviado sozinho: no fim você copia o resumo e me manda por e-mail. Pode fechar a aba no meio, o rascunho fica salvo neste navegador.</p>';
+    document.getElementById("btnStart").addEventListener("click", function(){ go(0); });
+  }
+
+  function renderStep(i){
+    var s = STEPS[i];
+    var last = i === STEPS.length - 1;
+    main.innerHTML =
+      '<span class="eyebrow r">Seção '+(i+1)+' de '+STEPS.length+'</span>'+
+      '<h2 class="r">'+esc(s.title)+'.</h2>'+
+      '<p class="lead r">'+esc(s.note)+'</p>'+
+      '<div class="fields r">'+ s.fields.map(fieldHTML).join("") +'</div>'+
+      '<div class="actions r">'+
+        '<button type="button" class="btn btn-ghost" id="btnBack">Voltar</button>'+
+        '<span class="grow"></span>'+
+        '<span class="saved" id="saved" aria-live="polite"></span>'+
+        '<button type="button" class="btn btn-primary" id="btnNext">'+(last ? "Ver resumo" : "Continuar")+' <span class="arr" aria-hidden="true">&#8599;</span></button>'+
+      '</div>';
+    document.getElementById("btnBack").addEventListener("click", function(){ go(i - 1); });
+    document.getElementById("btnNext").addEventListener("click", function(){ go(i + 1); });
+  }
+
+  function missingRequired(){
+    var out = [];
+    STEPS.forEach(function(s, i){
+      s.fields.forEach(function(f){
+        if(!f.required) return;
+        var v = state[f.id];
+        var empty = f.type === "checkbox" ? (!Array.isArray(v) || !v.length) : (!v || !String(v).trim());
+        if(empty) out.push({step:i, label:f.label});
+      });
+    });
+    return out;
+  }
+
+  function renderReview(){
+    var miss = missingRequired();
+    var groups = STEPS.map(function(s, i){
+      var rows = s.fields.map(function(f){
+        var v = state[f.id];
+        var txt = Array.isArray(v) ? v.join(", ") : (v || "");
+        var empty = !txt || !String(txt).trim();
+        return '<div class="rv-row"><dt>'+esc(f.label)+'</dt><dd'+(empty?' class="empty"':'')+'>'+esc(empty ? "sem resposta" : txt)+'</dd></div>';
+      }).join("");
+      return '<section class="rv-group r"><span class="eyebrow muted">'+String(i+1).padStart(2,"0")+' · '+esc(s.title)+'</span><dl class="rv" style="margin:0">'+rows+'</dl></section>';
+    }).join("");
+
+    var missHTML = "";
+    if(miss.length){
+      missHTML = '<div class="missing r"><b>'+miss.length+(miss.length>1?' respostas obrigatórias faltando':' resposta obrigatória faltando')+'</b>'+
+        esc(miss.map(function(m){ return m.label; }).join(" · "))+'. Dá pra enviar assim mesmo, mas o orçamento sai como estimativa, não como proposta fechada.</div>';
+    }
+
+    var subject = encodeURIComponent("Briefing de site: " + (state.empresa || "nova empresa"));
+
+    main.innerHTML =
+      '<span class="eyebrow r">Resumo</span>'+
+      '<h2 class="r">Seu briefing está <em>pronto</em>.</h2>'+
+      '<p class="lead r">Confira as respostas e envie. Eu respondo com escopo e preço em até dois dias úteis.</p>'+
+      missHTML+
+      '<div class="actions r" style="margin-top:0">'+
+        '<button type="button" class="btn btn-primary" id="btnSend">Enviar briefing <span class="arr" aria-hidden="true">&#8599;</span></button>'+
+        '<button type="button" class="btn btn-ghost" id="btnCopy">Copiar texto</button>'+
+      '</div>'+
+      '<p class="toast r" id="toast" aria-live="polite"></p>'+
+      '<p class="note r" style="margin-top:0.25rem">Vai direto pra minha caixa. Se preferir, copie o texto e mande pra <a href="mailto:'+EMAIL+'?subject='+subject+'">'+EMAIL+'</a>.</p>'+
+      groups+
+      '<div class="actions">'+
+        '<button type="button" class="btn btn-ghost" id="btnEdit">Voltar e editar</button>'+
+        '<span class="grow"></span>'+
+        '<button type="button" class="btn btn-ghost" id="btnReset">Recomeçar</button>'+
+      '</div>';
+
+    document.getElementById("btnEdit").addEventListener("click", function(){ go(STEPS.length - 1); });
+    document.getElementById("btnCopy").addEventListener("click", function(){
+      var t = document.getElementById("toast");
+      copyText(buildText()).then(function(ok){
+        t.textContent = ok ? "Texto copiado." : "Não consegui copiar. Selecione o texto do resumo manualmente.";
+      });
+    });
+    document.getElementById("btnSend").addEventListener("click", sendBriefing);
+    var reset = document.getElementById("btnReset");
+    reset.addEventListener("click", function(){
+      if(!armed){
+        armed = true; reset.textContent = "Apagar tudo?";
+        setTimeout(function(){ if(armed){ armed = false; reset.textContent = "Recomeçar"; } }, 4000);
+        return;
+      }
+      armed = false; state = {};
+      try{ localStorage.removeItem(STORE); }catch(e){}
+      go(-1);
+    });
+  }
+
+  function buildText(){
+    var L = [];
+    L.push("BRIEFING DE SITE: " + (state.empresa || "sem nome"));
+    L.push("Enviado por " + (state.nome || "") + (state.email ? " · " + state.email : ""));
+    L.push("Data: " + new Date().toLocaleDateString("pt-BR"));
+    L.push("");
+    STEPS.forEach(function(s){
+      L.push("## " + s.title);
+      s.fields.forEach(function(f){
+        var v = state[f.id];
+        var txt = Array.isArray(v) ? v.join("; ") : (v || "");
+        if(!txt || !String(txt).trim()) return;
+        L.push("- " + f.label + ": " + txt);
+      });
+      L.push("");
+    });
+    return L.join("\n");
+  }
+
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).then(function(){ return true; }).catch(function(){ return legacyCopy(text); });
+    }
+    return Promise.resolve(legacyCopy(text));
+  }
+  function legacyCopy(text){
+    try{
+      var ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      var ok = document.execCommand("copy");
+      document.body.removeChild(ta);
+      return ok;
+    }catch(e){ return false; }
+  }
+
+  /* ---------- send ---------- */
+  function sendBriefing(){
+    var btn = document.getElementById("btnSend");
+    var t = document.getElementById("toast");
+    var miss = missingRequired();
+    if(!state.nome || !state.email){
+      t.textContent = "Preciso do seu nome e e-mail pra responder. Estão na seção 1.";
+      return;
+    }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(state.email).trim())){
+      t.textContent = "Esse e-mail não parece válido. Confere na seção 1.";
+      return;
+    }
+    btn.disabled = true; btn.textContent = "Enviando";
+    t.textContent = "";
+    fetch(ENDPOINT, {
+      method:"POST",
+      headers:{"content-type":"application/json"},
+      body:JSON.stringify({
+        nome:state.nome, email:state.email, empresa:state.empresa || "",
+        text:buildText(), missing:miss.length, website:""
+      })
+    }).then(function(r){ return r.json().catch(function(){ return {ok:false}; }); })
+    .then(function(res){
+      if(res && res.ok){
+        main.innerHTML =
+          '<span class="eyebrow r">Enviado</span>'+
+          '<h2 class="r">Recebi. <em>Obrigada.</em></h2>'+
+          '<p class="lead r">Vou ler com calma e te respondo em '+esc(state.email)+' em até dois dias úteis, com escopo e preço.</p>'+
+          '<p class="note r">Uma cópia do que você enviou fica salva neste navegador até você recomeçar.</p>'+
+          '<div class="actions r"><button type="button" class="btn btn-ghost" id="btnAgain">Ver o que enviei</button></div>';
+        document.getElementById("btnAgain").addEventListener("click", function(){ go(STEPS.length); });
+        window.scrollTo(0,0);
+      } else {
+        btn.disabled = false; btn.innerHTML = 'Enviar briefing <span class="arr" aria-hidden="true">&#8599;</span>';
+        t.textContent = "Não consegui enviar agora. Copie o texto e mande por e-mail, chega do mesmo jeito.";
+      }
+    }).catch(function(){
+      btn.disabled = false; btn.innerHTML = 'Enviar briefing <span class="arr" aria-hidden="true">&#8599;</span>';
+      t.textContent = "Sem conexão. Copie o texto e mande por e-mail, chega do mesmo jeito.";
+    });
+  }
+
+  /* ---------- routing ---------- */
+  function go(i){
+    idx = Math.max(-1, Math.min(STEPS.length, i));
+    armed = false;
+    if(idx < 0) renderIntro();
+    else if(idx < STEPS.length) renderStep(idx);
+    else renderReview();
+    markSeg();
+    window.scrollTo(0,0);
+    try{ sessionStorage.setItem(STORE + ":idx", String(idx)); }catch(e){}
+  }
+
+  /* ---------- input ---------- */
+  main.addEventListener("input", function(e){
+    var el = e.target; var id = el.getAttribute("data-f"); if(!id) return;
+    if(el.type === "checkbox" || el.type === "radio") return;
+    state[id] = el.value; save();
+  });
+  main.addEventListener("change", function(e){
+    var el = e.target; var id = el.getAttribute("data-f"); if(!id) return;
+    var g = main.querySelector('[data-group="'+id+'"]');
+    if(el.type === "checkbox"){
+      var vals = []; g.querySelectorAll("input:checked").forEach(function(c){ vals.push(c.value); });
+      state[id] = vals;
+    } else { state[id] = el.value; }
+    if(g) g.querySelectorAll(".opt").forEach(function(lab){ lab.classList.toggle("on", lab.querySelector("input").checked); });
+    save();
+  });
+
+  /* ---------- cursor ---------- */
+  (function(){
+    var c = document.getElementById("cursor");
+    if(!c || !window.matchMedia || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    var x = -100, y = -100, raf = null;
+    function paint(){ c.style.transform = "translate3d("+(x - c.offsetWidth/2)+"px,"+(y - c.offsetHeight/2)+"px,0)"; raf = null; }
+    document.addEventListener("mousemove", function(e){
+      x = e.clientX; y = e.clientY;
+      if(!raf) raf = requestAnimationFrame(paint);
+      var t = e.target;
+      c.classList.toggle("active", !!t.closest("a, button, .opt"));
+      c.classList.toggle("off", !!t.closest("input.ctl, textarea"));
+    }, {passive:true});
+    document.addEventListener("mouseleave", function(){ c.classList.add("off"); });
+    document.addEventListener("mouseenter", function(){ c.classList.remove("off"); });
+  })();
+
+  /* ---------- boot ---------- */
+  buildSeg();
+  load();
+  var start = -1;
+  try{ var s = sessionStorage.getItem(STORE + ":idx"); if(s !== null) start = parseInt(s, 10); }catch(e){}
+  go(isNaN(start) ? -1 : start);
+})();
+</script>
+
+<script defer src="https://cloud.umami.is/script.js" data-website-id="fb0010c7-011d-4984-8c5a-075500cf715c" data-domains="pietragottardo.com"></script>
+</body>
+</html>

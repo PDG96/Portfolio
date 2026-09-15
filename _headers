@@ -1,0 +1,7 @@
+# The briefing is reached by link only: no card, no nav entry, and no
+# search engine. The page carries a noindex meta as well; this covers
+# crawlers that read headers before markup.
+/briefing
+  X-Robots-Tag: noindex, nofollow
+/briefing.html
+  X-Robots-Tag: noindex, nofollow
