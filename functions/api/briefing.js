@@ -1,5 +1,5 @@
 /**
- * POST /briefing
+ * POST /api/briefing
  * Receives the site briefing (briefing.html) and relays it to Pietra's inbox
  * through Resend, the same pipeline as /contact. The page builds the
  * briefing as plain text on the client; this only wraps it in an e-mail.

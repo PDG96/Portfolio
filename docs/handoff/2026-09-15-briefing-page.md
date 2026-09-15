@@ -1,7 +1,7 @@
 # Briefing de site em pietragottardo.com/briefing
 
 Data: 2026-09-15
-Arquivos: `briefing.html`, `functions/briefing.js`, `_headers`
+Arquivos: `briefing.html`, `functions/api/briefing.js`, `_headers`
 
 ## O que é
 Formulário de briefing pra orçamento de site, em seis seções, na identidade do
@@ -13,8 +13,8 @@ artifact não consegue guardar respostas de gente de fora da organização.
 - A página não aparece em lugar nenhum do site: sem card, sem item no seg,
   sem link. Só quem receber a URL abre. `_headers` manda `X-Robots-Tag:
   noindex` e a página carrega `<meta name="robots" content="noindex">`.
-- O botão **Enviar briefing** faz POST em `/briefing`
-  (`functions/briefing.js`), que manda o texto por Resend pra
+- O botão **Enviar briefing** faz POST em `/api/briefing`
+  (`functions/api/briefing.js`), que manda o texto por Resend pra
   `pietragottardo@gmail.com`, com `reply_to` no e-mail do cliente. Mesma
   chave `RESEND_API_KEY` do `/contact`, nada novo pra configurar.
 - Assunto: `Briefing de site: <empresa>`; se faltou obrigatória, o assunto
