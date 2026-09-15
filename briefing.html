@@ -776,8 +776,9 @@
       groups+
       '<div class="actions">'+
         '<button type="button" class="btn btn-ghost" id="btnEdit">Voltar e editar</button>'+
-        '<span class="grow"></span>'+
         '<button type="button" class="btn btn-ghost" id="btnReset">Recomeçar</button>'+
+        '<span class="grow"></span>'+
+        '<button type="button" class="btn btn-primary" id="btnSend2">Enviar briefing <span class="arr" aria-hidden="true">&#8599;</span></button>'+
       '</div>';
 
     document.getElementById("btnEdit").addEventListener("click", function(){ go(STEPS.length - 1); });
@@ -788,6 +789,7 @@
       });
     });
     document.getElementById("btnSend").addEventListener("click", sendBriefing);
+    document.getElementById("btnSend2").addEventListener("click", sendBriefing);
     var reset = document.getElementById("btnReset");
     reset.addEventListener("click", function(){
       if(!armed){
@@ -874,7 +876,10 @@
 
   /* ---------- send ---------- */
   function sendBriefing(){
-    var btn = document.getElementById("btnSend");
+    var btns = [document.getElementById("btnSend"), document.getElementById("btnSend2")].filter(Boolean);
+    var btn = { set disabled(v){ btns.forEach(function(b){ b.disabled = v; }); },
+                set textContent(v){ btns.forEach(function(b){ b.textContent = v; }); },
+                set innerHTML(v){ btns.forEach(function(b){ b.innerHTML = v; }); } };
     var t = document.getElementById("toast");
     var miss = missingRequired();
     if(miss.length){
