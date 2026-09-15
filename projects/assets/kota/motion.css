@@ -39,7 +39,12 @@
 
   .m-armed .m-bar{transform:scaleY(0)}
   .m-armed .m-fill{transform:scaleX(0)}
-  .m-armed .m-draw,.m-armed .m-arc{stroke-dashoffset:100}
+  .m-armed .m-draw{stroke-dashoffset:100}
+  /* An arc hides behind its own dash length, not behind 100: with a dash of
+     --arc and a gap of 100 the path only clears the visible run once the
+     offset equals --arc. At 100 the tail of the pattern wraps back into
+     view and the gauge starts part drawn. */
+  .m-armed .m-arc{stroke-dashoffset:var(--arc,100)}
   .m-armed .m-area,.m-armed .m-dot,.m-armed .m-cell,.m-armed .m-val{opacity:0}
 
   /* ---- bars ----
@@ -80,7 +85,7 @@
      Sweeps from the start of the arc to the value, which is the direction the
      score is counted in. */
   .m-on .m-arc{animation:m-sweep 1s cubic-bezier(.25,.65,.25,1) both}
-  @keyframes m-sweep{from{stroke-dashoffset:100}to{stroke-dashoffset:0}}
+  @keyframes m-sweep{from{stroke-dashoffset:var(--arc,100)}to{stroke-dashoffset:0}}
 
   /* ---- the number a chart resolves to ----
      Arrives last, because it is the conclusion of everything above it. */
@@ -88,5 +93,14 @@
 }
 
 /* SVG needs the property even when nothing is animating it, or the dash never
-   applies once the class is added. */
-.m-draw,.m-arc{stroke-dasharray:100;stroke-dashoffset:0}
+   applies once the class is added.
+
+   The two are split because they mean different things. A .m-draw draws its
+   whole path, so 100 is right. A .m-arc stops at a value, and that value is
+   the whole point of a gauge: written flat here it overrode the per element
+   dasharray, a stylesheet rule beating a presentation attribute, and every
+   gauge rendered full whatever score it was showing. The value lives in
+   --arc on the element now, which is also what the armed state and the sweep
+   read, so there is one number and three uses of it. */
+.m-draw{stroke-dasharray:100;stroke-dashoffset:0}
+.m-arc{stroke-dasharray:var(--arc,100) 100;stroke-dashoffset:0}
