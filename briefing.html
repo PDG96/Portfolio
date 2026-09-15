@@ -232,6 +232,10 @@
   .field.done .q .mark{opacity:1;transform:none}
   .field.done .q{color:var(--text-2)}
   .field.done .q .req{display:none}
+  .field.error .q{color:rgb(var(--dot-rgb))}
+  .field.error .ctl,.field.error .opt{border-color:rgb(var(--dot-rgb))}
+  .err{font-size:0.875rem;color:rgb(var(--dot-rgb));text-align:right;max-width:24em}
+  .err:empty{display:none}
   .help{font-size:0.875rem;color:var(--text-2);margin:0 0 0.9rem;line-height:1.5}
   .q + .ctl,.q + .opts{margin-top:0.75rem}
 
@@ -584,7 +588,13 @@
     seg.innerHTML = h;
     seg.addEventListener("click", function(e){
       var b = e.target.closest("[data-go]"); if(!b) return;
-      go(parseInt(b.getAttribute("data-go"), 10));
+      var target = parseInt(b.getAttribute("data-go"), 10);
+      if(target > idx){
+        var blocked = firstBlocked(target);
+        if(blocked > -1 && blocked <= idx){ flagMissing(idx); return; }
+        if(blocked > -1){ go(blocked); flagMissing(blocked); return; }
+      }
+      go(target);
     });
   }
   function markSeg(){
@@ -673,13 +683,46 @@
         '<button type="button" class="btn btn-ghost" id="btnBack">Voltar</button>'+
         '<span class="grow"></span>'+
         '<span class="saved" id="saved" aria-live="polite"></span>'+
+        '<span class="err" id="stepErr" role="alert"></span>'+
         '<button type="button" class="btn btn-primary" id="btnNext">'+(last ? "Ver resumo" : "Continuar")+' <span class="arr" aria-hidden="true">&#8599;</span></button>'+
       '</div>';
     document.getElementById("btnBack").addEventListener("click", function(){ go(i - 1); });
-    document.getElementById("btnNext").addEventListener("click", function(){ go(i + 1); });
+    document.getElementById("btnNext").addEventListener("click", function(){ if(!flagMissing(i)) go(i + 1); });
     renderFiles();
   }
 
+  function stepMissing(i){
+    var out = [];
+    STEPS[i].fields.forEach(function(f){
+      if(!visible(f)) return;
+      if(f.required && !answered(f)) out.push(f);
+      else if(f.type === "email" && answered(f) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(state[f.id]).trim())) out.push(f);
+    });
+    return out;
+  }
+  function firstBlocked(upTo){
+    for(var i = 0; i < Math.min(upTo, STEPS.length); i++){ if(stepMissing(i).length) return i; }
+    return -1;
+  }
+  function flagMissing(i){
+    var miss = stepMissing(i);
+    main.querySelectorAll(".field.error").forEach(function(el){ el.classList.remove("error"); });
+    var err = document.getElementById("stepErr");
+    if(!miss.length){ if(err) err.textContent = ""; return false; }
+    miss.forEach(function(f){
+      var el = main.querySelector('[data-field="'+f.id+'"]'); if(el) el.classList.add("error");
+    });
+    if(err){
+      var bad = miss.filter(function(f){ return f.type === "email" && answered(f); }).length;
+      err.textContent = bad ? "Esse e-mail não parece válido." : "Falta responder: " + miss.map(function(f){ return f.label; }).join(", ") + ".";
+    }
+    var first = main.querySelector('[data-field="'+miss[0].id+'"]');
+    if(first){
+      first.scrollIntoView({block:"center", behavior:"smooth"});
+      var c = first.querySelector("input, textarea"); if(c) c.focus({preventScroll:true});
+    }
+    return true;
+  }
   function missLabel(n){
     return n === 0 ? "Tudo obrigatório respondido" : n + (n > 1 ? " respostas obrigatórias faltando" : " resposta obrigatória faltando");
   }
@@ -713,7 +756,7 @@
       var missFields = [];
       STEPS.forEach(function(s){ s.fields.forEach(function(f){ if(f.required && visible(f) && !answered(f)) missFields.push(f); }); });
       missHTML = '<div class="missing r"><b id="missCount">'+missLabel(miss.length)+'</b>'+
-        '<p class="help">Dá pra enviar assim mesmo, mas o orçamento sai como estimativa, não como proposta fechada. Responde aqui mesmo:</p>'+
+        '<p class="help">O envio abre quando estiverem respondidas. Dá pra fazer aqui mesmo:</p>'+
         '<div class="fields">'+missFields.map(fieldHTML).join("")+'</div></div>';
     }
 
@@ -834,8 +877,9 @@
     var btn = document.getElementById("btnSend");
     var t = document.getElementById("toast");
     var miss = missingRequired();
-    if(!state.nome || !state.email){
-      t.textContent = "Preciso do seu nome e e-mail pra responder. Estão na seção 1.";
+    if(miss.length){
+      t.textContent = "Responde as obrigatórias acima antes de enviar.";
+      var m = main.querySelector(".missing"); if(m) m.scrollIntoView({block:"start", behavior:"smooth"});
       return;
     }
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(state.email).trim())){
@@ -919,6 +963,7 @@
     var field = main.querySelector('[data-field="'+id+'"]');
     var f = null; STEPS.forEach(function(s){ s.fields.forEach(function(x){ if(x.id === id) f = x; }); });
     if(field && f) field.classList.toggle("done", answered(f));
+    if(field && answered(f)) field.classList.remove("error");
     if(idx >= STEPS.length && f){
       var row = main.querySelector('[data-rv="'+id+'"] dd');
       if(row){
