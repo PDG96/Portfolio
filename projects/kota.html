@@ -102,6 +102,15 @@
    calc(var(--card-h) * var(--card-max) * 2 + var(--grid-gap))
  );
 
+ /* The case pages are not bound by Work's card ratio. On the landing the
+    measure is capped by --view-h so a 2:1 card grid never outgrows the
+    window, and every surface follows Work so the site has one width. A case
+    study has no card grid to protect, and inheriting that cap left the whole
+    document huddled in the middle of a wide screen: on a short window it
+    stopped growing around 1400px however much room there was. Here the only
+    ceiling is --work-max. */
+ --measure-case: min(calc(100% - 2 * var(--edge)), var(--work-max));
+
  /* Kota accent, deep orange (per-page brand override) */
  --accent: #E25E25;
  --accent-deep: #B5491C;
@@ -376,7 +385,7 @@
  /* The bar is full-bleed, its contents ride the measure: the logo lands
     on the sidebar's left edge at every width. */
  .shell-page .nav .wrap {
- width: var(--measure);
+ width: var(--measure-case);
  max-width: none;
  padding: 0;
  margin-inline: auto;
@@ -406,7 +415,7 @@
  box-sizing: border-box;
  /* Same measure as the landing views, so the sidebar edge and the
     logo above it share one line at every width. */
- width: var(--measure);
+ width: var(--measure-case);
  margin-inline: auto;
  }
  @media (max-width: 900px) {
@@ -780,7 +789,7 @@
  }
  .case-meta-value {
  font-size: 1rem;
- font-weight: 500;
+ font-weight: 400;
  color: var(--text);
  line-height: 1.4;
  }
