@@ -774,7 +774,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   // clipe toca uma vez quando o estado entra; depois a principal volta em idle (pedido da Pietra). loop: true mantém em loop.
   // pose: 'main' → sem clipe próprio: o corpo inteiro segue a principal (idle + postura doente procedural), retargetado osso a osso
   const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, tired: { url: 'avatar-tired.glb', pose: 'main' },
-                     dead: { url: 'avatar-dead.glb', lie: true } };   // sem rig: deitada de costas (T-pose vira corpo no chão)
+                     radiant: { url: 'avatar-radiant.glb', clip: 'look', arms: 'main' },
+                     dead: { url: 'avatar-dead.glb', clip: 'fall', hold: true } };   // hold: toca uma vez e trava no último quadro
   const ARM_BONES = ['L_Upperarm', 'L_Forearm', 'L_Hand', 'R_Upperarm', 'R_Forearm', 'R_Hand'];   // sem clavícula/twists: o rig da variante já os posiciona
   const mainRest = {}, mainBones = {};
   const tmpQR = new THREE.Quaternion();
@@ -818,11 +819,15 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       avatarGroup.add(root);
       v.root = root; v.arms = def.arms === 'main'; v.pose = def.pose === 'main'; v.static = !!def.lie; v.bones = {}; v.rest = {};
       root.traverse(o => { if (o.isBone) { v.bones[o.name] = o; v.rest[o.name] = o.quaternion.clone(); } });
+      root.updateMatrixWorld(true);
+      if (v.bones.Hip) { v.hipRest = v.bones.Hip.getWorldPosition(new THREE.Vector3()).sub(avatarGroup.position); }   // pro cancelamento de root motion (queda/dança deslocam)
       if (gltf.animations.length && !v.pose && !v.static) {
         v.mixer = new THREE.AnimationMixer(root);
         const c = gltf.animations.find(a => a.name.toLowerCase().includes(def.clip)) || gltf.animations[0];
         v.action = v.mixer.clipAction(c);
-        if (def.loop) v.action.setLoop(THREE.LoopRepeat, Infinity); else { v.action.setLoop(THREE.LoopOnce, 1); v.action.clampWhenFinished = false; v.mixer.addEventListener('finished', () => { v.done = true; }); }
+        if (def.loop) v.action.setLoop(THREE.LoopRepeat, Infinity);
+        else if (def.hold) { v.action.setLoop(THREE.LoopOnce, 1); v.action.clampWhenFinished = true; v.hold = true; }
+        else { v.action.setLoop(THREE.LoopOnce, 1); v.action.clampWhenFinished = false; v.mixer.addEventListener('finished', () => { v.done = true; }); }
       }
       res(v);
     }, undefined, e => { err.textContent += 'variante: ' + e.message + '\n'; res(null); }));
@@ -839,7 +844,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   // a variante é o "fundo" do estado; reações, passos e a queda tocam na principal (que tem os 19 clipes), depois a variante volta
   function syncVariantVisibility() {
     const av = activeVariant && variants[activeVariant];
-    const busy = clipOnce || !!walkTarget || keyWalking || (held && !(av && av.static));   // morta: a estática substitui a queda travada
+    const busy = clipOnce || !!walkTarget || keyWalking || (held && !(av && (av.static || av.hold)));   // morta: o modelo dela substitui a queda travada da principal
     const showMain = !av || !av.root || av.done || busy;
     if (avatarRoot) avatarRoot.visible = showMain;
     for (const [k, x] of Object.entries(variants)) if (x.root) x.root.visible = !showMain && k === activeVariant;
@@ -992,11 +997,23 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   let bounce = 0;                                   // segundos restantes do pulinho de reação
   let reseed = false;
   let deadTarget = 0;
+  function cancelRootMotion(root, hip, rest) {
+    root.updateMatrixWorld(true);
+    const hipW = hip.getWorldPosition(hipNow);
+    const rootW = root.getWorldPosition(tmpV1);
+    const off = tmpV2.copy(hipW).sub(rootW);                            // quadril em relação à raiz, no mundo
+    const yaw = avatarGroup.rotation.y;
+    const restRot = tmpV3.set(rest.x * Math.cos(yaw) + rest.z * Math.sin(yaw), 0, -rest.x * Math.sin(yaw) + rest.z * Math.cos(yaw));
+    const target = tmpV4.copy(avatarGroup.position).add(restRot).sub(off);   // onde a raiz tem que estar pro quadril ficar no lugar
+    target.y = rootW.y;
+    avatarGroup.worldToLocal(target);
+    root.position.x = target.x; root.position.z = target.z;
+  }
   function simulate(dt) {
     // expressão: aproxima do alvo com easing; shape key e textura andam juntas
     if (mixer) mixer.update(dt);
     syncVariantVisibility();
-    for (const x of Object.values(variants)) if (x.root && x.root.visible && x.mixer) x.mixer.update(dt);
+    for (const x of Object.values(variants)) if (x.root && x.root.visible && x.mixer) { x.mixer.update(dt); if (x.hipRest) cancelRootMotion(x.root, x.bones.Hip, x.hipRest); }
     sadNow += (sadness - sadNow) * Math.min(1, dt * 2);
     // doente: tronco curvado + respiração pesada + balanço lento (tudo aditivo, sobre o clipe)
     if (spineBone && sadNow > 0.001) {
@@ -1022,18 +1039,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       headBone.quaternion.copy(headTilt).multiply(headBase);
       headLast.copy(headBone.quaternion);
     }
-    if (hipBone && avatarRoot) {                                       // mantém o quadril sobre a posição do grupo (só X/Z), sem acumular
-      avatarRoot.updateMatrixWorld(true);
-      const hipW = hipBone.getWorldPosition(hipNow);
-      const rootW = avatarRoot.getWorldPosition(tmpV1);
-      const off = tmpV2.copy(hipW).sub(rootW);                          // quadril em relação à raiz, no mundo
-      const yaw = avatarGroup.rotation.y;
-      const restRot = tmpV3.set(hipRest.x * Math.cos(yaw) + hipRest.z * Math.sin(yaw), 0, -hipRest.x * Math.sin(yaw) + hipRest.z * Math.cos(yaw));
-      const target = tmpV4.copy(avatarGroup.position).add(restRot).sub(off);   // onde a raiz tem que estar pro quadril ficar no lugar
-      target.y = rootW.y;
-      avatarGroup.worldToLocal(target);
-      avatarRoot.position.x = target.x; avatarRoot.position.z = target.z;
-    }
+    if (hipBone && avatarRoot) cancelRootMotion(avatarRoot, hipBone, hipRest);   // mantém o quadril sobre a posição do grupo (só X/Z), sem acumular
     uExpr.value += (exprTarget - uExpr.value) * Math.min(1, dt * 5);
     if (exprMesh) exprMesh.morphTargetInfluences[exprMesh.morphTargetDictionary['expr:happy']] = uExpr.value;
     if (bounce > 0) {
