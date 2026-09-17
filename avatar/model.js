@@ -125,6 +125,7 @@ export function vitals(goals, checkins, now = Date.now()) {
 // ---------------------------------------------------------------- o que está pendente agora (gera alertas)
 export function pending(goals, checkins, now = Date.now()) {
   const out = [];
+  if (!goals.started) return out;                                     // sem meta ativa não há o que cobrar
   const today = checkins.filter(c => c.at >= startOfDay(now) && c.at <= now);
   for (const [k, m] of Object.entries(goals.meals)) {
     if (!m.on) continue;

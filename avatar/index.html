@@ -364,7 +364,7 @@ function renderStates() {
   // saúde 0..1 (média dos sinais); ?health=0.3 na URL força pra ver os estágios
   const forced = q.get('health');
   const forcedH = forced in HEALTH_PRESET ? HEALTH_PRESET[forced] : forced === 'dead' ? 0 : parseFloat(forced);   // ?health=sick ou ?health=0.3
-  const health = document.body.dataset.dead ? 0 : override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : override.health === 'success' ? 0.95 : forced != null && !isNaN(forcedH) ? forcedH : v.avg / 100;
+  const health = document.body.dataset.dead ? 0 : override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : override.health === 'success' ? 0.95 : forced != null && !isNaN(forcedH) ? forcedH : !goals.started ? 0.85 : v.avg / 100;   // sem meta ativa ela não adoece: só espera
   scene.setHealth(health);
   const stage = health > 0.7 ? (v.avg > 85 ? 'radiante' : 'saudável') : health > 0.45 ? 'cansada' : health > 0.25 ? 'doente' : 'muito doente';
   document.getElementById('mood').textContent = document.body.dataset.dead ? 'não resistiu' : !goals.started ? 'calibrando metas' : stage;
@@ -394,7 +394,7 @@ function applyFace() {
   scene.setExpression(face);
   const forced = q.get('health');
   const forcedH = forced in HEALTH_PRESET ? HEALTH_PRESET[forced] : forced === 'dead' ? 0 : parseFloat(forced);
-  const h = override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : forced != null && !isNaN(forcedH) ? forcedH : (v ? v.avg / 100 : 1);
+  const h = override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : forced != null && !isNaN(forcedH) ? forcedH : !goals.started ? 0.85 : (v ? v.avg / 100 : 1);
   if (override.health === 'success') { scene.setBaseClip('cheer'); return; }
   if (override.health === 'auto' && gs && !gs.success) gs.success = false;
   scene.setBaseClip(baseClipForHealth(h));
