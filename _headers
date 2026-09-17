@@ -5,3 +5,10 @@
   X-Robots-Tag: noindex, nofollow
 /briefing.html
   X-Robots-Tag: noindex, nofollow
+
+# The avatar app (PWA) is personal and reached by link only. The service
+# worker must never be served stale, or an old version pins itself.
+/avatar/*
+  X-Robots-Tag: noindex, nofollow
+/avatar/sw.js
+  Cache-Control: no-cache
