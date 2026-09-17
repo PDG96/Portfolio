@@ -16,8 +16,11 @@ export async function createScene(opts = {}) {
   window.addEventListener('unhandledrejection', e => err.textContent += (e.reason?.message || e.reason) + '\n');
 
   // ---------------------------------------------------------------- parâmetros (ref: Omma Digital Oasis)
-  const BLADE_COUNT = 300000;
-  const GRID = 548;                    // 548² ≈ 300k posições
+  // perfil de qualidade: celular (toque + tela estreita) roda com menos folhas/pixels/malha; ?quality=low|high força
+  const qParam = new URLSearchParams(location.search).get('quality');
+  const LOW = qParam ? qParam === 'low' : (opts.quality === 'low' || (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 900));
+  const BLADE_COUNT = LOW ? 90000 : 300000;
+  const GRID = Math.ceil(Math.sqrt(BLADE_COUNT));   // 548² ≈ 300k posições; 300² = 90k
   const FIELD_SIZE = 28;
   const DOME = { radius: 10.5, height: 1.6 };   // ilha em domo: altura no centro, zero na borda
   const domeY = r => DOME.height * Math.max(0, 1 - (r / DOME.radius) ** 2);
@@ -25,7 +28,7 @@ export async function createScene(opts = {}) {
 
   const P = {
     windSpeed: 1.3, windAmplitude: 0.21,
-    bladeWidth: 4.0, bladeTipWidth: 0.28, bladeHeight: 0.92, bladeHeightVariation: 0.5, bladeLean: 0.9,
+    bladeWidth: LOW ? 6.4 : 4.0, bladeTipWidth: 0.28, bladeHeight: 0.92,   // menos folhas → mais largas, mesma cobertura bladeHeightVariation: 0.5, bladeLean: 0.9,
     noiseAmplitude: 1.85, noiseFrequency: 0.3, noise2Amplitude: 0.2, noise2Frequency: 15,
     mouseRadius: 2.2, mouseStrength: 3.0, outerRadius: 3.6, outerStrength: 1.0,
     fogStart: 16.0, fogEnd: 34.0, fogIntensity: 0.0,
@@ -102,11 +105,24 @@ export async function createScene(opts = {}) {
   camera.position.set(0, 9.5, 34);
   const lookTarget = new THREE.Vector3(0, 7.5, 0);
   camera.lookAt(lookTarget);
+  // retrato (celular): câmera mais longe e alvo mais baixo, pra ela inteira caber entre o cabeçalho e a bandeja de baixo
+  let portrait = false;
+  function frameFor(aspect, force = false) {
+    const p = aspect < 0.9;
+    if (p === portrait && !force) return;
+    portrait = p;
+    const dist = p ? 46 : 34;
+    lookTarget.y = p ? 7.0 : 7.5;
+    camera.position.set(0, p ? 10.0 : 9.5, dist);
+    camera.lookAt(lookTarget);
+    if (controls) { controls.target.copy(lookTarget); controls.minDistance = p ? 34 : 22; controls.maxDistance = p ? 64 : 48; controls.update(); }
+  }
+  let controls = null;
 
   const renderer = new THREE.WebGPURenderer({ antialias: true });
   const isMobile = innerWidth < 768;
   const px = innerWidth * innerHeight;
-  renderer.setPixelRatio(px > 2.4e6 ? Math.min(devicePixelRatio, 1.25) : px > 1.2e6 ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));   // tela grande: menos pixels
+  renderer.setPixelRatio(LOW ? Math.min(devicePixelRatio, 1.5) : px > 2.4e6 ? Math.min(devicePixelRatio, 1.25) : px > 1.2e6 ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));   // tela grande/celular: menos pixels
   renderer.setSize(innerWidth, innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   (opts.container || document.body).prepend(renderer.domElement);
@@ -142,7 +158,7 @@ export async function createScene(opts = {}) {
   const uLand = uniform(1.0);                                         // colina é a paisagem padrão
   const uField = uniform(108.0);                                      // lado da área de semeadura (muda por paisagem)
   // colina: ela no topo (y 0 no centro), o terreno desce suave até -depth no raio; ondulações leves ao redor
-  const HILL = { radius: 55, depth: 14, flatTop: 9, bump: 0.6, field: 108, blades: 300000 };
+  const HILL = { radius: 55, depth: 14, flatTop: 9, bump: 0.6, field: LOW ? 84 : 108, blades: 300000 };
   const hillY = Fn(([x, z]) => {
     const r = sqrt(x.mul(x).add(z.mul(z)));
     const t = smoothstep(float(HILL.flatTop), float(HILL.radius), r);   // 0 no topo (plano), 1 na base
@@ -339,7 +355,7 @@ export async function createScene(opts = {}) {
 
   // ---------------------------------------------------------------- estrelas (só de noite)
   const uNight = uniform(0.0);
-  const STAR_N = 1400, starPos = new Float32Array(STAR_N * 3), starSeed = new Float32Array(STAR_N);
+  const STAR_N = LOW ? 600 : 1400, starPos = new Float32Array(STAR_N * 3), starSeed = new Float32Array(STAR_N);
   for (let i = 0; i < STAR_N; i++) {
     const u = Math.random(), v = Math.random();
     const th = u * Math.PI * 2, ph = Math.acos(1 - v * 0.9);                  // hemisfério de cima (evita o horizonte)
@@ -374,14 +390,14 @@ export async function createScene(opts = {}) {
     const sand = cSand.mul(float(0.88).add(ripple.mul(0.08)).add(grain.mul(0.08)));
     return mix(mix(dry, sand, uDead), C.fog, far.mul(0.85)).mul(uDim);
   })();
-  const hillMesh = new THREE.Mesh(new THREE.PlaneGeometry(320, 320, 140, 140), hillMat);
+  const hillMesh = new THREE.Mesh(new THREE.PlaneGeometry(320, 320, LOW ? 72 : 140, LOW ? 72 : 140), hillMat);
   hillMesh.rotation.x = -Math.PI / 2;
   hillMesh.position.y = -0.15;
   hillMesh.visible = true;
   scene.add(hillMesh);
 
   // ---------------------------------------------------------------- água (procedural, reage ao mouse como a grama)
-  const WATER = { y: -0.35, size: 900, segs: 160, deep: '#6f86c8', shallow: '#9fd2cf', sky: '#dcc9e6', foam: '#f7f4fa' };
+  const WATER = { y: -0.35, size: 900, segs: LOW ? 72 : 160, deep: '#6f86c8', shallow: '#9fd2cf', sky: '#dcc9e6', foam: '#f7f4fa' };
   const RIPPLES = 16;
   const ripples = uniformArray(Array.from({ length: RIPPLES }, () => new THREE.Vector4(0, 0, -100, 0)));  // x, z, t0, força
   const W = {}; for (const [k, v] of Object.entries(WATER)) if (typeof v === 'string') W[k] = uniform(new THREE.Color(v));
@@ -546,7 +562,7 @@ const flowers = FLOWERS.map(f => {
   });
 
   // ---------------------------------------------------------------- chuva: fios caindo (instanciados, só quando uRain > 0)
-  const RAIN_COUNT = 5500, RAIN_H = 38, RAIN_AREA = 84;
+  const RAIN_COUNT = LOW ? 2200 : 5500, RAIN_H = 38, RAIN_AREA = 84;
   const rainMat = new THREE.MeshBasicNodeMaterial({ transparent: true, depthWrite: false, side: THREE.DoubleSide, fog: true });
   rainMat.positionNode = Fn(() => {
     const i = instanceIndex;
@@ -734,11 +750,12 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
 
 
   // ---------------------------------------------------------------- girar a cena (arrastar), zoom leve (scroll)
-  const controls = new OrbitControls(camera, renderer.domElement);
+  controls = new OrbitControls(camera, renderer.domElement);
   controls.target.copy(lookTarget);
   controls.enablePan = false;
   controls.enableDamping = true; controls.dampingFactor = 0.06;
   controls.minDistance = 22; controls.maxDistance = 48;
+  frameFor(innerWidth / innerHeight, true);
   controls.minPolarAngle = Math.PI * 0.32; controls.maxPolarAngle = Math.PI * 0.52;   // nem de cima, nem por baixo
   controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.5;
   controls.update();
@@ -865,10 +882,14 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     }
   });
   addEventListener('mouseleave', () => mouseWorld.value.set(99999, 0, 99999));
-  addEventListener('resize', () => {
+  function onResize() {
     camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
     renderer.setSize(innerWidth, innerHeight);
-  });
+    frameFor(camera.aspect);
+  }
+  addEventListener('resize', onResize);
+  addEventListener('orientationchange', () => setTimeout(onResize, 300));
+  if (window.visualViewport) visualViewport.addEventListener('resize', onResize);   // iOS: barra do Safari some/aparece
 
   // ---------------------------------------------------------------- loop
   await renderer.computeAsync(computeInit);
@@ -927,7 +948,9 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     if (bounce > 0) avatarGroup.position.y += Math.max(0, Math.sin((1 - bounce / 0.55) * Math.PI)) * 1.3;
   }
 
+  let frameNo = 0;
   renderer.setAnimationLoop(() => { try {
+    if (LOW && (++frameNo & 1) && !document.hidden) return;   // celular: 30 fps bastam pra cena calma e poupam bateria
     const dt = Math.min(clock.getDelta(), 0.05);
     uTime.value = clock.elapsedTime;
     // pingos espontâneos na água (fora da ilha), a cada 1.2 a 3 s

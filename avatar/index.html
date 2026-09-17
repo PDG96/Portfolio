@@ -32,7 +32,7 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #e9e1f0; }
   body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; letter-spacing: -0.005em; }
-  canvas { display: block; position: fixed; inset: 0; }
+  canvas { display: block; position: fixed; inset: 0; width: 100% !important; height: 100% !important; }   /* iOS: cobre a tela mesmo se o innerHeight atrasar */
 
   /* ---------- vidro ---------- */
   .glass {
@@ -180,11 +180,43 @@
   .cal .foot b { color: var(--ink); font-weight: 600; }
   .row input[type=date] { font: inherit; font-size: 13px; padding: 6px 8px; border-radius: 10px; border: 1px solid rgba(28,27,34,.12); background: rgba(255,255,255,.7); }
 
+  /* ---------- faixa-resumo (só celular): toca pra abrir "Hoje" ---------- */
+  .strip { display: none; padding: 10px 14px; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-2); cursor: pointer; }
+  .strip b { color: var(--ink); font-weight: 600; }
+  .strip .dots { margin-left: auto; display: flex; gap: 5px; }
+  .strip .dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); opacity: .18; }
+  .strip .dots i.ok { opacity: .8; } .strip .dots i.mid { opacity: .45; }
+  .strip .chev { color: var(--ink-3); font-size: 11px; }
+
   @media (max-width: 760px) {
-    .col { width: calc(100% - 32px); }
-    .col.left { left: 16px; top: 16px; }
-    .col.right { right: 16px; top: auto; bottom: 96px; }
-    .states { display: none; }
+    :root { --r: 18px; --pad: 12px; }
+    .col.left { left: 12px; right: 12px; top: calc(env(safe-area-inset-top) + 10px); width: auto; gap: 8px; }
+    .col.right { display: none; }
+    .head { padding: 10px 14px; }
+    .head .name { font-size: 14px; }
+    .head .previewbtn { position: static; width: 34px; height: 34px; font-size: 15px; margin-left: 6px; box-shadow: none; background: rgba(255,255,255,.55); border: 0; }
+    #tray { position: absolute; left: 12px; right: 12px; bottom: calc(env(safe-area-inset-bottom) + 10px); display: flex; flex-direction: column; gap: 8px; }
+    #tray .alerts { gap: 8px; }
+    #tray .alert { padding: 12px 14px; grid-template-columns: 30px 1fr; }
+    #tray .alert .icon { width: 30px; height: 30px; font-size: 14px; }
+    #tray .alert .title { font-size: 13px; } #tray .alert .body { font-size: 11.5px; margin-top: 2px; }
+    #tray .alert .actions { margin-top: 8px; }
+    #tray .alert:hover { transform: none; }
+    .empty { display: none; }
+    .strip { display: flex; }
+    .dock { position: static; transform: none; width: 100%; justify-content: space-between; padding: 6px; }
+    .dock button { width: 42px; height: 42px; font-size: 18px; }
+    .dock button:hover { transform: none; box-shadow: none; background: transparent; }
+    .dock button::after { display: none; }
+    .preview { left: 12px; right: 12px; width: auto; top: calc(env(safe-area-inset-top) + 70px); bottom: auto; grid-template-columns: 1fr; row-gap: 4px; }
+    .preview .plabel { margin-top: 6px; }
+    .sheet { align-items: flex-end; }
+    .panel { width: 100%; max-height: calc(100% - env(safe-area-inset-top) - 40px); border-radius: 22px 22px 0 0; padding: 18px 18px calc(env(safe-area-inset-bottom) + 16px); }
+    .panel .states, .panel .cal { background: transparent; border: 0; box-shadow: none; padding-left: 0; padding-right: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+    .panel .states { display: block; padding-top: 4px; }
+    .panel .states h2 { margin-bottom: 8px; }
+    .panel .cal .d { font-size: 12px; }
+    .row input[type=time] { width: 82px; }
   }
 </style>
 <script type="importmap">
@@ -215,6 +247,7 @@
     <div class="alerts" id="alerts"></div>
   </div>
 
+  <div class="glass strip" id="strip"><span id="stripText">Sem meta ativa</span><span class="dots" id="stripDots"></span><span class="chev">▲</span></div>
   <div class="glass dock" id="dock">
     <button data-act="meal" data-label="Registrar refeição">🍽️</button>
     <button data-act="water" data-label="Bebi água (+250 ml)">💧</button>
@@ -244,6 +277,10 @@
   <!-- painel de metas -->
   <div class="sheet" id="goalsSheet">
     <div class="glass panel" id="goalsPanel"></div>
+  </div>
+  <!-- hoje (celular): estados + calendário -->
+  <div class="sheet" id="todaySheet">
+    <div class="glass panel" id="todayPanel"><h2>Hoje</h2><div id="todayBody"></div><div class="foot"><button class="btn ghost" data-close>Fechar</button></div></div>
   </div>
   <!-- registro (check-in) -->
   <div class="sheet" id="checkSheet">
@@ -405,7 +442,7 @@ const alertsEl = document.getElementById('alerts');
 const open = new Map(); const snoozed = new Map(); let emptyEl = null;
 const ICON = { breakfast: '🍳', lunch: '🍽️', snack: '🍎', dinner: '🥘', water: '💧', exercise: '🏋️', walk: '🚶', sleep: '🌙' };
 function renderAlerts() {
-  if (!goals.started) { for (const k of [...open.keys()]) closeAlert(k); renderEmpty('Configura as metas em ⚙︎ e inicia.'); return; }
+  if (!goals.started) { for (const k of [...open.keys()]) closeAlert(k); renderEmpty(''); return; }
   const list = pending(goals, checkins);
   const want = new Map(list.map(a => [a.type, a]));
   for (const k of [...open.keys()]) if (!want.has(k)) closeAlert(k);
@@ -423,6 +460,7 @@ function renderAlerts() {
 }
 function closeAlert(k) { const el = open.get(k); if (!el) return; el.classList.add('leaving'); setTimeout(() => el.remove(), 450); open.delete(k); }
 function renderEmpty(text) {
+  if (!text) { if (emptyEl) { emptyEl.remove(); emptyEl = null; } return; }
   if (open.size === 0) { if (!emptyEl) { emptyEl = document.createElement('div'); emptyEl.className = 'glass empty'; alertsEl.appendChild(emptyEl); } emptyEl.textContent = text; }
   else if (emptyEl) { emptyEl.remove(); emptyEl = null; }
 }
@@ -647,11 +685,31 @@ fetchWeather(); setInterval(applyEnv, 60000); setInterval(fetchWeather, 15 * 600
 // ---------------------------------------------------------------- relógio + ciclo (tempo real: recalcula a cada 30 s)
 const clockEl = document.getElementById('clock');
 setInterval(() => { clockEl.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }, 1000);
+// ---------------------------------------------------------------- celular: cabeçalho + bandeja embaixo, estados/calendário viram a folha "Hoje"
+const MOBILE = matchMedia('(max-width: 760px)').matches;
+const todaySheet = document.getElementById('todaySheet');
+if (MOBILE) {
+  const tray = document.createElement('div'); tray.id = 'tray';
+  tray.append(document.getElementById('alerts'), document.getElementById('strip'), document.getElementById('dock'));
+  document.getElementById('ui').appendChild(tray);
+  document.getElementById('todayBody').append(document.getElementById('states'), document.getElementById('cal'));
+  document.querySelector('.head').appendChild(document.getElementById('previewBtn'));
+  document.getElementById('strip').onclick = () => { if (!goals.started) { renderGoals(); goalsSheet.classList.add('open'); } else todaySheet.classList.add('open'); };
+  todaySheet.querySelector('[data-close]').onclick = () => todaySheet.classList.remove('open');
+}
+function renderStrip(info, stk) {
+  const t = document.getElementById('stripText'), d = document.getElementById('stripDots');
+  if (!info) { t.innerHTML = 'Sem meta ativa · <b>definir</b>'; d.innerHTML = ''; return; }
+  t.innerHTML = info.active ? `dia <b>${info.dayN}</b> de ${info.total} · faltam <b>${info.left}</b> · <b>${stk}</b> ${stk === 1 ? 'seguido' : 'seguidos'}` : (Date.now() < info.start ? 'começa em breve' : 'período encerrado');
+  const vv = v ? [v.hidratacao, v.energia, v.saciedade, v.movimento] : [];
+  d.innerHTML = vv.map(x => `<i class="${x > 60 ? 'ok' : x > 30 ? 'mid' : ''}"></i>`).join('');
+}
 // ---------------------------------------------------------------- calendário do período
 const calEl = document.getElementById('cal');
 function renderCal() {
   const info = periodInfo(goals);
-  if (!info) { calEl.innerHTML = '<div class="hint" style="margin:0">Define o período em ⚙︎.</div>'; return; }
+  if (!info) { calEl.innerHTML = ''; calEl.style.display = 'none'; renderStrip(null, 0); return; }
+  calEl.style.display = '';
   const now = Date.now(), today = dayKey(now);
   const view = new Date(now); view.setDate(1); view.setHours(0, 0, 0, 0);
   const monthName = view.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
@@ -673,6 +731,7 @@ function renderCal() {
   calEl.innerHTML = `<div class="top"><b>${monthName[0].toUpperCase() + monthName.slice(1)}</b><span>${info.active ? `dia ${info.dayN} de ${info.total}` : (now < info.start ? 'começa em breve' : 'período encerrado')}</span></div>
     <div class="grid">${cells}</div>
     <div class="foot"><span>faltam <b>${info.left}</b> dias</span><span>${gs ? `<b>${gs.lost}</b> perdidos · ` : ''}<b>${stk}</b> ${stk === 1 ? 'seguido' : 'seguidos'}</span></div>`;
+  renderStrip(info, stk);
 }
 
 // ---------------------------------------------------------------- eventos → reações (uma vez cada)
