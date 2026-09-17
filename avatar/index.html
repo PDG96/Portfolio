@@ -429,7 +429,7 @@ function autoFace() {
 }
 let gs = null;                                                       // situação da meta (dias perdidos, morte, sucesso)
 function baseClipForHealth(h) {
-  if (gs && gs.success) return 'cheer';
+  if (gs && gs.success) return 'idle';                              // sucesso: a dança toca uma vez, depois idle
   if (h > 0.7) return (v && v.avg > 85) ? 'standing_relax' : 'idle';
   return 'idle';                                                    // doente: idle mais lento + tronco curvado, respiração pesada e balanço (procedural)
 }
@@ -440,8 +440,8 @@ function applyFace() {
   const forcedH = forced in HEALTH_PRESET ? HEALTH_PRESET[forced] : forced === 'dead' ? 0 : parseFloat(forced);
   const h = override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : forced != null && !isNaN(forcedH) ? forcedH : !goals.started ? 0.85 : (v ? v.avg / 100 : 1);
   const success = override.health === 'success' || (override.health === 'auto' && gs && gs.success);
-  scene.setVariant(success ? 'dance' : null);                        // meta cumprida: modelo feliz dançando; resto: modelo principal (o neutro 'look_around' ficou disponível, Pietra preferiu o principal)
-  if (override.health === 'success') { scene.setBaseClip('cheer'); return; }
+  scene.setVariant(success ? 'dance' : h <= 0.25 && !document.body.dataset.dead ? 'grave' : null);   // sucesso: dança; grave: modelo doente (depressed); resto: principal (o neutro 'look_around' ficou disponível, Pietra preferiu o principal)
+  if (override.health === 'success') { scene.setBaseClip('idle'); return; }
   if (override.health === 'auto' && gs && !gs.success) gs.success = false;
   scene.setBaseClip(baseClipForHealth(h));
 }
@@ -501,7 +501,7 @@ function renderGoals() {
     <div class="row"><div>Água<div class="sub">litros por dia</div></div><input type="number" min="0.5" max="6" step="0.25" data-g="water.liters" value="${g.water.liters}"></div>
     <h3>Avisos</h3>
     <div class="row"><div>Notificações<div class="sub" data-push-sub>${pushStatusText()}</div></div><button class="btn ghost" data-push>${pushState.on ? 'Desativar' : 'Ativar'}</button></div>
-    <div class="row"><div>Versão<div class="sub">202609171232</div></div><button class="btn ghost" data-update>Atualizar</button></div>
+    <div class="row"><div>Versão<div class="sub">202609172010</div></div><button class="btn ghost" data-update>Atualizar</button></div>
     <div class="foot">
       ${g.started ? '<button class="btn ghost danger" data-reset>Recomeçar do zero</button>' : ''}
       <button class="btn ghost" data-close>Fechar</button>
@@ -696,7 +696,7 @@ document.getElementById('env2').addEventListener('click', e => {
   override.health = b.dataset.v; paintEnv();
   if (override.health === 'dead') { die(false); return; }
   if (document.body.dataset.dead && !goals.dead) { delete document.body.dataset.dead; scene.revive(); }
-  if (override.health === 'success') { gs = { ...(gs || {}), success: true }; scene.setBaseClip('cheer'); }
+  if (override.health === 'success') { gs = { ...(gs || {}), success: true }; scene.setBaseClip('idle'); }
   tick();
 });
 paintEnv();
@@ -773,7 +773,7 @@ const EVENT_REACTION = {
   daylostrun: e => { scene.react('defeat_03', { bounce: false }); bubble(e.run + ' dias perdidos…'); },
   daydone:    e => { scene.react('clap'); bubble('dia completo ✨'); },
   daystreak:  e => { scene.react('laugh'); bubble(e.run + ' dias seguidos!'); },
-  success:    e => { scene.setBaseClip('cheer'); bubble('meta cumprida 🎉'); },
+  success:    e => { scene.react('cheer'); bubble('meta cumprida 🎉'); },
   dead:       e => { die(!e.preview); },
 };
 function die(persist = true) {

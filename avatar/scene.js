@@ -59,9 +59,11 @@ export async function createScene(opts = {}) {
       const k2 = Math.min(1, ENV.clouds * 0.45 + ENV.rain * 0.35);
       c.lerp(grey, k2).multiplyScalar(1 - ENV.rain * 0.12);
       // saúde: quanto pior, mais cinza avermelhado (o mundo dela adoece junto)
+      // saúde: quanto pior, mais nublado (cinza-lavanda, mais pesado no alto e mais claro no horizonte; não cinza puro)
       const sick = 1 - Math.min(1, Math.max(0, (ENV.health - 0.2) / 0.6));
-      const ash = new THREE.Color('#9c7f7c').lerp(new THREE.Color('#3a2c2c'), ENV.weights.night);
-      c.lerp(ash, sick * 0.7).multiplyScalar(1 - sick * 0.15);
+      const high = k === 'top' || k === 'midHigh';
+      const ash = new THREE.Color(high ? '#8d8a9e' : '#c4bcc6').lerp(new THREE.Color(high ? '#2c2a38' : '#3d3844'), ENV.weights.night);
+      c.lerp(ash, sick * 0.72).multiplyScalar(1 - sick * 0.08);
       out[k] = '#' + c.getHexString();
     }
     return out;
@@ -320,7 +322,7 @@ export async function createScene(opts = {}) {
     const shade = float(1).sub(float(1).sub(smoothstep(float(1.2), float(3.6), sd)).mul(0.45));
     const dist = sqrt(blade.x.mul(blade.x).add(blade.y.mul(blade.y)));
     const sick = float(1).sub(smoothstep(float(0.25), float(0.85), uHealth));
-    const dry = mix(color, vec3(0.62, 0.55, 0.28), sick.mul(0.75));                             // doente: grama amarela/seca
+    const dry = mix(color, vec3(0.27, 0.17, 0.085), sick.mul(0.85));                              // doente: grama seca, amarronzada
     return mix(dry.mul(lit).mul(shade), C.fog, smoothstep(U.fogStart, U.fogEnd, dist).mul(U.fogIntensity)).mul(uDim);
   })();
 
@@ -383,7 +385,7 @@ export async function createScene(opts = {}) {
     const far = smoothstep(float(50.0), float(110.0), sqrt(wx.mul(wx).add(wz.mul(wz))));
     const base = mix(C.ground, C.mid.mul(0.7), n.mul(0.5));
     const sick = float(1).sub(smoothstep(float(0.25), float(0.85), uHealth));
-    const dry = mix(base, vec3(0.5, 0.42, 0.24), sick.mul(0.6));
+    const dry = mix(base, vec3(0.22, 0.14, 0.07), sick.mul(0.8));
     // morta: areia com marolas de vento (listras finas moduladas por ruído) e grão
     const ripple = sin(wx.mul(1.6).add(wz.mul(0.9)).add(n.mul(6.0))).mul(0.5).add(0.5);
     const grain = mx_noise_float(vec3(wx.mul(0.9), float(7.0), wz.mul(0.9))).mul(0.5).add(0.5);
@@ -473,8 +475,8 @@ export async function createScene(opts = {}) {
     col = mix(col, W.deep.mul(0.82), smoothstep(float(120.0), float(420.0), camD));
     // doente: a água amarela e fica opaca, cada vez mais turva conforme piora
     const sickW = float(1).sub(smoothstep(float(0.15), float(0.8), uHealth));
-    const murky = mix(vec3(0.70, 0.60, 0.28), vec3(0.42, 0.40, 0.20), uDead);           // morta: mais escura, separa da areia
-    col = mix(col, murky.mul(uDim), sickW.mul(0.8));
+    const murky = mix(vec3(0.14, 0.27, 0.16), vec3(0.09, 0.15, 0.09), uDead);           // doente: verde-pântano; morta: mais escuro, separa da areia
+    col = mix(col, murky.mul(uDim), sickW.mul(0.88));
     return col.add(spec.mul(float(1).sub(sickW.mul(0.6))));
   })();
   waterMat.opacityNode = float(0.96);
@@ -486,8 +488,8 @@ export async function createScene(opts = {}) {
     let col = mix(W.deep, W.sky, uSkyMix.mul(0.6));
     col = mix(col, W.deep.mul(0.82), smoothstep(float(120.0), float(420.0), camD));
     const sickW = float(1).sub(smoothstep(float(0.15), float(0.8), uHealth));
-    const murky = mix(vec3(0.70, 0.60, 0.28), vec3(0.42, 0.40, 0.20), uDead);
-    return mix(col, murky.mul(uDim), sickW.mul(0.8));
+    const murky = mix(vec3(0.14, 0.27, 0.16), vec3(0.09, 0.15, 0.09), uDead);
+    return mix(col, murky.mul(uDim), sickW.mul(0.88));
   })();
   const water = LOW
     ? new THREE.Mesh(new THREE.PlaneGeometry(WATER.size, WATER.size, 1, 1), flatWaterMat)
@@ -634,13 +636,14 @@ const flowers = FLOWERS.map(f => {
   // ---------------------------------------------------------------- cabelo de feltro (máscara por cor + altura, sobre a mesma malha)
   const FELT = { minY: 0.45, sheen: 0.32, grain: 0.14, sheenColor: '#7a4e3a', darken: 0.9 };
   const feltY = uniform(0);                                          // altura (mundo) acima da qual pode ser cabelo
-  function feltHair(mesh) {
+  function feltHair(mesh, { tint = true } = {}) {
     const src = mesh.material;
     if (!src.map) return;
+    const healthN = tint ? uHealth : float(1.0);                    // modelos de estado já vêm com a cara do estado: sem tinta de doença
     const m = LOW ? new THREE.MeshStandardNodeMaterial() : new THREE.MeshPhysicalNodeMaterial();   // celular: sem sheen/feltro (shader mais barato)
     const base0 = texture(src.map);
     // saúde: pele pálida (dessatura e esfria) e olheiras (escurece abaixo dos olhos); cabelo perde brilho
-    const sickAmt = float(1).sub(smoothstep(float(0.25), float(0.85), uHealth));
+    const sickAmt = float(1).sub(smoothstep(float(0.25), float(0.85), healthN));
     const c0 = base0.rgb;
     const lum0 = c0.r.mul(0.3).add(c0.g.mul(0.5)).add(c0.b.mul(0.2));
     // (valores lineares: pele ≈ r 0.9, g 0.5, b 0.3; camiseta branca r≈b; cabelo escuro lum < 0.25)
@@ -768,7 +771,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   // Carregado só quando pedido; troca a malha inteira e toca o próprio clipe em loop. A principal continua no lugar, escondida.
   // arms: 'main' → o clipe da variante não mexe os braços (look_around do Tripo deixa em T); copia os braços da principal (idle),
   // retargetando pela diferença em relação à pose de descanso de cada rig (mesmo esqueleto Tripo, orientações de bind diferentes)
-  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance' }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' } };
+  // clipe toca uma vez quando o estado entra; depois a principal volta em idle (pedido da Pietra). loop: true mantém em loop.
+  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, grave: { url: 'avatar-grave.glb', clip: 'depressed' } };
   const ARM_BONES = ['L_Upperarm', 'L_Forearm', 'L_Hand', 'R_Upperarm', 'R_Forearm', 'R_Hand'];   // sem clavícula/twists: o rig da variante já os posiciona
   const mainRest = {}, mainBones = {};
   const tmpQR = new THREE.Quaternion();
@@ -798,7 +802,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       root.position.set(-(box.min.x + box.max.x) / 2 + AVATAR.x, -box.min.y + domeY(Math.hypot(AVATAR.x, AVATAR.z)), -(box.min.z + box.max.z) / 2 + AVATAR.z);
       root.rotation.y = AVATAR.rotY;
       // dança: a malha abre em cabelo/axila/short e mostrava o lado de dentro (escuro). Dupla face pinta o avesso com a textura.
-      root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { o.material.fog = false; feltHair(o); o.material.side = THREE.DoubleSide; } });
+      // só a basecolor: o normal/roughness do export HD do Tripo dava losangos nas pálpebras e contorno escuro depois da simplificação
+      root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { const m0 = o.material; m0.fog = false; m0.normalMap = null; m0.roughnessMap = null; m0.metalnessMap = null; m0.metalness = 0; feltHair(o, { tint: false }); if (def.doubleSide) o.material.side = THREE.DoubleSide; } });
       root.visible = false;
       avatarGroup.add(root);
       v.root = root; v.arms = def.arms === 'main'; v.bones = {}; v.rest = {};
@@ -806,7 +811,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       if (gltf.animations.length) {
         v.mixer = new THREE.AnimationMixer(root);
         const c = gltf.animations.find(a => a.name.toLowerCase().includes(def.clip)) || gltf.animations[0];
-        v.action = v.mixer.clipAction(c); v.action.setLoop(THREE.LoopRepeat, Infinity);
+        v.action = v.mixer.clipAction(c);
+        if (def.loop) v.action.setLoop(THREE.LoopRepeat, Infinity); else { v.action.setLoop(THREE.LoopOnce, 1); v.action.clampWhenFinished = false; v.mixer.addEventListener('finished', () => { v.done = true; }); }
       }
       res(v);
     }, undefined, e => { err.textContent += 'variante: ' + e.message + '\n'; res(null); }));
@@ -817,13 +823,14 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     activeVariant = name;
     const v = name ? await loadVariant(name) : null;
     if (activeVariant !== name) return;                                // mudou de ideia enquanto carregava
-    if (v && v.action) { v.action.reset().play(); }
+    if (v && v.action) { v.done = false; v.action.reset().play(); }
     syncVariantVisibility();
   }
   // a variante é o "fundo" do estado; reações, passos e a queda tocam na principal (que tem os 19 clipes), depois a variante volta
   function syncVariantVisibility() {
     const busy = clipOnce || !!walkTarget || keyWalking || held;
-    const showMain = !activeVariant || busy || !(variants[activeVariant] && variants[activeVariant].root);
+    const av = activeVariant && variants[activeVariant];
+    const showMain = !av || !av.root || av.done || busy;
     if (avatarRoot) avatarRoot.visible = showMain;
     for (const [k, x] of Object.entries(variants)) if (x.root) x.root.visible = !showMain && k === activeVariant;
   }
@@ -1088,6 +1095,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
 
   return {
     scene, camera, renderer, controls, avatarGroup, hooks, grass, setVariant,
+    debugVariant() { return { activeVariant, clipOnce, walk: !!walkTarget, keyWalking, held, loaded: Object.fromEntries(Object.entries(variants).map(([k, v]) => [k, !!v.root])) }; },
     get rain() { return ENV.rain; },
     setEnvironment({ weights, clouds = 0, rain = 0 }) {
       if (weights) ENV.weights = weights;
