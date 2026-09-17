@@ -475,8 +475,8 @@ export async function createScene(opts = {}) {
     col = mix(col, W.deep.mul(0.82), smoothstep(float(120.0), float(420.0), camD));
     // doente: a água amarela e fica opaca, cada vez mais turva conforme piora
     const sickW = float(1).sub(smoothstep(float(0.15), float(0.8), uHealth));
-    const murky = mix(vec3(0.14, 0.27, 0.16), vec3(0.09, 0.15, 0.09), uDead);           // doente: verde-pântano; morta: mais escuro, separa da areia
-    col = mix(col, murky.mul(uDim), sickW.mul(0.88));
+    const murky = mix(vec3(0.70, 0.60, 0.28), vec3(0.42, 0.40, 0.20), uDead);           // doente: verde-pântano; morta: mais escuro, separa da areia
+    col = mix(col, murky.mul(uDim), sickW.mul(0.8));
     return col.add(spec.mul(float(1).sub(sickW.mul(0.6))));
   })();
   waterMat.opacityNode = float(0.96);
@@ -488,8 +488,8 @@ export async function createScene(opts = {}) {
     let col = mix(W.deep, W.sky, uSkyMix.mul(0.6));
     col = mix(col, W.deep.mul(0.82), smoothstep(float(120.0), float(420.0), camD));
     const sickW = float(1).sub(smoothstep(float(0.15), float(0.8), uHealth));
-    const murky = mix(vec3(0.14, 0.27, 0.16), vec3(0.09, 0.15, 0.09), uDead);
-    return mix(col, murky.mul(uDim), sickW.mul(0.88));
+    const murky = mix(vec3(0.70, 0.60, 0.28), vec3(0.42, 0.40, 0.20), uDead);
+    return mix(col, murky.mul(uDim), sickW.mul(0.8));
   })();
   const water = LOW
     ? new THREE.Mesh(new THREE.PlaneGeometry(WATER.size, WATER.size, 1, 1), flatWaterMat)
