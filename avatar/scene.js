@@ -772,14 +772,16 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   // arms: 'main' → o clipe da variante não mexe os braços (look_around do Tripo deixa em T); copia os braços da principal (idle),
   // retargetando pela diferença em relação à pose de descanso de cada rig (mesmo esqueleto Tripo, orientações de bind diferentes)
   // clipe toca uma vez quando o estado entra; depois a principal volta em idle (pedido da Pietra). loop: true mantém em loop.
-  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, grave: { url: 'avatar-grave.glb', clip: 'depressed' } };
+  // pose: 'main' → sem clipe próprio: o corpo inteiro segue a principal (idle + postura doente procedural), retargetado osso a osso
+  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, grave: { url: 'avatar-grave.glb', pose: 'main' } };
   const ARM_BONES = ['L_Upperarm', 'L_Forearm', 'L_Hand', 'R_Upperarm', 'R_Forearm', 'R_Hand'];   // sem clavícula/twists: o rig da variante já os posiciona
   const mainRest = {}, mainBones = {};
   const tmpQR = new THREE.Quaternion();
   function retargetArms(v) {
-    if (!v.arms || !avatarRoot) return;
+    if (!(v.arms || v.pose) || !avatarRoot) return;
     if (!mainBones.ready) { avatarRoot.traverse(o => { if (o.isBone) mainBones[o.name] = o; }); mainBones.ready = true; }
-    for (const n of ARM_BONES) {
+    const names = v.pose ? Object.keys(v.bones) : ARM_BONES;
+    for (const n of names) {
       const src = mainBones[n], dst = v.bones[n], rs = mainRest[n], rd = v.rest[n];
       if (!src || !dst || !rs || !rd) continue;
       tmpQR.copy(rs).invert().multiply(src.quaternion);              // quanto o clipe da principal girou a partir do descanso
@@ -806,9 +808,9 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { const m0 = o.material; m0.fog = false; m0.normalMap = null; m0.roughnessMap = null; m0.metalnessMap = null; m0.metalness = 0; feltHair(o, { tint: false }); if (def.doubleSide) o.material.side = THREE.DoubleSide; } });
       root.visible = false;
       avatarGroup.add(root);
-      v.root = root; v.arms = def.arms === 'main'; v.bones = {}; v.rest = {};
+      v.root = root; v.arms = def.arms === 'main'; v.pose = def.pose === 'main'; v.bones = {}; v.rest = {};
       root.traverse(o => { if (o.isBone) { v.bones[o.name] = o; v.rest[o.name] = o.quaternion.clone(); } });
-      if (gltf.animations.length) {
+      if (gltf.animations.length && !v.pose) {
         v.mixer = new THREE.AnimationMixer(root);
         const c = gltf.animations.find(a => a.name.toLowerCase().includes(def.clip)) || gltf.animations[0];
         v.action = v.mixer.clipAction(c);
@@ -986,7 +988,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     // expressão: aproxima do alvo com easing; shape key e textura andam juntas
     if (mixer) mixer.update(dt);
     syncVariantVisibility();
-    for (const x of Object.values(variants)) if (x.mixer && x.root && x.root.visible) { x.mixer.update(dt); retargetArms(x); }
+    for (const x of Object.values(variants)) if (x.root && x.root.visible && x.mixer) x.mixer.update(dt);
     sadNow += (sadness - sadNow) * Math.min(1, dt * 2);
     // doente: tronco curvado + respiração pesada + balanço lento (tudo aditivo, sobre o clipe)
     if (spineBone && sadNow > 0.001) {
@@ -1034,6 +1036,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     updateKeys(dt);
     updateWalk(dt);
     if (bounce > 0) avatarGroup.position.y += Math.max(0, Math.sin((1 - bounce / 0.55) * Math.PI)) * 1.3;
+    for (const x of Object.values(variants)) if (x.root && x.root.visible) retargetArms(x);   // depois da postura procedural e do quadril
   }
 
   let frameNo = 0;
