@@ -781,7 +781,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       box.setFromObject(root);
       root.position.set(-(box.min.x + box.max.x) / 2 + AVATAR.x, -box.min.y + domeY(Math.hypot(AVATAR.x, AVATAR.z)), -(box.min.z + box.max.z) / 2 + AVATAR.z);
       root.rotation.y = AVATAR.rotY;
-      root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { o.material.fog = false; feltHair(o); } });
+      // dança: a malha abre em cabelo/axila/short e mostrava o lado de dentro (escuro). Dupla face pinta o avesso com a textura.
+      root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { o.material.fog = false; feltHair(o); o.material.side = THREE.DoubleSide; } });
       root.visible = false;
       avatarGroup.add(root);
       v.root = root;
