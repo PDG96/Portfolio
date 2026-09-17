@@ -643,13 +643,9 @@ const flowers = FLOWERS.map(f => {
     // doente: cabelo perde a cor (puxa pra castanho acinzentado e opaco)
     const hairMask = dark.mul(warm).mul(high).mul(float(1).sub(inEyes)).saturate();
     const dullHair = mix(c, vec3(lum.mul(0.9).add(0.06), lum.mul(0.82).add(0.05), lum.mul(0.7).add(0.04)), hairMask.mul(sickAmt).mul(0.8));
-    // doente: roupa suja. Manchas de ruído em dois tamanhos, mais na barra da camiseta e nos joelhos, só nas partes claras
+    // doente: a camiseta branca vai pra um cinza claro (só nas partes claras e neutras)
     const isShirt = smoothstep(float(0.5), float(0.7), lum).mul(float(1).sub(smoothstep(float(0.08), float(0.2), abs(c.r.sub(c.b)))));
-    const dirtA = mx_noise_float(positionWorld.mul(5.0).add(vec3(3.1, 0, 7.7))).mul(0.5).add(0.5);
-    const dirtB = mx_noise_float(positionWorld.mul(17.0)).mul(0.5).add(0.5);
-    const hem = float(1).sub(smoothstep(0.30 * h, 0.55 * h, py)).mul(0.5).add(0.5);           // barra e pernas sujam mais
-    const dirt = smoothstep(float(0.5), float(0.85), dirtA.mul(0.7).add(dirtB.mul(0.3)).mul(hem).add(sickAmt.mul(0.25))).mul(isShirt).mul(sickAmt);
-    const dirty = mix(dullHair, vec3(0.40, 0.34, 0.26).mul(float(0.8).add(dirtB.mul(0.4))), dirt.mul(0.85));
+    const dirty = mix(dullHair, c.mul(vec3(0.66, 0.66, 0.69)), isShirt.mul(sickAmt));
     const felted = dirty.mul(grain).mul(float(1.0).add(fuzz.mul(0.04))).mul(FELT.darken);
     m.colorNode = vec4(mix(dirty, felted, mask), 1.0);
     m.roughnessNode = mix(rm ? rm.g : float(0.6), float(1.0), mask);
