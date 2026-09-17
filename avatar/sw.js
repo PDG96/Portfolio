@@ -1,11 +1,12 @@
 // Service worker: guarda o app e o modelo pra abrir rápido (e offline) no iPhone.
 // Versão muda a cada deploy (tools/deploy_site.sh troca o número), o que apaga o cache antigo.
-const VERSION = 'v202609171142';
-const SHELL = ['./', './index.html', './scene.js', './model.js', './audio.js', './manifest.webmanifest',
+const VERSION = 'v202609171146';
+const SHELL = ['./', './scene.js', './model.js', './audio.js', './manifest.webmanifest',
   './avatar-tripo-anim.glb', './favicon.png', './favicon-32.png', './apple-touch-icon.png'];
 
+// cada arquivo separado e sem derrubar a instalação: um 404/redirect no addAll travaria o SW novo pra sempre
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(VERSION).then(c => Promise.all(SHELL.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => {})))).then(() => self.skipWaiting()));
 });
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k)))).then(() => self.clients.claim()));
@@ -42,7 +43,7 @@ self.addEventListener('push', e => {
 self.addEventListener('notificationclick', e => {
   e.notification.close();
   const open = e.notification.data && e.notification.data.open;
-  const target = new URL('./index.html' + (open && open !== 'pietra' ? '?open=' + open : ''), self.location).href;
+  const target = new URL('./' + (open && open !== 'pietra' ? '?open=' + open : ''), self.location).href;
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
     const w = list.find(c => c.url.startsWith(self.registration.scope));
     return w ? w.focus().then(() => w.navigate(target)) : self.clients.openWindow(target);

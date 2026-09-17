@@ -501,7 +501,7 @@ function renderGoals() {
     <div class="row"><div>Água<div class="sub">litros por dia</div></div><input type="number" min="0.5" max="6" step="0.25" data-g="water.liters" value="${g.water.liters}"></div>
     <h3>Avisos</h3>
     <div class="row"><div>Notificações<div class="sub" data-push-sub>${pushStatusText()}</div></div><button class="btn ghost" data-push>${pushState.on ? 'Desativar' : 'Ativar'}</button></div>
-    <div class="hint" style="margin-top:14px">versão 202609171142</div>
+    <div class="row"><div>Versão<div class="sub">202609171146</div></div><button class="btn ghost" data-update>Atualizar</button></div>
     <div class="foot">
       ${g.started ? '<button class="btn ghost danger" data-reset>Recomeçar do zero</button>' : ''}
       <button class="btn ghost" data-close>Fechar</button>
@@ -509,6 +509,10 @@ function renderGoals() {
     </div>`;
   goalsPanel.querySelectorAll('.switch').forEach(sw => sw.onclick = () => sw.classList.toggle('on'));
   goalsPanel.querySelector('[data-close]').onclick = () => goalsSheet.classList.remove('open');
+  goalsPanel.querySelector('[data-update]').onclick = async () => {   // limpa service worker e caches e recarrega do servidor
+    try { const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r => r.unregister())); const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k))); } catch (e) {}
+    location.replace(location.pathname + '?r=' + Date.now());
+  };
   const pb = goalsPanel.querySelector('[data-push]');
   pb.onclick = async () => { pb.disabled = true; try { pushState.on ? await pushDisable() : await pushEnable(); } catch (e) { alert('Não deu: ' + (e.message || e)); } pb.disabled = false; pb.textContent = pushState.on ? 'Desativar' : 'Ativar'; goalsPanel.querySelector('[data-push-sub]').textContent = pushStatusText(); };
   const rs = goalsPanel.querySelector('[data-reset]');
