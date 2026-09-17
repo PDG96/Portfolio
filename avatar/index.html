@@ -355,7 +355,7 @@ async function pushDisable() {
   pushState.on = false; localStorage.removeItem('companion:push');
   try { await fetch(PUSH.api + '/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: pushId }) }); } catch (e) {}
 }
-const scene = await createScene();
+const scene = await createScene(); window.__scene = scene;   // debug no console
 window.__api = scene;   // debug no console
 
 // ---------------------------------------------------------------- som (procedural; liga no botão, política de autoplay)
@@ -439,6 +439,8 @@ function applyFace() {
   const forced = q.get('health');
   const forcedH = forced in HEALTH_PRESET ? HEALTH_PRESET[forced] : forced === 'dead' ? 0 : parseFloat(forced);
   const h = override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : forced != null && !isNaN(forcedH) ? forcedH : !goals.started ? 0.85 : (v ? v.avg / 100 : 1);
+  const success = override.health === 'success' || (override.health === 'auto' && gs && gs.success);
+  scene.setVariant(success ? 'dance' : null);                        // meta cumprida: modelo feliz dançando
   if (override.health === 'success') { scene.setBaseClip('cheer'); return; }
   if (override.health === 'auto' && gs && !gs.success) gs.success = false;
   scene.setBaseClip(baseClipForHealth(h));

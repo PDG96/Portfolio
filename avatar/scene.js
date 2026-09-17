@@ -28,7 +28,7 @@ export async function createScene(opts = {}) {
 
   const P = {
     windSpeed: 1.3, windAmplitude: 0.21,
-    bladeWidth: LOW ? 7.5 : 4.0, bladeTipWidth: 0.28, bladeHeight: 0.92,   // menos folhas → mais largas, mesma cobertura bladeHeightVariation: 0.5, bladeLean: 0.9,
+    bladeWidth: LOW ? 7.5 : 4.0, bladeTipWidth: 0.28, bladeHeight: 0.92, bladeHeightVariation: 0.5, bladeLean: 0.9,   // celular: menos folhas, mais largas
     noiseAmplitude: 1.85, noiseFrequency: 0.3, noise2Amplitude: 0.2, noise2Frequency: 15,
     mouseRadius: 2.2, mouseStrength: 3.0, outerRadius: 3.6, outerStrength: 1.0,
     fogStart: 16.0, fogEnd: 34.0, fogIntensity: 0.0,
@@ -763,6 +763,47 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     }
   }, undefined, e => err.textContent += 'avatar: ' + e.message + '\n');
 
+  // ---------------------------------------------------------------- variantes: outro modelo pra um estado (ex.: meta cumprida → modelo feliz dançando)
+  // Carregado só quando pedido; troca a malha inteira e toca o próprio clipe em loop. A principal continua no lugar, escondida.
+  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance' } };
+  const variants = {};
+  let activeVariant = null;
+  function loadVariant(name) {
+    const def = VARIANTS[name];
+    if (!def) return Promise.resolve(null);
+    if (variants[name]) return variants[name].ready;
+    const v = variants[name] = { root: null, mixer: null, ready: null };
+    v.ready = new Promise(res => new GLTFLoader().load(def.url, gltf => {
+      const root = gltf.scene;
+      const box = new THREE.Box3().setFromObject(root);
+      const size = box.getSize(new THREE.Vector3());
+      root.scale.setScalar(AVATAR.height / size.y);
+      box.setFromObject(root);
+      root.position.set(-(box.min.x + box.max.x) / 2 + AVATAR.x, -box.min.y + domeY(Math.hypot(AVATAR.x, AVATAR.z)), -(box.min.z + box.max.z) / 2 + AVATAR.z);
+      root.rotation.y = AVATAR.rotY;
+      root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { o.material.fog = false; feltHair(o); } });
+      root.visible = false;
+      avatarGroup.add(root);
+      v.root = root;
+      if (gltf.animations.length) {
+        v.mixer = new THREE.AnimationMixer(root);
+        const c = gltf.animations.find(a => a.name.toLowerCase().includes(def.clip)) || gltf.animations[0];
+        v.action = v.mixer.clipAction(c); v.action.setLoop(THREE.LoopRepeat, Infinity);
+      }
+      res(v);
+    }, undefined, e => { err.textContent += 'variante: ' + e.message + '\n'; res(null); }));
+    return v.ready;
+  }
+  async function setVariant(name) {
+    if (name === activeVariant) return;
+    activeVariant = name;
+    const v = name ? await loadVariant(name) : null;
+    if (activeVariant !== name) return;                                // mudou de ideia enquanto carregava
+    for (const [k, x] of Object.entries(variants)) if (x.root) x.root.visible = k === name;
+    if (avatarRoot) avatarRoot.visible = !v;
+    if (v && v.action) { v.action.reset().play(); }
+  }
+
 
   // ---------------------------------------------------------------- girar a cena (arrastar), zoom leve (scroll)
   controls = new OrbitControls(camera, renderer.domElement);
@@ -913,6 +954,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   function simulate(dt) {
     // expressão: aproxima do alvo com easing; shape key e textura andam juntas
     if (mixer) mixer.update(dt);
+    for (const x of Object.values(variants)) if (x.mixer && x.root && x.root.visible) x.mixer.update(dt);
     sadNow += (sadness - sadNow) * Math.min(1, dt * 2);
     // doente: tronco curvado + respiração pesada + balanço lento (tudo aditivo, sobre o clipe)
     if (spineBone && sadNow > 0.001) {
@@ -1020,7 +1062,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   let dropRate = 0;
 
   return {
-    scene, camera, renderer, controls, avatarGroup, hooks,
+    scene, camera, renderer, controls, avatarGroup, hooks, grass, setVariant,
     get rain() { return ENV.rain; },
     setEnvironment({ weights, clouds = 0, rain = 0 }) {
       if (weights) ENV.weights = weights;
