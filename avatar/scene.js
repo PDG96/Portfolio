@@ -478,7 +478,20 @@ export async function createScene(opts = {}) {
     return col.add(spec.mul(float(1).sub(sickW.mul(0.6))));
   })();
   waterMat.opacityNode = float(0.96);
-  const water = new THREE.Mesh(new THREE.PlaneGeometry(WATER.size, WATER.size, WATER.segs, WATER.segs), waterMat);
+  // celular: mar chapado (uma cor, sem ondas, sem anéis, sem reflexo), só pra manter a linha do horizonte
+  const flatWaterMat = new THREE.MeshBasicNodeMaterial({ fog: false });
+  flatWaterMat.colorNode = Fn(() => {
+    const p = positionWorld;
+    const camD = length(vec2(p.x.sub(cameraPosition.x), p.z.sub(cameraPosition.z)));
+    let col = mix(W.deep, W.sky, uSkyMix.mul(0.6));
+    col = mix(col, W.deep.mul(0.82), smoothstep(float(120.0), float(420.0), camD));
+    const sickW = float(1).sub(smoothstep(float(0.15), float(0.8), uHealth));
+    const murky = mix(vec3(0.70, 0.60, 0.28), vec3(0.42, 0.40, 0.20), uDead);
+    return mix(col, murky.mul(uDim), sickW.mul(0.8));
+  })();
+  const water = LOW
+    ? new THREE.Mesh(new THREE.PlaneGeometry(WATER.size, WATER.size, 1, 1), flatWaterMat)
+    : new THREE.Mesh(new THREE.PlaneGeometry(WATER.size, WATER.size, WATER.segs, WATER.segs), waterMat);
   water.rotation.x = -Math.PI / 2;
   water.position.y = -HILL.depth + 0.8; uWaterY.value = water.position.y;
   scene.add(water);
