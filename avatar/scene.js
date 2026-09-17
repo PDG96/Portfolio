@@ -747,6 +747,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { o.material.fog = false; if (o.morphTargetDictionary && 'expr:happy' in o.morphTargetDictionary) exprMesh = o; feltHair(o); } });
     avatarGroup.add(root);
     avatarRoot = root;
+    root.traverse(o => { if (o.isBone) mainRest[o.name] = o.quaternion.clone(); });   // pose de descanso (retarget das variantes)
     avatarWorld.value.set(AVATAR.x, 0, AVATAR.z);
     feltY.value = domeY(0) + AVATAR.height * FELT.minY;
     root.updateMatrixWorld(true);
@@ -765,7 +766,22 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
 
   // ---------------------------------------------------------------- variantes: outro modelo pra um estado (ex.: meta cumprida → modelo feliz dançando)
   // Carregado só quando pedido; troca a malha inteira e toca o próprio clipe em loop. A principal continua no lugar, escondida.
-  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance' } };
+  // arms: 'main' → o clipe da variante não mexe os braços (look_around do Tripo deixa em T); copia os braços da principal (idle),
+  // retargetando pela diferença em relação à pose de descanso de cada rig (mesmo esqueleto Tripo, orientações de bind diferentes)
+  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance' }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' } };
+  const ARM_BONES = ['L_Upperarm', 'L_Forearm', 'L_Hand', 'R_Upperarm', 'R_Forearm', 'R_Hand'];   // sem clavícula/twists: o rig da variante já os posiciona
+  const mainRest = {}, mainBones = {};
+  const tmpQR = new THREE.Quaternion();
+  function retargetArms(v) {
+    if (!v.arms || !avatarRoot) return;
+    if (!mainBones.ready) { avatarRoot.traverse(o => { if (o.isBone) mainBones[o.name] = o; }); mainBones.ready = true; }
+    for (const n of ARM_BONES) {
+      const src = mainBones[n], dst = v.bones[n], rs = mainRest[n], rd = v.rest[n];
+      if (!src || !dst || !rs || !rd) continue;
+      tmpQR.copy(rs).invert().multiply(src.quaternion);              // quanto o clipe da principal girou a partir do descanso
+      dst.quaternion.copy(rd).multiply(tmpQR);                       // mesma rotação a partir do descanso da variante
+    }
+  }
   const variants = {};
   let activeVariant = null;
   function loadVariant(name) {
@@ -785,7 +801,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { o.material.fog = false; feltHair(o); o.material.side = THREE.DoubleSide; } });
       root.visible = false;
       avatarGroup.add(root);
-      v.root = root;
+      v.root = root; v.arms = def.arms === 'main'; v.bones = {}; v.rest = {};
+      root.traverse(o => { if (o.isBone) { v.bones[o.name] = o; v.rest[o.name] = o.quaternion.clone(); } });
       if (gltf.animations.length) {
         v.mixer = new THREE.AnimationMixer(root);
         const c = gltf.animations.find(a => a.name.toLowerCase().includes(def.clip)) || gltf.animations[0];
@@ -800,9 +817,15 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     activeVariant = name;
     const v = name ? await loadVariant(name) : null;
     if (activeVariant !== name) return;                                // mudou de ideia enquanto carregava
-    for (const [k, x] of Object.entries(variants)) if (x.root) x.root.visible = k === name;
-    if (avatarRoot) avatarRoot.visible = !v;
     if (v && v.action) { v.action.reset().play(); }
+    syncVariantVisibility();
+  }
+  // a variante é o "fundo" do estado; reações, passos e a queda tocam na principal (que tem os 19 clipes), depois a variante volta
+  function syncVariantVisibility() {
+    const busy = clipOnce || !!walkTarget || keyWalking || held;
+    const showMain = !activeVariant || busy || !(variants[activeVariant] && variants[activeVariant].root);
+    if (avatarRoot) avatarRoot.visible = showMain;
+    for (const [k, x] of Object.entries(variants)) if (x.root) x.root.visible = !showMain && k === activeVariant;
   }
 
 
@@ -955,7 +978,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   function simulate(dt) {
     // expressão: aproxima do alvo com easing; shape key e textura andam juntas
     if (mixer) mixer.update(dt);
-    for (const x of Object.values(variants)) if (x.mixer && x.root && x.root.visible) x.mixer.update(dt);
+    syncVariantVisibility();
+    for (const x of Object.values(variants)) if (x.mixer && x.root && x.root.visible) { x.mixer.update(dt); retargetArms(x); }
     sadNow += (sadness - sadNow) * Math.min(1, dt * 2);
     // doente: tronco curvado + respiração pesada + balanço lento (tudo aditivo, sobre o clipe)
     if (spineBone && sadNow > 0.001) {
