@@ -55,9 +55,9 @@ export let estimateCalories = async (blob) => null;
 export function setCalorieEstimator(fn) { estimateCalories = fn; }
 
 // ---------------------------------------------------------------- check-in
-export async function checkin({ type, photo = null, amount = null, kcal = null, at = Date.now() }) {
+export async function checkin({ type, photo = null, amount = null, kcal = null, note = null, at = Date.now() }) {
   const id = `${type}-${at}-${Math.random().toString(36).slice(2, 7)}`;
-  const c = { id, type, at, amount, kcal, photo: !!photo };
+  const c = { id, type, at, amount, kcal, photo: !!photo, note: note ? String(note).trim().slice(0, 240) : null };   // note: descrição do prato quando não há foto
   if (photo) await savePhoto(id, photo);
   const list = loadCheckins(); list.push(c); saveCheckins(list);
   return c;

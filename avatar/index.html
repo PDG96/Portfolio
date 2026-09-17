@@ -30,6 +30,7 @@
     --ease: cubic-bezier(.2, .8, .2, 1);
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   html, body { margin: 0; height: 100%; overflow: hidden; background: #e9e1f0; }
   body { font-family: "Inter", system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; letter-spacing: -0.005em; }
   canvas { display: block; position: fixed; inset: 0; width: 100% !important; height: 100% !important; }   /* iOS: cobre a tela mesmo se o innerHeight atrasar */
@@ -155,6 +156,12 @@
   .photo .drop:hover { background: rgba(255,255,255,.8); border-color: rgba(28,27,34,.4); }
   .photo img { width: 100%; max-height: 260px; object-fit: cover; border-radius: 16px; display: block; }
   .photo input[type=file] { display: none; }
+  .photo textarea { width: 100%; font: inherit; font-size: 13px; line-height: 1.45; padding: 12px 14px; border-radius: 16px; border: 1px solid rgba(28,27,34,.12); background: rgba(255,255,255,.7); resize: none; }
+  .photo textarea:focus { outline: none; border-color: rgba(28,27,34,.4); }
+  .seg { display: flex; gap: 2px; padding: 2px; border-radius: 999px; background: rgba(28,27,34,.06); margin-top: 12px; }
+  .seg button { flex: 1; appearance: none; border: 0; background: transparent; color: var(--ink-3); font: inherit; font-size: 12.5px; font-weight: 500; padding: 8px 10px; border-radius: 999px; cursor: pointer; transition: all .25s var(--ease); }
+  .seg button.on { background: rgba(255,255,255,.9); color: var(--ink); box-shadow: 0 4px 12px -6px rgba(40,30,70,.4); }
+  .history .note { color: var(--ink-2); white-space: normal; }
   .kcal { display: flex; align-items: center; gap: 10px; font-size: 13px; }
   .kcal input { width: 90px; }
   .calib { font-size: 12px; color: var(--ink-3); }
@@ -529,18 +536,32 @@ function openCheckin(type) {
   let photoBlob = null;
   checkPanel.innerHTML = `
     <h2>${TYPE_LABEL[type]}</h2>
-    <div class="hint">${needsPhoto ? 'Foto obrigatória: é a prova de que aconteceu.' : 'Registra o número; foto é opcional.'}</div>
+    <div class="hint">${isMeal ? 'Prova do prato: uma foto ou uma descrição do que comeu.' : needsPhoto ? 'Foto obrigatória: é a prova de que aconteceu.' : 'Registra o número; foto é opcional.'}</div>
     ${isMeal ? `<div class="row"><div>Qual refeição?</div><select id="mealType" style="font:inherit;font-size:13px;padding:6px 10px;border-radius:10px;border:1px solid rgba(28,27,34,.12);background:rgba(255,255,255,.7)">
         ${Object.keys(MEAL_LABEL).map(k => `<option value="${k}" ${k === type ? 'selected' : ''}>${MEAL_LABEL[k]}</option>`).join('')}</select></div>` : ''}
     ${type === 'water' ? `<div class="row"><div>Quanto?<div class="sub">litros</div></div><input type="number" id="amount" min="0.05" max="3" step="0.05" value="0.25"></div>` : ''}
     ${type === 'sleep' ? `<div class="row"><div>Horas de sono<div class="sub">a noite passada</div></div><input type="number" id="amount" min="0" max="16" step="0.25" value="${goals.sleep.hours}"></div>` : ''}
     ${type === 'exercise' || type === 'walk' ? `<div class="row"><div>Duração<div class="sub">minutos</div></div><input type="number" id="amount" min="5" max="300" step="5" value="${type === 'walk' ? 30 : 45}"></div>` : ''}
-    <div class="photo"><label class="drop" for="photoIn">📷 ${needsPhoto ? 'Tirar ou escolher foto' : 'Foto (opcional)'}</label><input id="photoIn" type="file" accept="image/*" capture="environment"><img id="preview" hidden></div>
+    ${isMeal ? `<div class="seg" id="proofSeg"><button class="on" data-mode="photo">📷 Foto</button><button data-mode="text">✍️ Descrever</button></div>` : ''}
+    <div class="photo" id="photoBox"><label class="drop" for="photoIn">📷 ${needsPhoto ? 'Tirar ou escolher foto' : 'Foto (opcional)'}</label><input id="photoIn" type="file" accept="image/*" capture="environment"><img id="preview" hidden></div>
+    ${isMeal ? `<div class="photo" id="noteBox" hidden><textarea id="note" rows="3" placeholder="O que teve no prato? Ex.: arroz, feijão, frango grelhado e salada"></textarea></div>` : ''}
     ${isMeal ? `<div class="kcal"><span>Calorias</span><input type="number" id="kcal" min="0" max="3000" step="10" placeholder="kcal"><span class="calib" id="kcalHint">estimativa automática pela foto quando disponível</span></div>` : ''}
     <div class="foot"><button class="btn ghost" data-close>Cancelar</button><button class="btn primary" data-save disabled>Registrar</button></div>`;
   const saveBtn = checkPanel.querySelector('[data-save]');
   const photoIn = checkPanel.querySelector('#photoIn'), preview = checkPanel.querySelector('#preview');
-  const ready = () => { saveBtn.disabled = needsPhoto && !photoBlob; };
+  const noteEl = checkPanel.querySelector('#note');
+  let proof = 'photo';
+  const ready = () => { saveBtn.disabled = needsPhoto && !(proof === 'photo' ? photoBlob : (noteEl && noteEl.value.trim().length >= 3)); };
+  if (isMeal) {
+    checkPanel.querySelectorAll('#proofSeg button').forEach(b => b.onclick = () => {
+      proof = b.dataset.mode;
+      checkPanel.querySelectorAll('#proofSeg button').forEach(x => x.classList.toggle('on', x === b));
+      checkPanel.querySelector('#photoBox').hidden = proof !== 'photo'; checkPanel.querySelector('#noteBox').hidden = proof !== 'text';
+      checkPanel.querySelector('#kcalHint').textContent = proof === 'text' ? 'digita as calorias, se souber' : 'estimativa automática pela foto quando disponível';
+      ready(); if (proof === 'text') noteEl.focus();
+    });
+    noteEl.oninput = ready;
+  }
   photoIn.onchange = async () => {
     const f = photoIn.files[0]; if (!f) return;
     photoBlob = await shrink(f, 1280);
@@ -558,7 +579,8 @@ function openCheckin(type) {
     const t = isMeal ? checkPanel.querySelector('#mealType').value : type;
     const amount = checkPanel.querySelector('#amount') ? parseFloat(checkPanel.querySelector('#amount').value) : null;
     const kcal = isMeal ? (parseFloat(checkPanel.querySelector('#kcal').value) || null) : null;
-    await checkin({ type: t, photo: photoBlob, amount, kcal });
+    const note = isMeal && proof === 'text' ? noteEl.value : null;
+    await checkin({ type: t, photo: proof === 'photo' ? photoBlob : null, amount, kcal, note });
     pushSync();
     checkins = loadCheckins();
     checkSheet.classList.remove('open');
@@ -592,7 +614,8 @@ async function openHistory() {
     const row = document.createElement('div'); row.className = 'row';
     const when = new Date(c.at).toLocaleString('pt-BR', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
     const extra = c.kcal ? `${c.kcal} kcal` : c.amount ? (c.type === 'water' ? `${c.amount} L` : c.type === 'sleep' ? `${c.amount} h` : `${c.amount} min`) : '';
-    row.innerHTML = `<div class="ph">${ICON[c.type] || '•'}</div><div>${TYPE_LABEL[c.type] || c.type}<div class="sub">${when} ${extra ? '· ' + extra : ''}</div></div><button class="btn ghost danger">apagar</button>`;
+    const esc = t => String(t).replace(/[&<>]/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[ch]));
+    row.innerHTML = `<div class="ph">${ICON[c.type] || '•'}</div><div>${TYPE_LABEL[c.type] || c.type}<div class="sub">${when} ${extra ? '· ' + extra : ''}</div>${c.note ? `<div class="sub note">${esc(c.note)}</div>` : ''}</div><button class="btn ghost danger">apagar</button>`;
     if (c.photo) { const b = await loadPhoto(c.id); if (b) { const img = document.createElement('img'); img.src = URL.createObjectURL(b); row.replaceChild(img, row.firstChild); } }
     row.querySelector('button').onclick = () => { removeCheckin(c.id); checkins = loadCheckins(); row.remove(); tick(); pushSync(); };
     hist.appendChild(row);
