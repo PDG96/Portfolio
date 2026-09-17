@@ -1,6 +1,6 @@
 // Service worker: guarda o app e o modelo pra abrir rápido (e offline) no iPhone.
 // Versão muda a cada deploy (tools/deploy_site.sh troca o número), o que apaga o cache antigo.
-const VERSION = 'v202609171140';
+const VERSION = 'v202609171142';
 const SHELL = ['./', './index.html', './scene.js', './model.js', './audio.js', './manifest.webmanifest',
   './avatar-tripo-anim.glb', './favicon.png', './favicon-32.png', './apple-touch-icon.png'];
 

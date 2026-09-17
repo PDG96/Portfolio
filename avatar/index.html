@@ -320,7 +320,7 @@ function pushStatusText() {
 let swReg = null;
 async function swReady() {
   if (!('serviceWorker' in navigator) || location.hostname === 'localhost') return null;
-  if (!swReg) swReg = await navigator.serviceWorker.register(`sw.js?api=${encodeURIComponent(PUSH.api)}&id=${pushId}`);
+  if (!swReg) swReg = await navigator.serviceWorker.register(`sw.js?api=${encodeURIComponent(PUSH.api)}&id=${pushId}`, { updateViaCache: 'none' });
   await navigator.serviceWorker.ready;
   return swReg;
 }
@@ -501,6 +501,7 @@ function renderGoals() {
     <div class="row"><div>Água<div class="sub">litros por dia</div></div><input type="number" min="0.5" max="6" step="0.25" data-g="water.liters" value="${g.water.liters}"></div>
     <h3>Avisos</h3>
     <div class="row"><div>Notificações<div class="sub" data-push-sub>${pushStatusText()}</div></div><button class="btn ghost" data-push>${pushState.on ? 'Desativar' : 'Ativar'}</button></div>
+    <div class="hint" style="margin-top:14px">versão 202609171142</div>
     <div class="foot">
       ${g.started ? '<button class="btn ghost danger" data-reset>Recomeçar do zero</button>' : ''}
       <button class="btn ghost" data-close>Fechar</button>
@@ -792,6 +793,12 @@ if (!goals.started) setTimeout(() => { renderGoals(); goalsSheet.classList.add('
 if (q.get('open')) setTimeout(() => openCheckin(q.get('open')), 800);   // vindo da notificação: já abre o registro
 if (q.get('event')) setTimeout(() => { const fn = EVENT_REACTION[q.get('event')]; if (fn) fn({ type: 'lunch', run: 3, preview: true }); }, 3000);   // preview: ?event=dead (não grava)
 swReady().catch(() => {});
+// atualização: quando um service worker novo assume, recarrega uma vez (senão o app instalado no iPhone fica na versão velha)
+if ('serviceWorker' in navigator) {
+  let reloading = false; const hadController = !!navigator.serviceWorker.controller;   // na 1ª visita o SW só assume, sem recarregar
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloading || !hadController) return; reloading = true; location.reload(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && swReg) swReg.update().catch(() => {}); });   // ao voltar pro app, procura versão nova
+}
 if (pushState.on) pushSync();                                        // ao abrir, o Worker recebe o retrato do dia
 </script>
 </body>
