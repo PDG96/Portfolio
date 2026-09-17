@@ -773,7 +773,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   // retargetando pela diferença em relação à pose de descanso de cada rig (mesmo esqueleto Tripo, orientações de bind diferentes)
   // clipe toca uma vez quando o estado entra; depois a principal volta em idle (pedido da Pietra). loop: true mantém em loop.
   // pose: 'main' → sem clipe próprio: o corpo inteiro segue a principal (idle + postura doente procedural), retargetado osso a osso
-  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, tired: { url: 'avatar-tired.glb', pose: 'main' } };
+  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, tired: { url: 'avatar-tired.glb', pose: 'main' },
+                     dead: { url: 'avatar-dead.glb', lie: true } };   // sem rig: deitada de costas (T-pose vira corpo no chão)
   const ARM_BONES = ['L_Upperarm', 'L_Forearm', 'L_Hand', 'R_Upperarm', 'R_Forearm', 'R_Hand'];   // sem clavícula/twists: o rig da variante já os posiciona
   const mainRest = {}, mainBones = {};
   const tmpQR = new THREE.Quaternion();
@@ -803,14 +804,21 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       box.setFromObject(root);
       root.position.set(-(box.min.x + box.max.x) / 2 + AVATAR.x, -box.min.y + domeY(Math.hypot(AVATAR.x, AVATAR.z)), -(box.min.z + box.max.z) / 2 + AVATAR.z);
       root.rotation.y = AVATAR.rotY;
+      if (def.lie) {                                                     // deita: gira 90° e reassenta no chão pela caixa nova
+        root.rotation.set(-Math.PI / 2, Math.PI / 2, 0, 'YXZ'); root.updateMatrixWorld(true);   // deita de costas (X) e vira 90° (Y): corpo atravessado pra câmera
+        const b2 = new THREE.Box3().setFromObject(root);
+        root.position.y += (domeY(0) + 0.25) - b2.min.y;
+        root.position.x += AVATAR.x - (b2.min.x + b2.max.x) / 2;
+        root.position.z += AVATAR.z - (b2.min.z + b2.max.z) / 2 + 1.0;
+      }
       // dança: a malha abre em cabelo/axila/short e mostrava o lado de dentro (escuro). Dupla face pinta o avesso com a textura.
       // só a basecolor: o normal/roughness do export HD do Tripo dava losangos nas pálpebras e contorno escuro depois da simplificação
       root.traverse(o => { if (o.isMesh) o.frustumCulled = false; if (o.isMesh && o.material) { const m0 = o.material; m0.fog = false; m0.normalMap = null; m0.roughnessMap = null; m0.metalnessMap = null; m0.metalness = 0; feltHair(o, { tint: false }); if (def.doubleSide) o.material.side = THREE.DoubleSide; } });
       root.visible = false;
       avatarGroup.add(root);
-      v.root = root; v.arms = def.arms === 'main'; v.pose = def.pose === 'main'; v.bones = {}; v.rest = {};
+      v.root = root; v.arms = def.arms === 'main'; v.pose = def.pose === 'main'; v.static = !!def.lie; v.bones = {}; v.rest = {};
       root.traverse(o => { if (o.isBone) { v.bones[o.name] = o; v.rest[o.name] = o.quaternion.clone(); } });
-      if (gltf.animations.length && !v.pose) {
+      if (gltf.animations.length && !v.pose && !v.static) {
         v.mixer = new THREE.AnimationMixer(root);
         const c = gltf.animations.find(a => a.name.toLowerCase().includes(def.clip)) || gltf.animations[0];
         v.action = v.mixer.clipAction(c);
@@ -821,7 +829,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     return v.ready;
   }
   async function setVariant(name) {
-    if (name === activeVariant) return;
+    if (name === undefined || name === activeVariant) return;           // undefined: não mexe
     activeVariant = name;
     const v = name ? await loadVariant(name) : null;
     if (activeVariant !== name) return;                                // mudou de ideia enquanto carregava
@@ -830,8 +838,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   }
   // a variante é o "fundo" do estado; reações, passos e a queda tocam na principal (que tem os 19 clipes), depois a variante volta
   function syncVariantVisibility() {
-    const busy = clipOnce || !!walkTarget || keyWalking || held;
     const av = activeVariant && variants[activeVariant];
+    const busy = clipOnce || !!walkTarget || keyWalking || (held && !(av && av.static));   // morta: a estática substitui a queda travada
     const showMain = !av || !av.root || av.done || busy;
     if (avatarRoot) avatarRoot.visible = showMain;
     for (const [k, x] of Object.entries(variants)) if (x.root) x.root.visible = !showMain && k === activeVariant;

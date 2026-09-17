@@ -428,6 +428,7 @@ function autoFace() {
   return v.avg > 72 ? 'relaxed' : 'neutral';
 }
 let gs = null;                                                       // situação da meta (dias perdidos, morte, sucesso)
+let deadAt = 0;                                                      // quando morreu (a queda toca antes do modelo deitado)
 function baseClipForHealth(h) {
   if (gs && gs.success) return 'idle';                              // sucesso: a dança toca uma vez, depois idle
   if (h > 0.7) return (v && v.avg > 85) ? 'standing_relax' : 'idle';
@@ -440,7 +441,9 @@ function applyFace() {
   const forcedH = forced in HEALTH_PRESET ? HEALTH_PRESET[forced] : forced === 'dead' ? 0 : parseFloat(forced);
   const h = override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : forced != null && !isNaN(forcedH) ? forcedH : !goals.started ? 0.85 : (v ? v.avg / 100 : 1);
   const success = override.health === 'success' || (override.health === 'auto' && gs && gs.success);
-  scene.setVariant(success ? 'dance' : h > 0.45 && h <= 0.7 ? 'tired' : null);   // sucesso: dança; cansada: modelo cansado em idle; resto: principal (doente/grave esperam modelos; o neutro 'look_around' ficou disponível, Pietra preferiu o principal)
+  const deadFor = document.body.dataset.dead ? Date.now() - (deadAt || 0) : -1;
+  const DEAD_MODEL = false;                                            // liga quando o modelo morta vier rigado (o estático em T deitado ficou pior que a queda da principal)
+  scene.setVariant(deadFor >= 0 ? (DEAD_MODEL && deadFor > 2600 ? 'dead' : DEAD_MODEL ? undefined : null) : success ? 'dance' : h > 0.45 && h <= 0.7 ? 'tired' : null);   // sucesso: dança; cansada: modelo cansado em idle; resto: principal (doente/grave esperam modelos; o neutro 'look_around' ficou disponível, Pietra preferiu o principal)
   if (override.health === 'success') { scene.setBaseClip('idle'); return; }
   if (override.health === 'auto' && gs && !gs.success) gs.success = false;
   scene.setBaseClip(baseClipForHealth(h));
@@ -501,7 +504,7 @@ function renderGoals() {
     <div class="row"><div>Água<div class="sub">litros por dia</div></div><input type="number" min="0.5" max="6" step="0.25" data-g="water.liters" value="${g.water.liters}"></div>
     <h3>Avisos</h3>
     <div class="row"><div>Notificações<div class="sub" data-push-sub>${pushStatusText()}</div></div><button class="btn ghost" data-push>${pushState.on ? 'Desativar' : 'Ativar'}</button></div>
-    <div class="row"><div>Versão<div class="sub">202609172020</div></div><button class="btn ghost" data-update>Atualizar</button></div>
+    <div class="row"><div>Versão<div class="sub">202609172041</div></div><button class="btn ghost" data-update>Atualizar</button></div>
     <div class="foot">
       ${g.started ? '<button class="btn ghost danger" data-reset>Recomeçar do zero</button>' : ''}
       <button class="btn ghost" data-close>Fechar</button>
@@ -778,7 +781,7 @@ const EVENT_REACTION = {
 };
 function die(persist = true) {
   if (persist) { goals.dead = true; saveGoals(goals); }
-  document.body.dataset.dead = '1';
+  document.body.dataset.dead = '1'; deadAt = Date.now(); setTimeout(applyFace, 2800);
   scene.hold('fall'); scene.setHealth(0);
   document.getElementById('mood').textContent = 'não resistiu';
   for (const k of [...open.keys()]) closeAlert(k);
