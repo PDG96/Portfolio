@@ -773,7 +773,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   // retargetando pela diferença em relação à pose de descanso de cada rig (mesmo esqueleto Tripo, orientações de bind diferentes)
   // clipe toca uma vez quando o estado entra; depois a principal volta em idle (pedido da Pietra). loop: true mantém em loop.
   // pose: 'main' → sem clipe próprio: o corpo inteiro segue a principal (idle + postura doente procedural), retargetado osso a osso
-  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, tired: { url: 'avatar-tired.glb', pose: 'main' },
+  const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, tired: { url: 'avatar-tired.glb', pose: 'main' }, sick: { url: 'avatar-sick.glb', pose: 'main' },
                      radiant: { url: 'avatar-radiant.glb', clip: 'look', arms: 'main' },
                      dead: { url: 'avatar-dead.glb', clip: 'fall', hold: true } };   // hold: toca uma vez e trava no último quadro
   const ARM_BONES = ['L_Upperarm', 'L_Forearm', 'L_Hand', 'R_Upperarm', 'R_Forearm', 'R_Hand'];   // sem clavícula/twists: o rig da variante já os posiciona
