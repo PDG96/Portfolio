@@ -259,6 +259,58 @@ import { loadGoals, saveGoals, loadCheckins, checkin, removeCheckin, loadPhoto, 
          MEAL_LABEL, TYPE_LABEL, NEEDS_PHOTO, dayKey, fromKey, dayStatus, streak, periodInfo, goalStatus, newEvents } from './model.js';
 
 const q = new URLSearchParams(location.search);
+// ---------------------------------------------------------------- PWA + notificações (Web Push via Worker avatar-push)
+// O Worker guarda a inscrição e um retrato do dia (refeições feitas, água) e insiste por push enquanto uma janela está pendente.
+const PUSH = { api: 'https://avatar-push.pietradgotardo.workers.dev', key: 'BD1eiMSj05Or3ZV_7GDyE_MWKjTGuqZ9mPOgMlV1jqKwojFz3rdJJwGYLcXsddaqIdHOiLv6M3gozpN-ttjyYro' };
+const pushId = (() => { let id = localStorage.getItem('companion:pushId'); if (!id) { id = crypto.randomUUID(); localStorage.setItem('companion:pushId', id); } return id; })();
+const pushState = { on: localStorage.getItem('companion:push') === '1', supported: 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window };
+const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = /iPhone|iPad/.test(navigator.userAgent);
+function pushStatusText() {
+  if (!PUSH.api.startsWith('http')) return 'servidor de avisos ainda não configurado';
+  if (pushState.on) return 'ativas neste aparelho: refeições, água e sono';
+  if (isIOS && !isStandalone) return 'no iPhone: Compartilhar → Adicionar à Tela de Início, depois ativa aqui';
+  if (!pushState.supported) return 'este navegador não recebe notificações';
+  return 'avisa quando abre a janela de uma refeição e insiste até você registrar';
+}
+let swReg = null;
+async function swReady() {
+  if (!('serviceWorker' in navigator) || location.hostname === 'localhost') return null;
+  if (!swReg) swReg = await navigator.serviceWorker.register(`sw.js?api=${encodeURIComponent(PUSH.api)}&id=${pushId}`);
+  await navigator.serviceWorker.ready;
+  return swReg;
+}
+function b64uToBytes(s) { const b = atob(s.replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(b, c => c.charCodeAt(0)); }
+function pushSnapshot() {
+  const start = fromKey(dayKey(Date.now()));
+  const today = checkins.filter(c => c.at >= start);
+  return { id: pushId, tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    goals: { meals: goals.meals, water: goals.water, sleep: goals.sleep, started: goals.started },
+    today: { key: dayKey(Date.now()), done: [...new Set(today.map(c => c.type))], water: today.filter(c => c.type === 'water').reduce((a, c) => a + (c.amount || 0), 0) } };
+}
+async function pushSync(sub = null) {
+  if (!pushState.on && !sub) return;
+  if (!PUSH.api.startsWith('http')) return;
+  try { await fetch(PUSH.api + '/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...pushSnapshot(), sub }) }); } catch (e) {}
+}
+async function pushEnable() {
+  if (!PUSH.api.startsWith('http')) throw new Error('servidor de avisos não configurado');
+  if (!pushState.supported) throw new Error(isIOS && !isStandalone ? 'instala o app na Tela de Início primeiro' : 'navegador sem suporte');
+  const perm = await Notification.requestPermission();
+  if (perm !== 'granted') throw new Error('permissão negada');
+  const reg = await swReady();
+  if (!reg) throw new Error('sem service worker (localhost)');
+  const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64uToBytes(PUSH.key) });
+  pushState.on = true; localStorage.setItem('companion:push', '1');
+  await pushSync(sub.toJSON());
+}
+async function pushDisable() {
+  const reg = await swReady();
+  const sub = reg && await reg.pushManager.getSubscription();
+  if (sub) await sub.unsubscribe();
+  pushState.on = false; localStorage.removeItem('companion:push');
+  try { await fetch(PUSH.api + '/unsubscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: pushId }) }); } catch (e) {}
+}
 const scene = await createScene();
 window.__api = scene;   // debug no console
 
@@ -400,6 +452,8 @@ function renderGoals() {
     <h3>Descanso e água</h3>
     <div class="row"><div>Sono<div class="sub">horas por noite</div></div><input type="number" min="4" max="12" step="0.5" data-g="sleep.hours" value="${g.sleep.hours}"></div>
     <div class="row"><div>Água<div class="sub">litros por dia</div></div><input type="number" min="0.5" max="6" step="0.25" data-g="water.liters" value="${g.water.liters}"></div>
+    <h3>Avisos</h3>
+    <div class="row"><div>Notificações<div class="sub" data-push-sub>${pushStatusText()}</div></div><button class="btn ghost" data-push>${pushState.on ? 'Desativar' : 'Ativar'}</button></div>
     <div class="foot">
       ${g.started ? '<button class="btn ghost danger" data-reset>Recomeçar do zero</button>' : ''}
       <button class="btn ghost" data-close>Fechar</button>
@@ -407,6 +461,8 @@ function renderGoals() {
     </div>`;
   goalsPanel.querySelectorAll('.switch').forEach(sw => sw.onclick = () => sw.classList.toggle('on'));
   goalsPanel.querySelector('[data-close]').onclick = () => goalsSheet.classList.remove('open');
+  const pb = goalsPanel.querySelector('[data-push]');
+  pb.onclick = async () => { pb.disabled = true; try { pushState.on ? await pushDisable() : await pushEnable(); } catch (e) { alert('Não deu: ' + (e.message || e)); } pb.disabled = false; pb.textContent = pushState.on ? 'Desativar' : 'Ativar'; goalsPanel.querySelector('[data-push-sub]').textContent = pushStatusText(); };
   const rs = goalsPanel.querySelector('[data-reset]');
   if (rs) rs.onclick = () => { if (confirm('Apagar metas e todos os registros?')) { localStorage.removeItem('companion:goals'); localStorage.removeItem('companion:checkins'); localStorage.removeItem('companion:seen'); location.reload(); } };
   goalsPanel.querySelector('[data-start]').onclick = () => {
@@ -414,7 +470,7 @@ function renderGoals() {
     goalsPanel.querySelectorAll('[data-meal]').forEach(i => { const m = g.meals[i.dataset.meal]; if (i.dataset.f === 'on') m.on = i.classList.contains('on'); else m[i.dataset.f] = i.value; });
     g.period = { start: goalsPanel.querySelector('[data-p=start]').value, end: goalsPanel.querySelector('[data-p=end]').value };
     if (!g.started) g.started = Date.now();
-    saveGoals(g); goalsSheet.classList.remove('open'); tick();
+    saveGoals(g); goalsSheet.classList.remove('open'); tick(); pushSync();
   };
 }
 
@@ -465,6 +521,7 @@ function openCheckin(type) {
     const amount = checkPanel.querySelector('#amount') ? parseFloat(checkPanel.querySelector('#amount').value) : null;
     const kcal = isMeal ? (parseFloat(checkPanel.querySelector('#kcal').value) || null) : null;
     await checkin({ type: t, photo: photoBlob, amount, kcal });
+    pushSync();
     checkins = loadCheckins();
     checkSheet.classList.remove('open');
     celebrate(t);
@@ -499,7 +556,7 @@ async function openHistory() {
     const extra = c.kcal ? `${c.kcal} kcal` : c.amount ? (c.type === 'water' ? `${c.amount} L` : c.type === 'sleep' ? `${c.amount} h` : `${c.amount} min`) : '';
     row.innerHTML = `<div class="ph">${ICON[c.type] || '•'}</div><div>${TYPE_LABEL[c.type] || c.type}<div class="sub">${when} ${extra ? '· ' + extra : ''}</div></div><button class="btn ghost danger">apagar</button>`;
     if (c.photo) { const b = await loadPhoto(c.id); if (b) { const img = document.createElement('img'); img.src = URL.createObjectURL(b); row.replaceChild(img, row.firstChild); } }
-    row.querySelector('button').onclick = () => { removeCheckin(c.id); checkins = loadCheckins(); row.remove(); tick(); };
+    row.querySelector('button').onclick = () => { removeCheckin(c.id); checkins = loadCheckins(); row.remove(); tick(); pushSync(); };
     hist.appendChild(row);
   }
   if (!list.length) hist.innerHTML = '<div class="hint">Nada registrado ainda.</div>';
@@ -650,8 +707,8 @@ tick();
 if (!goals.started) setTimeout(() => { renderGoals(); goalsSheet.classList.add('open'); }, 1500);
 if (q.get('open')) setTimeout(() => openCheckin(q.get('open')), 800);   // vindo da notificação: já abre o registro
 if (q.get('event')) setTimeout(() => { const fn = EVENT_REACTION[q.get('event')]; if (fn) fn({ type: 'lunch', run: 3, preview: true }); }, 3000);   // preview: ?event=dead (não grava)
-// PWA: service worker só fora do localhost (em dev o serve.py já é no-cache)
-if ('serviceWorker' in navigator && location.hostname !== 'localhost') navigator.serviceWorker.register('sw.js').catch(() => {});
+swReady().catch(() => {});
+if (pushState.on) pushSync();                                        // ao abrir, o Worker recebe o retrato do dia
 </script>
 </body>
 </html>
