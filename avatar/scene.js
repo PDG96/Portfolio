@@ -19,7 +19,7 @@ export async function createScene(opts = {}) {
   // perfil de qualidade: celular (toque + tela estreita) roda com menos folhas/pixels/malha; ?quality=low|high força
   const qParam = new URLSearchParams(location.search).get('quality');
   const LOW = qParam ? qParam === 'low' : (opts.quality === 'low' || (matchMedia('(pointer: coarse)').matches && Math.min(innerWidth, innerHeight) < 900));
-  const BLADE_COUNT = LOW ? 90000 : 300000;
+  const BLADE_COUNT = LOW ? 60000 : 300000;
   const GRID = Math.ceil(Math.sqrt(BLADE_COUNT));   // 548² ≈ 300k posições; 300² = 90k
   const FIELD_SIZE = 28;
   const DOME = { radius: 10.5, height: 1.6 };   // ilha em domo: altura no centro, zero na borda
@@ -28,7 +28,7 @@ export async function createScene(opts = {}) {
 
   const P = {
     windSpeed: 1.3, windAmplitude: 0.21,
-    bladeWidth: LOW ? 6.4 : 4.0, bladeTipWidth: 0.28, bladeHeight: 0.92,   // menos folhas → mais largas, mesma cobertura bladeHeightVariation: 0.5, bladeLean: 0.9,
+    bladeWidth: LOW ? 7.5 : 4.0, bladeTipWidth: 0.28, bladeHeight: 0.92,   // menos folhas → mais largas, mesma cobertura bladeHeightVariation: 0.5, bladeLean: 0.9,
     noiseAmplitude: 1.85, noiseFrequency: 0.3, noise2Amplitude: 0.2, noise2Frequency: 15,
     mouseRadius: 2.2, mouseStrength: 3.0, outerRadius: 3.6, outerStrength: 1.0,
     fogStart: 16.0, fogEnd: 34.0, fogIntensity: 0.0,
@@ -122,7 +122,7 @@ export async function createScene(opts = {}) {
   const renderer = new THREE.WebGPURenderer({ antialias: true });
   const isMobile = innerWidth < 768;
   const px = innerWidth * innerHeight;
-  renderer.setPixelRatio(LOW ? Math.min(devicePixelRatio, 1.5) : px > 2.4e6 ? Math.min(devicePixelRatio, 1.25) : px > 1.2e6 ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));   // tela grande/celular: menos pixels
+  renderer.setPixelRatio(LOW ? Math.min(devicePixelRatio, 1.25) : px > 2.4e6 ? Math.min(devicePixelRatio, 1.25) : px > 1.2e6 ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));   // tela grande/celular: menos pixels
   renderer.setSize(innerWidth, innerHeight);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   (opts.container || document.body).prepend(renderer.domElement);
@@ -398,7 +398,7 @@ export async function createScene(opts = {}) {
 
   // ---------------------------------------------------------------- água (procedural, reage ao mouse como a grama)
   const WATER = { y: -0.35, size: 900, segs: LOW ? 72 : 160, deep: '#6f86c8', shallow: '#9fd2cf', sky: '#dcc9e6', foam: '#f7f4fa' };
-  const RIPPLES = 16;
+  const RIPPLES = LOW ? 6 : 16;
   const ripples = uniformArray(Array.from({ length: RIPPLES }, () => new THREE.Vector4(0, 0, -100, 0)));  // x, z, t0, força
   const W = {}; for (const [k, v] of Object.entries(WATER)) if (typeof v === 'string') W[k] = uniform(new THREE.Color(v));
 
@@ -624,7 +624,7 @@ const flowers = FLOWERS.map(f => {
   function feltHair(mesh) {
     const src = mesh.material;
     if (!src.map) return;
-    const m = new THREE.MeshPhysicalNodeMaterial();
+    const m = LOW ? new THREE.MeshStandardNodeMaterial() : new THREE.MeshPhysicalNodeMaterial();   // celular: sem sheen/feltro (shader mais barato)
     const base0 = texture(src.map);
     // saúde: pele pálida (dessatura e esfria) e olheiras (escurece abaixo dos olhos); cabelo perde brilho
     const sickAmt = float(1).sub(smoothstep(float(0.25), float(0.85), uHealth));
@@ -654,8 +654,8 @@ const flowers = FLOWERS.map(f => {
     const shorts = smoothstep(0.24 * h, 0.29 * h, py).mul(float(1).sub(smoothstep(0.45 * h, 0.50 * h, py)));
     const mask = dark.mul(warm).mul(high.add(shorts).saturate()).mul(float(1).sub(inEyes)).saturate();
     // grão de fibra: ruído fino que clareia/escurece, mais claro nos fios de fora
-    const grain = mx_noise_float(positionWorld.mul(38.0)).mul(FELT.grain).add(1.0);
-    const fuzz = mx_noise_float(positionWorld.mul(9.0)).mul(0.5).add(0.5);
+    const grain = LOW ? float(1.0) : mx_noise_float(positionWorld.mul(38.0)).mul(FELT.grain).add(1.0);
+    const fuzz = LOW ? float(0.5) : mx_noise_float(positionWorld.mul(9.0)).mul(0.5).add(0.5);
     // doente: cabelo perde a cor (puxa pra castanho acinzentado e opaco)
     const hairMask = dark.mul(warm).mul(high).mul(float(1).sub(inEyes)).saturate();
     const dullHair = mix(c, vec3(lum.mul(0.9).add(0.06), lum.mul(0.82).add(0.05), lum.mul(0.7).add(0.04)), hairMask.mul(sickAmt).mul(0.8));
@@ -667,9 +667,11 @@ const flowers = FLOWERS.map(f => {
     m.roughnessNode = mix(rm ? rm.g : float(0.6), float(1.0), mask);
     m.metalnessNode = rm ? rm.b.mul(float(1).sub(mask)) : float(0);
     if (src.normalMap) m.normalNode = normalMap(texture(src.normalMap), src.normalScale);
-    m.sheenNode = mask.mul(FELT.sheen).mul(float(1).sub(sickAmt.mul(0.6)));               // cabelo doente sem brilho
-    m.sheenRoughnessNode = float(0.85);
-    m.sheenColorNode = vec3(...new THREE.Color(FELT.sheenColor).toArray());
+    if (!LOW) {
+      m.sheenNode = mask.mul(FELT.sheen).mul(float(1).sub(sickAmt.mul(0.6)));             // cabelo doente sem brilho
+      m.sheenRoughnessNode = float(0.85);
+      m.sheenColorNode = vec3(...new THREE.Color(FELT.sheenColor).toArray());
+    }
     m.fog = false;
     mesh.material = m;
   }
@@ -841,8 +843,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     const moved = Math.hypot(e.clientX - pointerDown.x, e.clientY - pointerDown.y);
     const quick = performance.now() - pointerDown.t < 400;
     pointerDown = null;
-    if (moved > 6 || !quick) return;                                   // foi arraste (giro da câmera), não clique
-    clickAt(e.clientX, e.clientY);
+    if (moved > 6 || !quick || LOW) return;                            // arraste (giro da câmera) não é clique; no celular não anda
   });
   function clickAt(cx, cy) {
     const n = new THREE.Vector2((cx / innerWidth) * 2 - 1, -(cy / innerHeight) * 2 + 1);
