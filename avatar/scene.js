@@ -729,7 +729,7 @@ const flowers = FLOWERS.map(f => {
 
   // ---------------------------------------------------------------- avatar
   // look padrão: 02 (verão). ?avatar=avatar.glb na URL volta pro look 01 (casaco)
-const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts.avatar || 'avatar-tripo-anim.glb', height: 16.0, x: 0, z: 0, rotY: 0 };
+const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts.avatar || (LOW ? 'avatar-tripo-anim-m.glb' : 'avatar-tripo-anim.glb'), height: 16.0, x: 0, z: 0, rotY: 0 };   // celular: texturas 2k (as 4k pesam na GPU do iPhone)
   const keyLight = new THREE.DirectionalLight('#ffc3a0', 3.0);                // luz principal quente, da frente/esquerda
   keyLight.position.set(-10, 14, 22);
   const rimLight = new THREE.DirectionalLight('#ff8fb0', 2.0);                // contraluz rosa do pôr do sol
@@ -769,7 +769,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       play(clipKey('idle') ? 'idle' : 'happy-idle', { fade: 0 });
     }
     // pré-carrega os modelos de estado (em sequência, sem travar): a troca precisa ser imediata (a morte não pode cair duas vezes)
-    setTimeout(async () => { for (const k of ['dead', 'success', 'tired', 'sick']) await loadVariant(k); }, 1500);
+    if (!LOW) setTimeout(async () => { for (const k of ['dead', 'success', 'tired', 'sick']) await loadVariant(k); }, 1500);   // celular: nada pré-carregado (memória da GPU no iPhone)
   }, undefined, e => err.textContent += 'avatar: ' + e.message + '\n');
 
   // ---------------------------------------------------------------- variantes: outro modelo pra um estado (ex.: meta cumprida → modelo feliz dançando)
@@ -838,11 +838,19 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     }, undefined, e => { err.textContent += 'variante: ' + e.message + '\n'; res(null); }));
     return v.ready;
   }
+  function disposeVariant(k) {                                         // celular: libera a GPU do modelo que saiu de cena (fica só principal + 1)
+    const v = variants[k]; if (!v || !v.root) return;
+    avatarGroup.remove(v.root);
+    v.root.traverse(o => { if (o.isMesh) { o.geometry.dispose(); const m = o.material; if (m) { for (const key of ['map', 'normalMap', 'roughnessMap', 'metalnessMap']) if (m[key]) m[key].dispose(); m.dispose(); } } });
+    delete variants[k];
+  }
   async function setVariant(name) {
     if (name === undefined || name === activeVariant) return;           // undefined: não mexe
+    const prev = activeVariant;
     activeVariant = name;
     const v = name ? await loadVariant(name) : null;
     if (activeVariant !== name) return;                                // mudou de ideia enquanto carregava
+    if (LOW && prev && prev !== name) disposeVariant(prev);
     if (v && v.action) { v.done = false; v.action.reset().play(); }
     syncVariantVisibility();
   }
