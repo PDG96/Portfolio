@@ -548,8 +548,9 @@ export async function createScene(opts = {}) {
   const petalGeo = new THREE.SphereGeometry(0.16, 16, 10);
   const flowerGroup = new THREE.Group();
   scene.add(flowerGroup);
-  let flowerDroop = 0;
-function flowersHealth(h) { flowerDroop = 1 - Math.min(1, Math.max(0, (h - 0.2) / 0.6)); }
+  // doença: as flores não murcham, vão sumindo (uma a uma, em ordem fixa) e perdendo cor; morta não sobra nenhuma
+  let flowerSick = 0;
+function flowersHealth(h) { flowerSick = 1 - Math.min(1, Math.max(0, (h - 0.2) / 0.6)); }
 const flowers = FLOWERS.map(f => {
     const g = new THREE.Group();
     g.position.set(f.xh, hillYJS(f.xh, f.zh), f.zh);
@@ -573,8 +574,10 @@ const flowers = FLOWERS.map(f => {
     head.add(center);
     g.add(head);
     flowerGroup.add(g);
-    return { g, head, f };
+    return { g, head, f, petalMat, color0: new THREE.Color(f.color), gone: 0 };
   });
+  const FLOWER_ORDER = flowers.map((_, i) => ((i * 7) % 16) / 16);          // limiar de sumiço por flor (0.06 … 0.94), espalhado no campo
+  const dullFlower = new THREE.Color('#9a8f86');
 
   // ---------------------------------------------------------------- chuva: fios caindo (instanciados, só quando uRain > 0)
   const RAIN_COUNT = LOW ? 2200 : 5500, RAIN_H = 38, RAIN_AREA = 84;
@@ -1073,11 +1076,16 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     }
     camSphereWorld.value.set(camera.position.x, 0, camera.position.z);
     const t = clock.elapsedTime;
-    for (const { g, f } of flowers) {
-      g.rotation.z = Math.sin(t * P.windSpeed * 0.9 + f.phase) * 0.08 * (1 + P.windAmplitude) + flowerDroop * 0.9 * (f.phase % 2 ? 1 : -1);   // murcha: tomba de lado
-      g.rotation.x = Math.cos(t * P.windSpeed * 0.6 + f.phase) * 0.05 + flowerDroop * 0.5;
-      g.scale.setScalar(1 - flowerDroop * 0.35);
-    }
+    flowers.forEach((fl, i) => {
+      const { g, f } = fl;
+      g.rotation.z = Math.sin(t * P.windSpeed * 0.9 + f.phase) * 0.08 * (1 + P.windAmplitude);
+      g.rotation.x = Math.cos(t * P.windSpeed * 0.6 + f.phase) * 0.05;
+      const goneTarget = flowerSick > FLOWER_ORDER[i] || flowerSick >= 0.98 ? 1 : 0;          // quanto pior, menos flores; morta: nenhuma
+      fl.gone += (goneTarget - fl.gone) * Math.min(1, dt * 1.5);
+      g.scale.setScalar(Math.max(0.001, 1 - fl.gone));
+      g.visible = fl.gone < 0.995;
+      fl.petalMat.color.copy(fl.color0).lerp(dullFlower, flowerSick * 0.8);                    // e as que ficam perdem a cor
+    });
     simulate(dt);
     controls.update();
     rain.rotation.y = controls.getAzimuthalAngle();
