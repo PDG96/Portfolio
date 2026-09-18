@@ -765,6 +765,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       mixer.addEventListener('finished', () => { if (clipOnce) { clipOnce = false; play(clipBase, { fade: 0.35 }); } });
       play(clipKey('idle') ? 'idle' : 'happy-idle', { fade: 0 });
     }
+    // pré-carrega os modelos de estado (em sequência, sem travar): a troca precisa ser imediata (a morte não pode cair duas vezes)
+    setTimeout(async () => { for (const k of ['dead', 'dance', 'tired', 'sick']) await loadVariant(k); }, 1500);
   }, undefined, e => err.textContent += 'avatar: ' + e.message + '\n');
 
   // ---------------------------------------------------------------- variantes: outro modelo pra um estado (ex.: meta cumprida → modelo feliz dançando)
@@ -1120,7 +1122,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       applyEnvironment();
     },
     react(clip = 'jump', { bounce: doBounce = true } = {}) { if (doBounce && !held) bounce = 0.55; play(clipKey(clip) ? clip : 'greet', { once: true, fade: 0.25 }); },
-    hold(clip) { play(clip, { hold: true, fade: 0.3 }); },
+    hold(clip) { const av = activeVariant && variants[activeVariant]; if (av && av.hold && av.root) { held = true; return; } play(clip, { hold: true, fade: 0.3 }); },   // com modelo próprio de morta pronto, só ela cai
     revive() { held = false; play(clipBase, { fade: 0.5 }); },
     setBaseClip, walkTo, clickAt, simulate,
     debugPos() { const hp = new THREE.Vector3(); if (hipBone) hipBone.getWorldPosition(hp); return { group: avatarGroup.position.toArray().map(v => +v.toFixed(2)), root: avatarRoot ? avatarRoot.position.toArray().map(v => +v.toFixed(3)) : null, hip: hp.toArray().map(v => +v.toFixed(2)), target: walkTarget && [walkTarget.x, walkTarget.z], yaw: +walkYaw.toFixed(2) }; },
