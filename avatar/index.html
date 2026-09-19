@@ -272,7 +272,7 @@
       <div class="grp" data-key="weather"><button data-v="auto" class="on">Auto</button><button data-v="clear">Sol</button><button data-v="clouds">Nuvem</button><button data-v="rain">Chuva</button></div>
     </div>
     <div class="prow" id="env2"><span class="plabel">Saúde</span>
-      <div class="grp" data-key="health"><button data-v="auto" class="on">Auto</button><button data-v="healthy">Saudável</button><button data-v="tired">Cansada</button><button data-v="sick">Doente</button><button data-v="dead">Morta</button><button data-v="success">Sucesso</button></div>
+      <div class="grp" data-key="health"><button data-v="auto" class="on">Auto</button><button data-v="healthy">Saudável</button><button data-v="tired">Cansada</button><button data-v="sick">Doente</button><button data-v="dead">Morta</button><button data-v="success">Sucesso</button><button data-v="test">Teste</button></div>
       <span class="plabel">Evento</span>
       <div class="grp" data-key="event"><button data-ev="done">Ação ok</button><button data-ev="skip">Adiada</button><button data-ev="missed">Perdida</button><button data-ev="daylost">Dia perdido</button><button data-ev="daylostrun">Dias perdidos</button><button data-ev="daydone">Dia completo</button><button data-ev="daystreak">Sequência</button></div>
     </div>
@@ -442,7 +442,7 @@ function applyFace() {
   const h = override.health in HEALTH_PRESET ? HEALTH_PRESET[override.health] : forced != null && !isNaN(forcedH) ? forcedH : !goals.started ? 0.85 : (v ? v.avg / 100 : 1);
   const success = override.health === 'success' || (override.health === 'auto' && gs && gs.success);
   const deadFor = document.body.dataset.dead ? Date.now() - (deadAt || 0) : -1;
-  scene.setVariant(deadFor >= 0 ? 'dead' : success ? 'success' : h > 0.45 && h <= 0.7 ? 'tired' : h <= 0.45 ? 'sick' : null);   // morta: cai e fica; cansada/doente: modelo próprio em idle; saudável: principal
+  scene.setVariant(override.health === 'test' ? 'test' : deadFor >= 0 ? 'dead' : success ? 'success' : h > 0.45 && h <= 0.7 ? 'tired' : h <= 0.45 ? 'sick' : null);   // morta: cai e fica; cansada/doente: modelo próprio em idle; saudável: principal
   if (override.health === 'success') { scene.setBaseClip('idle'); return; }
   if (override.health === 'auto' && gs && !gs.success) gs.success = false;
   scene.setBaseClip(baseClipForHealth(h));
@@ -503,7 +503,7 @@ function renderGoals() {
     <div class="row"><div>Água<div class="sub">litros por dia</div></div><input type="number" min="0.5" max="6" step="0.25" data-g="water.liters" value="${g.water.liters}"></div>
     <h3>Avisos</h3>
     <div class="row"><div>Notificações<div class="sub" data-push-sub>${pushStatusText()}</div></div><button class="btn ghost" data-push>${pushState.on ? 'Desativar' : 'Ativar'}</button></div>
-    <div class="row"><div>Versão<div class="sub">202609172239</div></div><button class="btn ghost" data-update>Atualizar</button></div>
+    <div class="row"><div>Versão<div class="sub">202609191211</div></div><button class="btn ghost" data-update>Atualizar</button></div>
     <div class="foot">
       ${g.started ? '<button class="btn ghost danger" data-reset>Recomeçar do zero</button>' : ''}
       <button class="btn ghost" data-close>Fechar</button>
@@ -683,7 +683,7 @@ document.getElementById('previewBtn').onclick = () => previewEl.classList.toggle
 function paintEnv() { document.querySelectorAll('#env .grp, #env2 .grp').forEach(g => { const k = g.dataset.key; g.querySelectorAll('button').forEach(b => { if (b.dataset.v) b.classList.toggle('on', b.dataset.v === override[k]); }); }); }
 envEl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !b.closest('.grp')) return; override[b.closest('.grp').dataset.key] = b.dataset.v; paintEnv(); applyEnv(); applyFace(); });
 // editor de estado: saúde forçada (preview, não grava) e eventos disparados na hora
-const HEALTH_PRESET = { healthy: 0.85, tired: 0.58, sick: 0.3 };   // 'grave' e 'radiante' saíram (Pietra): saudável, cansada, doente, morta
+const HEALTH_PRESET = { healthy: 0.85, tired: 0.58, sick: 0.3, test: 0.85 };   // test: base careca (Mixamo) em preview   // 'grave' e 'radiante' saíram (Pietra): saudável, cansada, doente, morta
 document.getElementById('env2').addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.ev) {
