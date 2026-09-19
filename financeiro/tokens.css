@@ -1,5 +1,5 @@
 /* finapp design tokens
-   Dona: Pietra. Marca monocromática: sem cor de acento, só a escala de cinzas.
+   Dona: Pietra. Neutros em cinza, sem cor de acento; verde e vermelho só pra sinal (positivo/negativo) e status.
    Decisão em docs/decisions/0002-marca-monocromatica.md
    Ramp base: neutros frios estilo Untitled UI (gray light mode). */
 
@@ -19,6 +19,28 @@
   --color-gray-800: #182230;
   --color-gray-900: #101828;
   --color-gray-950: #0c111d;
+
+  /* ---------- Status (decisão da Pietra, 2026-09-19: verde positivo, vermelho negativo, preto neutro) ---------- */
+  --color-success-50: #ecfdf3;
+  --color-success-200: #abefc6;
+  --color-success-500: #17b26a;
+  --color-success-600: #079455;
+  --color-success-700: #067647;
+  --color-error-50: #fef3f2;
+  --color-error-200: #fecdca;
+  --color-error-500: #f04438;
+  --color-error-600: #d92d20;
+  --color-error-700: #b42318;
+  --text-positive: var(--color-success-700);
+  --text-negative: var(--color-error-700);
+  --bg-positive-subtle: var(--color-success-50);
+  --bg-negative-subtle: var(--color-error-50);
+  --border-positive: var(--color-success-200);
+  --border-negative: var(--color-error-200);
+  --dot-positive: var(--color-success-500);
+  --dot-negative: var(--color-error-500);
+  --viz-positive: var(--color-success-600);
+  --viz-negative: var(--color-error-500);
 
   /* ---------- Semânticos: superfícies ---------- */
   --bg-page: var(--color-gray-50);

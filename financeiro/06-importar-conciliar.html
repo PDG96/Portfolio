@@ -84,21 +84,21 @@
     <div class="stack">
       <div class="summary-strip num">
         <div class="card kpi"><div class="kpi-label">Importados</div><div class="kpi-value">14</div></div>
-        <div class="card kpi"><div class="kpi-label">Iguais a lançamentos seus</div><div class="kpi-value">9</div></div>
-        <div class="card kpi"><div class="kpi-label">Novos</div><div class="kpi-value">4</div></div>
-        <div class="card kpi"><div class="kpi-label">Movimento interno</div><div class="kpi-value">1</div></div>
+        <div class="card kpi"><div class="kpi-label">Iguais a lançamentos seus</div><div class="kpi-value">10</div></div>
+        <div class="card kpi"><div class="kpi-label">Novos</div><div class="kpi-value">2</div></div>
+        <div class="card kpi"><div class="kpi-label">Movimento interno</div><div class="kpi-value">2</div></div>
       </div>
 
       <section class="card" aria-labelledby="h-rev">
         <div class="card-header">
-          <div><h2 id="h-rev">Lançamentos do extrato</h2><p>Os iguais já estão aceitos. Confira só os novos e o movimento interno.</p></div>
-          <button class="btn btn-secondary btn-sm" type="button">Aceitar todos</button>
+          <div><h2 id="h-rev">Lançamentos do extrato</h2><p>Os 10 iguais já estão aceitos. Confira os 2 novos e os 2 movimentos internos.</p></div>
+          <button class="btn btn-secondary btn-sm" type="button" id="aceitar-todos">Aceitar os 4</button>
         </div>
         <div>
           <div class="imp">
             <span class="d">Sex 18</span>
             <div class="t"><strong>Aposentadoria</strong><span class="orig">CRED INSS BENEFICIO</span><div class="match"><span class="badge badge-paid"><span class="dot"></span>Igual ao seu lançamento de dia 18</span></div></div>
-            <div class="v in num">+ R$ 3.270,67</div>
+            <div class="v in num">R$ 3.270,67</div>
             <div class="act"><span class="muted type-14-medium">Aceito</span></div>
           </div>
           <div class="imp">
@@ -111,25 +111,25 @@
             <span class="d">Sáb 19</span>
             <div class="t"><strong>Drogaria do Bairro</strong><span class="orig">19/09 09:03 DROGARIA DO BAIRRO LT</span><div class="match"><span class="badge"><svg class="icon sm"><use href="#i-sparkle"/></svg>Novo · Farmácia e saúde</span></div></div>
             <div class="v out num">R$ 216,98</div>
-            <div class="act"><button class="btn btn-secondary btn-sm" type="button">Mudar</button><button class="btn btn-primary btn-sm" type="button">Aceitar</button></div>
+            <div class="act"><button class="btn btn-secondary btn-sm" type="button" data-mudar>Mudar</button><button class="btn btn-primary btn-sm" type="button" data-aceitar>Aceitar</button></div>
           </div>
           <div class="imp">
             <span class="d">Qui 17</span>
             <div class="t"><strong>Pix recebido</strong><span class="orig">17/09 14:20 PIX REC 1234 CONTA SECUNDARIA</span><div class="match"><span class="badge"><svg class="icon sm"><use href="#i-swap"/></svg>Movimento interno · par com a saída de R$ 500 na conta secundária</span></div></div>
-            <div class="v in num">+ R$ 500,00</div>
-            <div class="act"><button class="btn btn-secondary btn-sm" type="button">É receita</button><button class="btn btn-primary btn-sm" type="button">Aceitar</button></div>
+            <div class="v in num">R$ 500,00</div>
+            <div class="act"><button class="btn btn-secondary btn-sm" type="button" data-receita>É receita</button><button class="btn btn-primary btn-sm" type="button" data-aceitar>Aceitar</button></div>
           </div>
           <div class="imp">
             <span class="d">Ter 15</span>
             <div class="t"><strong>Rendimento automático</strong><span class="orig">RENDE FACIL RESGATE AUTOM</span><div class="match"><span class="badge"><svg class="icon sm"><use href="#i-swap"/></svg>Movimento interno · aplicação do banco</span> <span class="badge badge-muted">Ocultar dos relatórios</span></div></div>
-            <div class="v in num">+ R$ 14,13</div>
-            <div class="act"><button class="btn btn-secondary btn-sm" type="button">Mudar</button><button class="btn btn-primary btn-sm" type="button">Aceitar</button></div>
+            <div class="v in num">R$ 14,13</div>
+            <div class="act"><button class="btn btn-secondary btn-sm" type="button" data-mudar>Mudar</button><button class="btn btn-primary btn-sm" type="button" data-aceitar>Aceitar</button></div>
           </div>
           <div class="imp">
             <span class="d">Seg 14</span>
             <div class="t"><strong>Tarifa bancária</strong><span class="orig">TAR PACOTE SERVICOS</span><div class="match"><span class="badge"><svg class="icon sm"><use href="#i-sparkle"/></svg>Novo · Tarifas</span></div></div>
             <div class="v out num">R$ 12,90</div>
-            <div class="act"><button class="btn btn-secondary btn-sm" type="button">Mudar</button><button class="btn btn-primary btn-sm" type="button">Aceitar</button></div>
+            <div class="act"><button class="btn btn-secondary btn-sm" type="button" data-mudar>Mudar</button><button class="btn btn-primary btn-sm" type="button" data-aceitar>Aceitar</button></div>
           </div>
           <div class="imp">
             <span class="d">Seg 14</span>
@@ -138,7 +138,7 @@
             <div class="act"><span class="muted type-14-medium">Aceito</span></div>
           </div>
         </div>
-        <div class="card-footer" style="justify-content:center"><button class="btn btn-tertiary" type="button">Mostrar os outros 7 aceitos</button></div>
+        <div class="card-footer" style="justify-content:center"><button class="btn btn-tertiary" type="button" id="mostrar">Mostrar os outros 7 aceitos</button></div>
       </section>
 
       <section class="card" aria-labelledby="h-conc">
@@ -148,7 +148,7 @@
         <div class="recon num">
           <div><span>Saldo no extrato</span><strong>R$ 772,99</strong></div>
           <div><span>Saldo calculado</span><strong>R$ 702,99</strong></div>
-          <div class="diff"><span>Diferença</span><strong>R$ 70,00</strong></div>
+          <div class="diff"><span>Diferença</span><strong class="neg" id="diff">R$ 70,00</strong></div>
         </div>
         <div class="card-body" style="border-top:1px solid var(--border-default)">
           <p class="type-14-semibold">A diferença vem de 1 lançamento seu que não apareceu no extrato</p>
@@ -157,7 +157,7 @@
               <div class="ic"><svg class="icon"><use href="#i-receipt"/></svg></div>
               <div class="t"><strong>Loteria</strong><span>Dia 12 · registrado à mão · R$ 70,00</span></div>
               <div class="v out num">R$ 70,00</div>
-              <div class="actions"><button class="btn btn-secondary btn-sm" type="button">Foi em dinheiro</button><button class="btn btn-secondary btn-sm" type="button">Excluir</button></div>
+              <div class="actions"><button class="btn btn-secondary btn-sm" type="button" id="dinheiro">Foi em dinheiro</button><button class="btn btn-secondary btn-sm" type="button" id="excluir">Excluir</button></div>
             </div>
           </div>
           <p class="muted" style="margin-top:var(--space-12)">"Foi em dinheiro" move o lançamento pra conta Dinheiro. "Excluir" apaga. Ou deixe como está e a diferença fica registrada.</p>
@@ -165,13 +165,71 @@
       </section>
 
       <div class="footer-actions">
-        <span class="note">4 novos e 1 movimento interno ainda sem revisão.</span>
-        <a class="btn btn-secondary" href="03-movimentacoes.html">Salvar e revisar depois</a>
-        <button class="btn btn-primary" type="button">Concluir importação</button>
+        <span class="note" id="nota">2 novos e 2 movimentos internos ainda sem revisão.</span>
+        <a class="btn btn-secondary" href="03-movimentacoes.html?revisar=1&toast=Importa%C3%A7%C3%A3o%20salva%3A%204%20lan%C3%A7amentos%20ficaram%20a%20revisar">Salvar e revisar depois</a>
+        <button class="btn btn-primary" type="button" id="concluir">Concluir importação</button>
       </div>
     </div>
   </main>
 </div>
+<div class="menu" id="menu-cat" hidden role="listbox" aria-label="Categoria">
+  <button type="button" role="option" data-value="Mercado">Mercado</button>
+  <button type="button" role="option" data-value="Farmácia e saúde">Farmácia e saúde</button>
+  <button type="button" role="option" data-value="Moradia e utilidades">Moradia e utilidades</button>
+  <button type="button" role="option" data-value="Veículos">Veículos</button>
+  <button type="button" role="option" data-value="Tarifas">Tarifas</button>
+  <button type="button" role="option" data-value="Transferência">Transferência interna</button>
+  <button type="button" role="option" data-value="Outros">Outros</button>
+</div>
 <script src="shell.js"></script>
+<script src="proto.js"></script>
+<script>
+  (function () {
+    var pend = document.querySelectorAll('[data-aceitar]').length;
+    function fmt(v) { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+    function nota() { document.getElementById('nota').textContent = pend ? pend + (pend === 1 ? ' lançamento ainda sem revisão.' : ' lançamentos ainda sem revisão.') : 'Tudo revisado. Pode concluir.'; document.getElementById('aceitar-todos').textContent = pend ? 'Aceitar os ' + pend : 'Todos aceitos'; document.getElementById('aceitar-todos').disabled = !pend; }
+    function accept(row) {
+      var act = row.querySelector('.act'); if (!act.querySelector('[data-aceitar]')) return;
+      act.innerHTML = '<span class="muted type-14-medium">Aceito</span>'; row.style.opacity = '.75';
+      var b = row.querySelector('.badge'); if (b) { b.classList.add('badge-paid'); b.innerHTML = '<span class="dot"></span>' + b.textContent.trim().replace(/^Novo · /, ''); }
+      pend--; nota();
+    }
+    document.querySelectorAll('[data-aceitar]').forEach(function (b) { b.addEventListener('click', function () { var row = b.closest('.imp'); var name = row.querySelector('.t strong').textContent; accept(row); Proto.toast(name + ' aceito'); }); });
+    document.getElementById('aceitar-todos').addEventListener('click', function () { var n = pend; document.querySelectorAll('.imp').forEach(function (r) { accept(r); }); Proto.toast(n + ' lançamentos aceitos'); });
+    var menu = document.getElementById('menu-cat'), target = null;
+    document.querySelectorAll('[data-mudar]').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation(); target = b.closest('.imp');
+        var r = b.getBoundingClientRect(); menu.hidden = false; menu.style.position = 'fixed'; menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 236)) + 'px'; menu.style.top = (r.bottom + 6) + 'px'; menu.querySelector('button').focus();
+      });
+    });
+    menu.querySelectorAll('[role="option"]').forEach(function (o) {
+      o.addEventListener('click', function () { var b = target.querySelector('.badge'); b.innerHTML = '<svg class="icon sm"><use href="#i-sparkle"/></svg>Novo · ' + o.dataset.value; menu.hidden = true; Proto.toast('Categoria: ' + o.dataset.value); });
+    });
+    document.addEventListener('click', function () { menu.hidden = true; });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') menu.hidden = true; });
+    document.querySelectorAll('[data-receita]').forEach(function (b) {
+      b.addEventListener('click', function () { var row = b.closest('.imp'); row.querySelector('.badge').innerHTML = '<svg class="icon sm"><use href="#i-sparkle"/></svg>Novo · Receita · Outras'; row.querySelector('.match').innerHTML = row.querySelector('.match').innerHTML; b.remove(); Proto.toast('Tratado como receita, não como movimento interno'); });
+    });
+    document.getElementById('mostrar').addEventListener('click', function () {
+      var extra = [['Sex 18','Hortifruti','18/09 17:02 HORTIFRUTI LTDA',-31.55,'Igual ao seu lançamento de dia 18'],['Sex 18','Cafeteria','18/09 08:15 CAFE CENTRAL',-36.07,'Igual ao seu lançamento de dia 18'],['Qui 17','Loja de materiais','17/09 10:40 MATERIAIS SUL',-191.35,'Igual ao seu lançamento de dia 17'],['Qui 17','Farmácia · parcela 2 de 6','17/09 FARMACIA PARC 02/06',-62.16,'Igual ao seu lançamento de dia 17'],['Ter 15','Telefone','15/09 DEB AUT OPERADORA',-55.07,'Igual ao seu lançamento de dia 12 · compromisso Telefone'],['Seg 14','Academia','14/09 DEB AUT ACADEMIA',-119.90,'Igual ao seu lançamento de dia 15 · compromisso Academia'],['Sáb 12','Aluguel recebido','12/09 PIX REC ALUGUEL',1200,'Igual ao seu lançamento de dia 11']];
+      var host = document.querySelector('.card[aria-labelledby="h-rev"] > div:nth-of-type(2)');
+      extra.forEach(function (r) { host.insertAdjacentHTML('beforeend', '<div class="imp" style="opacity:.75"><span class="d">' + r[0] + '</span><div class="t"><strong>' + r[1] + '</strong><span class="orig">' + r[2] + '</span><div class="match"><span class="badge badge-paid"><span class="dot"></span>' + r[4] + '</span></div></div><div class="v ' + (r[3] > 0 ? 'in' : 'out') + ' num">' + fmt(r[3]) + '</div><div class="act"><span class="muted type-14-medium">Aceito</span></div></div>'); });
+      this.disabled = true; this.textContent = 'Todos os 14 lançamentos estão acima';
+    });
+    function resolve(msg) {
+      document.querySelector('.card[aria-labelledby="h-conc"] .card-body').innerHTML = '<p class="type-14-semibold pos">Saldo conciliado. ' + msg + '</p>';
+      var d = document.getElementById('diff'); d.textContent = 'R$ 0,00'; d.className = 'pos';
+      document.querySelector('.recon > div:nth-child(2) strong').textContent = 'R$ 772,99';
+      Proto.toast(msg, { undo: function () { location.reload(); } });
+    }
+    document.getElementById('dinheiro').addEventListener('click', function () { resolve('Loteria movida pra conta Dinheiro.'); });
+    document.getElementById('excluir').addEventListener('click', function () { resolve('Loteria excluída.'); });
+    document.getElementById('concluir').addEventListener('click', function () {
+      location.href = '03-movimentacoes.html?conta=principal&toast=' + encodeURIComponent('Importação concluída: 14 lançamentos, ' + (pend ? pend + ' a revisar' : 'tudo revisado'));
+    });
+    nota();
+  })();
+</script>
 </body>
 </html>

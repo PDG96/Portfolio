@@ -59,23 +59,29 @@
     ["patrimonio", "Patrimônio", "i-chart", "07-patrimonio.html"]
   ];
   var secondary = [
-    ["contas", "Contas e conexões", "i-bank", "#"],
+    ["contas", "Contas e conexões", "i-bank", "07-patrimonio.html#contas"],
     ["importar", "Importar e conciliar", "i-upload", "06-importar-conciliar.html"],
-    ["categorias", "Categorias e regras", "i-tag", "#"],
-    ["alertas", "Alertas", "i-bell", "#"]
+    ["categorias", "Categorias e regras", "i-tag", "#categorias"],
+    ["alertas", "Alertas", "i-bell", "#alertas"]
   ];
 
   function icon(id, cls) { return '<svg class="icon ' + (cls || "") + '" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
+  function extra(n) {
+    if (n[3] === "#alertas") return ' aria-label="Alertas"';
+    if (n[3] === "#categorias") return ' data-toast="Categorias e regras: tela da v2. As regras já aparecem no detalhe de cada lançamento."';
+    if (n[3] === "#") return ' data-toast="Configurações: tela da v2."';
+    return "";
+  }
   function item(n) {
     var cur = n[0] === page ? ' aria-current="page"' : "";
-    return '<a class="nav-item" href="' + n[3] + '"' + cur + '>' + icon(n[2]) + '<span>' + n[1] + '</span></a>';
+    return '<a class="nav-item" href="' + n[3] + '"' + cur + extra(n) + '>' + icon(n[2]) + '<span>' + n[1] + '</span></a>';
   }
 
   var sidebar = '<aside class="sidebar"><a class="brand" href="01-inicio.html"><span class="mark">' + icon("i-wallet", "sm") + '</span><span>finapp</span></a>'
     + '<nav aria-label="Principal" class="nav-section"><div class="nav-label">Navegação</div>' + nav.map(item).join("") + '</nav>'
     + '<nav aria-label="Secundária" class="nav-section"><div class="nav-label">Dados</div>' + secondary.map(item).join("") + '</nav>'
     + '<div class="spacer"></div>'
-    + '<nav aria-label="Conta" class="nav-section"><a class="nav-item" href="#">' + icon("i-settings") + '<span>Configurações</span></a></nav>'
+    + '<nav aria-label="Conta" class="nav-section"><a class="nav-item" href="#" data-toast="Configurações: tela da v2.">' + icon("i-settings") + '<span>Configurações</span></a></nav>'
     + '<div class="account"><div class="avatar" aria-hidden="true">MG</div><div><div class="type-14-semibold">Minha conta</div><div class="muted type-12-medium">Plano pessoal</div></div></div>'
     + '</aside>';
 
@@ -99,7 +105,7 @@
     + '<div class="sheet-header"><h2 id="more-title">Mais</h2><button class="btn btn-tertiary btn-icon btn-sm" type="button" data-close-more aria-label="Fechar">' + icon("i-x") + '</button></div>'
     + '<div class="list more-list">' + moreItems.map(function (n) {
         var cur = n[0] === page ? ' aria-current="page"' : "";
-        return '<a class="row" href="' + n[3] + '"' + cur + '><div class="ic">' + icon(n[2]) + '</div><div class="t"><strong>' + n[1] + '</strong></div><div class="v">' + icon("i-chevron-right", "sm") + '</div></a>';
+        return '<a class="row" href="' + n[3] + '"' + cur + extra(n) + '><div class="ic">' + icon(n[2]) + '</div><div class="t"><strong>' + n[1] + '</strong></div><div class="v">' + icon("i-chevron-right", "sm") + '</div></a>';
       }).join("") + '</div></div></div>';
 
   var shell = document.querySelector(".shell");
@@ -125,10 +131,19 @@
     var cur = { m: 8, y: 2026 };
     var parts = labels[0].textContent.trim().split(" ");
     if (parts.length === 2 && MESES.indexOf(parts[0]) > -1) { cur.m = MESES.indexOf(parts[0]); cur.y = Number(parts[1]); }
+    var main = document.querySelector(".main");
+    var note = document.createElement("div");
+    note.className = "month-note";
+    note.setAttribute("role", "status");
+    note.hidden = true;
+    if (main) main.insertBefore(note, main.querySelector(".topbar") ? main.querySelector(".topbar").nextSibling : main.firstChild);
     function paint() {
       var txt = MESES[cur.m] + " " + cur.y;
       labels.forEach(function (l) { l.textContent = txt; });
-      document.body.classList.toggle("month-is-current", cur.m === 8 && cur.y === 2026);
+      var isCur = cur.m === 8 && cur.y === 2026;
+      document.body.classList.toggle("month-is-current", isCur);
+      note.hidden = isCur;
+      note.innerHTML = '<strong>' + txt + ' ainda não tem dados.</strong> Este é um mockup: só setembro de 2026 tem dados fictícios. Os números abaixo continuam sendo os de setembro.';
     }
     document.querySelectorAll(".month-nav button").forEach(function (b) {
       var dir = /anterior/i.test(b.getAttribute("aria-label") || "") ? -1 : 1;

@@ -46,7 +46,7 @@
         <span class="label">Setembro 2026</span>
         <button class="btn btn-tertiary btn-icon btn-sm" aria-label="Próximo mês"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
       </div>
-      <button class="btn btn-tertiary btn-icon" aria-label="Ver como calendário"><svg class="icon"><use href="#i-calendar"/></svg></button>
+      <button class="btn btn-tertiary btn-icon" aria-label="Ver como calendário" id="btn-cal" aria-pressed="false"><svg class="icon"><use href="#i-calendar"/></svg></button>
     </header>
 
     <div class="page-header hide-mobile-title">
@@ -60,28 +60,32 @@
           <span class="label">Setembro 2026</span>
           <button class="btn btn-secondary btn-icon btn-sm" aria-label="Próximo mês"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
         </div>
-        <div class="seg" role="tablist" aria-label="Visualização">
-          <button type="button" role="tab" aria-selected="true">Lista</button>
-          <button type="button" role="tab" aria-selected="false">Calendário</button>
+        <div class="seg" role="tablist" aria-label="Visualização" id="view-seg">
+          <button type="button" role="tab" aria-selected="true" data-value="lista">Lista</button>
+          <button type="button" role="tab" aria-selected="false" data-value="calendario">Calendário</button>
         </div>
-        <button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Novo compromisso</button>
+        <button class="btn btn-primary" type="button" id="novo-comp"><svg class="icon"><use href="#i-plus"/></svg>Novo compromisso</button>
       </div>
     </div>
 
     <div class="stack">
       <div class="seg seg-block" role="tablist" aria-label="Sentido">
-        <button type="button" role="tab" aria-selected="true">A pagar</button>
-        <button type="button" role="tab" aria-selected="false">A receber</button>
-        <button type="button" role="tab" aria-selected="false">Todos</button>
+        <button type="button" role="tab" aria-selected="true" data-value="pagar">A pagar</button>
+        <button type="button" role="tab" aria-selected="false" data-value="receber">A receber</button>
+        <button type="button" role="tab" aria-selected="false" data-value="todos">Todos</button>
       </div>
 
       <div class="summary num">
-        <div class="card kpi"><div class="kpi-label">Previsto no mês</div><div class="kpi-value">R$ 2.026,78</div></div>
-        <div class="card kpi"><div class="kpi-label">Já pago</div><div class="kpi-value">R$ 896,78</div></div>
-        <div class="card kpi"><div class="kpi-label">Falta pagar</div><div class="kpi-value">R$ 1.130,00</div></div>
+        <div class="card kpi"><div class="kpi-label">Previsto no mês</div><div class="kpi-value" id="k-prev">R$ 2.026,78</div></div>
+        <div class="card kpi"><div class="kpi-label">Já pago</div><div class="kpi-value pos" id="k-pago">R$ 896,78</div></div>
+        <div class="card kpi"><div class="kpi-label">Falta pagar</div><div class="kpi-value neg" id="k-falta">R$ 1.130,00</div></div>
       </div>
 
-      <section class="card" aria-labelledby="h-mes">
+      <section class="card sec-pagar" aria-label="Calendário de setembro" id="cal-mes" hidden>
+        <div class="card-header"><div><h2>Setembro, no calendário</h2><p>Toque num dia pra ver o que vence</p></div></div>
+        <div class="card-body"><div class="cal" id="cal"></div></div>
+      </section>
+      <section class="card sec-pagar" aria-labelledby="h-mes" id="lista-mes">
         <div class="card-header">
           <div><h2 id="h-mes">Setembro, por vencimento</h2><p>12 compromissos · 6 pagos</p></div>
         </div>
@@ -119,45 +123,45 @@
 
           <div class="row has-actions">
             <div class="ic day">20<small>dom</small></div>
-            <div class="t"><strong>Luz</strong><span>Amanhã · valor varia, média R$ 160 <span class="badge badge-outline-strong"><span class="dot"></span>Vence amanhã</span></span></div>
+            <div class="t"><strong>Luz</strong><span>Amanhã · valor varia, média R$ 160 <span class="badge badge-neg"><span class="dot"></span>Vence amanhã</span></span></div>
             <div class="v out num">R$ 168,40</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button" data-ver>Ver</button><button class="btn btn-primary btn-sm" type="button" data-pagar>Pagar</button></div>
           </div>
           <div class="row has-actions">
             <div class="ic day">22<small>ter</small></div>
             <div class="t"><strong>Internet</strong><span>Fixo · conta principal <span class="badge"><span class="dot"></span>Previsto</span></span></div>
             <div class="v out num">R$ 99,90</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button" data-ver>Ver</button><button class="btn btn-primary btn-sm" type="button" data-pagar>Pagar</button></div>
           </div>
           <div class="row has-actions">
             <div class="ic day">24<small>qui</small></div>
             <div class="t"><strong>Fatura do cartão</strong><span>Fecha dia 24, vence dia 30 · 3 parcelamentos dentro <span class="badge"><span class="dot"></span>Previsto</span></span></div>
             <div class="v out num">R$ 556,23</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm" type="button">Ver fatura</button></div>
+            <div class="actions"><a class="btn btn-secondary btn-sm" href="03-movimentacoes.html?conta=cartao">Ver fatura</a></div>
           </div>
           <div class="row has-actions">
             <div class="ic day">25<small>sex</small></div>
             <div class="t"><strong>Seguro do carro</strong><span>Parcela 7 de 12 · conta principal <span class="badge"><span class="dot"></span>Previsto</span></span></div>
             <div class="v out num">R$ 101,35</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button" data-ver>Ver</button><button class="btn btn-primary btn-sm" type="button" data-pagar>Pagar</button></div>
           </div>
           <div class="row has-actions">
             <div class="ic day">26<small>sáb</small></div>
             <div class="t"><strong>Água</strong><span>Valor varia, média R$ 62 <span class="badge"><span class="dot"></span>Previsto</span></span></div>
             <div class="v out num">R$ 61,74</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button" data-ver>Ver</button><button class="btn btn-primary btn-sm" type="button" data-pagar>Pagar</button></div>
           </div>
           <div class="row has-actions">
             <div class="ic day">28<small>seg</small></div>
             <div class="t"><strong>Streaming</strong><span>Fixo · cartão de crédito <span class="badge"><span class="dot"></span>Previsto</span></span></div>
             <div class="v out num">R$ 142,38</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button" data-ver>Ver</button><button class="btn btn-primary btn-sm" type="button" data-pagar>Pagar</button></div>
           </div>
         </div>
       </section>
 
-      <div class="section-title"><h2>Parcelamentos</h2><span class="muted num">R$ 174,42 por mês em 3 parcelamentos · R$ 1.311,08 a quitar</span></div>
-      <section class="card" aria-label="Parcelamentos ativos">
+      <div class="section-title sec-pagar"><h2>Parcelamentos</h2><span class="muted num">R$ 174,42 por mês em 3 parcelamentos · R$ 1.311,08 a quitar</span></div>
+      <section class="card sec-pagar" aria-label="Parcelamentos ativos">
         <div class="plan">
           <div class="ic"><svg class="icon"><use href="#i-pill"/></svg></div>
           <div class="t"><strong>Farmácia</strong><span class="muted">Cartão de crédito · parcela 2 de 6 · termina em janeiro</span><div class="progress" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" aria-label="2 de 6 parcelas pagas"><span style="width:33%"></span></div></div>
@@ -175,14 +179,14 @@
         </div>
       </section>
 
-      <div class="section-title" id="receber"><h2>A receber</h2><span class="muted num">R$ 3.650,00 previstos · R$ 500,00 recebidos</span></div>
-      <section class="card" aria-label="A receber neste mês">
+      <div class="section-title sec-receber" id="receber"><h2>A receber</h2><span class="muted num">R$ 3.650,00 previstos · R$ 500,00 recebidos</span></div>
+      <section class="card sec-receber" aria-label="A receber neste mês">
         <div class="list">
           <div class="row has-actions">
             <div class="ic day">10<small>qui</small></div>
             <div class="t"><strong>Venda do carro · parcela 4 de 10</strong><span>Venceu dia 10 · 9 dias de atraso <span class="badge badge-late"><span class="dot"></span>Atrasado</span></span></div>
             <div class="v in num">R$ 1.950,00</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button" data-open="sheet-receber">Registrar recebimento</button></div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button" data-ver>Ver</button><button class="btn btn-primary btn-sm" type="button" data-receber="Venda do carro · parcela 4 de 10" data-valor="1.950,00" data-parcial="1.460,00">Registrar recebimento</button></div>
           </div>
           <div class="row has-actions done">
             <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
@@ -193,7 +197,7 @@
             <div class="ic day">25<small>sex</small></div>
             <div class="t"><strong>Aluguel</strong><span>Mensal · conta secundária <span class="badge"><span class="dot"></span>Previsto</span></span></div>
             <div class="v in num">R$ 1.200,00</div>
-            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Registrar recebimento</button></div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button" data-ver>Ver</button><button class="btn btn-primary btn-sm" type="button" data-receber="Aluguel" data-valor="1.200,00">Registrar recebimento</button></div>
           </div>
         </div>
       </section>
@@ -201,71 +205,123 @@
   </main>
 </div>
 
-<!-- Sheet: recebimento parcial -->
-<div class="overlay" id="sheet-receber" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-receber-title">
-  <div class="sheet">
-    <div class="sheet-header">
-      <h2 id="sheet-receber-title">Registrar recebimento</h2>
-      <button class="btn btn-tertiary btn-icon btn-sm" type="button" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
-    </div>
-    <form class="sheet-body" id="form-receber">
-      <p class="muted">Venda do carro · parcela 4 de 10 · previsto R$ 1.950,00</p>
-      <div class="field">
-        <label for="rc-valor">Valor recebido</label>
-        <input class="input num" id="rc-valor" type="text" inputmode="decimal" value="R$ 1.460,00">
-        <span class="hint">Se for menos que o previsto, a parcela fica como parcial e o restante continua em aberto.</span>
-      </div>
-      <div class="partial-info num" aria-live="polite">
-        <div><span>Recebido</span><strong>R$ 1.460,00</strong></div>
-        <div><span>Fica em aberto</span><strong>R$ 490,00</strong></div>
-        <div><span>Saldo devedor total</span><strong>R$ 12.190,00</strong></div>
-      </div>
-      <div class="grid grid-2" style="gap:var(--space-16)">
-        <div class="field">
-          <label for="rc-data">Data</label>
-          <input class="input" id="rc-data" type="date" value="2026-09-19">
-        </div>
-        <div class="field">
-          <label for="rc-conta">Entrou em</label>
-          <select class="input" id="rc-conta"><option>Conta principal</option><option>Conta secundária</option><option>Dinheiro</option></select>
-        </div>
-      </div>
-      <div class="field">
-        <label for="rc-obs">Observação (opcional)</label>
-        <input class="input" id="rc-obs" type="text" placeholder="Ex.: combinou pagar o resto dia 30">
-      </div>
-    </form>
-    <div class="sheet-footer">
-      <button class="btn btn-secondary" type="button" data-close>Cancelar</button>
-      <button class="btn btn-primary" type="submit" form="form-receber">Confirmar recebimento</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast" hidden role="status">Recebimento registrado: R$ 1.460,00, faltam R$ 490,00 <button type="button" data-undo>Desfazer</button></div>
 
 <script src="shell.js"></script>
+<script src="proto.js"></script>
 <script>
   (function () {
-    var sheet = document.getElementById('sheet-receber');
-    var toast = document.getElementById('toast');
-    var opener = null;
-    function open() { opener = document.activeElement; sheet.hidden = false; document.getElementById('rc-valor').focus(); }
-    function close() { sheet.hidden = true; if (opener) opener.focus(); }
-    document.querySelectorAll('[data-open="sheet-receber"]').forEach(function (b) { b.addEventListener('click', open); });
-    sheet.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', close); });
-    sheet.addEventListener('click', function (e) { if (e.target === sheet) close(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hidden) close(); });
-    document.getElementById('form-receber').addEventListener('submit', function (e) {
-      e.preventDefault(); close(); toast.hidden = false;
-      var row = opener.closest('.row');
-      row.querySelector('.t span').innerHTML = 'Recebido R$ 1.460,00 dia 19 · faltam R$ 490,00 <span class="badge badge-outline-strong"><span class="dot"></span>Parcial</span>';
-      row.querySelector('[data-open]').textContent = 'Registrar o restante';
-      setTimeout(function () { toast.hidden = true; }, 6000);
+    var fmt = function (v) { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); };
+    // ---- Segmented: sentido ----
+    document.querySelector('.seg-block').addEventListener('tabchange', function (e) {
+      var v = e.detail.value;
+      document.querySelectorAll('.sec-pagar').forEach(function (el) { el.hidden = (v === 'receber') || (el.id === 'cal-mes' && !calOn) || (el.id === 'lista-mes' && calOn); });
+      document.querySelectorAll('.sec-receber').forEach(function (el) { el.hidden = v === 'pagar'; });
+      var k = document.querySelectorAll('.summary .kpi-label');
+      if (v === 'receber') { k[0].textContent = 'Previsto a receber'; document.getElementById('k-prev').textContent = 'R$ 3.650,00'; k[1].textContent = 'Já recebido'; document.getElementById('k-pago').textContent = 'R$ 500,00'; k[2].textContent = 'Falta receber'; document.getElementById('k-falta').textContent = 'R$ 3.150,00'; document.getElementById('k-falta').className = 'kpi-value pos'; }
+      else { k[0].textContent = 'Previsto no mês'; document.getElementById('k-prev').textContent = fmt(prev); k[1].textContent = 'Já pago'; document.getElementById('k-pago').textContent = fmt(pago); k[2].textContent = 'Falta pagar'; document.getElementById('k-falta').textContent = fmt(prev - pago); document.getElementById('k-falta').className = 'kpi-value neg'; }
     });
-    toast.querySelector('[data-undo]').addEventListener('click', function () { location.reload(); });
-    document.querySelectorAll('.seg [role="tab"]').forEach(function (t) {
-      t.addEventListener('click', function () { t.parentElement.querySelectorAll('[role="tab"]').forEach(function (x) { x.setAttribute('aria-selected', 'false'); }); t.setAttribute('aria-selected', 'true'); });
+    if (location.hash === '#receber') { document.querySelector('[data-value="receber"]').click(); }
+    // ---- Lista / Calendário ----
+    var calOn = false;
+    function setCal(on) {
+      calOn = on; document.getElementById('cal-mes').hidden = !on; document.getElementById('lista-mes').hidden = on;
+      var bc = document.getElementById('btn-cal'); if (bc) bc.setAttribute('aria-pressed', on);
+      var seg = document.getElementById('view-seg'); seg.querySelectorAll('[role="tab"]').forEach(function (t) { t.setAttribute('aria-selected', (t.dataset.value === 'calendario') === on); });
+      if (on) buildCal();
+    }
+    document.getElementById('view-seg').addEventListener('tabchange', function (e) { setCal(e.detail.value === 'calendario'); });
+    var bc = document.getElementById('btn-cal'); if (bc) bc.addEventListener('click', function () { setCal(!calOn); });
+    function buildCal() {
+      var cal = document.getElementById('cal'); cal.innerHTML = '';
+      ['D','S','T','Q','Q','S','S'].forEach(function (d) { cal.insertAdjacentHTML('beforeend', '<div class="dow">' + d + '</div>'); });
+      var first = 2; // 1 de setembro de 2026 é terça
+      for (var i = 0; i < first; i++) cal.insertAdjacentHTML('beforeend', '<div class="day pad"></div>');
+      var evs = {};
+      document.querySelectorAll('#lista-mes .row, .sec-receber .row').forEach(function (r) {
+        var day = r.querySelector('.ic.day'); var name = r.querySelector('.t strong').textContent; var val = r.querySelector('.v').textContent.trim();
+        var d = day && day.firstChild && /\d/.test(day.firstChild.textContent) ? Number(day.firstChild.textContent) : Number((r.querySelector('.t span').textContent.match(/dia (\d+)/) || [0, 0])[1]);
+        var cls = r.classList.contains('done') ? 'paid' : (r.querySelector('.badge-late') ? 'late' : (r.querySelector('.v.in') ? 'in' : ''));
+        (evs[d] = evs[d] || []).push({ n: name, v: val, c: cls });
+      });
+      for (var d = 1; d <= 30; d++) {
+        var list = (evs[d] || []).map(function (e) { return '<span class="ev ' + e.c + '" title="' + e.n + ' ' + e.v + '">' + e.n.split(' · ')[0] + '</span>'; }).join('');
+        cal.insertAdjacentHTML('beforeend', '<button type="button" class="day' + (d === 19 ? ' today' : '') + '" data-day="' + d + '"><span class="n">' + d + '</span>' + list + '</button>');
+      }
+      cal.querySelectorAll('.day[data-day]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var d = Number(b.dataset.day), items = evs[d] || [];
+          Proto.openSheet({ title: 'Dia ' + d + ' de setembro', secondary: 'Fechar', body: items.length ? '<div class="list" style="margin:0 calc(-1 * var(--space-24))">' + items.map(function (e) { return '<div class="row"><div class="ic"><svg class="icon"><use href="#i-calendar"/></svg></div><div class="t"><strong>' + e.n + '</strong><span>' + (e.c === 'paid' ? 'Pago' : e.c === 'late' ? 'Atrasado' : e.c === 'in' ? 'A receber' : 'Previsto') + '</span></div><div class="v num ' + (e.c === 'in' ? 'in' : '') + '">' + e.v + '</div></div>'; }).join('') + '</div>' : '<p class="muted">Nada vence neste dia.</p>' });
+        });
+      });
+    }
+    // ---- Pagar ----
+    var prev = 2026.78, pago = 896.78;
+    document.querySelectorAll('[data-pagar]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var row = b.closest('.row'), name = row.querySelector('.t strong').textContent, val = Proto.parse(row.querySelector('.v').textContent);
+        Proto.openSheet({ title: 'Marcar ' + name + ' como pago', primary: 'Confirmar pagamento', body:
+          '<div class="field"><label for="pg-valor">Valor pago</label><input class="input num" id="pg-valor" inputmode="decimal" value="R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + '"><span class="hint">Previsto: ' + fmt(val) + '. Ajuste se pagou outro valor.</span></div>'
+          + '<div class="grid grid-2" style="gap:var(--space-16)"><div class="field"><label for="pg-data">Data do pagamento</label><input class="input" id="pg-data" type="date" value="2026-09-19"></div><div class="field"><label for="pg-conta">Conta</label><select class="input" id="pg-conta"><option>Conta principal</option><option>Conta secundária</option><option>Dinheiro</option></select></div></div>'
+          + '<label class="check"><input type="checkbox" checked> Usar esses valores nos próximos meses</label>',
+          onSubmit: function (f) {
+            var paid = Proto.parse(f.querySelector('#pg-valor').value);
+            row.classList.add('done'); row.querySelector('.ic').className = 'ic day done'; row.querySelector('.ic').innerHTML = '<svg class="icon sm"><use href="#i-check"/></svg>';
+            row.querySelector('.t span').innerHTML = 'Pago hoje' + (paid !== val ? ' · ' + fmt(val) + ' previstos' : '') + ' <span class="badge badge-paid"><span class="dot"></span>Pago</span>';
+            row.querySelector('.v').firstChild.textContent = 'R$ ' + paid.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+            row.querySelector('.actions').remove();
+            pago += paid; prev += (paid - val);
+            document.getElementById('k-pago').textContent = fmt(pago); document.getElementById('k-falta').textContent = fmt(prev - pago); document.getElementById('k-prev').textContent = fmt(prev);
+            var n = document.querySelectorAll('#lista-mes .row.done').length; document.querySelector('#h-mes + p').textContent = '12 compromissos · ' + n + ' pagos';
+            Proto.toast(name + ' marcado como pago, ' + fmt(paid), { undo: function () { location.reload(); } });
+          } });
+      });
+    });
+    // ---- Ver: detalhe com histórico ----
+    document.querySelectorAll('[data-ver]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var row = b.closest('.row'), name = row.querySelector('.t strong').textContent, val = Proto.parse(row.querySelector('.v').textContent);
+        var hist = ['Ago', 'Jul', 'Jun', 'Mai', 'Abr', 'Mar'].map(function (m, i) { var v = val * (1 + (Math.sin(i * 1.7) * 0.08)); return '<div class="row"><div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div><div class="t"><strong>' + m + ' 2026</strong><span>Pago dia ' + (18 + (i % 3)) + '</span></div><div class="v num">' + fmt(v) + '</div></div>'; }).join('');
+        Proto.openSheet({ title: name, secondary: 'Fechar', primary: 'Editar compromisso', body:
+          '<dl style="margin:0"><div class="kv"><dt>Recorrência</dt><dd>Mensal, dia ' + (row.querySelector('.ic.day') && /\d/.test(row.querySelector('.ic.day').firstChild.textContent) ? row.querySelector('.ic.day').firstChild.textContent : '10') + '</dd></div><div class="kv"><dt>Valor previsto</dt><dd>' + fmt(val) + '</dd></div><div class="kv"><dt>Conta padrão</dt><dd>Conta principal</dd></div><div class="kv"><dt>Lembrete</dt><dd>3 dias antes</dd></div></dl>'
+          + '<div><span class="type-14-medium muted">Últimos meses</span><div class="list" style="margin:var(--space-8) calc(-1 * var(--space-24)) 0;border-top:1px solid var(--border-default)">' + hist + '</div></div>',
+          onSubmit: function () { Proto.toast('Edição do compromisso: fluxo da v2.'); } });
+      });
+    });
+    // ---- Receber ----
+    document.querySelectorAll('[data-receber]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var row = b.closest('.row'), name = b.dataset.receber, val = Proto.parse(b.dataset.valor), sug = b.dataset.parcial || b.dataset.valor;
+        var o = Proto.openSheet({ title: 'Registrar recebimento', primary: 'Confirmar recebimento', body:
+          '<p class="muted">' + name + ' · previsto ' + fmt(val) + '</p>'
+          + '<div class="field"><label for="rc-valor">Valor recebido</label><input class="input num" id="rc-valor" inputmode="decimal" value="R$ ' + sug + '"><span class="hint">Se for menos que o previsto, a parcela fica como parcial e o restante continua em aberto.</span></div>'
+          + '<div class="partial-info num" aria-live="polite"><div><span>Recebido</span><strong id="pi-rec"></strong></div><div><span>Fica em aberto</span><strong id="pi-aberto"></strong></div></div>'
+          + '<div class="grid grid-2" style="gap:var(--space-16)"><div class="field"><label for="rc-data">Data</label><input class="input" id="rc-data" type="date" value="2026-09-19"></div><div class="field"><label for="rc-conta">Entrou em</label><select class="input" id="rc-conta"><option>Conta principal</option><option>Conta secundária</option><option>Dinheiro</option></select></div></div>',
+          onSubmit: function (f) {
+            var got = Proto.parse(f.querySelector('#rc-valor').value), rest = Math.max(0, val - got);
+            if (rest > 0) { row.querySelector('.t span').innerHTML = 'Recebido ' + fmt(got) + ' dia 19 · faltam ' + fmt(rest) + ' <span class="badge badge-outline-strong"><span class="dot"></span>Parcial</span>'; b.textContent = 'Registrar o restante'; b.dataset.valor = rest.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); delete b.dataset.parcial; }
+            else { row.classList.add('done'); row.querySelector('.ic').className = 'ic day done'; row.querySelector('.ic').innerHTML = '<svg class="icon sm"><use href="#i-check"/></svg>'; row.querySelector('.t span').innerHTML = 'Recebido dia 19 <span class="badge badge-paid"><span class="dot"></span>Recebido</span>'; row.querySelector('.actions').remove(); }
+            Proto.toast('Recebimento registrado: ' + fmt(got) + (rest > 0 ? ', faltam ' + fmt(rest) : ''), { undo: function () { location.reload(); } });
+          } });
+        var inp = o.querySelector('#rc-valor');
+        function upd() { var g = Proto.parse(inp.value); o.querySelector('#pi-rec').textContent = fmt(g); o.querySelector('#pi-aberto').textContent = fmt(Math.max(0, val - g)); }
+        inp.addEventListener('input', upd); upd();
+      });
+    });
+    // ---- Novo compromisso ----
+    var nc = document.getElementById('novo-comp');
+    if (nc) nc.addEventListener('click', function () {
+      Proto.openSheet({ title: 'Novo compromisso', primary: 'Criar compromisso', body:
+        '<div class="seg seg-block" role="tablist" aria-label="Sentido"><button type="button" role="tab" aria-selected="true">A pagar</button><button type="button" role="tab" aria-selected="false">A receber</button></div>'
+        + '<div class="field"><label for="nc-nome">Nome</label><input class="input" id="nc-nome" placeholder="Ex.: Academia"></div>'
+        + '<div class="grid grid-2" style="gap:var(--space-16)"><div class="field"><label for="nc-val">Valor previsto</label><input class="input num" id="nc-val" inputmode="decimal" placeholder="0,00"></div><div class="field"><label for="nc-dia">Vence dia</label><input class="input num" id="nc-dia" inputmode="numeric" value="10"></div></div>'
+        + '<div class="field"><label for="nc-rec">Recorrência</label><select class="input" id="nc-rec"><option>Mensal, sem fim</option><option>Mensal, por 12 vezes</option><option>Anual</option><option>Só uma vez</option></select></div>'
+        + '<div class="field"><label for="nc-cat">Categoria</label><select class="input" id="nc-cat"><option>Moradia e utilidades</option><option>Assinaturas</option><option>Seguros e impostos</option><option>Outros</option></select></div>',
+        onSubmit: function (f) {
+          var name = f.querySelector('#nc-nome').value || 'Novo compromisso', val = Proto.parse(f.querySelector('#nc-val').value), dia = f.querySelector('#nc-dia').value || '10';
+          document.querySelector('#lista-mes .list').insertAdjacentHTML('beforeend', '<div class="row has-actions"><div class="ic day">' + dia + '<small>set</small></div><div class="t"><strong>' + name + '</strong><span>' + f.querySelector('#nc-rec').value + ' <span class="badge"><span class="dot"></span>Previsto</span></span></div><div class="v out num">' + fmt(val) + '</div><div class="actions"><button class="btn btn-primary btn-sm" type="button" data-toast="Recarregue a página pra pagar compromissos novos (mock)">Pagar</button></div></div>');
+          prev += val; document.getElementById('k-prev').textContent = fmt(prev); document.getElementById('k-falta').textContent = fmt(prev - pago);
+          Proto.toast('Compromisso criado: ' + name + ', dia ' + dia);
+        } });
     });
   })();
 </script>

@@ -31,7 +31,7 @@
   <main class="main" id="main">
     <header class="topbar hide-desktop">
       <div class="page-title" aria-hidden="true">Patrimônio</div>
-      <button class="btn btn-tertiary btn-icon" aria-label="Mais ações"><svg class="icon"><use href="#i-more"/></svg></button>
+      <button class="btn btn-tertiary btn-icon" aria-label="Mais ações" id="mais"><svg class="icon"><use href="#i-more"/></svg></button>
     </header>
 
     <div class="page-header hide-mobile-title">
@@ -40,8 +40,8 @@
         <p class="page-sub">Tudo que você tem, menos o que deve. Calculado, não digitado.</p>
       </div>
       <div class="page-actions hide-mobile">
-        <button class="btn btn-secondary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Adicionar bem</button>
-        <button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Adicionar conta</button>
+        <button class="btn btn-secondary" type="button" id="add-bem"><svg class="icon"><use href="#i-plus"/></svg>Adicionar bem</button>
+        <button class="btn btn-primary" type="button" id="add-conta"><svg class="icon"><use href="#i-plus"/></svg>Adicionar conta</button>
       </div>
     </div>
 
@@ -50,13 +50,13 @@
         <div class="card-body" style="padding-bottom:0">
           <div class="hstack between">
             <div>
-              <div class="kpi-label" id="h-pat">Patrimônio hoje <span class="badge"><svg class="icon sm"><use href="#i-arrow-up-right"/></svg>+ R$ 620,00 em 30 dias</span></div>
+              <div class="kpi-label" id="h-pat">Patrimônio hoje <span class="badge badge-pos" id="delta"><svg class="icon sm"><use href="#i-arrow-up-right"/></svg>+ R$ 620,00 em 30 dias</span></div>
               <div class="kpi-value num" style="font-size:var(--font-size-36)">R$ 15.339,26</div>
             </div>
             <div class="tabs range" role="tablist" aria-label="Período">
-              <button class="tab" role="tab" aria-selected="false">6 meses</button>
-              <button class="tab" role="tab" aria-selected="true">12 meses</button>
-              <button class="tab" role="tab" aria-selected="false">Tudo</button>
+              <button class="tab" role="tab" aria-selected="false" data-value="6">6 meses</button>
+              <button class="tab" role="tab" aria-selected="true" data-value="12">12 meses</button>
+              <button class="tab" role="tab" aria-selected="false" data-value="all">Tudo</button>
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@
       <div class="comp num">
         <div class="card kpi"><div class="kpi-label">Em conta e dinheiro</div><div class="kpi-value">R$ 3.495,49</div></div>
         <div class="card kpi"><div class="kpi-label">Investido</div><div class="kpi-value">R$ 12.400,00</div></div>
-        <div class="card kpi"><div class="kpi-label">Dívidas de curto prazo</div><div class="kpi-value">− R$ 556,23</div></div>
+        <div class="card kpi"><div class="kpi-label">Dívidas de curto prazo</div><div class="kpi-value neg">− R$ 556,23</div></div>
       </div>
 
       <section class="card card-body" aria-label="Composição">
@@ -90,38 +90,43 @@
         <div class="legend" style="margin-top:var(--space-12)"><span><i></i>Investido 78%</span><span><i style="background:var(--color-gray-400)"></i>Conta e dinheiro 22%</span></div>
       </section>
 
-      <div class="section-title"><h2>Contas e investimentos</h2><a class="card-link" href="#">Gerenciar<svg class="icon sm"><use href="#i-arrow-right"/></svg></a></div>
+      <div class="section-title" id="contas"><h2>Contas e investimentos</h2><button class="card-link" type="button" id="gerenciar">Gerenciar<svg class="icon sm"><use href="#i-arrow-right"/></svg></button></div>
       <section class="card" aria-label="Contas">
         <div class="list num">
           <a class="row" href="03-movimentacoes.html"><div class="ic"><svg class="icon"><use href="#i-bank"/></svg></div><div class="t"><strong>Conta principal</strong><span>Conectada · sincronizada hoje</span></div><div class="v">R$ 772,99</div></a>
           <a class="row" href="03-movimentacoes.html"><div class="ic"><svg class="icon"><use href="#i-bank"/></svg></div><div class="t"><strong>Conta secundária</strong><span>Manual · conciliada dia 19</span></div><div class="v">R$ 2.422,50</div></a>
           <a class="row" href="03-movimentacoes.html"><div class="ic"><svg class="icon"><use href="#i-wallet"/></svg></div><div class="t"><strong>Dinheiro</strong><span>Em espécie</span></div><div class="v">R$ 300,00</div></a>
-          <a class="row" href="#"><div class="ic"><svg class="icon"><use href="#i-chart"/></svg></div><div class="t"><strong>CDB</strong><span>Manual · rendeu R$ 92,10 em agosto</span></div><div class="v">R$ 9.400,00</div></a>
-          <a class="row" href="#"><div class="ic"><svg class="icon"><use href="#i-chart"/></svg></div><div class="t"><strong>Previdência</strong><span>Manual · atualizado em julho</span></div><div class="v">R$ 3.000,00</div></a>
-          <a class="row" href="04-compromissos.html"><div class="ic"><svg class="icon"><use href="#i-card"/></svg></div><div class="t"><strong>Cartão de crédito</strong><span>Fatura atual · fecha dia 24</span></div><div class="v out">R$ 556,23</div></a>
+          <button class="row" type="button" data-inv="CDB" data-val="9.400,00"><div class="ic"><svg class="icon"><use href="#i-chart"/></svg></div><div class="t"><strong>CDB</strong><span>Manual · rendeu <span class="pos">+ R$ 92,10</span> em agosto</span></div><div class="v">R$ 9.400,00</div></button>
+          <button class="row" type="button" data-inv="Previdência" data-val="3.000,00"><div class="ic"><svg class="icon"><use href="#i-chart"/></svg></div><div class="t"><strong>Previdência</strong><span>Manual · atualizado em julho</span></div><div class="v">R$ 3.000,00</div></button>
+          <a class="row" href="04-compromissos.html"><div class="ic"><svg class="icon"><use href="#i-card"/></svg></div><div class="t"><strong>Cartão de crédito</strong><span>Fatura atual · fecha dia 24</span></div><div class="v out num">R$ 556,23</div></a>
         </div>
       </section>
 
       <div class="section-title"><h2>Bens</h2><span class="muted">Fora do patrimônio líquido, com valor estimado por você</span></div>
       <section class="card" aria-label="Bens">
         <div class="list num">
-          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-house"/></svg></div><div class="t"><strong>Casa</strong><span>Gera IPTU e seguro da casa · estimado em janeiro</span></div><div class="v">R$ 380.000,00</div><div class="actions"><button class="btn btn-secondary btn-sm" type="button">Atualizar valor</button></div></div>
-          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-car"/></svg></div><div class="t"><strong>Carro</strong><span>Gera imposto e seguro do carro · projeto Carro R$ 7.615 · estimado em abril</span></div><div class="v">R$ 28.000,00</div><div class="actions"><button class="btn btn-secondary btn-sm" type="button">Atualizar valor</button><button class="btn btn-secondary btn-sm" type="button">Vender</button></div></div>
-          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-car"/></svg></div><div class="t"><strong>Carro antigo</strong><span>Vendido em abril · R$ 12.190 a receber em 7 parcelas</span></div><div class="v"><span class="badge"><span class="dot"></span>Vendido</span></div><div class="actions"><a class="btn btn-secondary btn-sm" href="04-compromissos.html#receber">Ver recebíveis</a></div></div>
+          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-house"/></svg></div><div class="t"><strong>Casa</strong><span>Gera IPTU e seguro da casa · estimado em janeiro</span></div><div class="v">R$ 380.000,00</div><div class="actions"><button class="btn btn-secondary btn-sm" type="button" data-atualizar="Casa">Atualizar valor</button></div></div>
+          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-car"/></svg></div><div class="t"><strong>Carro</strong><span>Gera imposto e seguro do carro · projeto Carro R$ 7.615 · estimado em abril</span></div><div class="v">R$ 28.000,00</div><div class="actions"><button class="btn btn-secondary btn-sm" type="button" data-atualizar="Carro">Atualizar valor</button><button class="btn btn-secondary btn-sm" type="button" data-vender="Carro">Vender</button></div></div>
+          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-car"/></svg></div><div class="t"><strong>Carro antigo</strong><span>Vendido em abril · R$ 12.190 a receber em 7 parcelas</span></div><div class="v"><span class="badge badge-paid"><span class="dot"></span>Vendido</span></div><div class="actions"><a class="btn btn-secondary btn-sm" href="04-compromissos.html#receber">Ver recebíveis</a></div></div>
         </div>
       </section>
     </div>
   </main>
 </div>
 <script src="shell.js"></script>
+<script src="proto.js"></script>
 <script>
   (function () {
-    var months = ['Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set'];
-    var vals = [9800, 10100, 10900, 8600, 9000, 9500, 13200, 13100, 13600, 14400, 14719, 15339];
-    var events = { 3: 'Imposto do carro, R$ 1.800', 6: 'Venda do carro antigo, entrada R$ 5.000' };
+    var SETS = {
+      '6':   { months: ['Abr','Mai','Jun','Jul','Ago','Set'], vals: [13200, 13100, 13600, 14400, 14719, 15339], events: { 0: 'Venda do carro antigo, entrada R$ 5.000' }, years: function (i) { return ' 2026'; }, min: 12000, max: 16000, grid: [[16000,'R$ 16 mil'],[14000,'R$ 14 mil'],[12000,'R$ 12 mil']] },
+      '12':  { months: ['Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set'], vals: [9800, 10100, 10900, 8600, 9000, 9500, 13200, 13100, 13600, 14400, 14719, 15339], events: { 3: 'Imposto do carro, R$ 1.800', 6: 'Venda do carro antigo, entrada R$ 5.000' }, years: function (i) { return i < 3 ? ' 2025' : ' 2026'; }, min: 6000, max: 18000, grid: [[18000,'R$ 18 mil'],[12000,'R$ 12 mil'],[6000,'R$ 6 mil']] },
+      'all': { months: ['2022','2023','2024','2025','2026'], vals: [3100, 26300, 4200, 9800, 15339], events: { 1: 'Aplicação de R$ 20 mil', 2: 'Reforma e troca de carro' }, years: function () { return ''; }, min: 0, max: 30000, grid: [[30000,'R$ 30 mil'],[15000,'R$ 15 mil'],[0,'R$ 0']] }
+    };
+    var set = SETS['12'];
+    var months = set.months, vals = set.vals, events = set.events;
     var svg = document.getElementById('line'), tip = document.getElementById('tip'), cross = document.getElementById('cross'), dot = document.getElementById('dot'), wrap = document.getElementById('wrap');
     var xl = document.getElementById('xlabels'), ev = document.getElementById('events'), gridEl = svg.querySelector('.grid');
-    var W, H = 220, top = 20, bottom = 180, left, right, min = 6000, max = 18000;
+    var W, H = 220, top = 20, bottom = 180, left, right, min = set.min, max = set.max;
     function x(i) { return left + (right - left) * i / (vals.length - 1); }
     function y(v) { return bottom - (bottom - top) * (v - min) / (max - min); }
     function el(n, a) { var e = document.createElementNS('http://www.w3.org/2000/svg', n); for (var k in a) e.setAttribute(k, a[k]); return e; }
@@ -130,9 +135,10 @@
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
       gridEl.innerHTML = ''; xl.innerHTML = ''; ev.innerHTML = '';
       svg.querySelectorAll('text.y').forEach(function (t) { t.remove(); });
-      [[40, 'R$ 18 mil'], [100, 'R$ 12 mil'], [160, 'R$ 6 mil']].forEach(function (g) {
-        gridEl.appendChild(el('line', { x1: 0, x2: W, y1: g[0], y2: g[0] }));
-        var t = el('text', { x: 0, y: g[0] - 4, 'class': 'y' }); t.textContent = g[1]; svg.insertBefore(t, gridEl.nextSibling);
+      set.grid.forEach(function (g) {
+        var yy = y(g[0]);
+        gridEl.appendChild(el('line', { x1: 0, x2: W, y1: yy, y2: yy }));
+        var t = el('text', { x: 0, y: yy - 4, 'class': 'y' }); t.textContent = g[1]; svg.insertBefore(t, gridEl.nextSibling);
       });
       var d = vals.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(' ');
       document.getElementById('path').setAttribute('d', d);
@@ -144,6 +150,12 @@
       });
     }
     draw(); window.addEventListener('resize', draw);
+    document.querySelector('.range').addEventListener('tabchange', function (e) {
+      set = SETS[e.detail.value]; months = set.months; vals = set.vals; events = set.events; min = set.min; max = set.max; draw();
+      var first = vals[0], last = vals[vals.length - 1], d = last - first, badge = document.getElementById('delta');
+      badge.className = 'badge ' + (d >= 0 ? 'badge-pos' : 'badge-neg');
+      badge.innerHTML = '<svg class="icon sm"><use href="#' + (d >= 0 ? 'i-arrow-up-right' : 'i-arrow-down-right') + '"/></svg>' + (d >= 0 ? '+ ' : '− ') + 'R$ ' + Math.abs(d).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) + (e.detail.value === 'all' ? ' desde 2022' : ' em ' + e.detail.value + ' meses');
+    });
     function fmt(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
     function show(e) {
       var r = svg.getBoundingClientRect();
@@ -151,7 +163,7 @@
       var i = Math.round((px - left) / (right - left) * (vals.length - 1)); i = Math.max(0, Math.min(vals.length - 1, i));
       cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.style.display = '';
       dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(vals[i])); dot.style.display = '';
-      tip.innerHTML = '<strong class="num">' + fmt(vals[i]) + '</strong><span>' + months[i] + (i < 3 ? ' 2025' : ' 2026') + (events[i] ? ' · ' + events[i] : '') + '</span>';
+      tip.innerHTML = '<strong class="num">' + fmt(vals[i]) + '</strong><span>' + months[i] + set.years(i) + (events[i] ? ' · ' + events[i] : '') + '</span>';
       tip.hidden = false;
       var wr = wrap.getBoundingClientRect();
       var lx = r.left - wr.left + x(i) * r.width / W;
@@ -162,6 +174,80 @@
     svg.addEventListener('mousemove', show); svg.addEventListener('mouseleave', hide);
     svg.addEventListener('touchstart', function (e) { show(e.touches[0]); }, { passive: true });
     svg.addEventListener('touchmove', function (e) { show(e.touches[0]); }, { passive: true });
+
+    // ---- Ações ----
+    var brl = function (v) { return 'R$ ' + Math.abs(v).toLocaleString('pt-BR', { minimumFractionDigits: 2 }); };
+    document.querySelectorAll('[data-atualizar]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var row = b.closest('.row'), cur = row.querySelector('.v').textContent;
+        Proto.openSheet({ title: 'Atualizar valor de ' + b.dataset.atualizar, primary: 'Salvar valor', body:
+          '<div class="field"><label for="a-val">Valor estimado hoje</label><input class="input num" id="a-val" inputmode="decimal" value="' + cur.replace('R$ ', '') + '"><span class="hint">Antes: ' + cur + '. Entra no histórico, não muda o patrimônio líquido.</span></div>',
+          onSubmit: function (f) { row.querySelector('.v').textContent = brl(Proto.parse(f.querySelector('#a-val').value)); row.querySelector('.t span').textContent = row.querySelector('.t span').textContent.replace(/estimado em \w+/, 'estimado hoje'); Proto.toast(b.dataset.atualizar + ' atualizado'); } });
+      });
+    });
+    document.querySelectorAll('[data-vender]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var row = b.closest('.row');
+        var o = Proto.openSheet({ title: 'Vender ' + b.dataset.vender, primary: 'Registrar venda', body:
+          '<div class="grid grid-2" style="gap:var(--space-16)"><div class="field"><label for="v-val">Valor da venda</label><input class="input num" id="v-val" inputmode="decimal" value="28.000,00"></div><div class="field"><label for="v-ent">Entrada</label><input class="input num" id="v-ent" inputmode="decimal" value="8.000,00"></div></div>'
+          + '<div class="grid grid-2" style="gap:var(--space-16)"><div class="field"><label for="v-n">Parcelas</label><input class="input num" id="v-n" inputmode="numeric" value="10"></div><div class="field"><label for="v-quem">Comprador</label><input class="input" id="v-quem" placeholder="Nome"></div></div>'
+          + '<p class="hint" id="v-hint"></p>',
+          onSubmit: function (f) {
+            var v = Proto.parse(f.querySelector('#v-val').value), e = Proto.parse(f.querySelector('#v-ent').value), n = Number(f.querySelector('#v-n').value) || 1;
+            row.querySelector('.t span').textContent = 'Vendido hoje · ' + brl(v - e) + ' a receber em ' + n + ' parcelas'; row.querySelector('.v').innerHTML = '<span class="badge badge-paid"><span class="dot"></span>Vendido</span>';
+            row.querySelector('.actions').innerHTML = '<a class="btn btn-secondary btn-sm" href="04-compromissos.html#receber">Ver recebíveis</a>';
+            Proto.toast('Venda registrada: ' + n + ' parcelas de ' + brl((v - e) / n) + ' viraram compromissos a receber');
+          } });
+        function upd() { var v = Proto.parse(o.querySelector('#v-val').value), e = Proto.parse(o.querySelector('#v-ent').value), n = Number(o.querySelector('#v-n').value) || 1; o.querySelector('#v-hint').textContent = 'Cria ' + n + ' parcelas a receber de ' + brl((v - e) / n) + ' cada.'; }
+        o.querySelectorAll('input').forEach(function (i) { i.addEventListener('input', upd); }); upd();
+      });
+    });
+    document.querySelectorAll('[data-inv]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        Proto.openSheet({ title: b.dataset.inv, primary: 'Salvar posição', body:
+          '<div class="field"><label for="i-val">Posição atual</label><input class="input num" id="i-val" inputmode="decimal" value="' + b.dataset.val + '"><span class="hint">Conecte a corretora pra atualizar sozinho (v2).</span></div>'
+          + '<div class="field"><label for="i-mov">Registrar</label><select class="input" id="i-mov"><option>Só atualizar o valor</option><option>Aporte</option><option>Resgate</option></select></div>',
+          onSubmit: function (f) { b.querySelector('.v').textContent = brl(Proto.parse(f.querySelector('#i-val').value)); b.querySelector('.t span').textContent = 'Manual · atualizado hoje'; Proto.toast(b.dataset.inv + ' atualizado'); } });
+      });
+    });
+    function addConta() {
+      Proto.openSheet({ title: 'Adicionar conta', primary: 'Adicionar', body:
+        '<div class="field"><label for="c-nome">Nome</label><input class="input" id="c-nome" placeholder="Ex.: Conta salário"></div>'
+        + '<div class="grid grid-2" style="gap:var(--space-16)"><div class="field"><label for="c-tipo">Tipo</label><select class="input" id="c-tipo"><option>Conta corrente</option><option>Poupança</option><option>Investimento</option><option>Cartão de crédito</option><option>Carteira digital</option><option>Dinheiro</option></select></div><div class="field"><label for="c-saldo">Saldo hoje</label><input class="input num" id="c-saldo" inputmode="decimal" placeholder="0,00"></div></div>'
+        + '<label class="check"><input type="checkbox" checked> Incluir no patrimônio</label>'
+        + '<p class="hint">Conectar pelo Open Finance fica pra v2; por enquanto a conta é manual.</p>',
+        onSubmit: function (f) {
+          var n = f.querySelector('#c-nome').value || 'Nova conta', v = Proto.parse(f.querySelector('#c-saldo').value);
+          document.querySelector('.card[aria-label="Contas"] .list').insertAdjacentHTML('afterbegin', '<a class="row" href="03-movimentacoes.html"><div class="ic"><svg class="icon"><use href="#i-bank"/></svg></div><div class="t"><strong>' + n + '</strong><span>Manual · ' + f.querySelector('#c-tipo').value + '</span></div><div class="v">' + brl(v) + '</div></a>');
+          Proto.toast('Conta adicionada: ' + n);
+        } });
+    }
+    function addBem() {
+      Proto.openSheet({ title: 'Adicionar bem', primary: 'Adicionar', body:
+        '<div class="field"><label for="b-nome">Nome</label><input class="input" id="b-nome" placeholder="Ex.: Moto"></div>'
+        + '<div class="grid grid-2" style="gap:var(--space-16)"><div class="field"><label for="b-tipo">Tipo</label><select class="input" id="b-tipo"><option>Veículo</option><option>Imóvel</option><option>Outro</option></select></div><div class="field"><label for="b-val">Valor estimado</label><input class="input num" id="b-val" inputmode="decimal" placeholder="0,00"></div></div>'
+        + '<label class="check"><input type="checkbox" checked> Criar compromissos de imposto e seguro</label>',
+        onSubmit: function (f) {
+          var n = f.querySelector('#b-nome').value || 'Novo bem', v = Proto.parse(f.querySelector('#b-val').value);
+          document.querySelector('.card[aria-label="Bens"] .list').insertAdjacentHTML('afterbegin', '<div class="row has-actions"><div class="ic"><svg class="icon"><use href="#' + (f.querySelector('#b-tipo').value === 'Imóvel' ? 'i-house' : 'i-car') + '"/></svg></div><div class="t"><strong>' + n + '</strong><span>Estimado hoje</span></div><div class="v">' + brl(v) + '</div><div class="actions"><button class="btn btn-secondary btn-sm" type="button" data-toast="Recarregue pra editar bens novos (mock)">Atualizar valor</button></div></div>');
+          Proto.toast('Bem adicionado: ' + n);
+        } });
+    }
+    document.getElementById('add-conta').addEventListener('click', addConta);
+    document.getElementById('add-bem').addEventListener('click', addBem);
+    document.getElementById('gerenciar').addEventListener('click', function () {
+      Proto.openSheet({ title: 'Contas e conexões', secondary: 'Fechar', body:
+        '<div class="list" style="margin:0 calc(-1 * var(--space-24))">'
+        + '<div class="row"><div class="ic"><svg class="icon"><use href="#i-link"/></svg></div><div class="t"><strong>Conta principal</strong><span>Open Finance · consentimento válido até 12/03/2027</span></div><div class="v"><span class="badge badge-pos"><span class="dot"></span>Conectada</span></div></div>'
+        + '<div class="row"><div class="ic"><svg class="icon"><use href="#i-bank"/></svg></div><div class="t"><strong>Conta secundária</strong><span>Manual · importação por OFX</span></div><div class="v"><button class="btn btn-secondary btn-sm" type="button" data-toast="Conexão pelo Open Finance: v2">Conectar</button></div></div>'
+        + '<div class="row"><div class="ic"><svg class="icon"><use href="#i-card"/></svg></div><div class="t"><strong>Cartão de crédito</strong><span>Manual</span></div><div class="v"><button class="btn btn-secondary btn-sm" type="button" data-toast="Conexão pelo Open Finance: v2">Conectar</button></div></div>'
+        + '</div><label class="check"><input type="checkbox" checked> Ocultar movimentos automáticos de aplicação (Rende Fácil) dos relatórios</label>' });
+    });
+    var mais = document.getElementById('mais'); if (mais) mais.addEventListener('click', function () {
+      Proto.openSheet({ title: 'Patrimônio', secondary: 'Fechar', body: '<div class="stack" style="gap:var(--space-8)"><button class="btn btn-secondary btn-block" type="button" id="m-conta">Adicionar conta</button><button class="btn btn-secondary btn-block" type="button" id="m-bem">Adicionar bem</button></div>' });
+      document.getElementById('m-conta').addEventListener('click', function () { Proto.close('proto-sheet'); setTimeout(addConta, 50); });
+      document.getElementById('m-bem').addEventListener('click', function () { Proto.close('proto-sheet'); setTimeout(addBem, 50); });
+    });
   })();
 </script>
 </body>

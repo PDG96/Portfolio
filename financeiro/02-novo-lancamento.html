@@ -182,33 +182,73 @@
   </main>
 </div>
 
-<div class="toast" id="toast" hidden role="status">Lançamento salvo: Atacadista Central, R$ 141,41 <button type="button" data-undo>Desfazer</button></div>
 
 <script src="shell.js"></script>
+<script src="proto.js"></script>
 <script>
   (function () {
     var form = document.getElementById('form-novo');
-    var toast = document.getElementById('toast');
+    var valor = document.getElementById('valor'), desc = document.getElementById('desc');
+    var tipo = 'Despesa';
     function saved(keep) {
-      toast.hidden = false; setTimeout(function () { toast.hidden = true; }, 5000);
-      if (keep) { document.getElementById('valor').value = ''; document.getElementById('desc').value = ''; document.getElementById('valor').focus(); }
+      var v = valor.value || '0,00', d = desc.value || 'Sem descrição';
+      if (keep) {
+        Proto.toast('Salvo: ' + d + ', R$ ' + v + '. Conta e data mantidas.');
+        valor.value = ''; cents = 0; desc.value = ''; if (mobile.matches) render(); valor.focus();
+      } else {
+        location.href = '03-movimentacoes.html?toast=' + encodeURIComponent('Lançamento salvo: ' + d + ', R$ ' + v);
+      }
     }
     form.addEventListener('submit', function (e) { e.preventDefault(); saved(false); });
     document.getElementById('salvar-novo').addEventListener('click', function () { saved(true); });
     document.addEventListener('keydown', function (e) { if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); saved(true); } });
-    document.querySelectorAll('.sign [role="tab"]').forEach(function (t) {
-      t.addEventListener('click', function () { document.querySelectorAll('.sign [role="tab"]').forEach(function (x) { x.setAttribute('aria-selected', 'false'); }); t.setAttribute('aria-selected', 'true'); });
+    document.querySelector('.sign').addEventListener('tabchange', function (e) {
+      tipo = e.detail.value;
+      var cat = document.getElementById('cat'), conta = document.querySelector('label[for="conta"]');
+      if (tipo === 'Transferência') { cat.disabled = true; cat.closest('.field').style.opacity = '.5'; conta.textContent = 'De'; showPara(true); }
+      else { cat.disabled = false; cat.closest('.field').style.opacity = ''; conta.textContent = 'Conta'; showPara(false); }
+      if (tipo === 'Receita') { cat.innerHTML = '<option>Receita fixa</option><option>Aluguel</option><option>Venda de bem</option><option>Rendimentos</option><option>Outras receitas</option>'; }
+      else if (tipo === 'Despesa') { cat.innerHTML = '<option>Mercado</option><option>Farmácia e saúde</option><option>Moradia e utilidades</option><option>Veículos</option><option>Alimentação fora</option><option>Casa e construção</option><option>Lazer</option><option>Outros</option>'; }
     });
+    var para = null;
+    function showPara(on) {
+      if (on && !para) {
+        para = document.createElement('div'); para.className = 'field';
+        para.innerHTML = '<label for="para">Para</label><select class="input" id="para"><option>Conta principal</option><option>Conta secundária</option><option>Cartão de crédito</option><option>Dinheiro</option></select>';
+        document.getElementById('conta').closest('.field').after(para);
+      }
+      if (para) para.hidden = !on;
+    }
     document.querySelectorAll('.quick-dates .chip').forEach(function (c) {
-      c.addEventListener('click', function () { document.querySelectorAll('.quick-dates .chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); c.setAttribute('aria-pressed', 'true'); });
+      c.addEventListener('click', function () {
+        document.querySelectorAll('.quick-dates .chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); c.setAttribute('aria-pressed', 'true');
+        var d = c.textContent.match(/(\d+)$/)[1]; document.getElementById('data').value = '2026-09-' + String(d).padStart(2, '0');
+      });
     });
-    document.querySelectorAll('#desc-sugestoes .chip').forEach(function (c) { c.addEventListener('click', function () { document.getElementById('desc').value = c.textContent; }); });
-    toast.querySelector('[data-undo]').addEventListener('click', function () { toast.hidden = true; });
+    document.getElementById('data').addEventListener('change', function () { document.querySelectorAll('.quick-dates .chip').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); });
+    document.querySelectorAll('#desc-sugestoes .chip').forEach(function (c) {
+      c.addEventListener('click', function () {
+        desc.value = c.textContent;
+        var map = { 'Atacadista Central': 'Mercado', 'Hortifruti': 'Mercado', 'Posto': 'Veículos', 'Drogaria do Bairro': 'Farmácia e saúde' };
+        if (map[c.textContent]) document.getElementById('cat').value = map[c.textContent];
+      });
+    });
+    // Parcelamento
+    var parc = document.getElementById('parc'), stepper = document.querySelector('.stepper'), perMes = document.querySelector('.parcelas .muted'), n = 6;
+    function paintParc() {
+      stepper.hidden = !parc.checked; perMes.hidden = !parc.checked;
+      stepper.querySelector('span').textContent = n + '×';
+      var total = Proto.parse(valor.value) || 0; perMes.textContent = 'R$ ' + (total / n).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' por mês';
+    }
+    parc.addEventListener('change', paintParc);
+    stepper.querySelectorAll('button')[0].addEventListener('click', function () { n = Math.max(2, n - 1); paintParc(); });
+    stepper.querySelectorAll('button')[1].addEventListener('click', function () { n = Math.min(48, n + 1); paintParc(); });
+    valor.addEventListener('input', paintParc);
+    paintParc();
     // Teclado numérico (mobile): digita em centavos, a vírgula entra sozinha
-    var valor = document.getElementById('valor');
     var mobile = window.matchMedia('(max-width: 767px)');
     var cents = 14141;
-    function render() { var s = String(cents).padStart(3, '0'); valor.value = s.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + s.slice(-2); }
+    function render() { var s = String(cents).padStart(3, '0'); valor.value = s.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + s.slice(-2); paintParc(); }
     function applyMode() { if (mobile.matches) { valor.setAttribute('inputmode', 'none'); valor.readOnly = true; render(); } else { valor.setAttribute('inputmode', 'decimal'); valor.readOnly = false; } }
     applyMode(); mobile.addEventListener('change', applyMode);
     document.querySelectorAll('.keypad [data-key]').forEach(function (k) {
