@@ -1,6 +1,6 @@
 // Service worker: guarda o app e o modelo pra abrir rápido (e offline) no iPhone.
 // Versão muda a cada deploy (tools/deploy_site.sh troca o número), o que apaga o cache antigo.
-const VERSION = 'v202609191602';
+const VERSION = 'v202609191629';
 const SHELL = ['./', './scene.js', './model.js', './audio.js', './manifest.webmanifest', './favicon.png', './favicon-32.png', './apple-touch-icon.png'];   // GLBs entram no cache quando usados (cache-first)
 
 // cada arquivo separado e sem derrubar a instalação: um 404/redirect no addAll travaria o SW novo pra sempre

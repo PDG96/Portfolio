@@ -781,7 +781,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   const VARIANTS = { dance: { url: 'avatar-dance.glb', clip: 'dance', doubleSide: true }, success: { url: 'avatar-success.glb', pose: 'main' }, neutral: { url: 'avatar-neutral.glb', clip: 'look', arms: 'main' }, tired: { url: 'avatar-tired.glb', pose: 'main' }, sick: { url: 'avatar-sick.glb', pose: 'main' },
                      radiant: { url: 'avatar-radiant.glb', clip: 'look', arms: 'main' },
                      dead: { url: 'avatar-dead.glb', clip: 'fall', hold: true },
-                     test: { url: 'avatar-bald.glb', clip: 'idle', loop: true }, test2: { url: 'avatar-bald2.glb', clip: 'idle', loop: true } };   // test2: careca + cabelo recortado do modelo original   // teste: base careca com esqueleto Mixamo + clipes do Mixamo   // hold: toca uma vez e trava no último quadro
+                     test: { url: 'avatar-parts.glb', clip: 'idle', loop: true }, test2: { url: 'avatar-bald.glb', clip: 'idle', loop: true } };   // test: modelo em partes do Tripo (cabelo separado); test2: careca + peruca   // test2: careca + cabelo recortado do modelo original   // teste: base careca com esqueleto Mixamo + clipes do Mixamo   // hold: toca uma vez e trava no último quadro
   const ARM_BONES = ['L_Upperarm', 'L_Forearm', 'L_Hand', 'R_Upperarm', 'R_Forearm', 'R_Hand'];   // sem clavícula/twists: o rig da variante já os posiciona
   const mainRest = {}, mainBones = {};
   const tmpQR = new THREE.Quaternion();
