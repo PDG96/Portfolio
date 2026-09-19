@@ -12,3 +12,8 @@
   X-Robots-Tag: noindex, nofollow
 /avatar/sw.js
   Cache-Control: no-cache
+
+# Mockups do app de finanças (finapp): revisão por link direto, sem card e
+# sem busca. Dados fictícios.
+/financeiro/*
+  X-Robots-Tag: noindex, nofollow

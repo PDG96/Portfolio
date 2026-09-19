@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<title>Patrimônio · finapp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .comp { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-24); }
+  .comp .kpi-value { font-size: var(--font-size-24); }
+  .bar-comp { display: flex; height: 12px; border-radius: var(--radius-full); overflow: hidden; gap: 2px; background: var(--bg-surface); margin-top: var(--space-16); }
+  .bar-comp span { display: block; height: 100%; }
+  .range { display: flex; gap: var(--space-4); }
+  .range .tab { margin-right: var(--space-8); }
+  .event { fill: var(--bg-surface); stroke: var(--color-gray-900); stroke-width: 1.5; }
+  @media (max-width: 767px) {
+    .comp { display: flex; flex-direction: column; gap: 0; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-12); box-shadow: var(--shadow-xs); }
+    .comp .kpi { display: flex; justify-content: space-between; align-items: center; padding: var(--space-12) var(--space-16); border: 0; box-shadow: none; border-bottom: 1px solid var(--border-default); border-radius: 0; }
+    .comp .kpi:last-child { border-bottom: 0; }
+    .comp .kpi-value { font-size: var(--font-size-16); margin-top: 0; }
+  }
+</style>
+</head>
+<body data-page="patrimonio">
+<div class="shell">
+  <main class="main" id="main">
+    <header class="topbar hide-desktop">
+      <div class="page-title" aria-hidden="true">Patrimônio</div>
+      <button class="btn btn-tertiary btn-icon" aria-label="Mais ações"><svg class="icon"><use href="#i-more"/></svg></button>
+    </header>
+
+    <div class="page-header hide-mobile-title">
+      <div>
+        <h1 class="page-title">Patrimônio</h1>
+        <p class="page-sub">Tudo que você tem, menos o que deve. Calculado, não digitado.</p>
+      </div>
+      <div class="page-actions hide-mobile">
+        <button class="btn btn-secondary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Adicionar bem</button>
+        <button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Adicionar conta</button>
+      </div>
+    </div>
+
+    <div class="stack">
+      <section class="card" aria-labelledby="h-pat">
+        <div class="card-body" style="padding-bottom:0">
+          <div class="hstack between">
+            <div>
+              <div class="kpi-label" id="h-pat">Patrimônio hoje <span class="badge"><svg class="icon sm"><use href="#i-arrow-up-right"/></svg>+ R$ 620,00 em 30 dias</span></div>
+              <div class="kpi-value num" style="font-size:var(--font-size-36)">R$ 15.339,26</div>
+            </div>
+            <div class="tabs range" role="tablist" aria-label="Período">
+              <button class="tab" role="tab" aria-selected="false">6 meses</button>
+              <button class="tab" role="tab" aria-selected="true">12 meses</button>
+              <button class="tab" role="tab" aria-selected="false">Tudo</button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body chart-wrap" id="wrap">
+          <svg class="chart" id="line" viewBox="0 0 800 220" role="img" aria-label="Patrimônio mês a mês de outubro de 2025 a setembro de 2026. Começa em R$ 9.800, cai em janeiro pelo imposto do carro, sobe em abril com a venda do carro, termina em R$ 15.339.">
+            <g class="grid"></g>
+            <path class="area" id="area"/>
+            <path class="line" id="path"/>
+            <g id="events"></g>
+            <line class="crosshair" id="cross" x1="0" x2="0" y1="20" y2="180" style="display:none"/>
+            <circle class="marker" id="dot" r="5" style="display:none"/>
+            <g id="xlabels"></g>
+          </svg>
+          <div class="tooltip" id="tip" hidden></div>
+          <div class="legend" style="margin-top:var(--space-12)"><span><i></i>Patrimônio</span><span><i style="background:none;border:1.5px solid var(--color-gray-900);border-radius:50%"></i>Evento (venda, aporte)</span></div>
+        </div>
+      </section>
+
+      <div class="comp num">
+        <div class="card kpi"><div class="kpi-label">Em conta e dinheiro</div><div class="kpi-value">R$ 3.495,49</div></div>
+        <div class="card kpi"><div class="kpi-label">Investido</div><div class="kpi-value">R$ 12.400,00</div></div>
+        <div class="card kpi"><div class="kpi-label">Dívidas de curto prazo</div><div class="kpi-value">− R$ 556,23</div></div>
+      </div>
+
+      <section class="card card-body" aria-label="Composição">
+        <div class="hstack between"><strong class="type-14-semibold">Composição</strong><span class="muted num">R$ 15.895,49 em ativos · R$ 556,23 em dívidas</span></div>
+        <div class="bar-comp" role="img" aria-label="Investido 78%, conta e dinheiro 22%">
+          <span style="width:78%;background:var(--color-gray-900)"></span>
+          <span style="width:22%;background:var(--color-gray-400)"></span>
+        </div>
+        <div class="legend" style="margin-top:var(--space-12)"><span><i></i>Investido 78%</span><span><i style="background:var(--color-gray-400)"></i>Conta e dinheiro 22%</span></div>
+      </section>
+
+      <div class="section-title"><h2>Contas e investimentos</h2><a class="card-link" href="#">Gerenciar<svg class="icon sm"><use href="#i-arrow-right"/></svg></a></div>
+      <section class="card" aria-label="Contas">
+        <div class="list num">
+          <a class="row" href="03-movimentacoes.html"><div class="ic"><svg class="icon"><use href="#i-bank"/></svg></div><div class="t"><strong>Conta principal</strong><span>Conectada · sincronizada hoje</span></div><div class="v">R$ 772,99</div></a>
+          <a class="row" href="03-movimentacoes.html"><div class="ic"><svg class="icon"><use href="#i-bank"/></svg></div><div class="t"><strong>Conta secundária</strong><span>Manual · conciliada dia 19</span></div><div class="v">R$ 2.422,50</div></a>
+          <a class="row" href="03-movimentacoes.html"><div class="ic"><svg class="icon"><use href="#i-wallet"/></svg></div><div class="t"><strong>Dinheiro</strong><span>Em espécie</span></div><div class="v">R$ 300,00</div></a>
+          <a class="row" href="#"><div class="ic"><svg class="icon"><use href="#i-chart"/></svg></div><div class="t"><strong>CDB</strong><span>Manual · rendeu R$ 92,10 em agosto</span></div><div class="v">R$ 9.400,00</div></a>
+          <a class="row" href="#"><div class="ic"><svg class="icon"><use href="#i-chart"/></svg></div><div class="t"><strong>Previdência</strong><span>Manual · atualizado em julho</span></div><div class="v">R$ 3.000,00</div></a>
+          <a class="row" href="04-compromissos.html"><div class="ic"><svg class="icon"><use href="#i-card"/></svg></div><div class="t"><strong>Cartão de crédito</strong><span>Fatura atual · fecha dia 24</span></div><div class="v out">R$ 556,23</div></a>
+        </div>
+      </section>
+
+      <div class="section-title"><h2>Bens</h2><span class="muted">Fora do patrimônio líquido, com valor estimado por você</span></div>
+      <section class="card" aria-label="Bens">
+        <div class="list num">
+          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-house"/></svg></div><div class="t"><strong>Casa</strong><span>Gera IPTU e seguro da casa · estimado em janeiro</span></div><div class="v">R$ 380.000,00</div><div class="actions"><button class="btn btn-secondary btn-sm" type="button">Atualizar valor</button></div></div>
+          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-car"/></svg></div><div class="t"><strong>Carro</strong><span>Gera imposto e seguro do carro · projeto Carro R$ 7.615 · estimado em abril</span></div><div class="v">R$ 28.000,00</div><div class="actions"><button class="btn btn-secondary btn-sm" type="button">Atualizar valor</button><button class="btn btn-secondary btn-sm" type="button">Vender</button></div></div>
+          <div class="row has-actions"><div class="ic"><svg class="icon"><use href="#i-car"/></svg></div><div class="t"><strong>Carro antigo</strong><span>Vendido em abril · R$ 12.190 a receber em 7 parcelas</span></div><div class="v"><span class="badge"><span class="dot"></span>Vendido</span></div><div class="actions"><a class="btn btn-secondary btn-sm" href="04-compromissos.html#receber">Ver recebíveis</a></div></div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<script src="shell.js"></script>
+<script>
+  (function () {
+    var months = ['Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set'];
+    var vals = [9800, 10100, 10900, 8600, 9000, 9500, 13200, 13100, 13600, 14400, 14719, 15339];
+    var events = { 3: 'Imposto do carro, R$ 1.800', 6: 'Venda do carro antigo, entrada R$ 5.000' };
+    var svg = document.getElementById('line'), tip = document.getElementById('tip'), cross = document.getElementById('cross'), dot = document.getElementById('dot'), wrap = document.getElementById('wrap');
+    var xl = document.getElementById('xlabels'), ev = document.getElementById('events'), gridEl = svg.querySelector('.grid');
+    var W, H = 220, top = 20, bottom = 180, left, right, min = 6000, max = 18000;
+    function x(i) { return left + (right - left) * i / (vals.length - 1); }
+    function y(v) { return bottom - (bottom - top) * (v - min) / (max - min); }
+    function el(n, a) { var e = document.createElementNS('http://www.w3.org/2000/svg', n); for (var k in a) e.setAttribute(k, a[k]); return e; }
+    function draw() {
+      W = Math.max(320, Math.round(wrap.clientWidth - 48)); left = 56; right = W - 10;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      gridEl.innerHTML = ''; xl.innerHTML = ''; ev.innerHTML = '';
+      svg.querySelectorAll('text.y').forEach(function (t) { t.remove(); });
+      [[40, 'R$ 18 mil'], [100, 'R$ 12 mil'], [160, 'R$ 6 mil']].forEach(function (g) {
+        gridEl.appendChild(el('line', { x1: 0, x2: W, y1: g[0], y2: g[0] }));
+        var t = el('text', { x: 0, y: g[0] - 4, 'class': 'y' }); t.textContent = g[1]; svg.insertBefore(t, gridEl.nextSibling);
+      });
+      var d = vals.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(v).toFixed(1); }).join(' ');
+      document.getElementById('path').setAttribute('d', d);
+      document.getElementById('area').setAttribute('d', d + ' L' + right + ',' + bottom + ' L' + left + ',' + bottom + ' Z');
+      var every = W < 480 ? 2 : 1;
+      months.forEach(function (m, i) {
+        if (i % every === (months.length - 1) % every) { var t = el('text', { x: x(i), y: 205, 'text-anchor': 'middle' }); t.textContent = m; xl.appendChild(t); }
+        if (events[i]) ev.appendChild(el('circle', { 'class': 'event', cx: x(i), cy: y(vals[i]), r: 6 }));
+      });
+    }
+    draw(); window.addEventListener('resize', draw);
+    function fmt(v) { return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 }); }
+    function show(e) {
+      var r = svg.getBoundingClientRect();
+      var px = (e.clientX - r.left) * W / r.width;
+      var i = Math.round((px - left) / (right - left) * (vals.length - 1)); i = Math.max(0, Math.min(vals.length - 1, i));
+      cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.style.display = '';
+      dot.setAttribute('cx', x(i)); dot.setAttribute('cy', y(vals[i])); dot.style.display = '';
+      tip.innerHTML = '<strong class="num">' + fmt(vals[i]) + '</strong><span>' + months[i] + (i < 3 ? ' 2025' : ' 2026') + (events[i] ? ' · ' + events[i] : '') + '</span>';
+      tip.hidden = false;
+      var wr = wrap.getBoundingClientRect();
+      var lx = r.left - wr.left + x(i) * r.width / W;
+      tip.style.left = Math.min(wr.width - tip.offsetWidth - 8, Math.max(8, lx - tip.offsetWidth / 2)) + 'px';
+      tip.style.top = (r.top - wr.top + y(vals[i]) * r.height / H - tip.offsetHeight - 12) + 'px';
+    }
+    function hide() { cross.style.display = 'none'; dot.style.display = 'none'; tip.hidden = true; }
+    svg.addEventListener('mousemove', show); svg.addEventListener('mouseleave', hide);
+    svg.addEventListener('touchstart', function (e) { show(e.touches[0]); }, { passive: true });
+    svg.addEventListener('touchmove', function (e) { show(e.touches[0]); }, { passive: true });
+  })();
+</script>
+</body>
+</html>

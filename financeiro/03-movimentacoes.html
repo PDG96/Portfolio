@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<title>Movimentações · finapp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .toolbar { display: flex; flex-direction: column; gap: var(--space-16); margin-bottom: var(--space-24); }
+  .toolbar-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-16); flex-wrap: wrap; }
+  .totals { display: flex; gap: var(--space-24); }
+  .totals div { display: flex; flex-direction: column; }
+  .totals span { font-size: var(--font-size-12); color: var(--text-tertiary); font-weight: var(--font-weight-500); }
+  .totals strong { font-weight: var(--font-weight-600); font-size: var(--font-size-16); }
+  .search { max-width: 320px; flex: 1; }
+  .row.sel { cursor: pointer; }
+  .row .cb { width: 20px; height: 20px; accent-color: var(--color-gray-900); margin: 0; }
+  .row.sel { grid-template-columns: 20px 40px 1fr auto; }
+  .row.sel .v { grid-column: 4; }
+  .row.selected { background: var(--bg-subtle); }
+  .row .bal { color: var(--text-tertiary); font-size: var(--font-size-12); font-weight: var(--font-weight-400); }
+  body:not(.show-balance) .bal { display: none; }
+  .selbar { position: fixed; left: 50%; transform: translateX(-50%); bottom: var(--space-24); background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-12); box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: var(--space-4); padding: var(--space-8); z-index: 40; }
+  .selbar .count { font-weight: var(--font-weight-600); padding: 0 var(--space-12); border-right: 1px solid var(--border-default); margin-right: var(--space-4); }
+  .orig { background: var(--bg-subtle); border: 1px dashed var(--border-strong); border-radius: var(--radius-8); padding: var(--space-8) var(--space-12); font-size: var(--font-size-12); color: var(--text-secondary); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+  .rule { display: flex; gap: var(--space-12); align-items: flex-start; padding: var(--space-12); border: 1px solid var(--border-default); border-radius: var(--radius-8); background: var(--bg-subtle); }
+  .rule .btn { flex: 0 0 auto; }
+  .items { display: flex; flex-direction: column; gap: var(--space-4); color: var(--text-secondary); }
+  .items li { display: flex; justify-content: space-between; }
+  .panel-close { display: none; }
+  @media (max-width: 767px) {
+    .toolbar-top .page-title { display: none; }
+    .totals { width: 100%; justify-content: space-between; }
+    .search { max-width: none; width: 100%; }
+    .row.sel { grid-template-columns: 40px 1fr auto; }
+    .row.sel .cb { display: none; }
+    .row.sel .v { grid-column: 3; }
+    .selbar { display: none; }
+    .panel { position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 45; max-height: 88vh; overflow: auto; border-radius: var(--radius-16) var(--radius-16) 0 0; box-shadow: var(--shadow-lg); transform: translateY(105%); transition: transform .2s ease; }
+    body.panel-open .panel { transform: none; }
+    body.panel-open::after { content: ""; position: fixed; inset: 0; background: var(--bg-overlay); z-index: 44; }
+    .panel-close { display: inline-flex; }
+  }
+</style>
+</head>
+<body data-page="movimentacoes">
+<div class="shell">
+  <main class="main" id="main">
+    <header class="topbar hide-desktop">
+      <div class="month-nav">
+        <button class="btn btn-tertiary btn-icon btn-sm" aria-label="Mês anterior"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+        <span class="label">Setembro 2026</span>
+        <button class="btn btn-tertiary btn-icon btn-sm" aria-label="Próximo mês"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
+      </div>
+      <button class="btn btn-tertiary btn-icon" aria-label="Filtros"><svg class="icon"><use href="#i-filter"/></svg></button>
+    </header>
+
+    <div class="toolbar">
+      <div class="toolbar-top">
+        <div>
+          <h1 class="page-title">Movimentações</h1>
+          <div class="totals num" style="margin-top:var(--space-8)">
+            <div><span>Entradas</span><strong>R$ 4.860,00</strong></div>
+            <div><span>Saídas</span><strong>R$ 3.120,00</strong></div>
+            <div><span>Resultado</span><strong>+ R$ 1.740,00</strong></div>
+          </div>
+        </div>
+        <div class="page-actions hide-mobile">
+          <div class="month-nav">
+            <button class="btn btn-secondary btn-icon btn-sm" aria-label="Mês anterior"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+            <span class="label">Setembro 2026</span>
+            <button class="btn btn-secondary btn-icon btn-sm" aria-label="Próximo mês"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
+          </div>
+          <a class="btn btn-secondary" href="06-importar-conciliar.html"><svg class="icon"><use href="#i-upload"/></svg>Importar</a>
+          <a class="btn btn-primary" href="02-novo-lancamento.html"><svg class="icon"><use href="#i-plus"/></svg>Novo lançamento</a>
+        </div>
+      </div>
+      <div class="hstack between">
+        <div class="input-wrap search">
+          <svg class="icon"><use href="#i-search"/></svg>
+          <input class="input" type="search" placeholder="Buscar por descrição, valor ou categoria" aria-label="Buscar movimentações">
+          <span class="kbd hide-mobile">⌘K</span>
+        </div>
+        <label class="check hide-mobile"><input type="checkbox" id="toggle-bal"> Mostrar saldo corrente</label>
+      </div>
+      <div class="chips" role="group" aria-label="Filtros">
+        <button class="chip" type="button" aria-pressed="false">Todas as contas <svg class="icon sm"><use href="#i-chevron-down"/></svg></button>
+        <button class="chip" type="button" aria-pressed="false">Categoria <svg class="icon sm"><use href="#i-chevron-down"/></svg></button>
+        <button class="chip" type="button" aria-pressed="true">A revisar · 6</button>
+        <button class="chip" type="button" aria-pressed="false">Sem categoria · 2</button>
+        <button class="chip" type="button" aria-pressed="false">Transferências</button>
+        <button class="chip" type="button" aria-pressed="false">Etiqueta <svg class="icon sm"><use href="#i-chevron-down"/></svg></button>
+      </div>
+    </div>
+
+    <div class="with-panel">
+      <section class="card" aria-label="Lista de movimentações">
+        <div class="list">
+          <div class="list-group-label"><span>Hoje, sábado 19</span><span class="num">− R$ 358,39</span></div>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Atacadista Central" checked><div class="ic"><svg class="icon"><use href="#i-cart"/></svg></div><div class="t"><strong>Atacadista Central</strong><span>Conta secundária · <span class="badge"><svg class="icon sm"><use href="#i-sparkle"/></svg>Mercado</span></span></div><div class="v out num">R$ 141,41<small class="bal">saldo R$ 2.422,50</small></div></label>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Drogaria do Bairro" checked><div class="ic"><svg class="icon"><use href="#i-pill"/></svg></div><div class="t"><strong>Drogaria do Bairro</strong><span>Conta principal · <span class="badge"><svg class="icon sm"><use href="#i-sparkle"/></svg>Farmácia e saúde</span></span></div><div class="v out num">R$ 216,98<small class="bal">saldo R$ 772,99</small></div></label>
+
+          <div class="list-group-label"><span>Ontem, sexta 18</span><span class="num">+ R$ 3.104,64</span></div>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Aposentadoria"><div class="ic"><svg class="icon"><use href="#i-arrow-down-right"/></svg></div><div class="t"><strong>Aposentadoria</strong><span>Conta principal · Receita fixa</span></div><div class="v in num">R$ 3.270,67<small class="bal">saldo R$ 989,97</small></div></label>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Posto"><div class="ic"><svg class="icon"><use href="#i-car"/></svg></div><div class="t"><strong>Posto</strong><span>Conta principal · Veículos · <span class="badge badge-muted">Carro</span></span></div><div class="v out num">R$ 98,41<small class="bal">saldo R$ −2.280,70</small></div></label>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Hortifruti"><div class="ic"><svg class="icon"><use href="#i-cart"/></svg></div><div class="t"><strong>Hortifruti</strong><span>Dinheiro · Mercado</span></div><div class="v out num">R$ 31,55</div></label>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Cafeteria"><div class="ic"><svg class="icon"><use href="#i-fork"/></svg></div><div class="t"><strong>Cafeteria</strong><span>Cartão de crédito · Alimentação fora</span></div><div class="v out num">R$ 36,07</div></label>
+
+          <div class="list-group-label"><span>Quinta 17</span><span class="num">− R$ 253,51</span></div>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Pix entre contas"><div class="ic"><svg class="icon"><use href="#i-swap"/></svg></div><div class="t"><strong>Pix entre contas</strong><span>Secundária → principal · Transferência · <span class="badge"><svg class="icon sm"><use href="#i-sparkle"/></svg>a revisar</span></span></div><div class="v num">R$ 500,00</div></label>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Farmácia, parcela"><div class="ic"><svg class="icon"><use href="#i-pill"/></svg></div><div class="t"><strong>Farmácia · parcela 2 de 6</strong><span>Cartão de crédito · Farmácia e saúde</span></div><div class="v out num">R$ 62,16</div></label>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Loja de materiais"><div class="ic"><svg class="icon"><use href="#i-house"/></svg></div><div class="t"><strong>Loja de materiais</strong><span>Conta secundária · Casa e construção · <span class="badge badge-muted">Reforma</span></span></div><div class="v out num">R$ 191,35</div></label>
+
+          <div class="list-group-label"><span>Segunda 14</span><span class="num">− R$ 166,77</span></div>
+          <label class="row sel" data-select><input class="cb" type="checkbox" aria-label="Selecionar Luz de agosto"><div class="ic"><svg class="icon"><use href="#i-zap"/></svg></div><div class="t"><strong>Luz</strong><span>Conta principal · Moradia · <span class="badge badge-paid"><span class="dot"></span>Compromisso pago</span></span></div><div class="v out num">R$ 166,77</div></label>
+        </div>
+        <div class="card-footer" style="justify-content:center"><button class="btn btn-tertiary" type="button">Carregar dias anteriores</button></div>
+      </section>
+
+      <aside class="card panel" aria-label="Detalhe do lançamento">
+        <div class="card-header">
+          <div><h2>Atacadista Central</h2><p>Hoje, 19 de setembro · Conta secundária</p></div>
+          <div class="hstack" style="gap:var(--space-4)">
+            <button class="btn btn-tertiary btn-icon btn-sm" type="button" aria-label="Editar"><svg class="icon"><use href="#i-edit"/></svg></button>
+            <button class="btn btn-tertiary btn-icon btn-sm" type="button" aria-label="Mais ações"><svg class="icon"><use href="#i-more"/></svg></button>
+            <button class="btn btn-tertiary btn-icon btn-sm panel-close" type="button" aria-label="Fechar detalhe" data-panel-close><svg class="icon"><use href="#i-x"/></svg></button>
+          </div>
+        </div>
+        <div class="card-body stack" style="gap:var(--space-16)">
+          <div class="kpi-value num" style="margin:0">− R$ 141,41</div>
+          <div class="rule">
+            <svg class="icon" style="flex:0 0 auto;margin-top:2px"><use href="#i-sparkle"/></svg>
+            <div style="flex:1"><strong class="type-14-semibold">Categoria sugerida: Mercado</strong><p class="muted">Você categorizou 14 compras aqui como Mercado. Quer uma regra pra sempre?</p></div>
+            <button class="btn btn-secondary btn-sm" type="button">Criar regra</button>
+          </div>
+          <dl style="margin:0">
+            <div class="kv"><dt>Tipo</dt><dd>Despesa</dd></div>
+            <div class="kv"><dt>Categoria</dt><dd>Mercado</dd></div>
+            <div class="kv"><dt>Conta</dt><dd>Conta secundária</dd></div>
+            <div class="kv"><dt>Origem</dt><dd>Importado hoje</dd></div>
+            <div class="kv"><dt>Revisão</dt><dd><span class="badge"><span class="dot"></span>A revisar</span></dd></div>
+          </dl>
+          <div class="field">
+            <span class="type-14-medium muted">Descrição original do banco</span>
+            <div class="orig">19/09 11:12 ATACADISTA CENTRAL LTDA</div>
+          </div>
+          <div class="field">
+            <span class="type-14-medium muted">Itens</span>
+            <ul class="items num"><li><span>Arroz 5 kg</span><span>R$ 28,90</span></li><li><span>Café</span><span>R$ 19,80</span></li><li><span>Frutas e verduras</span><span>R$ 44,20</span></li><li><span>Limpeza</span><span>R$ 48,51</span></li></ul>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-secondary" type="button">Mudar categoria</button>
+          <button class="btn btn-primary" type="button">Confirmar</button>
+        </div>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<div class="selbar" role="toolbar" aria-label="Ações em lote">
+  <span class="count">2 selecionados</span>
+  <button class="btn btn-tertiary btn-sm" type="button"><svg class="icon sm"><use href="#i-tag"/></svg><span>Categorizar</span></button>
+  <button class="btn btn-tertiary btn-sm" type="button"><svg class="icon sm"><use href="#i-check"/></svg><span>Marcar revisado</span></button>
+  <button class="btn btn-tertiary btn-sm" type="button"><svg class="icon sm"><use href="#i-trash"/></svg><span>Excluir</span></button>
+</div>
+
+<script src="shell.js"></script>
+<script>
+  (function () {
+    var t = document.getElementById('toggle-bal');
+    t.addEventListener('change', function () { document.body.classList.toggle('show-balance', t.checked); });
+    var rows = document.querySelectorAll('[data-select]');
+    var mobile = window.matchMedia('(max-width: 767px)');
+    rows.forEach(function (r) {
+      r.addEventListener('click', function (e) {
+        if (mobile.matches) { e.preventDefault(); document.body.classList.add('panel-open'); return; }
+        var cb = r.querySelector('.cb'); setTimeout(function () { r.classList.toggle('selected', cb.checked); }, 0);
+        var n = document.querySelectorAll('.cb:checked').length;
+        document.querySelector('.selbar .count').textContent = n + (n === 1 ? ' selecionado' : ' selecionados');
+        document.querySelector('.selbar').style.display = n ? '' : 'none';
+      });
+    });
+    document.querySelectorAll('[data-panel-close]').forEach(function (b) { b.addEventListener('click', function () { document.body.classList.remove('panel-open'); }); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.body.classList.remove('panel-open'); });
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex, nofollow">
+<title>Compromissos · finapp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-24); }
+  .summary .kpi-value { font-size: var(--font-size-24); }
+  .row.done .t strong { color: var(--text-secondary); }
+  .row .ic.done { background: var(--bg-emphasis); color: var(--text-on-emphasis); border-color: var(--bg-emphasis); }
+  .plan { display: grid; grid-template-columns: 40px 1fr auto; gap: var(--space-16); align-items: center; padding: var(--space-16) var(--space-24); border-bottom: 1px solid var(--border-default); }
+  .plan:last-child { border-bottom: 0; }
+  .plan .ic { width: 40px; height: 40px; border-radius: var(--radius-full); background: var(--bg-muted); border: 1px solid var(--border-default); display: grid; place-items: center; color: var(--icon-strong); }
+  .plan .t strong { display: block; font-weight: var(--font-weight-500); }
+  .plan .progress { margin-top: var(--space-8); }
+  .plan .v { text-align: right; font-weight: var(--font-weight-600); }
+  .plan .v small { display: block; color: var(--text-tertiary); font-weight: var(--font-weight-400); font-size: var(--font-size-12); }
+  .partial-info { display: flex; justify-content: space-between; padding: var(--space-12); border: 1px solid var(--border-default); border-radius: var(--radius-8); background: var(--bg-subtle); }
+  .partial-info div { display: flex; flex-direction: column; }
+  .partial-info span { font-size: var(--font-size-12); color: var(--text-tertiary); }
+  .partial-info strong { font-weight: var(--font-weight-600); }
+  @media (max-width: 767px) {
+    .summary { display: flex; flex-direction: column; gap: 0; background: var(--bg-surface); border: 1px solid var(--border-default); border-radius: var(--radius-12); box-shadow: var(--shadow-xs); }
+    .summary .kpi { display: flex; justify-content: space-between; align-items: center; padding: var(--space-12) var(--space-16); border: 0; box-shadow: none; border-bottom: 1px solid var(--border-default); border-radius: 0; }
+    .summary .kpi:last-child { border-bottom: 0; }
+    .summary .kpi-value { font-size: var(--font-size-16); margin-top: 0; }
+    .summary .kpi:last-child .kpi-value { font-size: var(--font-size-20); }
+    .plan { padding: var(--space-12) var(--space-16); }
+    .row .actions .btn { min-height: var(--touch-target); }
+  }
+</style>
+</head>
+<body data-page="compromissos">
+<div class="shell">
+  <main class="main" id="main">
+    <header class="topbar hide-desktop">
+      <div class="month-nav">
+        <button class="btn btn-tertiary btn-icon btn-sm" aria-label="Mês anterior"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+        <span class="label">Setembro 2026</span>
+        <button class="btn btn-tertiary btn-icon btn-sm" aria-label="Próximo mês"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
+      </div>
+      <button class="btn btn-tertiary btn-icon" aria-label="Ver como calendário"><svg class="icon"><use href="#i-calendar"/></svg></button>
+    </header>
+
+    <div class="page-header hide-mobile-title">
+      <div>
+        <h1 class="page-title">Compromissos</h1>
+        <p class="page-sub">O que vence, o que já foi pago e o que vai entrar.</p>
+      </div>
+      <div class="page-actions hide-mobile">
+        <div class="month-nav">
+          <button class="btn btn-secondary btn-icon btn-sm" aria-label="Mês anterior"><svg class="icon"><use href="#i-chevron-left"/></svg></button>
+          <span class="label">Setembro 2026</span>
+          <button class="btn btn-secondary btn-icon btn-sm" aria-label="Próximo mês"><svg class="icon"><use href="#i-chevron-right"/></svg></button>
+        </div>
+        <div class="seg" role="tablist" aria-label="Visualização">
+          <button type="button" role="tab" aria-selected="true">Lista</button>
+          <button type="button" role="tab" aria-selected="false">Calendário</button>
+        </div>
+        <button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Novo compromisso</button>
+      </div>
+    </div>
+
+    <div class="stack">
+      <div class="seg seg-block" role="tablist" aria-label="Sentido">
+        <button type="button" role="tab" aria-selected="true">A pagar</button>
+        <button type="button" role="tab" aria-selected="false">A receber</button>
+        <button type="button" role="tab" aria-selected="false">Todos</button>
+      </div>
+
+      <div class="summary num">
+        <div class="card kpi"><div class="kpi-label">Previsto no mês</div><div class="kpi-value">R$ 2.026,78</div></div>
+        <div class="card kpi"><div class="kpi-label">Já pago</div><div class="kpi-value">R$ 896,78</div></div>
+        <div class="card kpi"><div class="kpi-label">Falta pagar</div><div class="kpi-value">R$ 1.130,00</div></div>
+      </div>
+
+      <section class="card" aria-labelledby="h-mes">
+        <div class="card-header">
+          <div><h2 id="h-mes">Setembro, por vencimento</h2><p>12 compromissos · 6 pagos</p></div>
+        </div>
+        <div class="list">
+          <div class="row has-actions done">
+            <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
+            <div class="t"><strong>Imposto do carro · parcela 3 de 3</strong><span>Venceu dia 5 · pago dia 4 <span class="badge badge-paid"><span class="dot"></span>Pago</span></span></div>
+            <div class="v out num">R$ 50,50</div>
+          </div>
+          <div class="row has-actions done">
+            <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
+            <div class="t"><strong>Imposto de renda · parcela 6 de 8</strong><span>Venceu dia 10 · pago dia 10 <span class="badge badge-paid"><span class="dot"></span>Pago</span></span></div>
+            <div class="v out num">R$ 462,87</div>
+          </div>
+          <div class="row has-actions done">
+            <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
+            <div class="t"><strong>Telefone</strong><span>Venceu dia 12 · pago dia 12 <span class="badge badge-paid"><span class="dot"></span>Pago</span></span></div>
+            <div class="v out num">R$ 55,07</div>
+          </div>
+          <div class="row has-actions done">
+            <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
+            <div class="t"><strong>Seguro da casa</strong><span>Venceu dia 15 · pago dia 14 · R$ 85,82 previstos <span class="badge badge-paid"><span class="dot"></span>Pago</span></span></div>
+            <div class="v out num">R$ 86,31</div>
+          </div>
+          <div class="row has-actions done">
+            <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
+            <div class="t"><strong>IPTU · parcela 9 de 10</strong><span>Venceu dia 10 · pago dia 10 <span class="badge badge-paid"><span class="dot"></span>Pago</span></span></div>
+            <div class="v out num">R$ 122,13</div>
+          </div>
+          <div class="row has-actions done">
+            <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
+            <div class="t"><strong>Academia</strong><span>Venceu dia 15 · pago dia 15 <span class="badge badge-paid"><span class="dot"></span>Pago</span></span></div>
+            <div class="v out num">R$ 119,90</div>
+          </div>
+
+          <div class="row has-actions">
+            <div class="ic day">20<small>dom</small></div>
+            <div class="t"><strong>Luz</strong><span>Amanhã · valor varia, média R$ 160 <span class="badge badge-outline-strong"><span class="dot"></span>Vence amanhã</span></span></div>
+            <div class="v out num">R$ 168,40</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+          </div>
+          <div class="row has-actions">
+            <div class="ic day">22<small>ter</small></div>
+            <div class="t"><strong>Internet</strong><span>Fixo · conta principal <span class="badge"><span class="dot"></span>Previsto</span></span></div>
+            <div class="v out num">R$ 99,90</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+          </div>
+          <div class="row has-actions">
+            <div class="ic day">24<small>qui</small></div>
+            <div class="t"><strong>Fatura do cartão</strong><span>Fecha dia 24, vence dia 30 · 3 parcelamentos dentro <span class="badge"><span class="dot"></span>Previsto</span></span></div>
+            <div class="v out num">R$ 556,23</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm" type="button">Ver fatura</button></div>
+          </div>
+          <div class="row has-actions">
+            <div class="ic day">25<small>sex</small></div>
+            <div class="t"><strong>Seguro do carro</strong><span>Parcela 7 de 12 · conta principal <span class="badge"><span class="dot"></span>Previsto</span></span></div>
+            <div class="v out num">R$ 101,35</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+          </div>
+          <div class="row has-actions">
+            <div class="ic day">26<small>sáb</small></div>
+            <div class="t"><strong>Água</strong><span>Valor varia, média R$ 62 <span class="badge"><span class="dot"></span>Previsto</span></span></div>
+            <div class="v out num">R$ 61,74</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+          </div>
+          <div class="row has-actions">
+            <div class="ic day">28<small>seg</small></div>
+            <div class="t"><strong>Streaming</strong><span>Fixo · cartão de crédito <span class="badge"><span class="dot"></span>Previsto</span></span></div>
+            <div class="v out num">R$ 142,38</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Pagar</button></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-title"><h2>Parcelamentos</h2><span class="muted num">R$ 174,42 por mês em 3 parcelamentos · R$ 1.311,08 a quitar</span></div>
+      <section class="card" aria-label="Parcelamentos ativos">
+        <div class="plan">
+          <div class="ic"><svg class="icon"><use href="#i-pill"/></svg></div>
+          <div class="t"><strong>Farmácia</strong><span class="muted">Cartão de crédito · parcela 2 de 6 · termina em janeiro</span><div class="progress" role="progressbar" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" aria-label="2 de 6 parcelas pagas"><span style="width:33%"></span></div></div>
+          <div class="v num">R$ 62,16<small>faltam R$ 248,64</small></div>
+        </div>
+        <div class="plan">
+          <div class="ic"><svg class="icon"><use href="#i-car"/></svg></div>
+          <div class="t"><strong>Pneus</strong><span class="muted">Cartão de crédito · parcela 4 de 10 · termina em março</span><div class="progress" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="4 de 10 parcelas pagas"><span style="width:40%"></span></div></div>
+          <div class="v num">R$ 43,80<small>faltam R$ 262,80</small></div>
+        </div>
+        <div class="plan">
+          <div class="ic"><svg class="icon"><use href="#i-cart"/></svg></div>
+          <div class="t"><strong>Loja online</strong><span class="muted">Cartão de crédito · parcela 3 de 12 · termina em junho</span><div class="progress" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" aria-label="3 de 12 parcelas pagas"><span style="width:25%"></span></div></div>
+          <div class="v num">R$ 68,46<small>faltam R$ 799,64</small></div>
+        </div>
+      </section>
+
+      <div class="section-title" id="receber"><h2>A receber</h2><span class="muted num">R$ 3.650,00 previstos · R$ 500,00 recebidos</span></div>
+      <section class="card" aria-label="A receber neste mês">
+        <div class="list">
+          <div class="row has-actions">
+            <div class="ic day">10<small>qui</small></div>
+            <div class="t"><strong>Venda do carro · parcela 4 de 10</strong><span>Venceu dia 10 · 9 dias de atraso <span class="badge badge-late"><span class="dot"></span>Atrasado</span></span></div>
+            <div class="v in num">R$ 1.950,00</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button" data-open="sheet-receber">Registrar recebimento</button></div>
+          </div>
+          <div class="row has-actions done">
+            <div class="ic day done"><svg class="icon sm"><use href="#i-check"/></svg></div>
+            <div class="t"><strong>Venda dos móveis · parcela 14 de 17</strong><span>Venceu dia 10 · recebido dia 9 <span class="badge badge-paid"><span class="dot"></span>Recebido</span></span></div>
+            <div class="v in num">R$ 500,00</div>
+          </div>
+          <div class="row has-actions">
+            <div class="ic day">25<small>sex</small></div>
+            <div class="t"><strong>Aluguel</strong><span>Mensal · conta secundária <span class="badge"><span class="dot"></span>Previsto</span></span></div>
+            <div class="v in num">R$ 1.200,00</div>
+            <div class="actions"><button class="btn btn-secondary btn-sm btn-ver" type="button">Ver</button><button class="btn btn-primary btn-sm" type="button">Registrar recebimento</button></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Sheet: recebimento parcial -->
+<div class="overlay" id="sheet-receber" hidden role="dialog" aria-modal="true" aria-labelledby="sheet-receber-title">
+  <div class="sheet">
+    <div class="sheet-header">
+      <h2 id="sheet-receber-title">Registrar recebimento</h2>
+      <button class="btn btn-tertiary btn-icon btn-sm" type="button" data-close aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+    </div>
+    <form class="sheet-body" id="form-receber">
+      <p class="muted">Venda do carro · parcela 4 de 10 · previsto R$ 1.950,00</p>
+      <div class="field">
+        <label for="rc-valor">Valor recebido</label>
+        <input class="input num" id="rc-valor" type="text" inputmode="decimal" value="R$ 1.460,00">
+        <span class="hint">Se for menos que o previsto, a parcela fica como parcial e o restante continua em aberto.</span>
+      </div>
+      <div class="partial-info num" aria-live="polite">
+        <div><span>Recebido</span><strong>R$ 1.460,00</strong></div>
+        <div><span>Fica em aberto</span><strong>R$ 490,00</strong></div>
+        <div><span>Saldo devedor total</span><strong>R$ 12.190,00</strong></div>
+      </div>
+      <div class="grid grid-2" style="gap:var(--space-16)">
+        <div class="field">
+          <label for="rc-data">Data</label>
+          <input class="input" id="rc-data" type="date" value="2026-09-19">
+        </div>
+        <div class="field">
+          <label for="rc-conta">Entrou em</label>
+          <select class="input" id="rc-conta"><option>Conta principal</option><option>Conta secundária</option><option>Dinheiro</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="rc-obs">Observação (opcional)</label>
+        <input class="input" id="rc-obs" type="text" placeholder="Ex.: combinou pagar o resto dia 30">
+      </div>
+    </form>
+    <div class="sheet-footer">
+      <button class="btn btn-secondary" type="button" data-close>Cancelar</button>
+      <button class="btn btn-primary" type="submit" form="form-receber">Confirmar recebimento</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden role="status">Recebimento registrado: R$ 1.460,00, faltam R$ 490,00 <button type="button" data-undo>Desfazer</button></div>
+
+<script src="shell.js"></script>
+<script>
+  (function () {
+    var sheet = document.getElementById('sheet-receber');
+    var toast = document.getElementById('toast');
+    var opener = null;
+    function open() { opener = document.activeElement; sheet.hidden = false; document.getElementById('rc-valor').focus(); }
+    function close() { sheet.hidden = true; if (opener) opener.focus(); }
+    document.querySelectorAll('[data-open="sheet-receber"]').forEach(function (b) { b.addEventListener('click', open); });
+    sheet.querySelectorAll('[data-close]').forEach(function (b) { b.addEventListener('click', close); });
+    sheet.addEventListener('click', function (e) { if (e.target === sheet) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !sheet.hidden) close(); });
+    document.getElementById('form-receber').addEventListener('submit', function (e) {
+      e.preventDefault(); close(); toast.hidden = false;
+      var row = opener.closest('.row');
+      row.querySelector('.t span').innerHTML = 'Recebido R$ 1.460,00 dia 19 · faltam R$ 490,00 <span class="badge badge-outline-strong"><span class="dot"></span>Parcial</span>';
+      row.querySelector('[data-open]').textContent = 'Registrar o restante';
+      setTimeout(function () { toast.hidden = true; }, 6000);
+    });
+    toast.querySelector('[data-undo]').addEventListener('click', function () { location.reload(); });
+    document.querySelectorAll('.seg [role="tab"]').forEach(function (t) {
+      t.addEventListener('click', function () { t.parentElement.querySelectorAll('[role="tab"]').forEach(function (x) { x.setAttribute('aria-selected', 'false'); }); t.setAttribute('aria-selected', 'true'); });
+    });
+  })();
+</script>
+</body>
+</html>

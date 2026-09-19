@@ -1,0 +1,119 @@
+/* finapp design tokens
+   Dona: Pietra. Marca monocromática: sem cor de acento, só a escala de cinzas.
+   Decisão em docs/decisions/0002-marca-monocromatica.md
+   Ramp base: neutros frios estilo Untitled UI (gray light mode). */
+
+:root {
+  /* ---------- Ramp ---------- */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-gray-25: #fcfcfd;
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f2f4f7;
+  --color-gray-200: #eaecf0;
+  --color-gray-300: #d0d5dd;
+  --color-gray-400: #98a2b3;
+  --color-gray-500: #667085;
+  --color-gray-600: #475467;
+  --color-gray-700: #344054;
+  --color-gray-800: #182230;
+  --color-gray-900: #101828;
+  --color-gray-950: #0c111d;
+
+  /* ---------- Semânticos: superfícies ---------- */
+  --bg-page: var(--color-gray-50);
+  --bg-surface: var(--color-white);
+  --bg-subtle: var(--color-gray-50);
+  --bg-muted: var(--color-gray-100);
+  --bg-emphasis: var(--color-gray-900);
+  --bg-overlay: rgba(16, 24, 40, 0.6);
+
+  /* ---------- Semânticos: bordas ---------- */
+  --border-default: var(--color-gray-200);
+  --border-strong: var(--color-gray-300);
+  --border-emphasis: var(--color-gray-900);
+
+  /* ---------- Semânticos: texto ---------- */
+  --text-primary: var(--color-gray-900);
+  --text-secondary: var(--color-gray-600);
+  --text-tertiary: var(--color-gray-500);
+  --text-placeholder: var(--color-gray-500);
+  --text-disabled: var(--color-gray-400);
+  --text-on-emphasis: var(--color-white);
+
+  /* ---------- Semânticos: ícones ---------- */
+  --icon-default: var(--color-gray-500);
+  --icon-strong: var(--color-gray-700);
+
+  /* ---------- Dataviz (monocromático: identidade por luminosidade + textura + rótulo) ---------- */
+  --viz-1: var(--color-gray-900);
+  --viz-2: var(--color-gray-500);
+  --viz-3: var(--color-gray-300);
+  --viz-4: var(--color-gray-200);
+  --viz-grid: var(--color-gray-200);
+  --viz-fill: rgba(16, 24, 40, 0.06);
+
+  /* ---------- Tipografia ---------- */
+  --font-family-base: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+  --font-size-12: 12px;
+  --font-size-14: 14px;
+  --font-size-16: 16px;
+  --font-size-18: 18px;
+  --font-size-20: 20px;
+  --font-size-24: 24px;
+  --font-size-30: 30px;
+  --font-size-36: 36px;
+  --font-size-48: 48px;
+  --font-weight-400: 400;
+  --font-weight-500: 500;
+  --font-weight-600: 600;
+  --font-weight-700: 700;
+  --line-height-tight: 1.2;
+  --line-height-base: 1.5;
+
+  /* ---------- Espaçamento (grade de 4) ---------- */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-64: 64px;
+
+  /* ---------- Raios ---------- */
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-16: 16px;
+  --radius-full: 9999px;
+
+  /* ---------- Sombras (Untitled xs / sm / lg) ---------- */
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.1), 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-lg: 0 12px 16px -4px rgba(16, 24, 40, 0.08), 0 4px 6px -2px rgba(16, 24, 40, 0.03);
+
+  /* ---------- Foco ---------- */
+  --focus-ring: 0 0 0 2px var(--color-white), 0 0 0 4px var(--color-gray-900);
+
+  /* ---------- Layout ---------- */
+  --sidebar-width: 256px;
+  --tabbar-height: 64px;
+  --touch-target: 44px;
+}
+
+/* Utilitários de tipo (mesma convenção do design-studio) */
+.type-12-medium { font-size: var(--font-size-12); font-weight: var(--font-weight-500); line-height: var(--line-height-base); }
+.type-14-regular { font-size: var(--font-size-14); font-weight: var(--font-weight-400); line-height: var(--line-height-base); }
+.type-14-medium { font-size: var(--font-size-14); font-weight: var(--font-weight-500); line-height: var(--line-height-base); }
+.type-14-semibold { font-size: var(--font-size-14); font-weight: var(--font-weight-600); line-height: var(--line-height-base); }
+.type-16-medium { font-size: var(--font-size-16); font-weight: var(--font-weight-500); line-height: var(--line-height-base); }
+.type-16-semibold { font-size: var(--font-size-16); font-weight: var(--font-weight-600); line-height: var(--line-height-base); }
+.type-18-semibold { font-size: var(--font-size-18); font-weight: var(--font-weight-600); line-height: var(--line-height-base); }
+.type-20-semibold { font-size: var(--font-size-20); font-weight: var(--font-weight-600); line-height: var(--line-height-tight); }
+.type-24-semibold { font-size: var(--font-size-24); font-weight: var(--font-weight-600); line-height: var(--line-height-tight); }
+.type-30-semibold { font-size: var(--font-size-30); font-weight: var(--font-weight-600); line-height: var(--line-height-tight); letter-spacing: -0.01em; }
+.type-36-semibold { font-size: var(--font-size-36); font-weight: var(--font-weight-600); line-height: var(--line-height-tight); letter-spacing: -0.02em; }
+.type-48-semibold { font-size: var(--font-size-48); font-weight: var(--font-weight-600); line-height: var(--line-height-tight); letter-spacing: -0.02em; }
