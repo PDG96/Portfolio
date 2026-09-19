@@ -276,6 +276,7 @@
       <span class="plabel">Evento</span>
       <div class="grp" data-key="event"><button data-ev="done">Ação ok</button><button data-ev="skip">Adiada</button><button data-ev="missed">Perdida</button><button data-ev="daylost">Dia perdido</button><button data-ev="daylostrun">Dias perdidos</button><button data-ev="daydone">Dia completo</button><button data-ev="daystreak">Sequência</button></div>
     </div>
+    <div class="prow" id="clipRow" hidden><span class="plabel">Clipe</span><div class="grp" id="clipGrp"></div></div>
     <div class="prow"><span class="plabel">Som</span><button id="sound" class="snd" title="som">🔇</button></div>
   </div>
 
@@ -503,7 +504,7 @@ function renderGoals() {
     <div class="row"><div>Água<div class="sub">litros por dia</div></div><input type="number" min="0.5" max="6" step="0.25" data-g="water.liters" value="${g.water.liters}"></div>
     <h3>Avisos</h3>
     <div class="row"><div>Notificações<div class="sub" data-push-sub>${pushStatusText()}</div></div><button class="btn ghost" data-push>${pushState.on ? 'Desativar' : 'Ativar'}</button></div>
-    <div class="row"><div>Versão<div class="sub">202609191211</div></div><button class="btn ghost" data-update>Atualizar</button></div>
+    <div class="row"><div>Versão<div class="sub">202609191216</div></div><button class="btn ghost" data-update>Atualizar</button></div>
     <div class="foot">
       ${g.started ? '<button class="btn ghost danger" data-reset>Recomeçar do zero</button>' : ''}
       <button class="btn ghost" data-close>Fechar</button>
@@ -680,6 +681,14 @@ const override = { phase: 'auto', weather: 'auto', face: 'auto', health: 'auto' 
 const envEl = document.getElementById('env');
 const previewEl = document.getElementById('preview');
 document.getElementById('previewBtn').onclick = () => previewEl.classList.toggle('open');
+function renderClipRow() {                                           // teste: botões pra cada clipe do arquivo da variante
+  const row = document.getElementById('clipRow'), grp = document.getElementById('clipGrp');
+  const names = scene.variantClips();
+  if (!names.length) { setTimeout(renderClipRow, 1000); return; }
+  grp.innerHTML = names.map(n => `<button data-clip="${n}">${n}</button>`).join('');
+  grp.querySelectorAll('button').forEach(b => b.onclick = () => scene.playVariantClip(b.dataset.clip));
+  row.hidden = false;
+}
 function paintEnv() { document.querySelectorAll('#env .grp, #env2 .grp').forEach(g => { const k = g.dataset.key; g.querySelectorAll('button').forEach(b => { if (b.dataset.v) b.classList.toggle('on', b.dataset.v === override[k]); }); }); }
 envEl.addEventListener('click', e => { const b = e.target.closest('button'); if (!b || !b.closest('.grp')) return; override[b.closest('.grp').dataset.key] = b.dataset.v; paintEnv(); applyEnv(); applyFace(); });
 // editor de estado: saúde forçada (preview, não grava) e eventos disparados na hora
@@ -696,6 +705,7 @@ document.getElementById('env2').addEventListener('click', e => {
   const key = b.closest('.grp').dataset.key;
   if (key === 'land') { override.land = b.dataset.v; paintEnv(); scene.setLandscape(override.land); return; }
   override.health = b.dataset.v; paintEnv();
+  if (override.health === 'test') setTimeout(renderClipRow, 1500); else { document.getElementById('clipRow').hidden = true; }
   if (override.health === 'dead') { die(false); return; }
   if (document.body.dataset.dead && !goals.dead) { delete document.body.dataset.dead; scene.revive(); }
   if (override.health === 'success') { gs = { ...(gs || {}), success: true }; scene.setBaseClip('idle'); }

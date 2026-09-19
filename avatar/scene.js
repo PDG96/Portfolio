@@ -830,6 +830,7 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
       if (gltf.animations.length && !v.pose && !v.static) {
         v.mixer = new THREE.AnimationMixer(root);
         const c = gltf.animations.find(a => a.name.toLowerCase().includes(def.clip)) || gltf.animations[0];
+        v.actions = {}; for (const a of gltf.animations) v.actions[a.name] = v.mixer.clipAction(a);   // todos os clipes do arquivo (pra tocar por nome)
         v.action = v.mixer.clipAction(c);
         if (def.loop) v.action.setLoop(THREE.LoopRepeat, Infinity);
         else if (def.hold) { v.action.setLoop(THREE.LoopOnce, 1); v.action.clampWhenFinished = true; v.hold = true; }
@@ -856,6 +857,17 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
     syncVariantVisibility();
   }
   // a variante é o "fundo" do estado; reações, passos e a queda tocam na principal (que tem os 19 clipes), depois a variante volta
+  // toca um clipe do arquivo da variante uma vez e volta pro clipe de fundo dela (teste de animações do Mixamo)
+  function playVariantClip(name, { fade = 0.3 } = {}) {
+    const v = activeVariant && variants[activeVariant]; if (!v || !v.actions || !v.actions[name]) return false;
+    const a = v.actions[name];
+    a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = false;
+    if (v.action && v.action !== a) v.action.fadeOut(fade);
+    a.reset().setEffectiveWeight(1).fadeIn(fade).play();
+    const back = e => { if (e.action !== a) return; v.mixer.removeEventListener('finished', back); if (v.action) v.action.reset().fadeIn(fade).play(); };
+    v.mixer.addEventListener('finished', back);
+    return true;
+  }
   function syncVariantVisibility() {
     const av = activeVariant && variants[activeVariant];
     const busy = clipOnce || !!walkTarget || keyWalking || (held && !(av && (av.static || av.hold)));   // morta: o modelo dela substitui a queda travada da principal
@@ -1130,7 +1142,8 @@ const AVATAR = { url: new URLSearchParams(location.search).get('avatar') || opts
   let dropRate = 0;
 
   return {
-    scene, camera, renderer, controls, avatarGroup, hooks, grass, setVariant,
+    scene, camera, renderer, controls, avatarGroup, hooks, grass, setVariant, playVariantClip,
+    variantClips() { const v = activeVariant && variants[activeVariant]; return v && v.actions ? Object.keys(v.actions) : []; },
     debugVariant() { return { activeVariant, clipOnce, walk: !!walkTarget, keyWalking, held, loaded: Object.fromEntries(Object.entries(variants).map(([k, v]) => [k, !!v.root])) }; },
     get rain() { return ENV.rain; },
     setEnvironment({ weights, clouds = 0, rain = 0 }) {
