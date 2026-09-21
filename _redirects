@@ -5,4 +5,5 @@
 
 # Financeiro saiu do ar (2026-09-21). O redirect garante que nada fique
 # servindo por URL antiga enquanto o cache da borda expira.
+/financeiro / 302
 /financeiro/* / 302
