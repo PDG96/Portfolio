@@ -2,3 +2,7 @@
 # the page built and answered on a typed URL even with nothing linking to it,
 # so the redirect was what actually kept it unpublished. Both its rules are
 # gone now that the Work card links to it.
+
+# Financeiro saiu do ar (2026-09-21). O redirect garante que nada fique
+# servindo por URL antiga enquanto o cache da borda expira.
+/financeiro/* / 302
