@@ -17,3 +17,7 @@
 # sem busca. Dados fictícios.
 /financeiro/*
   X-Robots-Tag: noindex, nofollow
+
+# Páginas privadas com URL aleatória (notas pessoais): só por link direto.
+/p/*
+  X-Robots-Tag: noindex, nofollow

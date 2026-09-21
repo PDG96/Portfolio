@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#141414">
+<title>Notes</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/assets/fonts/TWKLausanne-300.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/TWKLausanne-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/TWKLausanne-500.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/fonts/lausanne.css">
+<style>
+  :root {
+    --gray-true-25: #fcfcfc;
+    --gray-true-100: #f5f5f5;
+    --gray-true-200: #e5e5e5;
+    --gray-true-300: #d6d6d6;
+    --gray-true-400: #a3a3a3;
+    --gray-true-500: #737373;
+    --gray-true-700: #424242;
+    --gray-true-800: #292929;
+    --gray-true-900: #141414;
+
+    --bg: var(--gray-true-900);
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hi: rgba(255, 255, 255, 0.07);
+    --text: var(--gray-true-25);
+    --text-2: var(--gray-true-400);
+    --text-3: var(--gray-true-500);
+    --border: rgba(255, 255, 255, 0.10);
+    --accent-yellow: #f7fdb9;
+    --chip-bg: rgba(247, 253, 185, 0.10);
+    --chip-fg: var(--accent-yellow);
+    --font: 'TWKLausanne', 'TWKLausanne Fallback', system-ui, sans-serif;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --edge: clamp(1rem, 3vw, 2.5rem);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    font-weight: 300;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    padding: var(--edge);
+    padding-bottom: calc(var(--edge) + env(safe-area-inset-bottom));
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; }
+
+  header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+  }
+  header h1 {
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+  }
+  header .meta {
+    font-size: 0.8125rem;
+    color: var(--text-3);
+    margin-top: 0.25rem;
+  }
+  .toggle-all {
+    font: inherit;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--text-2);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    cursor: pointer;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  }
+  .toggle-all:active { background: var(--surface-hi); color: var(--text); }
+
+  .item { border-bottom: 1px solid var(--border); }
+
+  .q {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 2.25rem 1fr auto;
+    column-gap: 1rem;
+    align-items: start;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 1.35rem 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .q .n {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--text-3);
+    padding-top: 0.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .q .title {
+    font-size: clamp(1.125rem, 2.4vw, 1.4rem);
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -0.005em;
+  }
+  .q .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.7rem;
+  }
+  .chip {
+    font-size: 0.8125rem;
+    font-weight: 400;
+    color: var(--chip-fg);
+    background: var(--chip-bg);
+    border-radius: 999px;
+    padding: 0.28rem 0.7rem;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+  .chip.soft { color: var(--text-2); background: var(--surface); }
+  .q .icon {
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    color: var(--text-2);
+    margin-top: 0.1rem;
+    transition: transform 0.45s var(--ease), background 0.2s var(--ease);
+  }
+  .q .icon svg { width: 0.75rem; height: 0.75rem; }
+  .item.open .q .icon { transform: rotate(45deg); background: var(--surface-hi); }
+
+  .a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.45s var(--ease);
+  }
+  .a > div { overflow: hidden; }
+  .item.open .a { grid-template-rows: 1fr; }
+  .a-inner {
+    padding: 0 0 1.75rem 3.25rem;
+    max-width: 68ch;
+  }
+  .a-inner p {
+    font-size: clamp(1.0625rem, 2.2vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--gray-true-200);
+    margin-bottom: 1rem;
+  }
+  .a-inner p:last-child { margin-bottom: 0; }
+  .a-inner p strong { font-weight: 500; color: var(--text); }
+  .a-inner ol {
+    padding-left: 1.25rem;
+    font-size: clamp(1.0625rem, 2.2vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--gray-true-200);
+  }
+  .a-inner ol li { margin-bottom: 0.75rem; padding-left: 0.25rem; }
+  .a-inner ol li::marker { color: var(--text-3); }
+
+  footer {
+    padding-top: 1.5rem;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+
+  @media (max-width: 480px) {
+    .q { grid-template-columns: 1.75rem 1fr auto; column-gap: 0.75rem; }
+    .a-inner { padding-left: 2.5rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .a, .q .icon { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Toybox notes</h1>
+      <p class="meta">9 questions. Tap one to open the answer.</p>
+    </div>
+    <button class="toggle-all" type="button" id="toggleAll" aria-pressed="false">Expand all</button>
+  </header>
+
+  <div id="list">
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a1">
+        <span class="n">01</span>
+        <span>
+          <span class="title">Tell me about yourself and what made you apply</span>
+          <span class="chips">
+            <span class="chip">10 years</span>
+            <span class="chip">5 UX</span>
+            <span class="chip">senior product</span>
+            <span class="chip">mining, carbon</span>
+            <span class="chip">Blender</span>
+            <span class="chip">kid who grew up?</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a1"><div><div class="a-inner">
+        <p>Thanks for having me, Jenn. I've been a designer for about ten years, the last five focused on UX and UI, and most recently as a senior product designer. I specialize in data-heavy workflows with multiple user and account types, mostly in environmental and regulatory fields, like artisanal small-scale mining and carbon projects.</p>
+        <p>What drew me to Toybox is how easy you made the whole 3D experience feel. During my degree I had to learn Blender, before AI, and I remember how complex the logic was. Making that simple enough for a kid to play with is a real design achievement, and I'd love to be part of that.</p>
+        <p>I'm also curious where the product goes from here, whether that's bringing in adults or not losing the kid who grew up.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a2">
+        <span class="n">02</span>
+        <span>
+          <span class="title">Transition from B2B to consumer mobile</span>
+          <span class="chips">
+            <span class="chip">nobody owes you attention</span>
+            <span class="chip">operator + decision maker = kid + parent</span>
+            <span class="chip">honest: side project avatar</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a2"><div><div class="a-inner">
+        <p>I don't think the core problem changes much. In B2B, people use the tool because their job requires it, so the win is speed and clarity. In consumer, nobody owes you their attention, so the win is making complexity disappear entirely.</p>
+        <p>What carries over is designing for more than one user at once. In my last role that was the operator entering data and the decision maker reading it. Here it's the kid creating and the parent paying and trusting. Same challenge, different faces.</p>
+        <p>I haven't shipped a consumer mobile product professionally, but I've been building one on the side, a self-care app with a 3D avatar of myself.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a3">
+        <span class="n">03</span>
+        <span>
+          <span class="title">A project you're proud of</span>
+          <span class="chips">
+            <span class="chip">Straatos (say it slowly)</span>
+            <span class="chip">spreadsheets</span>
+            <span class="chip">platform language</span>
+            <span class="chip">months → prefilled</span>
+            <span class="chip">investors up</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a3"><div><div class="a-inner">
+        <p>Straatos, a carbon market platform. They came with a rough sketch they weren't happy with, and years of work living in spreadsheets.</p>
+        <p>First I studied how they actually entered data. Then I told them we needed to translate everything into platform language, more granular data points we could measure over time. We did that together.</p>
+        <p>Two results. We could give them analytics they didn't know were possible. And their certification documents used to take months to write. Now the data fills in as people work, day by day. Their investor pitch got much stronger, and investor conversion went up over the past year.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a4">
+        <span class="n">04</span>
+        <span>
+          <span class="title">Working without a brief or PM</span>
+          <span class="chips">
+            <span class="chip">dig</span>
+            <span class="chip">people's heads</span>
+            <span class="chip">repeated, stuck, unblocks</span>
+            <span class="chip">prototype and be wrong</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a4"><div><div class="a-inner">
+        <p>I'm used to that. When there's no brief, I start by digging: documentation, old files, Slack threads. Then I talk to whoever was involved, because a lot of the context lives in people's heads.</p>
+        <p>For prioritizing, I look at three things. What comes up repeatedly, where people are actually getting stuck, and what unblocks other work downstream.</p>
+        <p>Then I don't wait for direction, I propose one. I'd rather show up with a prototype and be wrong than ask an open question and stall everyone. As a solo designer you don't win arguments with authority, you win them with something concrete.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a5">
+        <span class="n">05</span>
+        <span>
+          <span class="title">Users, business and engineering disagree</span>
+          <span class="chips">
+            <span class="chip">real or vocabulary</span>
+            <span class="chip">optimizing for</span>
+            <span class="chip">scoped too big</span>
+            <span class="chip">know why</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a5"><div><div class="a-inner">
+        <p>First I check if the disagreement is real, or just different vocabulary for the same thing.</p>
+        <p>If it's real, I ask each side what they're optimizing for. Then it becomes a trade-off conversation instead of a fight.</p>
+        <p>If everything is too expensive, that usually means we're scoped too big, so I look for the smallest version that tests the assumption.</p>
+        <p>Whatever we decide, I make sure people know why.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a6">
+        <span class="n">06</span>
+        <span>
+          <span class="title">How do you know it worked</span>
+          <span class="chips">
+            <span class="chip">target before design</span>
+            <span class="chip">completion, conversion</span>
+            <span class="chip">qualitative when no number</span>
+            <span class="chip">beautiful Figma nobody notices</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a6"><div><div class="a-inner">
+        <p>It depends on the goal, so the first thing is setting the target before we design. If we want fewer people abandoning a task, we measure completion. If it's a new subscription flow, we measure conversion.</p>
+        <p>When there's no clean number, I go qualitative: watching people use it, reviews, support tickets.</p>
+        <p>And I'm suspicious of the beautiful Figma screen that nobody notices in production.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a7">
+        <span class="n">07</span>
+        <span>
+          <span class="title">Working with engineers</span>
+          <span class="chips">
+            <span class="chip">check cost before falling in love</span>
+            <span class="chip">cheaper way to get close</span>
+            <span class="chip">ship fast > design intact</span>
+            <span class="chip">Jira, adapt</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a7"><div><div class="a-inner">
+        <p>Closely, from beginning to end. At the start I check what they're busy with and share where the design is heading. While designing, if I have a big idea, I check the cost before I fall in love with it. And at handoff I ask if they have a cheaper way to get something close.</p>
+        <p>I care more about shipping the right thing fast than about my design surviving intact. I've worked mostly in Jira, but I adapt to whatever the team uses.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a8">
+        <span class="n">08</span>
+        <span>
+          <span class="title">AI in your process</span>
+          <span class="chips">
+            <span class="chip">Figma → React</span>
+            <span class="chip">one source of truth</span>
+            <span class="chip">text handoff</span>
+            <span class="chip">Claude skills</span>
+            <span class="chip">avatar side project</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a8"><div><div class="a-inner">
+        <p>I use it daily. The biggest change: we moved the whole design system from Figma to React. Instead of Figma and Storybook as two sources of truth, there's one React library. Handoff isn't a static file anymore, I can list the components and describe the screen, and developers build it with their own AI assistant.</p>
+        <p>I also built a set of Claude skills for my design work, so it's process, not just tools.</p>
+        <p>And I play with it on my own time: my self-care app uses AI-generated 3D, rigging, animation, even live weather.</p>
+      </div></div></div>
+    </section>
+
+    <section class="item">
+      <button class="q" type="button" aria-expanded="false" aria-controls="a9">
+        <span class="n">09</span>
+        <span>
+          <span class="title">Your questions for Jenn</span>
+          <span class="chips">
+            <span class="chip soft">team + overlap</span>
+            <span class="chip soft">grow or new direction</span>
+            <span class="chip soft">biggest problem 6 months</span>
+            <span class="chip soft">next steps</span>
+            <span class="chip soft">Brazil + range</span>
+          </span>
+        </span>
+        <span class="icon" aria-hidden="true"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 1v10M1 6h10"/></svg></span>
+      </button>
+      <div class="a" id="a9"><div><div class="a-inner">
+        <ol>
+          <li>Who's on the team, where is everyone based, and how much overlap would we have with Brazil?</li>
+          <li>Is the role more about growing what exists, or creating a new direction?</li>
+          <li>What's the biggest UX problem for the next six months?</li>
+          <li>What are the next steps in the hiring process?</li>
+          <li><strong>One practical thing:</strong> since I'll be based in Brazil, how do you handle hiring outside the US, and does the range in the job post apply to international hires, or is it adjusted?</li>
+        </ol>
+      </div></div></div>
+    </section>
+
+  </div>
+
+  <footer>Private page. Not linked, not indexed.</footer>
+</div>
+
+<script>
+  const items = [...document.querySelectorAll('.item')];
+  const toggleAll = document.getElementById('toggleAll');
+
+  function setOpen(item, open) {
+    item.classList.toggle('open', open);
+    item.querySelector('.q').setAttribute('aria-expanded', String(open));
+  }
+  function syncToggleAll() {
+    const allOpen = items.every(i => i.classList.contains('open'));
+    toggleAll.textContent = allOpen ? 'Collapse all' : 'Expand all';
+    toggleAll.setAttribute('aria-pressed', String(allOpen));
+  }
+
+  items.forEach(item => {
+    item.querySelector('.q').addEventListener('click', () => {
+      setOpen(item, !item.classList.contains('open'));
+      syncToggleAll();
+    });
+  });
+
+  toggleAll.addEventListener('click', () => {
+    const allOpen = items.every(i => i.classList.contains('open'));
+    items.forEach(i => setOpen(i, !allOpen));
+    syncToggleAll();
+  });
+
+  // Keep the screen awake during the call, when the browser allows it.
+  if ('wakeLock' in navigator) {
+    const lock = () => navigator.wakeLock.request('screen').catch(() => {});
+    lock();
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') lock();
+    });
+  }
+</script>
+</body>
+</html>
