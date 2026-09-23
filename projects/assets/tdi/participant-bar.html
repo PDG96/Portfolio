@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Participant bar · LGES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Same tokens as globe.html so the two surfaces read as one product. */
+  :root{
+    --bg:#1B1B20; --panel:#121316; --panel-2:#17181c; --border:#25272d; --border-2:#2f323a;
+    --text:#f0f1f2; --text-2:#c9cbcf; --muted:#8a8e96; --muted-2:#5f636b;
+    --accent:#8b5cf6; --accent-2:#a78bfa;
+    --low:#4ade80; --medium:#fbbf24; --high:#f87171;
+    --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --glass:rgba(30,30,36,.58); --glass-border:rgba(255,255,255,.14);
+    --ease:cubic-bezier(.65,0,.35,1);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;-webkit-font-smoothing:antialiased}
+  body{padding:56px 40px 80px}
+  h1{font-size:13px;font-weight:500;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin:0 0 18px}
+  section{margin-bottom:64px}
+  .note{font-size:12px;color:var(--muted);margin:14px 0 0;max-width:720px;line-height:1.5}
+
+  /* Stand-in for the flow map behind the bar, so the glass has something to blur. */
+  .stage{position:relative;max-width:1320px;padding:48px 24px;border-radius:16px;overflow:hidden;background:
+    linear-gradient(var(--bg),var(--bg)) padding-box}
+  .stage::before{content:"";position:absolute;inset:0;background:
+    repeating-linear-gradient(90deg,transparent 0 118px,rgba(255,255,255,.05) 118px 119px),
+    repeating-linear-gradient(0deg,transparent 0 78px,rgba(255,255,255,.05) 78px 79px)}
+  .stage .node{position:absolute;width:150px;height:56px;border-radius:8px;background:#232329;border:1px solid #33343b}
+  .stage .node.on{border-color:var(--accent);box-shadow:0 0 0 1px rgba(139,92,246,.25)}
+  .stage .wire{position:absolute;width:1px;background:var(--accent);opacity:.8}
+
+  /* ---------- the bar ---------- */
+  .bar{position:relative;display:grid;grid-template-columns:minmax(260px,1.3fr) 1.3fr .9fr 1fr .8fr 40px;align-items:center;gap:20px;
+    background:var(--glass);backdrop-filter:blur(16px) saturate(140%);-webkit-backdrop-filter:blur(16px) saturate(140%);
+    border:1px solid var(--glass-border);border-radius:16px;padding:16px 18px;
+    box-shadow:0 10px 32px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
+  .who{display:flex;align-items:center;gap:14px;min-width:0}
+  .logo{width:44px;height:44px;border-radius:50%;flex:none}
+  .name{font-size:17px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .city{font-size:13px;color:var(--muted);margin-top:3px}
+  .field label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:8px}
+  .field .val{font-size:14px;display:flex;align-items:center;gap:8px;line-height:1.25;white-space:nowrap}
+  .ico{width:30px;height:30px;border-radius:7px;flex:none;display:grid;place-items:center;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.22);color:var(--low)}
+  .ico svg{width:16px;height:16px}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:999px;font-size:13px;font-weight:500;color:var(--low);background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.22)}
+  .pill i{width:6px;height:6px;border-radius:50%;background:var(--low)}
+  .flags{font-size:18px;line-height:1;letter-spacing:1px}
+  .open{width:40px;height:40px;border-radius:10px;border:1px solid var(--glass-border);background:rgba(255,255,255,.08);color:var(--text);display:grid;place-items:center;cursor:pointer;transition:background .15s,transform .1s}
+  .open:hover{background:rgba(255,255,255,.14)}
+  .open:active{background:rgba(255,255,255,.2);transform:scale(.97)}
+  .open svg{width:16px;height:16px}
+
+  /* Variant B: metrics from the graph plus sister sites, second row. */
+  .bar.wide{grid-template-columns:minmax(272px,1.2fr) 1.1fr .75fr .95fr .75fr 1fr 1fr 40px;gap:16px}
+  .bar.wide .name{font-size:16px}
+  .bar.wide .field .val{white-space:normal}
+  .bar.wide .kv span{white-space:nowrap}
+  .kv{display:flex;align-items:baseline;gap:6px}
+  .kv b{font-size:18px;font-weight:600;line-height:1}
+  .kv span{font-size:12px;color:var(--muted)}
+  .sub{grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;margin-top:2px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;color:var(--muted)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:7px;font-size:12px;color:var(--text-2);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);white-space:nowrap}
+  .chip b{font-weight:500;color:var(--text)}
+  .chip small{color:var(--muted);font-size:11px}
+  .sub i{width:5px;height:5px;border-radius:50%;background:var(--accent-2);display:inline-block;margin-right:6px;vertical-align:middle}
+
+  @media (max-width:1100px){
+    .bar,.bar.wide{grid-template-columns:1fr 1fr;gap:16px}
+    .who{grid-column:1 / -1}
+    .open{grid-column:2;justify-self:end}
+  }
+</style>
+</head>
+<body>
+
+<section>
+  <h1>A · Same fields as today, in the map's glass</h1>
+  <div class="stage">
+    <div class="node on" style="left:44%;top:-40px"></div>
+    <div class="wire" style="left:calc(44% + 75px);top:0;height:48px"></div>
+    <div class="node" style="left:8%;bottom:-40px"></div><div class="node" style="left:26%;bottom:-40px"></div>
+    <div class="node on" style="left:44%;bottom:-40px"></div><div class="node" style="left:62%;bottom:-40px"></div><div class="node" style="left:80%;bottom:-40px"></div>
+    <div class="wire" style="left:calc(44% + 75px);bottom:0;height:48px"></div>
+
+    <div class="bar">
+      <div class="who">
+        <img class="logo" src="lg.png" alt="">
+        <div><div class="name">LG Energy Solution (LGES)</div><div class="city">Seoul, South Korea</div></div>
+      </div>
+      <div class="field"><label>Supply chain position</label><div class="val"><span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2 13.5V6.5l4 2.5V6.5l4 2.5V4.5l4 2.5v6.5H2z"/><path d="M2 13.5h12"/></svg></span>Battery Pack Manufacturing</div></div>
+      <div class="field"><label>Country of origin</label><div class="val"><span class="flags">🇰🇷</span>South Korea</div></div>
+      <div class="field"><label>Associated countries</label><div class="val flags">🇺🇸🇨🇳🇨🇭🇯🇵🇨🇩🇿🇲</div></div>
+      <div class="field"><label>Supply Chain Risk</label><div class="val"><span class="pill"><i></i>Low</span></div></div>
+      <button class="open" type="button" title="Open participant"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12L12 4M6 4h6v6"/></svg></button>
+    </div>
+  </div>
+  <p class="note">Same content as the current bar. What changed: glass surface and border from the globe card, 16px radius, 44px logo, 17px name, country name next to the flag, risk pill and position tile in the card's proportions, arrow button with hover and pressed states.</p>
+</section>
+
+<section>
+  <h1>B · With the graph metrics from the globe card</h1>
+  <div class="stage">
+    <div class="node on" style="left:44%;top:-40px"></div>
+    <div class="wire" style="left:calc(44% + 75px);top:0;height:48px"></div>
+    <div class="node" style="left:8%;bottom:-40px"></div><div class="node" style="left:26%;bottom:-40px"></div>
+    <div class="node on" style="left:44%;bottom:-40px"></div><div class="node" style="left:62%;bottom:-40px"></div><div class="node" style="left:80%;bottom:-40px"></div>
+    <div class="wire" style="left:calc(44% + 75px);bottom:0;height:48px"></div>
+
+    <div class="bar wide">
+      <div class="who">
+        <img class="logo" src="lg.png" alt="">
+        <div><div class="name">LG Energy Solution (LGES)</div><div class="city">Seoul, South Korea</div></div>
+      </div>
+      <div class="field"><label>Supply chain position</label><div class="val"><span class="ico"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M2 13.5V6.5l4 2.5V6.5l4 2.5V4.5l4 2.5v6.5H2z"/><path d="M2 13.5h12"/></svg></span>Battery Pack Manufacturing</div></div>
+      <div class="field"><label>Country of origin</label><div class="val"><span class="flags">🇰🇷</span>South Korea</div></div>
+      <div class="field"><label>Associated countries</label><div class="val flags">🇺🇸🇨🇳🇨🇭🇯🇵🇨🇩🇿🇲</div></div>
+      <div class="field"><label>Supply Chain Risk</label><div class="val"><span class="pill"><i></i>Low</span></div></div>
+      <div class="field"><label>Direct links</label><div class="val kv"><b>2</b><span>1 supplier · 1 customer</span></div></div>
+      <div class="field"><label>Chain depth</label><div class="val kv"><b>7</b><span>tiers to mine site</span></div></div>
+      <button class="open" type="button" title="Open participant"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12L12 4M6 4h6v6"/></svg></button>
+      <div class="sub">
+        <span class="chips"><span style="color:var(--muted);margin-right:4px">Also operates</span><span class="chip"><b>Battery Cell Manufacturing</b><small>Ochang</small></span><span class="chip"><b>Cathode Manufacturing</b><small>Cheongju</small></span></span>
+        <span><i></i>Cobalt route · 42 participants upstream · Nikola downstream</span>
+      </div>
+    </div>
+  </div>
+  <p class="note">Variant A plus the two numbers the globe card computes from the graph (direct links, chain depth) and a second row with the sister sites and the route summary. Heavier, but it is the same vocabulary as the card, so opening the map and reading the bar feel like one thing.</p>
+</section>
+
+</body>
+</html>

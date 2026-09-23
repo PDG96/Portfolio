@@ -730,6 +730,76 @@
      max-width: 1500px;
      width: 100%;
    }
+   /* Vídeo com o mesmo enquadramento das imagens: a moldura carrega o raio e
+      a borda, e o vídeo preenche. */
+   .main-sheet .app-shot--video .video-frame {
+     width: 100%;
+     max-width: 1500px;
+     margin-inline: auto;
+     border-radius: 14px;
+     overflow: hidden;
+     background: var(--gray-true-900, #171717);
+     line-height: 0;
+   }
+   .main-sheet .app-shot--video video {
+     display: block;
+     width: 100%;
+     height: auto;
+   }
+   /* Par de quadrados: a frase de abertura e o ciclo das etapas, lado a lado.
+      Abaixo de 760px empilham. */
+   .shot-pair {
+     display: grid;
+     grid-template-columns: 1fr 1fr;
+     gap: clamp(0.75rem, 1.6vw, 1.25rem);
+     width: 100%;
+     max-width: 1500px;
+     margin-inline: auto;
+   }
+   .shot-pair figure { margin: 0; }
+   .shot-pair .video-frame { border-radius: 14px; overflow: hidden; line-height: 0; }
+   .shot-pair video { display: block; width: 100%; height: auto; aspect-ratio: 1/1; object-fit: cover; }
+   @media (max-width: 760px) { .shot-pair { grid-template-columns: 1fr; } }
+
+   /* ====== COMPARADOR — mesmo componente do case do KOTA ======
+      O cursor atravessa o quadro e a divisória acompanha, sem precisar clicar.
+      Toque arrasta (toque não tem hover) e as setas funcionam com foco. */
+   .reveal {
+     position: relative; width: 100%; max-width: 1500px; margin-inline: auto;
+     aspect-ratio: 2048/998; border-radius: 14px; overflow: hidden;
+     border: 1px solid var(--border); user-select: none; touch-action: pan-y; cursor: ew-resize;
+   }
+   .reveal img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+   .reveal .after-layer { position: absolute; inset: 0; z-index: 1; }
+   .reveal .before-layer { position: absolute; inset: 0; z-index: 2; clip-path: inset(0 calc(100% - var(--pos, 50%)) 0 0); }
+   .rline {
+     position: absolute; top: 0; bottom: 0; left: var(--pos, 50%); width: 2px;
+     background: rgba(255,255,255,.85); z-index: 3; transform: translateX(-1px);
+     pointer-events: none; box-shadow: 0 0 12px rgba(0,0,0,.4);
+   }
+   .rhandle {
+     position: absolute; top: 50%; left: var(--pos, 50%); z-index: 4; width: 48px; height: 48px; border-radius: 50%;
+     transform: translate(-50%, -50%); pointer-events: none;
+     background: rgba(18,19,24,.5); backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
+     -webkit-backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
+     border: 1px solid rgba(255,255,255,.24); display: flex; align-items: center; justify-content: center;
+     box-shadow: 0 8px 24px rgba(0,0,0,.35); transition: transform .2s ease;
+   }
+   .reveal:hover .rhandle { transform: translate(-50%, -50%) scale(1.08); }
+   .rhandle svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+   .rhandle .chL { margin-right: 2px; }
+   .rpill {
+     position: absolute; top: 14px; z-index: 3; display: inline-flex; align-items: center;
+     font-family: var(--mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
+     color: #fff; padding: 6px 14px; border-radius: 999px;
+     background: rgba(18,19,24,.5); backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
+     -webkit-backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
+     border: 1px solid rgba(255,255,255,.24);
+   }
+   .rpill.before { left: 14px; }
+   .rpill.after { right: 14px; }
+   .reveal:focus-visible { outline: 2px solid var(--accent, #7A5AF8); outline-offset: 2px; }
+
    /* The hero shot follows the same measure, so the page opens on the same
       left and right edges the sections below it keep. */
    .main-sheet .case-hero-mockup img {
@@ -2001,7 +2071,7 @@
   <section class="case-hero">
     <div class="wrap">
       <div class="case-hero-mockup r" style="aspect-ratio:auto;padding:0;background:transparent;border:none;">
-        <img src="assets/supply-chain/flow-map.jpg" alt="The supply chain flow map open on a laptop: the cobalt route traced from artisanal mine sites in the Democratic Republic of the Congo up through smelters, refiners and cathode makers to the battery pack manufacturer, with a supplier panel below showing position, country of origin and risk level">
+        <img src="assets/supply-chain/flow-map.jpg?v=2" alt="A tablet on a concrete surface in raking light, showing the flow map overview: the globe with the cobalt route drawn across it, and the supply chain participants listed below with position, country and risk">
       </div>
     </div>
   </section>
@@ -2027,19 +2097,57 @@
   </section>
 
 
-  <!-- ====== THE PLATFORM (real screens) ====== -->
+  <!-- ====== THE PLATFORM ======
+       A ordem é a da leitura: primeiro o produto em movimento, depois o que
+       ele promete e as etapas que percorre, e por fim a prova, a mesma cadeia
+       com e sem o registro por trás. -->
   <section class="case-section">
     <div class="wrap">
       <div class="app-stack r-stagger">
-        <figure class="app-shot r">
-          <img src="assets/supply-chain/supplier-assessment.jpg" alt="Supplier assessment for a copper mine: inherent risk, residual risk and audit performance as three separate readings, location on a map, audit criteria scored against the OECD-aligned checklist, and the self-assessment entry form the supplier fills in alongside it">
-          <figcaption>Supplier assessment, the analyst's read and the supplier's own entry form side by side</figcaption>
+
+        <figure class="app-shot app-shot--video r">
+          <div class="video-frame">
+            <video muted loop playsinline preload="metadata"
+              src="assets/supply-chain/tdi-app.mp4?v=5"
+              aria-label="The platform, animated: it opens on the chain drawn as a graph, from the artisanal mine sites up through smelters, refiners and cathode makers to the vehicle maker, then moves to the globe, where the same route is laid over the map and the LG Energy Solution card opens on its position in the chain, country of origin, associated countries, risk, direct links and depth to the mine site."></video>
+          </div>
+          <figcaption>The same chain as a graph and as a map, and one participant's record open on it</figcaption>
         </figure>
 
+        <div class="shot-pair r">
+          <figure>
+            <div class="video-frame">
+              <video muted loop playsinline preload="metadata"
+                src="assets/supply-chain/tdi-claim.mp4?v=3"
+                aria-label="Map the chain. Score the risk. Report it. The words build in over a slowly turning globe drawn as a field of dots."></video>
+            </div>
+          </figure>
+          <figure>
+            <div class="video-frame">
+              <video muted loop playsinline preload="metadata"
+                src="assets/supply-chain/tdi-stages.mp4?v=4"
+                aria-label="The stages of the chain cycling through: extract, process, manufacture, each one taking its turn in the centre as the colour changes."></video>
+            </div>
+          </figure>
+        </div>
+
         <figure class="app-shot r">
-          <img src="assets/supply-chain/composition.jpg" alt="Composition of platform surfaces: the country risk table, the flow overview tracing the chain from mine to manufacturer, the supply chain participants list, and the globe view plotting the route across continents">
-          <figcaption>One chain, four ways in, table, flow, participants and the globe</figcaption>
+          <div class="reveal" id="scReveal" role="slider" tabindex="0"
+               aria-label="Compare the opaque chain and the traced one"
+               aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" style="--pos:50%">
+            <div class="after-layer"><img src="assets/supply-chain/traced.jpg?v=4" alt="The chain traced: every stage carries its risk, the evidence behind it and the date it was checked"></div>
+            <div class="before-layer"><img src="assets/supply-chain/opaque.jpg?v=3" alt="The same chain without the record behind it: shapes on a map and nothing to read"></div>
+            <div class="rline"></div>
+            <div class="rpill before">Opaque</div>
+            <div class="rpill after">Traced</div>
+            <div class="rhandle">
+              <svg class="chL" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
+              <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+            </div>
+          </div>
+          <figcaption>The same chain, with and without the record behind it. Drag to compare.</figcaption>
         </figure>
+
       </div>
     </div>
   </section>
@@ -2054,6 +2162,71 @@
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', scrollY > 10);
     }, { passive: true });
+
+    /* Os vídeos começam quando chegam ao leitor, não no load. Não têm
+       `autoplay`: sem isso, cada clipe já teria repetido várias vezes antes
+       de alguém rolar até ele, e o leitor o encontraria no meio do movimento.
+       Cada um reabre no primeiro frame toda vez que volta à tela, porque são
+       loops curtos em que a construção é o ponto. Mesma lógica do case do
+       KOTA, inclusive rodando por conta do scroll em vez de
+       IntersectionObserver: se o handler nunca rodar, o clipe simplesmente
+       fica parado no primeiro frame em vez de virar uma caixa preta. */
+    (function () {
+      const vids = [...document.querySelectorAll('.app-shot--video video, .shot-pair video')];
+      if (!vids.length) return;
+      const playing = new WeakSet();
+      const SHOWN = 0.25;
+      function sync() {
+        const vh = window.innerHeight || document.documentElement.clientHeight;
+        vids.forEach(v => {
+          const r = v.getBoundingClientRect();
+          if (!r.height) return;
+          const visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+          const enough = visible / Math.min(r.height, vh) >= SHOWN;
+          if (enough && !playing.has(v)) {
+            playing.add(v);
+            v.currentTime = 0;
+            const p = v.play();
+            if (p && p.catch) p.catch(() => {});
+          } else if (!enough && playing.has(v)) {
+            playing.delete(v);
+            v.pause();
+          }
+        });
+      }
+      ['scroll', 'resize'].forEach(ev => window.addEventListener(ev, sync, { passive: true }));
+      const sheet = document.querySelector('.main-sheet');
+      if (sheet) sheet.addEventListener('scroll', sync, { passive: true });
+      sync();
+      window.addEventListener('load', sync, { once: true });
+    })();
+
+    // Comparador: o mouse só precisa passar por cima; toque arrasta, setas
+    // funcionam com o quadro focado.
+    (function () {
+      const el = document.getElementById('scReveal');
+      if (!el) return;
+      let dragging = false;
+      function setPos(clientX) {
+        const r = el.getBoundingClientRect();
+        const pct = Math.min(100, Math.max(0, ((clientX - r.left) / r.width) * 100));
+        el.style.setProperty('--pos', pct + '%');
+        el.setAttribute('aria-valuenow', Math.round(pct));
+      }
+      el.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || dragging) setPos(e.clientX); });
+      el.addEventListener('pointerdown', e => { dragging = true; el.setPointerCapture(e.pointerId); setPos(e.clientX); });
+      el.addEventListener('pointerup', () => { dragging = false; });
+      el.addEventListener('pointercancel', () => { dragging = false; });
+      el.addEventListener('keydown', e => {
+        let cur = parseFloat(el.style.getPropertyValue('--pos')) || 50;
+        if (e.key === 'ArrowLeft') cur = Math.max(0, cur - 5);
+        else if (e.key === 'ArrowRight') cur = Math.min(100, cur + 5);
+        else return;
+        e.preventDefault();
+        el.style.setProperty('--pos', cur + '%');
+        el.setAttribute('aria-valuenow', Math.round(cur));
+      });
+    })();
 
     // Reveal
     const obs = new IntersectionObserver(es =>

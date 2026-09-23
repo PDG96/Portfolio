@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>TDI · Sidebar reveal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Recriação do artboard "Teste claude" do Jitter (TDI), 4s.
+   Parâmetros lidos direto do painel do Jitter, camada por camada:
+     Shape 2   · Mask Reveal ↓ 620ms Smooth            · delay 214ms
+     Text 1    · Mask in ↑ 757ms Smooth, palavras 227ms · delay 0
+     Rectangle 2 · Fade in 590ms                        · delay 116ms
+     Icon      · Grow in de 50%, 610ms Slow down        · delays 133/214/289/364/440/515
+     Text 2-7  · Slide in ↑ 50%, 346ms Smooth, palavras 47ms · delays 272/289/376/457/521/590
+   Jitter "Smooth" = ease-in-out, "Slow down" = ease-out. */
+:root{
+  --ink:#0F0F12; --ink2:#18181C; --surface:#1B1B20; --line:#2A2B33;
+  --text:#F1F1F4; --muted:#9A9EAB; --accent:#7A5AF8;
+  --smooth:cubic-bezier(.45,0,.55,1);      /* Jitter · Smooth */
+  --slowdown:cubic-bezier(.22,1,.36,1);    /* Jitter · Slow down */
+}
+*{box-sizing:border-box}
+body{margin:0;background:#0A0A0C;color:var(--muted);font:13px Inter,sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;gap:20px;padding:40px}
+.bar{display:flex;gap:10px;align-items:center}
+button{font:inherit;color:var(--text);background:var(--surface);border:1px solid var(--line);
+  border-radius:8px;padding:8px 14px;cursor:pointer}
+button:hover{background:#202026}
+.stage{width:250px;height:696px;background:var(--ink2);position:relative;overflow:hidden;
+  border-radius:4px;flex:none}
+
+/* divider: Shape 2 · mask reveal para baixo */
+.divider{position:absolute;right:0;top:0;width:1px;height:100%;background:var(--line);
+  transform-origin:top center}
+
+.title{position:absolute;left:24px;top:32px;font-size:18px;font-weight:600;color:#fff;
+  letter-spacing:-.2px;display:flex;gap:.28em}
+.word{display:inline-block;overflow:hidden}
+.word i{display:inline-block;font-style:normal}
+
+.nav{position:absolute;left:14px;top:68px;width:222px}
+.row{position:relative;height:44px;display:flex;align-items:center;padding:0 12px}
+.hl{position:absolute;inset:2px 0;border-radius:8px;background:rgba(255,255,255,.08)}
+.row .ic{width:20px;height:20px;flex:none;transform-origin:center}
+.row .ic svg{width:20px;height:20px;fill:none;stroke:#B9BBC4;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;display:block}
+.row.on .ic svg{stroke:#fff}
+.label{margin-left:12px;font-size:14px;color:#D9DAE0;display:flex;gap:.28em}
+.row.on .label{color:#fff;font-weight:500}
+.label .w{display:inline-block}
+  .row{overflow:hidden}
+
+/* ---------- estado inicial ----------
+   No Jitter, "Mode: In" quer dizer que a camada não existe antes da própria
+   animação começar. Por isso fill-mode é `forwards` (e não `both`): durante o
+   delay vale o estado base abaixo, que esconde o elemento; no instante do
+   start o primeiro keyframe o traz à cena. Com `both` tudo aparecia de uma vez
+   no frame 0, que era o erro da primeira tentativa. */
+.divider{clip-path:inset(0 0 100% 0)}
+.word i{transform:translateY(100%)}          /* escondido pela máscara */
+.hl{opacity:0}
+.ic{visibility:hidden;transform:scale(.5)}
+.label .w{visibility:hidden;transform:translateY(50%)}
+
+.play .divider{animation:reveal .62s var(--smooth) .214s forwards}
+.play .word i{animation:maskup .757s var(--smooth) forwards}
+.play .word:nth-child(1) i{animation-delay:0s}
+.play .word:nth-child(2) i{animation-delay:.227s}
+.play .hl{animation:fade .59s linear .116s forwards}
+.play .ic{animation:grow .61s var(--slowdown) forwards}
+.play .label .w{animation:slideup .346s var(--smooth) forwards}
+
+.play .row:nth-child(1) .ic{animation-delay:.133s}
+.play .row:nth-child(2) .ic{animation-delay:.214s}
+.play .row:nth-child(3) .ic{animation-delay:.289s}
+.play .row:nth-child(4) .ic{animation-delay:.364s}
+.play .row:nth-child(5) .ic{animation-delay:.440s}
+.play .row:nth-child(6) .ic{animation-delay:.515s}
+
+.play .row:nth-child(1) .label .w{animation-delay:.272s}
+.play .row:nth-child(2) .label .w{animation-delay:.289s}
+.play .row:nth-child(3) .label .w{animation-delay:.376s}
+.play .row:nth-child(4) .label .w{animation-delay:.457s}
+.play .row:nth-child(5) .label .w{animation-delay:.521s}
+.play .row:nth-child(6) .label .w{animation-delay:.590s}
+/* palavras seguintes do mesmo label entram 47ms depois (Text animation · Words) */
+.play .row:nth-child(1) .label .w:nth-child(2){animation-delay:.319s}
+.play .row:nth-child(1) .label .w:nth-child(3){animation-delay:.366s}
+.play .row:nth-child(3) .label .w:nth-child(2){animation-delay:.423s}
+
+@keyframes reveal{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes maskup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes grow{from{visibility:visible;transform:scale(.5)}to{visibility:visible;transform:scale(1)}}
+@keyframes slideup{from{visibility:visible;transform:translateY(50%)}to{visibility:visible;transform:translateY(0)}}
+</style></head>
+<body>
+
+<div class="bar">
+  <button id="replay">Replay</button>
+  <button id="loop">Loop: on</button>
+  <span id="t">4.00s</span>
+</div>
+
+<div class="stage" id="stage">
+  <div class="divider"></div>
+  <div class="title"><span class="word"><i>Supply</i></span><span class="word"><i>Chain</i></span></div>
+  <div class="nav" id="nav"></div>
+</div>
+
+<script>
+const ICONS = {
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  box:'<path d="m21 8-9-5-9 5v8l9 5 9-5z"/><path d="m3 8 9 5 9-5"/><path d="M12 13v8"/>',
+  pin:'<circle cx="12" cy="6" r="3"/><path d="M12 9v7"/><path d="m8 20 4-4 4 4"/>',
+  alert:'<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v5"/><path d="M12 16.5v.01"/>',
+  clipboard:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/>',
+  pie:'<path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/>',
+};
+const NAV = [['Supply Chain Map','globe',true],['Suppliers','box'],['Traceability','pin'],
+             ['Risks','alert'],['Assessments','clipboard'],['Analytics','pie']];
+document.getElementById('nav').innerHTML = NAV.map(([label, ic, on]) => `
+  <div class="row${on?' on':''}">
+    ${on ? '<div class="hl"></div>' : ''}
+    <span class="ic"><svg viewBox="0 0 24 24">${ICONS[ic]}</svg></span>
+    <span class="label">${label.split(' ').map(w=>`<span class="w">${w}</span>`).join('')}</span>
+  </div>`).join('');
+
+const stage = document.getElementById('stage');
+let looping = true, timer;
+function play(){
+  stage.classList.remove('play'); void stage.offsetWidth; stage.classList.add('play');
+  clearTimeout(timer);
+  if (looping) timer = setTimeout(play, 4000);   // duração do artboard no Jitter
+}
+document.getElementById('replay').onclick = play;
+
+// Seek determinístico: congela a cena num instante exato, sem depender do
+// relógio (aba em segundo plano estrangula animação CSS). Útil pra comparar
+// frame a frame com o preview do Jitter.
+window.seek = t => {
+  stage.classList.remove('play'); void stage.offsetWidth; stage.classList.add('play');
+  clearTimeout(timer);
+  document.querySelectorAll('.stage *').forEach(e => {
+    const cs = getComputedStyle(e);
+    if (cs.animationName === 'none') return;
+    if (!e.dataset.d) e.dataset.d = parseFloat(cs.animationDelay) || 0;
+    e.style.animationDelay = (parseFloat(e.dataset.d) - t) + 's';
+    e.style.animationPlayState = 'paused';
+  });
+  return 'seek ' + t + 's';
+};
+window.resume = () => {
+  document.querySelectorAll('.stage *').forEach(e => {
+    e.style.animationDelay = ''; e.style.animationPlayState = '';
+  });
+  play();
+};
+document.getElementById('loop').onclick = e => {
+  looping = !looping; e.target.textContent = 'Loop: ' + (looping ? 'on' : 'off');
+  if (looping) play(); else clearTimeout(timer);
+};
+play();
+</script>
+</body></html>
