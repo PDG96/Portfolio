@@ -9,9 +9,6 @@
  <link rel="icon" type="image/svg+xml" href="../favicon.svg">
  <link rel="apple-touch-icon" href="../favicon.svg">
 
- <link rel="preload" href="../assets/fonts/TWKLausanne-300.woff2" as="font" type="font/woff2" crossorigin>
- <link rel="preload" href="../assets/fonts/TWKLausanne-300Italic.woff2" as="font" type="font/woff2" crossorigin>
- <link rel="preload" href="../assets/fonts/TWKLausanne-400.woff2" as="font" type="font/woff2" crossorigin>
  <link rel="stylesheet" href="../assets/fonts/lausanne.css">
 
  <!-- Stamped before first paint so a dark-theme reload doesn't flash white. -->
@@ -19,7 +16,7 @@
  (function () {
  var saved = null;
  try { saved = localStorage.getItem('theme'); } catch (e) {}
- // Dark is the default landing state, same as the main site, the OS
+ // Dark is the default landing state, same as the main site — the OS
  // preference no longer decides it.
  document.documentElement.setAttribute('data-theme', saved === 'light' ? 'light' : 'dark');
  })();
@@ -52,69 +49,13 @@
  /* Shell layer: the gutter behind the panes, and the pane surface itself.
  Tokenized so light/dark can swap them — they used to be hardcoded
  #f0f0ee and #ffffff in the shell rules. */
- /* One page ground across the whole site. The cards keep a step of
-    separation through --sheet. */
- --shell-bg: #fbfaf8;
- --shell-glass: rgba(251, 250, 248, 0.72);
- --sheet: #ffffff;
+ --shell-bg: #ebe9e4;
+ --sheet: #fbfaf8;
  /* One side spacing for everything inside the sheet. Components used to
     offset themselves by the old page gutter (4vw) while the wrap padded
     at a flat 2rem, so every bled element sat a different distance from
     the edge and the wide ones spilled. */
- /* ====== ONE EDGE (mirrors index.html) ======
-    Every outer corner on every page is the same distance from the window.
-    Measured off the three display mockups; the case sheet lands on the same
-    measure and the same vertical budget as the landing views.
-
-      nav band = edge (32) + header row (24) + edge (32) = 88
-      shell top    = nav band (88) + gap (24)            = 112
-      shell bottom = edge (32) + pill (36) + edge (32)   = 100
-
-    The sidebar is 23% of the measure, not of the window: at 23vw it kept
-    scaling with the display while the sheet was bounded, which is what
-    crushed the sheet into narrow columns on a wide screen. */
- --edge: 32px;
- --header-h: 24px;
- --seg-h: 40px;
- --seg-on-bg: #2e2e2e;
- --seg-on-fg: #fbfaf8;
- --nav-h: calc(var(--edge) * 2 + var(--header-h));
- --grid-gap: 24px;
-
- --page-gutter: var(--edge);
- --page-max: 2272px;
- --view-pad-top: calc(var(--nav-h) + var(--grid-gap));
- --seg-band: calc(var(--edge) * 2 + var(--seg-h));
- --sidebar-w: 19%;
-
- /* ====== THE MEASURE ======
-    Same computation as the landing, so the case sheet sits on exactly the
-    edge the Work grid does. Work is the constrained surface — card height
-    from --view-h, a ceiling on the ratio — and every other surface takes
-    its width from that rather than computing its own. --edge is the floor:
-    small enough a window and everything locks at 32 together. */
- --view-h: calc(100svh - var(--view-pad-top) - var(--seg-band));
- --card-max: 2.0;
- --work-max: 2208px;
- --card-h: calc((var(--view-h) - var(--grid-gap)) / 2);
- --measure: min(
-   calc(100% - 2 * var(--edge)),
-   var(--work-max),
-   calc(var(--card-h) * var(--card-max) * 2 + var(--grid-gap))
- );
-
- /* The case pages are not bound by Work's card ratio. On the landing the
-    measure is capped by --view-h so a 2:1 card grid never outgrows the
-    window, and every surface follows Work so the site has one width. A case
-    study has no card grid to protect, and inheriting that cap left the whole
-    document huddled in the middle of a wide screen: on a short window it
-    stopped growing around 1400px however much room there was. Here the only
-    ceiling is --work-max. */
- /* Its own ceiling, not Work's. --work-max is 2208 because that is where a
-    2:1 card stops being readable in the Work grid; a sheet of text and
-    screenshots has no such wall, so the case runs to 2400 before it stops. */
- --case-max: 2400px;
- --measure-case: min(calc(100% - 2 * var(--edge)), var(--case-max));
+ --sheet-gutter: clamp(1.25rem, 2.5vw, 2rem);
 
  --accent: #3d5a3e;
  --accent-light: #e8ede8;
@@ -128,8 +69,8 @@
  /* Terracotta "Challenge" label, per theme: 5.3:1 light, 5.9:1 dark. */
  --label-warn: #a04e2f;
 
- --font: 'TWKLausanne', 'TWKLausanne Fallback', system-ui, sans-serif;
- --mono: 'TWKLausanne', 'TWKLausanne Fallback', system-ui, sans-serif;
+ --font: 'TWKLausanne', system-ui, sans-serif;
+ --mono: 'TWKLausanne', system-ui, sans-serif;
  --ease: cubic-bezier(0.16, 1, 0.3, 1);
 
  --section-py: clamp(3rem, 8vw, 7rem);
@@ -140,8 +81,6 @@
  its meaning, the roles swap ends of it. Ratios against the pane
  (#1a1a1a): text 16.7:1, text-2 6.9:1, text-3 5.4:1, link 8.9:1. */
  [data-theme="dark"] {
- --seg-on-bg: #fbfaf8;
- --seg-on-fg: #141414;
  --bg: #141414;
  --bg-alt: #232323;
  --surface: #1a1a1a;
@@ -151,7 +90,6 @@
  --border: #333333;
 
  --shell-bg: #0f0f0f;
- --shell-glass: rgba(15, 15, 15, 0.72);
  --sheet: #1a1a1a;
 
  /* Sage reads as near-black on a dark pane, so focus rings and accents
@@ -173,33 +111,24 @@
  -webkit-font-smoothing: antialiased;
  overflow-x: hidden;
  }
-  /* ====== GRAIN ======
-     Part of the ground, not a film over the page. It used to be a fixed
-     body::after at z-index 9998, which ran the texture straight across the
-     case screenshots — it read as dirt on the photos. As a background-image
-     on each ground it paints above that ground's colour and below anything
-     sitting on it, so the images come out clean for free.
-
-     The old layer opacity (0.3 dark / 0.42 light) is baked into the SVG and
-     the light theme's multiply is a background-blend-mode. */
-  :root {
-  --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.15'/%3E%3C/svg%3E");
-  --grain-blend: normal;
-  }
-  [data-theme="light"] {
-  --grain: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.21'/%3E%3C/svg%3E");
-  --grain-blend: multiply;
-  }
-  /* Only grounds that actually paint a colour. .sidebar-intro has no
-     background of its own on desktop, so adding the grain there doubled it
-     up over the sidebar's and showed as a lighter band. */
-  body.shell-page,
-  .sidebar,
-  .main-sheet {
-  background-image: var(--grain);
+ /* Grain texture overlay, same one the landing wears: a fine fractal-noise
+  film over the whole viewport so neither theme reads as a flat wash. */
+  body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998; /* under the lightbox (9999) and the cursor (10000) */
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
   background-size: 200px;
-  background-attachment: fixed;
-  background-blend-mode: var(--grain-blend);
+  }
+  /* On a light ground the same overlay lightens instead of textures, so the
+  grain multiplies into the paper and runs a little stronger to survive
+  the brighter surface. */
+  [data-theme="light"] body::after {
+  opacity: 0.42;
+  mix-blend-mode: multiply;
   }
  a { color: inherit; text-decoration: none; }
  a:focus-visible, button:focus-visible {
@@ -261,7 +190,7 @@
  width: 100%;
  max-width: clamp(72rem, 90vw, 110rem);
  margin: 0 auto;
- padding: 0 var(--edge);
+ padding: 0 var(--sheet-gutter);
  }
 
  .mono-label {
@@ -320,15 +249,15 @@
  /* ====== NAV ====== */
  .nav {
  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
- background: rgba(252,252,252,0.72);
- backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
- -webkit-backdrop-filter: blur(22px) saturate(1.55) contrast(1.05);
- transition: box-shadow 0.4s var(--ease), backdrop-filter 0.4s var(--ease);
+ background: rgba(252,252,252,0.85);
+ backdrop-filter: blur(12px);
+ -webkit-backdrop-filter: blur(12px);
+ transition: box-shadow 0.4s var(--ease);
  }
  .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
  .nav-inner {
  display: flex; align-items: center; justify-content: space-between;
- height: var(--nav-h);
+ height: 60px;
  }
  .nav-logo {
  font-family: var(--mono);
@@ -370,15 +299,10 @@
  /* ====== SIDEBAR SHELL ====== */
  /* White mode: light gutter, white sidebar + sheet cards. Same structure
  as the dark version, colors flipped to the site's default light tokens. */
- /* background-color, not the shorthand: `background:` resets
-     background-image and would strip the grain given above. */
-  .shell-page { background-color: var(--shell-bg); }
+ .shell-page { background: var(--shell-bg); }
 
  /* Header matches the page background instead of the usual white frosted bar */
- /* Glass, not a slab: the base .nav blurs what passes under it, and this
-    override used to paint an opaque --shell-bg straight over that. It went
-    unnoticed while the bar was 60px; at 88 it reads as a black block. */
- .shell-page .nav { background: var(--shell-glass); }
+ .shell-page .nav { background: var(--shell-bg); }
  .shell-page .nav.scrolled { box-shadow: 0 1px 0 var(--border); }
  .shell-page .nav-logo { color: var(--text); }
  .shell-page .nav-links a { color: var(--text-2); }
@@ -386,16 +310,15 @@
  .shell-page .nav .theme-toggle { border-color: var(--border); }
  .shell-page .nav .theme-btn { color: var(--text-2); }
  .shell-page .nav .theme-btn.active { background: var(--text); color: var(--sheet); }
- /* The bar is full-bleed, its contents ride the measure: the logo lands
-    on the sidebar's left edge at every width. */
+ /* Nav uses the site-wide .wrap grid (max-width clamp + 4vw padding), the
+ shell spans the full viewport with flat 1.5rem gutters. Match them so the
+ logo/theme-toggle line up with the sidebar/sheet edges below. */
  .shell-page .nav .wrap {
- width: var(--measure-case);
  max-width: none;
- padding: 0;
- margin-inline: auto;
+ padding: 0 1.5rem;
  }
  @media (max-width: 900px) {
- .shell-page .nav .wrap { width: calc(100% - 2 * var(--edge)); }
+ .shell-page .nav .wrap { padding: 0 1rem; }
  }
  /* App-shell pane pattern (desktop): the window itself doesn't scroll,
  .shell is pinned at exactly the viewport height below the nav, and its
@@ -407,20 +330,21 @@
  html, body.shell-page { height: 100%; }
  body.shell-page { overflow: hidden; }
  .shell {
- /* Pinned frame rather than a flowed block: a top margin here used to
-    escape to the root and leave the document scrollable. The insets are
-    the shared vertical budget, so the sheet starts and ends on the same
-    lines the landing views do. */
+ /* No max-width: the two panes fill whatever the window gives them and
+ grow together, so the layout never becomes a narrow island floating in
+ the middle of a wide display. */
+ /* Pinned frame rather than a flowed block with a 60px top margin. That
+ margin escaped to the root and left the document 60px scrollable, so
+ the panes crept up under the nav (no gap at the top) while the gap at
+ the bottom grew by the same amount. Insets subtract the nav height
+ directly, which also drops the dependency on 100svh: the 1.5rem
+ padding is then identical on all four sides at every window size. */
  position: fixed;
- inset: var(--view-pad-top) 0 var(--seg-band) 0;
+ inset: 60px 0 0 0;
  display: flex;
- gap: var(--edge);
- padding: 0;
+ gap: 1.5rem;
+ padding: 1.5rem;
  box-sizing: border-box;
- /* Same measure as the landing views, so the sidebar edge and the
-    logo above it share one line at every width. */
- width: var(--measure-case);
- margin-inline: auto;
  }
  @media (max-width: 900px) {
  /* Nested independent-scroll panes only make sense side by side. Stacked
@@ -428,26 +352,19 @@
  study, sidebar-content first, then the project content below it. */
  html, body.shell-page { height: auto; }
  body.shell-page { overflow: visible; }
- /* The side inset is already inside --measure, so a horizontal padding
-    here recessed the panes a second 32px and left a wide dead band on the
-    right. Vertical only. The bottom is the segmented band, so the last
-    card clears the pill instead of ending under it. */
- .shell { position: static; inset: auto; flex-direction: column; align-items: stretch;
-          height: auto; margin: 0 auto; padding: calc(var(--nav-h) + 1rem) 0 var(--seg-band);
-          gap: 1rem; }
+ .shell { position: static; inset: auto; flex-direction: column; align-items: stretch; height: auto; margin: 0; padding: calc(60px + 1.25rem) 1rem 1rem; gap: 1rem; }
  }
 
  .sidebar {
- /* A share of the measure, not of the window. At 23vw it kept scaling
-    with the display while the sheet was bounded by the measure, so on a
-    wide screen the sidebar took 36% of the shell and crushed the sheet
-    into unreadable columns. */
- flex: 0 0 var(--sidebar-w);
- width: var(--sidebar-w);
- min-width: 260px;
+ /* Pure proportional width — a fixed share of the window at every size,
+ with only a floor to keep it usable just above the 900px stack
+ breakpoint. No ceiling, so on a wide display it keeps growing with the
+ sheet instead of freezing while the other pane runs away. */
+ flex: 0 0 max(260px, 23vw);
+ width: max(260px, 23vw);
  display: flex;
  flex-direction: column;
- background-color: var(--sheet);
+ background: var(--sheet);
  border: 1px solid var(--border);
  border-radius: 16px;
  padding: 2rem;
@@ -529,17 +446,7 @@
  border-radius: 8px;
  overflow: hidden;
  background: var(--bg-alt);
- transition: opacity 0.3s var(--ease), transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
- }
- /* Same lift as the Work page's case cards: translateY + shadow on the
-    card, scale on the thumb image. */
- .sidebar-card:hover {
- transform: translateY(-6px);
- box-shadow: 0 20px 40px -16px rgba(0,0,0,0.5);
- }
- .sidebar-card--soon:hover {
- transform: none;
- box-shadow: none;
+ transition: opacity 0.3s var(--ease);
  }
  /* Coming-soon variant, same treatment as the case-next cards on the other
  pages: the thumb stays at full strength and only reveals a dark overlay
@@ -581,14 +488,8 @@
  height: 100%;
  object-fit: cover;
  display: block;
- transition: transform 0.7s var(--ease);
- /* 1.02 nudges past the transparent rounded corners baked into the
-    source art; the hover below multiplies on top of that, same as the
-    Work page's case-card thumbs. */
+ /* Nudged past the transparent rounded corners in the source art. */
  transform: scale(1.02);
- }
- .sidebar-card:hover .sidebar-card-thumb img {
- transform: scale(1.06);
  }
 
  .main-sheet {
@@ -597,7 +498,7 @@
  white card surface matching the sidebar. */
  flex: 1 1 0%;
  min-width: 0;
- background-color: var(--sheet);
+ background: var(--sheet);
  border: 1px solid var(--border);
  border-radius: 16px;
  overflow-y: auto;
@@ -616,7 +517,7 @@
  .sidebar-intro keeps the card treatment the sidebar used to carry. */
  .sidebar { display: contents; }
  .sidebar-intro {
- background-color: var(--sheet);
+ background: var(--sheet);
  border: 1px solid var(--border);
  border-radius: 16px;
  padding: 1.75rem;
@@ -628,9 +529,9 @@
  space under it, separate nothing -- so the card ends on the last value. */
  .sidebar-meta { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
  }
- .main-sheet .case-hero { padding: 0 0 2rem; }
+ .main-sheet .case-hero { padding: 2rem 0; }
  .main-sheet .case-hero .wrap,
- .main-sheet .case-section .wrap { max-width: 100%; padding-left: var(--page-gutter); padding-right: var(--page-gutter); }
+ .main-sheet .case-section .wrap { max-width: 100%; padding-left: var(--sheet-gutter); padding-right: var(--sheet-gutter); }
 
  /* Hero shot + big diagrams expand edge-to-edge inside the sheet, breaking
  out of .wrap's side padding, matching masid.design's full-bleed panels. */
@@ -641,8 +542,8 @@
  don't grow it, that's why the right edge fell short. auto lets the
  negative margins pull both edges and the width fill what's left. */
  width: auto;
- margin-left: calc(-1 * var(--edge));
- margin-right: calc(-1 * var(--edge));
+ margin-left: calc(-1 * var(--sheet-gutter));
+ margin-right: calc(-1 * var(--sheet-gutter));
  border-radius: 0;
  }
  .main-sheet .bleed img { border-radius: 0; }
@@ -712,7 +613,7 @@
 
  /* ====== CASE HERO ====== */
  .case-hero {
- padding: calc(var(--nav-h) + var(--section-py)) 0 var(--section-py);
+ padding: calc(60px + var(--section-py)) 0 var(--section-py);
  position: relative;
  }
 
@@ -793,7 +694,7 @@
  }
  .case-meta-value {
  font-size: 1rem;
- font-weight: 400;
+ font-weight: 500;
  color: var(--text);
  line-height: 1.4;
  }
@@ -877,20 +778,6 @@
  padding: var(--section-py) 0;
  position: relative;
  }
- /* The space between two sections is one gap, not two stacked paddings. Left
-    doubled it measured 224px, which reads as a hole rather than a break; the
-    first section keeps its top space and the last keeps its bottom, and every
-    boundary in between is a single --section-py. */
- .case-section + .case-section { padding-top: 0; }
- /* Unless the section above paints a box. Then its padding is inside that box
-    and buys the next section nothing: at zero the following label sat flush
-    against the box edge. Half a gap is enough to clear it, because the other
-    half is already there, on the other side of the line. */
- .case-section--alt + .case-section,
- .case-section--dark + .case-section,
- .case-section--insights + .case-section,
- .case-section--network + .case-section,
- .case-section--showcase + .case-section { padding-top: calc(var(--section-py) / 2); }
  .case-section--alt { background: var(--bg-alt); }
  .case-section--dark {
  background: var(--gray-true-900);
@@ -1373,7 +1260,7 @@
  margin-left: calc(50% - 50vw);
  margin-right: calc(50% - 50vw);
  background: var(--bg-alt);
- padding: clamp(1.25rem, 2.5vw, 2rem) var(--edge);
+ padding: clamp(1.25rem, 2.5vw, 2rem) var(--sheet-gutter);
  }
  /* Same full-bleed gray background but holding a static image instead of an embed. */
  .app-shot--bg-full > img {
@@ -1398,10 +1285,10 @@
  /* Left-bleed variant, escapes the .wrap left padding so the asset
  visually touches the left edge of the viewport. Right padding stays. */
  .app-shot--bleed-left {
- margin-left: calc(-1 * var(--edge));
+ margin-left: calc(-1 * var(--sheet-gutter));
  }
  .app-shot--bleed-left .embed-frame {
- width: calc(100% + var(--edge));
+ width: calc(100% + var(--sheet-gutter));
  }
 
  /* Video-bg variant, looping video behind a foreground composition image */
@@ -1557,22 +1444,6 @@
  border-radius: 0;
  overflow: visible;
  }
- /* Motion capture, house radius. A canvas flyover across every screen; it is
-    ping-ponged so the loop has no cut. */
- .app-shot--video .video-frame {
- width: 100%;
- border-radius: 14px;
- overflow: hidden;
- line-height: 0;
- }
- .app-shot--video .video-frame video { width: 100%; height: auto; display: block; }
- /* Morph slide: one GIF per theme, on the page ground, so the loop never
-    sits on a mismatched rectangle. Square, so height drives width. */
- .id-car-slide--morph { aspect-ratio: 1 / 1; }
- .id-car-slide--morph img { width: 100%; height: 100%; object-fit: contain; }
- .id-car-slide--morph .morph-dark { display: none; }
- [data-theme="dark"] .id-car-slide--morph .morph-light { display: none; }
- [data-theme="dark"] .id-car-slide--morph .morph-dark { display: block; }
 
  /* slide variant with media + overlay text (e.g. type specimen on video) */
  .id-car-slide--overlay {
@@ -2988,21 +2859,9 @@
     decorative video layers are dropped there — they carry no information the
     stills next to them do not already carry. */
  @media (max-width: 900px) {
-   /* Only the backdrop goes. The card on top of it is the calculations
-      screen itself — dropping that left an empty frame with a caption. */
    .app-shot--video-bg .video-bg,
    .id-car-slide video { display: none; }
-   /* Without the backdrop the frame's 5073/3718 box and the card's inset
-      inside it were pure padding, so this component sat noticeably narrower
-      than every other one in the stack. It fills the column like the rest. */
-   .app-shot--video-bg .video-bg-frame {
-     background: transparent;
-     aspect-ratio: auto;
-     height: auto;
-   }
-   .app-shot--video-bg .video-bg-fg { position: static; padding: 0; }
-   .app-shot--video-bg .fg-video-card { width: 100%; }
-   .app-shot--video-bg .fg-video-card video { width: 100%; height: auto; display: block; }
+   .app-shot--video-bg .video-bg-frame { background: var(--bg-alt); }
  }
 
  /* ====== DASHBOARD AS A PHONE APP ======
@@ -3027,161 +2886,6 @@
      overflow: hidden;
    }
  }
-
- /* Stacked heights for the broken-apart bentos. The analysis composition
-    stacks five tiles, the simulation four, so they need their own numbers. */
- @media (max-width: 900px) {
-   /* Measured stacked totals now that the content-sized tiles hug their
-      content: analysis 400+270+511+320+400 and simulation 445+420+233+400,
-      each plus its 12px gaps. Anything larger trails blank frame. */
-   .app-shot--embed .embed-frame { aspect-ratio: auto !important; height: 1949px; }
-   .app-shot--sim .embed-frame { height: 1534px; }
- }
- /* ====== FOOTER ======
-    The landing has always had one and the case studies never did, so a reader
-    who arrived on a case had no colophon and no way back to the top. Same
-    markup and the same tokens; it sits at the end of the sheet's content
-    rather than at the end of the page, because the sheet is what scrolls. */
- .case-footer {
-   padding: 2rem var(--edge);
-   border-top: 1px solid var(--border);
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: space-between;
-   align-items: center;
-   gap: 1rem;
- }
- .case-footer span,
- .case-footer a {
-   font-family: var(--mono);
-   font-size: 0.625rem;
-   font-weight: 500;
-   text-transform: uppercase;
-   letter-spacing: 0.12em;
-   color: var(--text-2);
-   transition: color 0.3s;
- }
- .case-footer a:hover { color: var(--text); }
- .case-footer ul { display: flex; gap: 1.5rem; list-style: none; }
-
-    /* ====== SEGMENTED NAV (shared with the landing) ======
-       The landing is a single-view switcher driven by the hash, so these
-       are links back into it rather than buttons. Work carries the current
-       state: a case study is where Work leads. */
-    /* On a phone the page scrolls, so the floating pill has copy running
-       underneath it. The band gives it a ground of its own; combined with
-       the shell's --seg-band bottom padding, content stops above it. */
-    @media (max-width: 900px) {
-    .seg::before {
-      content: "";
-      position: fixed;
-      left: 0; right: 0; bottom: 0;
-      height: var(--seg-band);
-      background: linear-gradient(to top,
-        var(--shell-bg) 0%, var(--shell-bg) 62%, transparent 100%);
-      z-index: -1;
-      pointer-events: none;
-    }
-    }
-
-    .seg {
-      position: fixed;
-      left: 50%;
-      bottom: var(--edge);
-      transform: translateX(-50%);
-      z-index: 90;
-      display: flex;
-      align-items: center;
-      gap: 0.25rem;
-      height: var(--seg-h);
-      padding: 0 4px;
-      border-radius: 999px;
-      background: rgba(20, 20, 20, 0.08);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      max-width: calc(100vw - 2 * var(--edge));
-      overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .seg::-webkit-scrollbar { display: none; }
-    [data-theme="dark"] .seg { background: rgba(255, 255, 255, 0.1); }
-    .seg-btn {
-      flex: none;
-      border: 0;
-      cursor: pointer;
-      background: transparent;
-      color: var(--text);
-      font-family: var(--font);
-      font-size: 0.8125rem;
-      font-weight: 500;
-      letter-spacing: -0.005em;
-      display: inline-flex;
-      align-items: center;
-      height: calc(var(--seg-h) - 8px);
-      padding: 0 0.95rem;
-      border-radius: 999px;
-      white-space: nowrap;
-      text-decoration: none;
-      transition: background 0.3s var(--ease), color 0.3s var(--ease);
-    }
-    .seg-btn:not(.is-on):hover { background: rgba(20, 20, 20, 0.06); }
-    [data-theme="dark"] .seg-btn:not(.is-on):hover { background: rgba(255, 255, 255, 0.08); }
-    .seg-btn.is-on {
-      background: var(--seg-on-bg);
-      color: var(--seg-on-fg);
-    }
-    /* Room under the last section so the control never covers the copy. */
-    /* The same inset the sidebar carries, so the two panes start and end on
-       the same lines. Was 0 on top and 5.5rem at the bottom, from back when
-       the segmented control still floated over the sheet. */
-    .main-sheet { padding-block: var(--edge); }
-    @media (max-width: 640px) {
-      .seg { gap: 0; padding: 0 3px; }
-      .seg-btn { font-size: 0.75rem; padding: 0 0.7rem; }
-    }
-  
- /* Globe figure, interactive iframe rendered as a bare card — the same
-    treatment as .network-shot--graph on the WAZI page. It used to sit in a
-    browser frame with a fake URL bar around the whole dashboard; now it is
-    the globe alone, presented as the interactive object it is. */
- .app-shot--globe .globe-embed {
- position: relative;
- width: 100%;
- aspect-ratio: 16 / 10;
- border-radius: 14px;
- overflow: hidden;
- background: #F9FAFB;
- }
- .app-shot--globe .globe-iframe {
- width: 100%;
- height: 100%;
- border: 0;
- display: block;
- background: transparent;
- }
- /* Interactive-embed hint, ported from the Kota page: a dark scrim with a
-    hand that stays up until the first click or tap on the frame. */
- .embed-hint {
- position: absolute; inset: 0; z-index: 3; display: grid; place-items: center;
- background: rgba(14, 14, 12, .5); color: #fff;
- backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
- -webkit-backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
- opacity: 0; pointer-events: none; transition: opacity .45s var(--ease);
- }
- .is-hinting .embed-hint { opacity: 1; pointer-events: auto; cursor: pointer; }
- .embed-hint .hand {
- display: flex; align-items: center; gap: .75rem;
- background: rgba(252, 252, 252, .92); border: 1px solid rgba(20, 20, 18, .12);
- color: #141414;
- border-radius: 999px; padding: .7rem 1.1rem .7rem .9rem;
- font-family: var(--mono); font-size: .75rem; font-weight: 500; letter-spacing: .12em; text-transform: uppercase;
- backdrop-filter: blur(16px) saturate(1.5) contrast(1.05); -webkit-backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
- }
- .embed-hint svg { width: 26px; height: 26px; stroke: #141414; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
- .is-hinting .embed-hint svg { animation: hint-tap 1.1s ease-in-out infinite; transform-origin: 50% 90%; }
- @keyframes hint-tap { 0%, 100% { transform: translateY(0) } 50% { transform: translateY(5px) scale(.94) } }
- @media (prefers-reduced-motion: reduce) { .is-hinting .embed-hint svg { animation: none } }
-  
 </style>
 </head>
 
@@ -3193,15 +2897,27 @@
  <!-- NAV -->
  <nav class="nav" role="navigation" aria-label="Main navigation">
  <div class="wrap nav-inner">
- <a href="../index.html#hero" class="nav-logo">Pietra Gottardo.</a>
+ <a href="../index.html" class="nav-logo">Pietra Gottardo.</a>
  <div class="nav-right">
+ <ul class="nav-links">
+ <li><a href="../index.html#work" data-i18n="nav_work">Work</a></li>
+ <li><a href="../index.html#contact" data-i18n="nav_contact">Contact</a></li>
+ </ul>
  <div class="theme-toggle" role="group" aria-label="Color theme">
    <button class="theme-btn" data-theme-set="dark" aria-pressed="false" aria-label="Dark theme" title="Dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg></button>
    <button class="theme-btn active" data-theme-set="light" aria-pressed="true" aria-label="Light theme" title="Light"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.2v2.4M12 19.4v2.4M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2.2 12h2.4M19.4 12h2.4M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7"/></svg></button>
  </div>
+ <button class="nav-toggle" aria-label="Open menu" aria-expanded="false">
+   <span></span><span></span><span></span>
+ </button>
  </div>
  </div>
  </nav>
+
+ <div class="mobile-menu" role="dialog" aria-label="Mobile navigation">
+   <a href="../index.html#work" data-i18n="nav_work">Work</a>
+   <a href="../index.html#contact" data-i18n="nav_contact">Contact</a>
+ </div>
 
  <!-- Shell: fixed sidebar (project info + other cases) + scrolling main sheet -->
  <div class="shell">
@@ -3235,16 +2951,16 @@
  <div class="sidebar-next">
  <span class="sidebar-next-label" data-i18n="next_label">Next up</span>
  <div class="sidebar-next-list">
-  <!-- Image-only cards: the alt text carries the project name for
-       screen readers and the link label. -->
-  <a href="wazi.html" class="sidebar-card">
-   <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
+  <!-- Ordem fixa em todo o site: Kota, TDI, WAZI, Straatos,
+       menos a própria página. O alt carrega o nome do projeto. -->
+  <a href="kota.html" class="sidebar-card">
+   <div class="sidebar-card-thumb"><img src="assets/kota-cover.jpg?v=5" alt="Kota, Counterparty due-diligence infrastructure"></div>
   </a>
   <a href="supply-chain.html" class="sidebar-card">
    <div class="sidebar-card-thumb"><img src="assets/supply-chain/card.jpg?v=2" alt="A tablet showing the supply chain flow map: the globe with the cobalt route across it and the participants listed below with position, country and risk"></div>
   </a>
-  <a href="kota.html" class="sidebar-card">
-   <div class="sidebar-card-thumb"><img src="assets/kota-cover.jpg?v=5" alt="Kota, Counterparty due-diligence infrastructure"></div>
+  <a href="wazi.html" class="sidebar-card">
+   <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
   </a>
  </div>
  </div>
@@ -3283,7 +2999,6 @@
  </section>
 
 
-
  <!-- ====== VISUAL SYSTEM (bento: palette + typography + icons) ====== -->
  <section class="case-section">
  <div class="wrap">
@@ -3298,13 +3013,25 @@
  <img src="assets/straatos-palette.png?v=5" alt="Color palette with hex codes: #1B989B teal primary, #197778/#095D5E deep teals, #E4FCFD/#C5F5F5/#A2E9E9/#57CACB ice and mint tints, #F85531 coral, #FE9065 peach">
  </div>
 
+ <div class="id-car-slide id-car-slide--overlay">
+ <video src="assets/straatos-flamingos.mp4" autoplay muted loop playsinline preload="metadata" aria-label="Looping video of flamingos in the field"></video>
+ <div class="id-car-slide__type" aria-hidden="true">
+ <div class="id-car-slide__type-spec">
+ <span class="id-car-slide__type-row id-car-slide__type-row--caps">ABCDEFGHIJKLMN</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--caps">OPQRSTUVWXYZ</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--lower">abcdefghijklmno</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--lower">pqrstuvwxyz</span>
+ <span class="id-car-slide__type-row id-car-slide__type-row--num">0 1 2 3 4 5 6 7 8 9</span>
+ </div>
+ <div class="id-car-slide__type-meta">
+ <b>SF UI Display</b>
+ Apple system · 200–700
+ </div>
+ </div>
+ </div>
 
- <!-- The icon set in motion: monkey, ladybug, caterpillar, crab morphing into
-      one another. Frames are computed from the exported strokes (no in-betweens
-      drawn); the GIF is rendered on the page's own ground in each theme. -->
- <div class="id-car-slide id-car-slide--bare id-car-slide--morph">
- <img class="morph-light" src="assets/straatos-icon-morph.gif?v=2" alt="Four Straatos icons morphing into each other: monkey, ladybug, caterpillar, crab">
- <img class="morph-dark" src="assets/straatos-icon-morph-dark.gif?v=2" alt="" aria-hidden="true">
+ <div class="id-car-slide id-car-slide--bare">
+ <img src="assets/straatos-icons.png" alt="Icon set, fauna, flora and field markers in teal stroke style">
  </div>
  </div>
  <div class="h-scroll-hint">
@@ -3327,27 +3054,24 @@
  </div>
 
  <div class="app-stack r-stagger">
-  <figure class="app-shot app-shot--video r">
-  <div class="video-frame">
-  <video autoplay muted loop playsinline preload="metadata" src="assets/straatos-screens-wall.mp4"
-  aria-label="A slow pass over the Straatos screens laid out side by side: dashboard, restoration, simulation, field capture and sign-in."></video>
+  <figure class="app-shot app-shot--embed app-shot--browser r">
+  <div class="browser-frame">
+  <div class="browser-bar" aria-hidden="true">
+  <span class="browser-dots"><i></i><i></i><i></i></span>
+  <span class="browser-url">app.straatos.io/dashboard</span>
   </div>
-  <figcaption data-i18n="fig_wall">Every screen, side by side. One grammar from sign-in to simulation.</figcaption>
-  </figure>
-
-  <figure class="app-shot app-shot--globe r">
-  <div class="globe-embed">
-  <div class="embed-hint" aria-hidden="true"><span class="hand"><svg viewBox="0 0 24 24"><path d="M9 11.5V5.2a1.7 1.7 0 0 1 3.4 0V11M12.4 10.4V8.6a1.7 1.7 0 0 1 3.4 0v2.6M15.8 10.9V9.8a1.7 1.7 0 0 1 3.4 0v6.4c0 3-2.3 5.3-5.3 5.3h-1.6c-1.7 0-3.3-.8-4.3-2.2L4.5 14.6a1.6 1.6 0 0 1 2.5-2l2 2.2"/></svg><span data-i18n="hint_live">Interactive · click and scroll inside</span></span></div>
-  <iframe class="globe-iframe" src="assets/straatos-dashboard/dashboard.html?only=globe&v=9"
-  title="Interactive 3D globe, every active Straatos project pinned by country"
-  scrolling="no"></iframe>
+  <div class="embed-frame">
+  <iframe class="embed-iframe embed-iframe--app" src="assets/straatos-dashboard/dashboard.html?v=8" data-min-w="1000" data-h="780"
+  title="Straatos dashboard, interactive: developer metrics, a 3D globe with every active project pinned by country, and stacked performance charts by year"
+  loading="lazy"></iframe>
   </div>
-  <figcaption data-i18n="fig_dashboard">Every active project pinned on the globe. Drag to spin it, zoom into a country</figcaption>
+  </div>
+  <figcaption data-i18n="fig_dashboard">Dashboard, every project pinned on the globe, portfolio metrics and performance in one view</figcaption>
   </figure>
 
  <figure class="app-shot app-shot--embed r">
  <div class="embed-frame" style="aspect-ratio: 1265 / 640;">
- <iframe class="embed-iframe embed-iframe--scaled" src="assets/straatos-bento.html?v=1787669676" data-w="1265" data-h="640"
+ <iframe class="embed-iframe embed-iframe--scaled" src="assets/straatos-bento.html?v=2" data-w="1265" data-h="640"
  title="Straatos analysis composition, Salinity levels, Key indicators, Awareness Raising, Species composition with video background, and Stakeholder Engagement"
  loading="lazy" scrolling="no" allow="autoplay"></iframe>
  </div>
@@ -3385,7 +3109,7 @@
 
  <figure class="app-shot app-shot--embed app-shot--sim r">
  <div class="embed-frame" style="aspect-ratio: 1282 / 700;">
- <iframe class="embed-iframe embed-iframe--scaled" src="assets/straatos-simulation-bento.html?v=1787669676" data-w="1282" data-h="700"
+ <iframe class="embed-iframe embed-iframe--scaled" src="assets/straatos-simulation-bento.html?v=2" data-w="1282" data-h="700"
  title="Simulation composition, mangrove botanical with field measurements, canopy density gauge, carbon sequestration design vs actual chart, and SOS Mangrove project card"
  loading="lazy" scrolling="no" allow="autoplay"></iframe>
  </div>
@@ -3395,7 +3119,6 @@
  </div>
  </div>
  </section>
-
 
  </div><!-- /.main-sheet -->
  </div><!-- /.shell -->
@@ -3419,7 +3142,6 @@
  meta_live: "Live site",
  meta_live_val: "straatos.io",
  challenge_label: "The Challenge",
-
  challenge_title: "Restoration projects ran on spreadsheets, paper, and hope.",
  challenge_p1: "Teams managing nature-based carbon projects were juggling data across spreadsheets, paper field notes, satellite imagery, and disparate legacy systems. Field technicians in remote locations lacked tools that worked offline and matched their daily workflow.",
  challenge_p2: "Compliance with Verra methodologies like VM0033 required meticulous audit trails, weeks of manual reconciliation per project cycle, prone to errors, delaying critical verification milestones.",
@@ -3443,9 +3165,7 @@
  product_label: "The Product",
  product_title: "Application.",
  product_intro: "Five surfaces, one mental model. The dashboard anchors on a 3D globe, every project pinned in place. From there, project developers move into cycles and campaigns, satellite plot views, and finally simulations that forecast the same numbers the verifier will read at the end. No translation between screens; the data flows through one structure.",
- fig_wall: "Every screen, side by side. One grammar from sign-in to simulation.",
- fig_dashboard: "Every active project pinned on the globe. Drag to spin it, zoom into a country",
- hint_live: "Interactive · click and scroll inside",
+ fig_dashboard: "Dashboard, every project pinned on the globe, portfolio metrics and performance in one view",
  fig_analysis: "Analysis, charts, KPIs and field telemetry composed for verifier review",
  fig_field: "Field capture, daily planting forms on mobile + boundary drawing on satellite",
  fig_calc: "Calculations, biomass, carbon stock and uncertainty derived from field data",
@@ -3457,6 +3177,8 @@
  next_kota_tag: "Onboarding & Due Diligence",
  next_kota_t: "Kota, Counterparty due-diligence infrastructure",
  next_cta: "Read case study →",
+ next_safra_tag: "Sustainable Agribusiness",
+ next_safra_t: "Safra, Operating system for sustainable Brazilian agriculture",
  next_soon: "Coming soon",
  live_link: "Visit live site",
  scroll_hint: "Scroll to explore"
@@ -3477,7 +3199,6 @@
  meta_live: "Site no ar",
  meta_live_val: "straatos.io",
  challenge_label: "O Desafio",
-
  challenge_title: "Projetos de restauração rodavam em planilhas, papel e esperança.",
  challenge_p1: "Times gerenciando projetos de carbono baseados em natureza malabarismo de dados entre planilhas, anotações de campo em papel, imagens de satélite e sistemas legados desconectados. Técnicos em locais remotos não tinham ferramentas que funcionassem offline e acompanhassem o fluxo de trabalho do dia a dia.",
  challenge_p2: "Conformidade com metodologias Verra como a VM0033 exigia trilhas de auditoria meticulosas, semanas de reconciliação manual por ciclo de projeto, sujeitas a erros, atrasando marcos críticos de verificação.",
@@ -3501,9 +3222,7 @@
  product_label: "O Produto",
  product_title: "Application.",
  product_intro: "Cinco superfícies, um único modelo mental. O dashboard se ancora num globo 3D, cada projeto fixado em seu lugar. Dali, project developers entram em ciclos e campanhas, vistas de parcelas via satélite, e por fim simulações que projetam os mesmos números que o verificador vai ler no final. Sem tradução entre telas; os dados fluem por uma estrutura só.",
- fig_wall: "Todas as telas, lado a lado. Uma gramática só, do login à simulação.",
- fig_dashboard: "Cada projeto ativo fixado no globo. Arraste pra girar, aproxime num país",
- hint_live: "Interativo · clique e role aqui dentro",
+ fig_dashboard: "Dashboard, cada projeto fixado no globo, métricas do portfólio e desempenho em uma só visão",
  fig_analysis: "Análise, gráficos, KPIs e telemetria de campo compostos para revisão do verificador",
  fig_field: "Captura em campo, formulários diários de plantio no mobile + desenho de polígono no satélite",
  fig_calc: "Cálculos, biomassa, estoque de carbono e incerteza derivados dos dados de campo",
@@ -3515,6 +3234,8 @@
  next_kota_tag: "Onboarding & Due Diligence",
  next_kota_t: "Kota, Infraestrutura de due diligence de contrapartes",
  next_cta: "Ler case study →",
+ next_safra_tag: "Agronegócio Sustentável",
+ next_safra_t: "Safra, Sistema operacional da agricultura sustentável brasileira",
  next_soon: "Em breve",
  live_link: "Visitar site",
  scroll_hint: "Deslize para explorar"
@@ -3718,45 +3439,35 @@
  // prototype needs does this scale down, height included.
  (() => {
  const frames = document.querySelectorAll('.embed-iframe--app');
- if (!frames.length) return;
+ if (!frames.length || !('ResizeObserver' in window)) return;
  frames.forEach((iframe) => {
  const MIN_W = parseFloat(iframe.dataset.minW);
  const box = iframe.parentElement;
- // Measure the figure, not the box: the box's own width is about to
- // become a function of scale, so observing it would feed the mutation
- // back into the next measurement.
- const measureEl = box.parentElement;
  // Height comes from CSS (--dash-h) so a media query can drive it; the
  // data attribute stays as the fallback if the variable goes missing.
  const heightNow = () =>
  parseFloat(getComputedStyle(box).getPropertyValue('--dash-h')) ||
  parseFloat(iframe.dataset.h);
  let lastW = -1, lastH = -1;
- function apply(cw) {
+ const ro = new ResizeObserver((entries) => {
+ const cw = entries[0].contentRect.width;
  const H = heightNow();
+ // The callback also fires for the height we set below; bail unless
+ // something actually moved, or the two chase each other.
  if (cw <= 0 || (cw === lastW && H === lastH)) return;
  lastW = cw; lastH = H;
  // Below the phone breakpoint the embed has a layout of its own, so it
- // takes the real width and no transform. Above it, the frame scales
- // with the column, but never past its native size (the whole box
- // shrinks to match, or it leaves a blank card-colored gap on wide
- // screens where the iframe itself has stopped growing).
+ // takes the real width and no transform. Above it, the floor and the
+ // scale-down still apply.
  const phone = matchMedia('(max-width: 900px)').matches;
- const w = phone ? cw : MIN_W;
- const scale = phone ? 1 : Math.min(1, cw / MIN_W);
+ const w = phone ? cw : Math.max(MIN_W, cw);
+ const scale = phone ? 1 : Math.min(1, cw / w);
  iframe.style.width = w + 'px';
  iframe.style.height = H + 'px';
  iframe.style.transform = 'scale(' + scale + ')';
- box.style.width = (w * scale) + 'px';
  box.style.height = (H * scale) + 'px';
- }
- apply(measureEl.getBoundingClientRect().width);
- if ('ResizeObserver' in window) {
- const ro = new ResizeObserver((entries) => apply(entries[0].contentRect.width));
- ro.observe(measureEl);
- } else {
- window.addEventListener('resize', () => apply(measureEl.getBoundingClientRect().width), { passive: true });
- }
+ });
+ ro.observe(box);
  });
  })();
 
@@ -3791,26 +3502,19 @@
  // so hand it the width it actually got. Reading it from inside would
  // feed back on itself once it zooms.
 
- // A 1265px composition inside a 316px column is a quarter-size picture
- // however faithfully it is scaled, the arithmetic leaves no room. So on
- // a phone the composition is broken apart instead: the embed takes the
- // real width and the bento stacks its tiles, each one full width, which
- // is the only way the photographs and charts come out big enough to read.
- if (cw < 900) {
-   iframe.style.width = '';
-   iframe.style.height = '';
-   iframe.style.transform = '';
-   frame.style.aspectRatio = '';
-   frame.style.height = '';
- } else {
-   const iw = cw;
-   const ih = Math.round(iw * (h / w));
-   iframe.style.width = iw + 'px';
-   iframe.style.height = ih + 'px';
-   iframe.style.transform = '';
-   frame.style.aspectRatio = 'auto';
-   frame.style.height = ih + 'px';
- }
+ // One regime at every width: render at the floor the composition needs and
+ // scale the whole thing to fit. Handing a phone the real width let the
+ // bento use its stacked layout, but the live charts inside it do not
+ // follow — cards overflowed, the gauge labels piled on top of each other.
+ // A faithful miniature beats a broken layout.
+ const iw = Math.max(920, cw);
+ const ih = Math.round(iw * (h / w));
+ const scale = Math.min(1, cw / iw);
+ iframe.style.width = iw + 'px';
+ iframe.style.height = ih + 'px';
+ iframe.style.transform = 'scale(' + scale + ')';
+ frame.style.aspectRatio = 'auto';
+ frame.style.height = Math.round(ih * scale) + 'px';
  });
  ro.observe(frame);
  });
@@ -3862,7 +3566,7 @@
     are never requested at all. The stills beside them carry the same point. */
  (() => {
  if (!matchMedia('(max-width: 900px)').matches) return;
- document.querySelectorAll('.app-shot--video-bg .video-bg, .id-car-slide video').forEach((v) => {
+ document.querySelectorAll('.app-shot--video-bg video, .id-car-slide video').forEach((v) => {
  v.removeAttribute('autoplay');
  v.removeAttribute('src');
  v.load();
@@ -3961,73 +3665,7 @@
  });
  });
  })();
- 
- /* Wheel anywhere scrolls the sheet. The shell is a fixed frame and the
- sheet is the only scroller, so a wheel over the sidebar or the gutters
- used to do nothing. The sidebar keeps its own scroll while it can still
- move in that direction; otherwise the motion goes to the sheet. */
- (function () {
- const sheet = document.querySelector('.main-sheet');
- if (!sheet) return;
- const sidebar = document.querySelector('.sidebar');
- function canScroll(el, dy) {
- if (!el) return false;
- const st = getComputedStyle(el).overflowY;
- if (st !== 'auto' && st !== 'scroll') return false;
- if (el.scrollHeight <= el.clientHeight + 1) return false;
- return dy > 0 ? el.scrollTop + el.clientHeight < el.scrollHeight - 1 : el.scrollTop > 0;
- }
- document.addEventListener('wheel', (e) => {
- if (sheet.contains(e.target)) return;                 // native scroll
- if (sidebar && sidebar.contains(e.target) && canScroll(sidebar, e.deltaY)) return;
- if (e.ctrlKey) return;                                // pinch-zoom
- e.preventDefault();
- sheet.scrollBy({ top: e.deltaY, left: 0 });
- }, { passive: false });
- document.addEventListener('keydown', (e) => {
- const a = document.activeElement;
- if (a && a !== document.body && !a.classList.contains('seg-btn')) return;
- const page = sheet.clientHeight * 0.85;
- const map = { ArrowDown: 60, ArrowUp: -60, PageDown: page, PageUp: -page, ' ': e.shiftKey ? -page : page };
- if (!(e.key in map)) return;
- e.preventDefault();
- sheet.scrollBy({ top: map[e.key], behavior: 'smooth' });
- });
- })();
-</script>
+ </script>
 
-
- <!-- Segmented nav, same control as the landing. -->
- <nav class="seg" aria-label="Sections">
-   <a class="seg-btn" href="../index.html#hero" data-i18n="seg_landing">Landing</a>
-   <a class="seg-btn is-on" href="../index.html#work" aria-current="page" data-i18n="nav_work">Work</a>
-   <a class="seg-btn" href="../index.html#contact" data-i18n="seg_contact">Get in touch</a>
- </nav>
-
-<script>
- /* Interactive-embed hint (ported from Kota): shows when the frame scrolls
- into view and stays until the first click or tap on the screen. */
- (function () {
- const frames = [...document.querySelectorAll('.globe-embed, .embed-frame')].filter(f => f.querySelector('.embed-hint'));
- if (!frames.length || !('IntersectionObserver' in window)) return;
- const done = new WeakSet();
- function hide(f) { f.classList.remove('is-hinting'); done.add(f); }
- const io = new IntersectionObserver((entries) => {
- entries.forEach((e) => {
- if (!e.isIntersecting || done.has(e.target)) return;
- e.target.classList.add('is-hinting');
- io.unobserve(e.target);
- });
- }, { threshold: 0.2 });
- function start() { setTimeout(() => frames.forEach((f) => io.observe(f)), 400); }
- if (document.readyState === 'complete') start(); else window.addEventListener('load', start, { once: true });
- frames.forEach((f) => {
- const hint = f.querySelector('.embed-hint');
- if (hint) hint.addEventListener('pointerdown', () => hide(f));
- ['pointerdown', 'keydown'].forEach((ev) => f.addEventListener(ev, () => hide(f), { passive: true }));
- });
- })();
-</script>
-<script defer src="https://cloud.umami.is/script.js" data-website-id="fb0010c7-011d-4984-8c5a-075500cf715c" data-domains="pietragottardo.com"></script>
 </body>
 </html>
