@@ -788,16 +788,6 @@
    .reveal:hover .rhandle { transform: translate(-50%, -50%) scale(1.08); }
    .rhandle svg { width: 13px; height: 13px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
    .rhandle .chL { margin-right: 2px; }
-   .rpill {
-     position: absolute; top: 14px; z-index: 3; display: inline-flex; align-items: center;
-     font-family: var(--mono); font-size: 0.6875rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase;
-     color: #fff; padding: 6px 14px; border-radius: 999px;
-     background: rgba(18,19,24,.5); backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
-     -webkit-backdrop-filter: blur(16px) saturate(1.5) contrast(1.05);
-     border: 1px solid rgba(255,255,255,.24);
-   }
-   .rpill.before { left: 14px; }
-   .rpill.after { right: 14px; }
    .reveal:focus-visible { outline: 2px solid var(--accent, #7A5AF8); outline-offset: 2px; }
 
    /* The hero shot follows the same measure, so the page opens on the same
@@ -2055,12 +2045,9 @@
          <a href="wazi.html" class="sidebar-card">
           <div class="sidebar-card-thumb"><img src="assets/wazi/handheld-ipad.jpg?v=3" alt="WAZI, The Digital Backbone for Ethical Gold"></div>
          </a>
-         <div class="sidebar-card sidebar-card--soon" aria-disabled="true">
-          <div class="sidebar-card-thumb">
-           <img src="assets/kota-cover.jpg?v=5" alt="Kota, Counterparty due-diligence infrastructure">
-           <span class="sidebar-card-overlay" aria-hidden="true"><span data-i18n="next_soon">Coming soon</span></span>
-          </div>
-         </div>
+         <a href="kota.html" class="sidebar-card">
+          <div class="sidebar-card-thumb"><img src="assets/kota-cover.jpg?v=5" alt="Kota, Counterparty due-diligence infrastructure"></div>
+         </a>
         </div>
       </div>
     </aside>
@@ -2137,8 +2124,6 @@
             <div class="after-layer"><img src="assets/supply-chain/traced.jpg?v=4" alt="The chain traced: every stage carries its risk, the evidence behind it and the date it was checked"></div>
             <div class="before-layer"><img src="assets/supply-chain/opaque.jpg?v=3" alt="The same chain without the record behind it: shapes on a map and nothing to read"></div>
             <div class="rline"></div>
-            <div class="rpill before">Opaque</div>
-            <div class="rpill after">Traced</div>
             <div class="rhandle">
               <svg class="chL" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>
               <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
