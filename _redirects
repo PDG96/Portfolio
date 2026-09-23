@@ -7,3 +7,9 @@
 # servindo por URL antiga enquanto o cache da borda expira.
 /financeiro / 302
 /financeiro/* / 302
+
+# Straatos segue como Coming soon no Work e no Next up, então a página não
+# responde por URL digitada enquanto isso. Mesma regra que valeu pro Kota:
+# card fechado e rota fechada andam juntos.
+/projects/straatos.html / 302
+/projects/straatos / 302
