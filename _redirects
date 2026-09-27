@@ -7,3 +7,8 @@
 # servindo por URL antiga enquanto o cache da borda expira.
 /financeiro / 302
 /financeiro/* / 302
+
+# CV por Vaga (app privado de candidaturas, roda como Artifact no claude.ai).
+# A URL curta só redireciona; o app exige login na conta dela no claude.ai.
+/applications https://claude.ai/artifact/TcHKMxzQs1PskRdiBARpNr 302
+/applications/* https://claude.ai/artifact/TcHKMxzQs1PskRdiBARpNr 302
