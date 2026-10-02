@@ -1250,6 +1250,8 @@
  .app-shot + .app-shot {
  margin-top: 60px;
  }
+ /* The persona text under the two videos keeps the same 60px rhythm. */
+ .app-shot + .who-personas { margin-top: 60px; }
  /* The first figure of a section follows a paragraph, not another figure, so
     the rule above never reached it and it sat flush against the intro. Two
     class names is enough specificity to also cover .app-shot--front, which
@@ -4163,9 +4165,15 @@
  <span class="case-meta-label" data-i18n="meta_role">Role</span>
  <span class="case-meta-value" data-i18n="meta_role_val">Lead Product Designer</span>
  </div>
+ <!-- DRAFT, hidden until Pietra fills it in.
+ <div class="sidebar-meta-item r">
+ <span class="case-meta-label" data-i18n="meta_timeline">Timeline</span>
+ <span class="case-meta-value" data-i18n="meta_timeline_val">[CONFIRM: e.g. 4 months, 2025]</span>
+ </div>
+ -->
  <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_deliverables">Deliverables</span>
- <span class="case-meta-value" data-i18n="meta_deliverables_val">Flows, screens &amp; navigation patterns</span>
+ <span class="case-meta-value" data-i18n="meta_deliverables_val">Research, flows, wireframes, UI, interactive prototype, handover</span>
  </div>
  <div class="sidebar-meta-item r">
  <span class="case-meta-label" data-i18n="meta_team">Team</span>
@@ -4212,18 +4220,35 @@
  <span class="cs-block-label" data-i18n="challenge_label">The Challenge</span>
  <h3 data-i18n="challenge_title">Paper, filled in by the wrong hands.</h3>
  <p data-i18n="challenge_p1">The DRC produces over 70% of the world's cobalt, much of it dug by hand in a sector that sustains an estimated 10 million people. Banking access among artisanal miners sits at 1 to 3%, and informal lenders fill the gap on predatory terms.</p>
- <p data-i18n="challenge_p2">The blockage isn't the miner, it's the paperwork. Banks need identity, source of funds and due diligence, and no shared registry holds that record, so it ran on paper filled in by a bank agent on the operator's behalf. The person answering was never the person who knew, and the easiest decision was always no.</p>
+ <p data-i18n="challenge_p2">The blockage sits in the paperwork. Banks need identity, source of funds and due diligence, and no shared registry holds that record, so it ran on paper filled in by a bank agent on the operator's behalf. The person answering was never the person who knew, and the easiest decision was always no.</p>
  </div>
 
  <div class="cs-block cs-block--solution r">
  <span class="cs-block-label" data-i18n="solution_label">The Solution</span>
  <h3 data-i18n="solution_title">Change who holds the pen.</h3>
  <p data-i18n="solution_p1">KOTA moves the starting point: the operator registers themselves and submits digitally, in their own words. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward. The record belongs to the person it describes.</p>
- <p data-i18n="solution_p2">One engine serves two institutions, a commercial bank and a government-mandated commodity aggregator, wearing different vocabulary for the same record. Those product decisions belong to the team; my work happened one level down: a form people can actually use, and a score they can stand behind.</p>
+ <p data-i18n="solution_p2">One engine serves two institutions, a commercial bank and a government-mandated commodity aggregator, each with its own vocabulary for the same record. The team set the direction. My part was everything the operator and the reviewer touch: the registration form, the score and how it explains itself, and the review flow between bank and operator.</p>
  </div>
  </div>
  </div>
  </section>
+
+ <!-- DRAFT (B1 Research). Hidden until it is ready; add PT keys when it goes live.
+ <section class="case-section">
+ <div class="wrap">
+ <p class="case-section-label r">Research</p>
+ <h2 class="r">Start from the paper it replaces.</h2>
+ <p class="explore-intro r">Before drawing any screen, I went through the forms bank agents filled in on the operator's behalf. [CONFIRM: how many forms, from which banks]. For each field, I asked two questions: who actually knows this answer, and what does the reviewer do with it.</p>
+ <p class="explore-intro r">[CONFIRM: who Pietra spoke with. Example: "I spoke with compliance reviewers at the bank and with the field team that works with cooperatives in North Kivu."]</p>
+ <p class="explore-intro r">Three things came out of it. [CONFIRM: findings. Examples to replace: many fields asked for the same information in different words; reviewers had no way to ask a follow-up question without a site visit; operators had no idea why they were declined.]</p>
+
+   <figure class="app-shot r">
+   <div class="ph ph--16x9"></div>
+   <figcaption class="cap"><span>The paper form, mapped field by field.</span></figcaption>
+   </figure>
+ </div>
+ </section>
+ -->
 
  <!-- ====== THE PRODUCT, SHOWN EARLY ======
       The reveal sits between the problem and the process: what was built,
@@ -4242,7 +4267,7 @@
    src="assets/kota-problem-statement.mp4?v=13"
    aria-label="Problem statement board, animated: small producers in extractive industries need a better way to apply for banking. Applications arrived as handwritten forms completed by bank agents, making them difficult to verify and evaluate. Cards cycle through, including one where only 39% of adults in the DRC have a bank account. Sources: World Bank Global Findex 2025; EU Regulation 2017/821, in force since 1 January 2021."></video>
    </div>
-   <figcaption class="cap"><span data-i18n="cap1_d">One sentence, three numbers, and their sources.</span></figcaption>
+   <figcaption class="cap"><span data-i18n="cap1_d">39% of adults with a bank account, 8.7% of firms with a loan, EU due-diligence rules since 2021, and where those numbers come from.</span></figcaption>
    </figure>
 
    <figure class="app-shot app-shot--video r">
@@ -4254,6 +4279,18 @@
    <figcaption class="cap"><span data-i18n="cap2_d">What each side needs, and what holds it back.</span></figcaption>
    </figure>
 
+   <!-- The personas as text, so they read without playing the videos. -->
+   <div class="cs-grid who-personas r">
+   <div class="cs-block">
+   <span class="cs-block-label" data-i18n="persona_op_label">The operator</span>
+   <p data-i18n="persona_op_p">A cooperative that needs a bank account. Blocked by: no record that proves it exists.</p>
+   </div>
+   <div class="cs-block">
+   <span class="cs-block-label" data-i18n="persona_rev_label">The reviewer</span>
+   <p data-i18n="persona_rev_p">A compliance analyst at the bank. Blocked by: nothing solid to decide on.</p>
+   </div>
+   </div>
+
    <!-- Removed for now, per Pietra's request — kept commented out, not
         deleted, so it's a one-line revert.
    <figure class="app-shot app-shot--journey r">
@@ -4264,6 +4301,38 @@
  </div>
  </section>
 
+ <!-- DRAFT (B2 Before and after). Hidden until it is ready; add PT keys when it goes live.
+ <section class="case-section">
+ <div class="wrap">
+ <p class="case-section-label r">Before and After</p>
+ <h2 class="r">The same application, before and after.</h2>
+ <p class="explore-intro r">Before, an operator went to the branch and an agent filled in a paper card for them. The card went to compliance as part of a stack. Any missing answer meant another visit or a phone call, and the easiest decision was no. [CONFIRM: that this matches the real process]</p>
+ <p class="explore-intro r">With KOTA, the operator registers and fills in the record themselves, and can stop and come back. The score shows what is still missing. The bank receives a structured file, and any question goes back inside that file.</p>
+
+   <figure class="app-shot r">
+   <div class="ph ph--16x9"></div>
+   <figcaption class="cap"><span>One application, from the branch counter to the record.</span></figcaption>
+   </figure>
+ </div>
+ </section>
+ -->
+
+ <!-- DRAFT (B3 Flows. No placeholders: can go live once the flow diagram exists). Hidden until it is ready; add PT keys when it goes live.
+ <section class="case-section">
+ <div class="wrap">
+ <p class="case-section-label r">Flows</p>
+ <h2 class="r">Two flows, one record.</h2>
+ <p class="explore-intro r">The operator moves through Registration until the record is complete enough to be evaluated. The bank sees the file move from Registration to Ready for evaluation, then decides: approve, question or decline. An approved operator becomes a verified client, and the same record is read by every bank they apply to.</p>
+ <p class="explore-intro r">The question loop is where both flows meet. A reviewer leaves a question on the file, the operator answers it in the form, and the file goes back to evaluation. No visit, no new paper.</p>
+
+   <figure class="app-shot r">
+   <div class="ph ph--16x9"></div>
+   <figcaption class="cap"><span>Operator and bank, and the loop between them.</span></figcaption>
+   </figure>
+ </div>
+ </section>
+ -->
+
  <!-- ====== THE PRODUCT ======
       Its own section, not a second heading inside the one above. As a label
       in the middle of another section's wrap it had no space above it at all:
@@ -4272,7 +4341,7 @@
  <section class="case-section">
  <div class="wrap">
  <p class="case-section-label r" data-i18n="prod_label">The Product</p>
- <h2 class="r" data-i18n="prod_title">What the screens do with it.</h2>
+ <h2 class="r" data-i18n="prod_title">One file, read in one pass.</h2>
  <p class="explore-intro r" data-i18n="prod_intro">One record, filled once by the operator and read by every bank they apply to. Below: the file a reviewer opens, and the same bank screen at wireframe stage and at handover.</p>
 
    <!-- The dashboard bento. Screen capture at 2x; it scrolls down and back, and
@@ -4303,8 +4372,29 @@
    <figcaption class="cap"><span data-i18n="cap4_d">The same screen at both ends of the work. Drag to compare.</span></figcaption>
    </figure>
 
+   <!-- DRAFT (A6), hidden until Pietra fills in the three changes. Add PT keys when it goes live.
+   <ul class="reveal-notes r">
+     <li>[CONFIRM: change 1, e.g. "The score moved to the top of the file, because reviewers read it first."]</li>
+     <li>[CONFIRM: change 2]</li>
+     <li>[CONFIRM: change 3]</li>
+   </ul>
+   -->
+
  </div>
  </section>
+
+ <!-- DRAFT (B4 Three decisions). Hidden until it is ready; add PT keys when it goes live.
+ <section class="case-section">
+ <div class="wrap">
+ <p class="case-section-label r">Decisions</p>
+ <h2 class="r">Three decisions, and why.</h2>
+ <p class="explore-intro r"><strong>Registration shows progress.</strong> An operator at 72% knows what is left. [CONFIRM: the reason, e.g. operators often fill in the form over several days, with patchy connection.]</p>
+ <p class="explore-intro r"><strong>Questions live inside the file.</strong> A reviewer's question is attached to the field it refers to, so the operator answers in context. [CONFIRM: what changed from low-fi to this]</p>
+ <p class="explore-intro r"><strong>The score explains itself.</strong> Each part of the score links to what raised or lowered it. A score the operator can't read is just another no. [CONFIRM]</p>
+ <p class="explore-intro r">Optional fourth decision: how one record serves two institutions with different vocabulary. [CONFIRM: how it was solved]</p>
+ </div>
+ </section>
+ -->
 
  <!-- ====== THE BRIEF (pull quote) ====== -->
 
@@ -4319,7 +4409,7 @@
  <div class="wrap">
  <p class="case-section-label" data-i18n="proto_label">The Prototype, Live</p>
  <h2 data-i18n="proto_title">Be the bank, or be the operator.</h2>
- <p class="explore-intro" data-i18n="proto_intro">One record, two seats. As the bank you get the book of business on a map, the evaluation list, and an operator's file to approve, question or decline. As the operator you get that same file from the other end: the score the banks compute, the questions a reviewer left, and the form where they get answered. Throw the switch to change sides, here or from the mark at the foot of the sidebar.</p>
+ <p class="explore-intro" data-i18n="proto_intro">One record, two seats. As the bank, you see your applicants on a map, the evaluation list, and a file to approve, question or decline. As the operator, you see the same file from the other side: your score, the reviewer's questions, and the form to answer them. Switch sides from the sidebar.</p>
 
  <figure class="app-shot app-shot--embed app-shot--front r">
  <div class="proto-stack">
@@ -4355,6 +4445,39 @@
  </section>
 
 
+ <!-- DRAFT (B5 Testing, version 1: use if there was any validation. Keep only one version). Hidden until it is ready; add PT keys when it goes live.
+ <section class="case-section">
+ <div class="wrap">
+ <p class="case-section-label r">Testing</p>
+ <h2 class="r">What changed after testing.</h2>
+ <p class="explore-intro r">I tested [CONFIRM: what] with [CONFIRM: who, how many, format]. [CONFIRM: finding 1] led to [CONFIRM: change]. [CONFIRM: finding 2] led to [CONFIRM: change].</p>
+ </div>
+ </section>
+ -->
+
+ <!-- DRAFT (B5 Testing, version 2: use if there was no testing with real users. No placeholders. Keep only one version). Hidden until it is ready; add PT keys when it goes live.
+ <section class="case-section">
+ <div class="wrap">
+ <p class="case-section-label r">Testing</p>
+ <h2 class="r">What I would test next.</h2>
+ <p class="explore-intro r">The product went to handover before testing with operators in the field. These are the questions I would take there first.</p>
+ <p class="explore-intro r">Can an operator complete Registration without help from a bank agent? I would measure completion rate and where people stop.</p>
+ <p class="explore-intro r">Does the score make sense to the person it scores? I would ask operators to explain their own score back, and count how many get it right.</p>
+ <p class="explore-intro r">Does the question loop replace the site visit? I would compare the time from first question to decision with the paper process.</p>
+ </div>
+ </section>
+ -->
+
+ <!-- DRAFT (B6 Outcome). [CONFIRM: any result, e.g. pilot bank, number of registered operators, review time, feedback from the compliance team. If there is no result to share, delete this and let Testing close the page.]
+ <section class="case-section">
+ <div class="wrap">
+ <p class="case-section-label r">Outcome</p>
+ <h2 class="r">[CONFIRM: heading]</h2>
+ <p class="explore-intro r">[CONFIRM: result]</p>
+ </div>
+ </section>
+ -->
+
  <!-- ====== INFORMATION ARCHITECTURE / SITEMAP ====== -->
 
 
@@ -4386,7 +4509,7 @@
  meta_role: "Role",
  meta_role_val: "Lead Product Designer",
  meta_deliverables: "Deliverables",
- meta_deliverables_val: "Flows, screens & navigation patterns",
+ meta_deliverables_val: "Research, flows, wireframes, UI, interactive prototype, handover",
  meta_team: "Team",
  meta_team_val: "Sole designer · Datastake (founder + engineering)",
  meta_live: "Live site",
@@ -4402,11 +4525,11 @@
  challenge_label: "The Challenge",
  challenge_title: "Paper, filled in by the wrong hands.",
  challenge_p1: "The DRC produces over 70% of the world's cobalt, much of it dug by hand in a sector that sustains an estimated 10 million people. Banking access among artisanal miners sits at 1 to 3%, and informal lenders fill the gap on predatory terms.",
- challenge_p2: "The blockage isn't the miner, it's the paperwork. Banks need identity, source of funds and due diligence, and no shared registry holds that record, so it ran on paper filled in by a bank agent on the operator's behalf. The person answering was never the person who knew, and the easiest decision was always no.",
+ challenge_p2: "The blockage sits in the paperwork. Banks need identity, source of funds and due diligence, and no shared registry holds that record, so it ran on paper filled in by a bank agent on the operator's behalf. The person answering was never the person who knew, and the easiest decision was always no.",
  solution_label: "The Solution",
  solution_title: "Change who holds the pen.",
  solution_p1: "KOTA moves the starting point: the operator registers themselves and submits digitally, in their own words. The bank receives a structured application instead of a stack of handwritten cards, and the operator gets a score that shows the path forward. The record belongs to the person it describes.",
- solution_p2: "One engine serves two institutions, a commercial bank and a government-mandated commodity aggregator, wearing different vocabulary for the same record. Those product decisions belong to the team; my work happened one level down: a form people can actually use, and a score they can stand behind.",
+ solution_p2: "One engine serves two institutions, a commercial bank and a government-mandated commodity aggregator, each with its own vocabulary for the same record. The team set the direction. My part was everything the operator and the reviewer touch: the registration form, the score and how it explains itself, and the review flow between bank and operator.",
  ph_hero_cap: "Kota platform overview, institution dashboard with a counterparty profile in focus.",
  ia_label: "Information Architecture",
  ia_title: "The question that split the architecture.",
@@ -4502,17 +4625,21 @@
  brief_in3_v: "Features that lived in the founder's head, told in conversation, never written down.",
  proto_label: "The Prototype, Live",
  proto_title: "Be the bank, or be the operator.",
- proto_intro: "One record, two seats. As the bank you get the book of business on a map, the evaluation list, and an operator's file to approve, question or decline. As the operator you get that same file from the other end: the score the banks compute, the questions a reviewer left, and the form where they get answered. Throw the switch to change sides, here or from the mark at the foot of the sidebar.",
+ proto_intro: "One record, two seats. As the bank, you see your applicants on a map, the evaluation list, and a file to approve, question or decline. As the operator, you see the same file from the other side: your score, the reviewer's questions, and the form to answer them. Switch sides from the sidebar.",
  hint_seat: "Interactive · click to open",
  fig_front: "The same record, read from either seat.",
  who_label: "Who It Is For",
  who_title: "Two users, and what each one is blocked by.",
  who_intro: "A cooperative needs an account and has no record that proves it exists. A reviewer needs to decide and has nothing solid to decide on. Everything below starts from those two positions.",
  prod_label: "The Product",
- prod_title: "What the screens do with it.",
+ prod_title: "One file, read in one pass.",
  prod_intro: "One record, filled once by the operator and read by every bank they apply to. Below: the file a reviewer opens, and the same bank screen at wireframe stage and at handover.",
- cap1_d: "One sentence, three numbers, and their sources.",
+ cap1_d: "39% of adults with a bank account, 8.7% of firms with a loan, EU due-diligence rules since 2021, and where those numbers come from.",
  cap2_d: "What each side needs, and what holds it back.",
+ persona_op_label: "The operator",
+ persona_op_p: "A cooperative that needs a bank account. Blocked by: no record that proves it exists.",
+ persona_rev_label: "The reviewer",
+ persona_rev_p: "A compliance analyst at the bank. Blocked by: nothing solid to decide on.",
  cap3_d: "Score, risk, documents and counterparties, in one read.",
  cap4_d: "The same screen at both ends of the work. Drag to compare.",
  seat_bank: "Be the bank",
@@ -4572,7 +4699,7 @@
  meta_role: "Função",
  meta_role_val: "Lead Product Designer",
  meta_deliverables: "Entregas",
- meta_deliverables_val: "Fluxos, telas & padrões de navegação",
+ meta_deliverables_val: "Pesquisa, fluxos, wireframes, UI, protótipo interativo, handover",
  meta_team: "Time",
  meta_team_val: "Designer única · Datastake (founder + engenharia)",
  meta_live: "Site no ar",
@@ -4588,11 +4715,11 @@
  challenge_label: "O Desafio",
  challenge_title: "Papel, preenchido pelas mãos erradas.",
  challenge_p1: "A RDC produz mais de 70% do cobalto do mundo, boa parte extraída à mão num setor que sustenta cerca de 10 milhões de pessoas. O acesso bancário entre mineradores artesanais fica entre 1 e 3%, e agiotas informais preenchem a lacuna em termos predatórios.",
- challenge_p2: "O bloqueio não é o minerador, é a papelada. Bancos precisam de identidade, origem de fundos e due diligence, e nenhum registro compartilhado guarda isso, então o processo rodava em papel preenchido por um agente do banco em nome do operador. Quem respondia nunca era quem sabia, e a decisão mais fácil era sempre não.",
+ challenge_p2: "O bloqueio está na papelada. Bancos precisam de identidade, origem de fundos e due diligence, e nenhum registro compartilhado guarda isso, então o processo rodava em papel preenchido por um agente do banco em nome do operador. Quem respondia nunca era quem sabia, e a decisão mais fácil era sempre não.",
  solution_label: "A Solução",
  solution_title: "Mudar quem segura a caneta.",
  solution_p1: "O KOTA muda o ponto de partida: o operador se cadastra sozinho e submete digitalmente, com as próprias palavras. O banco recebe uma aplicação estruturada em vez de uma pilha de fichas manuscritas, e o operador recebe um score que mostra o caminho. O registro pertence a quem ele descreve.",
- solution_p2: "Um motor serve duas instituições, um banco comercial e um agregador de commodities mandatado pelo governo, vestindo vocabulários diferentes para o mesmo registro. Essas decisões de produto são do time; meu trabalho aconteceu um nível abaixo: uma forma que as pessoas realmente conseguem usar, e um score em que podem confiar.",
+ solution_p2: "Um motor serve duas instituições, um banco comercial e um agregador de commodities mandatado pelo governo, cada um com seu próprio vocabulário para o mesmo registro. O time definiu a direção. Minha parte foi tudo que o operador e o revisor tocam: o formulário de cadastro, o score e como ele se explica, e o fluxo de revisão entre banco e operador.",
  ph_hero_cap: "Visão geral da plataforma Kota, dashboard da instituição com um perfil de contraparte em foco.",
  ia_label: "Arquitetura da Informação",
  ia_title: "A pergunta que dividiu a arquitetura.",
@@ -4688,17 +4815,21 @@
  brief_in3_v: "Funcionalidades que viviam na cabeça do fundador, contadas em conversa, nunca escritas.",
  proto_label: "O Protótipo, Ao Vivo",
  proto_title: "Seja o banco, ou seja o operador.",
- proto_intro: "Um registro, dois assentos. Como banco você recebe a carteira no mapa, a lista de avaliação e a ficha de um operador para aprovar, questionar ou recusar. Como operador você recebe a mesma ficha pelo outro lado: a nota que os bancos calculam, as perguntas que um revisor deixou e o formulário onde elas são respondidas. Vire a chave para trocar de lado, aqui ou pela marca no pé da barra lateral.",
+ proto_intro: "Um registro, dois assentos. Como banco, você vê seus candidatos no mapa, a lista de avaliação e uma ficha para aprovar, questionar ou recusar. Como operador, você vê a mesma ficha pelo outro lado: sua nota, as perguntas do revisor e o formulário para respondê-las. Troque de lado pela barra lateral.",
  hint_seat: "Interativo · clique para abrir",
  fig_front: "O mesmo registro, lido pelos dois assentos.",
  who_label: "Para Quem É",
  who_title: "Dois usuários, e o que trava cada um.",
  who_intro: "Uma cooperativa precisa de conta e não tem registro que prove que existe. Um revisor precisa decidir e não tem base sólida para decidir. Tudo abaixo parte dessas duas posições.",
  prod_label: "O Produto",
- prod_title: "O que as telas fazem com isso.",
+ prod_title: "Uma ficha, lida de uma vez.",
  prod_intro: "Um registro, preenchido uma vez pelo operador e lido por todo banco a que ele se candidata. Abaixo: a ficha que um revisor abre, e a mesma tela do banco no wireframe e no handover.",
- cap1_d: "Uma frase, três números, e as fontes de cada um.",
+ cap1_d: "39% dos adultos com conta em banco, 8,7% das empresas com crédito, regras de due diligence da UE desde 2021, e de onde vêm esses números.",
  cap2_d: "O que cada lado precisa, e o que trava cada um.",
+ persona_op_label: "O operador",
+ persona_op_p: "Uma cooperativa que precisa de conta em banco. Travada por: nenhum registro que prove que ela existe.",
+ persona_rev_label: "O revisor",
+ persona_rev_p: "Um analista de compliance do banco. Travado por: nada sólido em que basear a decisão.",
  cap3_d: "Nota, risco, documentos e contrapartes, numa leitura.",
  cap4_d: "A mesma tela nas duas pontas do trabalho. Arraste para comparar.",
  seat_bank: "Seja o banco",
