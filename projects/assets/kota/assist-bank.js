@@ -290,4 +290,7 @@
     onAsk:onAsk,
     autoOpen:/[?&]assist=/.test(location.search)
   });
+
+  /* Arriving from Evaluation's "Draft reminders on Home". */
+  if (/[?&]assist=remind/.test(location.search)) setTimeout(function(){ A.ask('Draft reminders for Mweka and Matoro'); }, 700);
 })();
