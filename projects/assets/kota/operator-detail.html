@@ -928,6 +928,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 </style>
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=4">
+<link rel="stylesheet" href="assistant.css?v=3">
 <script src="page-transition.js?v=3"></script>
 </head>
 <body>
@@ -2612,6 +2613,13 @@ body{margin:0;background:var(--ground);color:var(--ink);
                                   : n + ' comments on this form';
   }
 
+  /* The assistant writes its follow-up questions into this same store, so
+     they are listed beside the reviewer's own comments, not somewhere else. */
+  window.KotaReview = {
+    showTab: showTab,
+    addComment: function(key, c){ (comments[key] = comments[key] || []).push(c); updateCount(); }
+  };
+
   function fieldRow(sec, f){
     var key = sec.name + '|' + f.label,
         wrap = document.createElement('div');
@@ -2755,6 +2763,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
     if (first) first.focus();
   }
 
+  if (window.KotaReview) window.KotaReview.openDecision = openDecision;
+
   function closeDecision(){
     if (!openCm) return;
     openCm.classList.remove('is-on');
@@ -2823,6 +2833,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 })();
 </script>
+<script src="assistant.js?v=3"></script>
+<script src="assist-review.js?v=4"></script>
 <script src="motion.js?v=1"></script>
 </body>
 </html>

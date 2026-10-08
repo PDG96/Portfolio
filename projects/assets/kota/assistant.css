@@ -1,0 +1,222 @@
+/* ==========================================================================
+   KOTA: the assistant.
+
+   One panel on every operator and bank screen. It reads the screen it opens
+   on, proposes a change, shows the work it did to get there, and waits: a
+   suggestion becomes an answer, a chart or a form only when a person accepts
+   it. The panel docks on the right; on a window too narrow to give it room
+   it floats over the page instead of squeezing it.
+   ========================================================================== */
+:root{
+  --ka-w:400px;
+  --ka-bg:var(--block,#1D1D1E);
+  --ka-ground:var(--ground,#151617);
+  --ka-line:var(--line,#2B2C2D);
+  --ka-ink:var(--ink,#F6F6F6);
+  --ka-ink-2:var(--ink-2,#D3D4D4);
+  --ka-muted:var(--muted,#898B8D);
+  --ka-accent:var(--accent,#E8723F);
+  --ka-soft:var(--accent-soft,#F08F65);
+  --ka-good:var(--good,#32D583);
+  --ka-warn:var(--warn,#FDB022);
+  --ka-ai:#F7B27A;
+}
+
+/* ---- launcher ---- */
+.ka-launch{position:fixed;right:24px;bottom:24px;z-index:70;display:inline-flex;align-items:center;gap:10px;
+  height:44px;padding:0 16px 0 12px;border-radius:22px;border:1px solid #3A3C3E;
+  background:linear-gradient(180deg,#232426,#1B1C1D);color:var(--ka-ink);font:inherit;font-size:14px;
+  font-weight:600;cursor:pointer;box-shadow:0 12px 28px rgba(0,0,0,.45);
+  transition:transform .18s ease,opacity .18s ease,border-color .15s ease}
+.ka-launch:hover{border-color:var(--ka-soft)}
+.ka-launch:focus-visible{outline:2px solid var(--ka-soft);outline-offset:3px}
+.ka-launch .ka-orb{width:26px;height:26px}
+.ka-launch kbd{font:inherit;font-size:11px;font-weight:500;color:var(--ka-muted);padding:2px 6px;
+  border-radius:5px;border:1px solid var(--ka-line)}
+body.ka-open .ka-launch{opacity:0;transform:translateY(8px);pointer-events:none}
+
+/* The mark: a warm orb, the one place the assistant is drawn rather than
+   written, so it reads as the same voice on every screen. */
+.ka-orb{display:grid;place-items:center;border-radius:50%;flex:none;color:#fff;
+  background:radial-gradient(circle at 32% 30%,#FFD2B0 0,#F08F65 38%,#E8723F 70%,#B9481C 100%)}
+.ka-orb svg{width:60%;height:60%}
+.ka-orb.is-busy{animation:ka-pulse 1.4s ease-in-out infinite}
+@keyframes ka-pulse{50%{box-shadow:0 0 0 6px rgba(232,114,63,.18)}}
+
+/* ---- panel ---- */
+.ka-panel{position:fixed;top:0;right:0;bottom:0;width:var(--ka-w);z-index:80;display:flex;flex-direction:column;
+  background:var(--ka-bg);border-left:1px solid var(--ka-line);color:var(--ka-ink);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.45;
+  transform:translateX(100%);transition:transform .22s cubic-bezier(.2,.7,.2,1);
+  box-shadow:-18px 0 40px rgba(0,0,0,.35)}
+body.ka-open .ka-panel{transform:none}
+/* Docked: the page gives the panel its column instead of sitting under it. */
+body.ka-open.ka-dock{padding-right:var(--ka-w)}
+body.ka-open.ka-dock .ka-panel{box-shadow:none}
+
+.ka-head{flex:none;display:flex;align-items:center;gap:12px;padding:16px 16px 14px 20px;border-bottom:1px solid var(--ka-line)}
+.ka-head .ka-orb{width:32px;height:32px}
+.ka-head .t{font-size:15px;font-weight:600;line-height:20px}
+.ka-head .c{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:12px;color:var(--ka-muted)}
+.ka-head .c i{width:6px;height:6px;border-radius:50%;background:var(--ka-good);flex:none}
+.ka-x{margin-left:auto;width:32px;height:32px;border:0;border-radius:8px;background:transparent;color:var(--ka-muted);
+  display:grid;place-items:center;cursor:pointer}
+.ka-x:hover{background:#2E3033;color:var(--ka-ink)}
+.ka-x svg{width:18px;height:18px}
+
+.ka-log{flex:1;min-height:0;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px;
+  scrollbar-width:thin;scrollbar-color:#3A3C3E transparent}
+
+/* ---- messages ---- */
+.ka-msg{display:flex;flex-direction:column;gap:8px;max-width:100%;animation:ka-in .22s ease both}
+@keyframes ka-in{from{opacity:0;transform:translateY(6px)}}
+.ka-msg--me{align-self:flex-end;max-width:86%}
+.ka-msg--me .ka-bubble{background:#2B2C2D;border-radius:14px 14px 4px 14px;padding:10px 14px;color:var(--ka-ink);white-space:pre-wrap}
+.ka-msg--bot .ka-text{color:var(--ka-ink-2)}
+.ka-msg--bot .ka-text p{margin:0 0 8px}
+.ka-msg--bot .ka-text p:last-child{margin:0}
+.ka-msg--bot .ka-text b{color:var(--ka-ink);font-weight:600}
+.ka-who{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--ka-muted)}
+.ka-who .ka-orb{width:18px;height:18px}
+.ka-files{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.ka-file{display:inline-flex;align-items:center;gap:8px;max-width:100%;padding:6px 10px;border-radius:8px;
+  background:var(--ka-ground);border:1px solid var(--ka-line);font-size:12px;color:var(--ka-ink-2)}
+.ka-file svg{width:14px;height:14px;color:var(--ka-soft);flex:none}
+.ka-file span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---- the work, shown ----
+   Every answer carries the steps that produced it. Running, each step has a
+   spinner; done, the list folds to one line that can be reopened. */
+.ka-steps{border:1px solid var(--ka-line);border-radius:10px;background:var(--ka-ground);overflow:hidden}
+.ka-steps summary{list-style:none;display:flex;align-items:center;gap:8px;padding:9px 12px;font-size:12px;
+  color:var(--ka-muted);cursor:pointer;user-select:none}
+.ka-steps summary::-webkit-details-marker{display:none}
+.ka-steps summary .chev{margin-left:auto;width:14px;height:14px;transition:transform .15s ease}
+.ka-steps[open] summary .chev{transform:rotate(180deg)}
+.ka-steps ol{list-style:none;margin:0;padding:0 12px 10px;display:flex;flex-direction:column;gap:7px}
+.ka-steps li{display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:17px;color:var(--ka-ink-2)}
+.ka-steps li .m{display:block;color:var(--ka-muted)}
+.ka-steps li .s{width:14px;height:14px;flex:none;margin-top:1.5px;display:grid;place-items:center}
+.ka-steps li .s svg{width:14px;height:14px;color:var(--ka-good)}
+.ka-steps li.is-wait{opacity:.4}
+.ka-spin{width:12px;height:12px;border-radius:50%;border:1.5px solid #46484D;border-top-color:var(--ka-soft);
+  animation:ka-rot .7s linear infinite}
+@keyframes ka-rot{to{transform:rotate(360deg)}}
+
+.ka-typing{display:inline-flex;gap:4px;padding:6px 0}
+.ka-typing i{width:6px;height:6px;border-radius:50%;background:var(--ka-muted);animation:ka-dot 1s infinite}
+.ka-typing i:nth-child(2){animation-delay:.15s}.ka-typing i:nth-child(3){animation-delay:.3s}
+@keyframes ka-dot{50%{opacity:.25;transform:translateY(-2px)}}
+
+/* ---- proposal card ---- */
+.ka-card{border:1px solid var(--ka-line);border-radius:12px;background:#222325;overflow:hidden}
+.ka-card .ch{padding:14px 14px 10px;display:flex;align-items:flex-start;gap:10px}
+.ka-card .ch .tt{font-size:14px;font-weight:600;color:var(--ka-ink)}
+.ka-card .ch .ts{font-size:12px;color:var(--ka-muted);margin-top:2px}
+.ka-card .cb{padding:0 14px 12px;display:flex;flex-direction:column;gap:8px}
+.ka-card .cf{display:flex;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid var(--ka-line);background:#1E1F21}
+.ka-card .cf .note{font-size:12px;color:var(--ka-muted);margin-right:auto}
+.ka-card.is-done .cf{display:none}
+
+/* One proposed answer: where it goes, what it says, where it came from. */
+.ka-row{display:grid;grid-template-columns:18px 1fr;gap:10px;padding:10px;border-radius:8px;background:var(--ka-ground);
+  border:1px solid transparent;cursor:pointer}
+.ka-row:hover{border-color:#3A3C3E}
+.ka-row input{margin:2px 0 0;accent-color:var(--ka-accent);width:15px;height:15px;cursor:pointer}
+.ka-row .w{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ka-muted)}
+.ka-row .q{font-size:12px;color:var(--ka-ink-2);margin-top:2px}
+.ka-row .a{font-size:14px;font-weight:600;color:var(--ka-ink);margin-top:4px}
+.ka-row .w,.ka-row .q,.ka-row .a,.ka-row .src,.ka-row .bd{display:block}
+.ka-row .src{margin-top:6px;font-size:11.5px;line-height:16px;color:var(--ka-muted)}
+.ka-row .src svg{width:12px;height:12px;color:var(--ka-soft);vertical-align:-2px;margin-right:5px}
+.ka-row .bd{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ka-row .bd:empty{display:none}
+.ka-badge{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:10px;font-size:11px;font-weight:600;white-space:nowrap}
+.ka-badge--ask{background:rgba(255,156,110,.12);color:#FF9C6E}
+.ka-badge--check{background:rgba(253,176,34,.12);color:var(--ka-warn)}
+.ka-badge--have{background:rgba(133,165,255,.12);color:#ADC6FF}
+.ka-badge--ok{background:rgba(50,213,131,.12);color:#6CE9A6}
+.ka-row.is-off{opacity:.5}
+
+/* ---- buttons, chips ---- */
+.ka-btn{height:32px;padding:0 14px;border-radius:8px;border:1px solid #3A3C3E;background:#2A2B2D;color:var(--ka-ink);
+  font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.ka-btn:hover{background:#34363A;border-color:#4A4C50}
+.ka-btn--go{background:var(--ka-accent);border-color:var(--ka-accent);color:#fff}
+.ka-btn--go:hover{background:#F2884F;border-color:#F2884F}
+.ka-btn:disabled{opacity:.45;cursor:not-allowed}
+.ka-btn svg{width:15px;height:15px}
+.ka-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ka-chip{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:16px;border:1px solid var(--ka-line);
+  background:transparent;color:var(--ka-ink-2);font:inherit;font-size:13px;cursor:pointer;text-align:left}
+.ka-chip:hover{border-color:var(--ka-soft);color:var(--ka-ink);background:rgba(232,114,63,.06)}
+.ka-chip svg{width:14px;height:14px;color:var(--ka-soft);flex:none}
+.ka-link{border:0;background:none;padding:0;font:inherit;color:#FF9C6E;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ka-list{margin:6px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.ka-list li{display:flex;gap:8px;align-items:baseline}
+.ka-list li::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--ka-soft);flex:none;transform:translateY(-2px)}
+
+/* ---- composer ---- */
+.ka-foot{flex:none;padding:12px 16px 14px;border-top:1px solid var(--ka-line);position:relative}
+.ka-pending{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.ka-pending:empty{display:none}
+.ka-pending .ka-file button{border:0;background:none;color:var(--ka-muted);padding:0;cursor:pointer;display:grid}
+.ka-pending .ka-file button svg{width:12px;height:12px;color:inherit}
+.ka-box{display:flex;align-items:flex-end;gap:6px;padding:6px;border:1px solid #3A3C3E;border-radius:12px;background:var(--ka-ground)}
+.ka-box:focus-within{border-color:var(--ka-soft);box-shadow:0 0 0 3px rgba(232,114,63,.12)}
+.ka-box textarea{flex:1;min-height:36px;max-height:160px;resize:none;border:0;outline:0;background:transparent;color:var(--ka-ink);
+  font:inherit;font-size:14px;line-height:20px;padding:8px 6px}
+.ka-box textarea::placeholder{color:var(--ka-muted)}
+.ka-ib{width:34px;height:34px;flex:none;border:0;border-radius:8px;background:transparent;color:var(--ka-muted);display:grid;place-items:center;cursor:pointer}
+.ka-ib:hover{background:#2E3033;color:var(--ka-ink)}
+.ka-ib svg{width:18px;height:18px}
+.ka-ib--send{background:var(--ka-accent);color:#fff}
+.ka-ib--send:hover{background:#F2884F;color:#fff}
+.ka-ib--send:disabled{background:#2B2C2D;color:#5A5C60;cursor:not-allowed}
+.ka-fine{margin-top:8px;font-size:11.5px;line-height:16px;color:var(--ka-muted);text-align:center}
+
+/* The attach menu: the documents the operator already keeps, then the computer. */
+.ka-menu{position:absolute;left:16px;bottom:calc(100% - 6px);width:300px;padding:6px;border-radius:10px;background:#232426;
+  border:1px solid var(--ka-line);box-shadow:0 16px 28px rgba(0,0,0,.5);display:none}
+.ka-menu.is-on{display:block}
+.ka-menu .lbl{padding:8px 10px 6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ka-muted)}
+.ka-menu button{width:100%;display:flex;align-items:center;gap:10px;padding:8px 10px;border:0;border-radius:7px;background:transparent;
+  color:var(--ka-ink);font:inherit;font-size:13px;text-align:left;cursor:pointer}
+.ka-menu button:hover{background:#2E3033}
+.ka-menu button svg{width:16px;height:16px;color:var(--ka-soft);flex:none}
+.ka-menu button .s{display:block;font-size:11.5px;color:var(--ka-muted)}
+.ka-menu .sep{height:1px;margin:6px 4px;background:var(--ka-line)}
+
+/* ---- what the assistant left on the page ----
+   Anything it wrote carries its source until a person edits it, so an
+   answer that came from a document never passes for one that was typed. */
+.ka-mark{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;color:var(--ka-ai)}
+.ka-mark svg{width:13px;height:13px}
+.ka-mark .ka-badge{margin-left:2px}
+.ka-glow{animation:ka-glow 2.4s ease-out 1}
+@keyframes ka-glow{0%{box-shadow:0 0 0 0 rgba(240,143,101,.0)}15%{box-shadow:0 0 0 3px rgba(240,143,101,.55)}100%{box-shadow:0 0 0 3px rgba(240,143,101,0)}}
+
+@media (prefers-reduced-motion:reduce){
+  .ka-panel,.ka-launch,.ka-msg{transition:none;animation:none}
+  .ka-orb.is-busy,.ka-glow{animation:none}
+}
+
+/* ---- on the form, beside the field ----
+   Two quiet states. A hint where a document could answer the question, and
+   a suggestion once one has: the value, its source, accept or dismiss, right
+   where the answer goes rather than in a panel the eye has to travel to. */
+.ka-hint{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12.5px;color:var(--ka-muted)}
+.ka-hint svg{width:13px;height:13px;color:var(--ka-ai);flex:none}
+.ka-hint button{border:0;background:none;padding:0;font:inherit;color:#FF9C6E;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.ka-sugg{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;margin-top:8px;padding:10px 12px;border-radius:8px;
+  background:rgba(232,114,63,.07);border:1px dashed rgba(240,143,101,.55)}
+.ka-sugg .ka-orb{width:22px;height:22px}
+.ka-sugg .v{font-size:14px;font-weight:600;color:var(--ka-ink)}
+.ka-sugg .m{display:block;font-size:12px;color:var(--ka-muted);margin-top:2px}
+.ka-sugg .b{display:flex;gap:6px}
+.ka-sugg .ka-badge{margin-left:6px;vertical-align:1px}
+.ka-problem{display:grid;grid-template-columns:18px 1fr;gap:10px;padding:10px;border-radius:8px;background:var(--ka-ground);border:1px solid rgba(253,176,34,.25)}
+.ka-problem > svg{width:16px;height:16px;color:var(--ka-warn);margin-top:1px}
+.ka-problem .pt{font-size:13px;font-weight:600;color:var(--ka-ink)}
+.ka-problem .pm{font-size:12.5px;color:var(--ka-ink-2);margin-top:3px;line-height:1.45}
+.ka-problem .pb{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}

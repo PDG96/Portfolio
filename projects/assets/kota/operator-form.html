@@ -302,6 +302,7 @@ select.finput{appearance:none;cursor:pointer;
 </style>
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=5">
+<link rel="stylesheet" href="assistant.css?v=3">
 <script src="page-transition.js?v=3"></script>
 </head>
 <body>
@@ -724,6 +725,7 @@ select.finput{appearance:none;cursor:pointer;
      would take the cursor out of the input mid-sentence. */
   function settle(el, f){
     f.touched = true;
+    if (f.ai){ f.ai = null; var mk = el.querySelector('.ka-mark'); if (mk) mk.remove(); }
     var done = isAnswered(f);
     if (f.ask) el.classList.toggle('field--resolved', done);
     el.classList.toggle('field--missing', showGaps && !done);
@@ -804,6 +806,9 @@ select.finput{appearance:none;cursor:pointer;
         body = '<input class="finput" value="' + f.value + '"' +
                (f.placeholder ? ' placeholder="' + f.placeholder + '"' : '') + '>';
       }
+      /* Written by the assistant: the answer keeps its source until a person
+         edits it, so a value read off a document never passes for one typed. */
+      if (f.ai && window.KotaAssistant) body += KotaAssistant.mark('From ' + f.ai.src, f.ai.check ? 'Check this' : '');
       var gap = showGaps && !isAnswered(f);
       var solved = f.ask && isAnswered(f);
       return '<div class="field' + (f.ask ? ' field--asked' : '') +
@@ -899,6 +904,9 @@ select.finput{appearance:none;cursor:pointer;
       });
     });
 
+    /* The assistant decorates the fields it has something to say about. */
+    if (window.KotaFormHook) window.KotaFormHook(document.getElementById('fields'), s);
+
     document.getElementById('prevBtn').disabled = current === 0;
     document.getElementById('nextBtn').textContent =
       current === SECTIONS.length - 1 ? 'Back to the top' : 'Next section';
@@ -941,6 +949,18 @@ select.finput{appearance:none;cursor:pointer;
     window.scrollTo({ top:0 });
   }
   draw();
+
+  /* What the assistant is allowed to touch: the same data the form draws
+     from, and the same redraw a click would cause. */
+  window.KotaForm = {
+    sections: SECTIONS,
+    isAnswered: isAnswered,
+    current: function(){ return current; },
+    go: function(i){ current = i; recount(); draw(); },
+    /* Keeps the reader where they are: accepting a suggestion is not a reason to jump. */
+    refresh: function(){ var y = window.scrollY; recount(); draw(); window.scrollTo({ top:y }); },
+    openSend: function(){ openSend(); }
+  };
 
   document.getElementById('prevBtn').addEventListener('click', function(){
     if (current > 0){ current--; draw(); }
@@ -1031,6 +1051,8 @@ select.finput{appearance:none;cursor:pointer;
 
 })();
 </script>
+<script src="assistant.js?v=3"></script>
+<script src="assist-form.js?v=3"></script>
 <script src="motion.js?v=1"></script>
 </body>
 </html>
