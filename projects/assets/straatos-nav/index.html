@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Straatos navigation</title>
+<style>
+	/* Stage = the 975x872 frames on Figma page "Case montado V2"
+	   (Dashboard 1795:227260, Projects 1795:254404, Project Overview 1795:374728).
+	   Each layer is one of the three full-frame SVG exports, offset and clipped to its region
+	   (sidebar 0-255, rail 0-56, header y<66, project sidebar 56-312, content 312+). */
+	:root {
+		--bg: #0b1514;
+		--sidebar: #01393a;
+		--header: #002726;
+		--ease: cubic-bezier(.22, .8, .24, 1);
+		--t: 1;            /* time multiplier, change to slow everything down */
+	}
+	* { box-sizing: border-box; margin: 0; padding: 0; }
+	html, body { height: 100%; background: var(--bg); overflow: hidden; }
+	body { font: 13px/1.4 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; color: #cfe3e1; }
+
+	.wrap { position: fixed; inset: 0; display: grid; place-items: center; }
+	.stage {
+		position: relative; width: 975px; height: 872px; overflow: hidden;
+		background: #f9fbfa; border-radius: 12px; transform-origin: center;
+		box-shadow: 0 30px 80px rgba(0,0,0,.45);
+	}
+	.stage img { position: absolute; display: block; user-select: none; -webkit-user-drag: none; }
+
+	/* ---------- base header bar, keeps the dark top band continuous ---------- */
+	.topbar { position: absolute; left: 0; top: 0; right: 0; height: 66px; background: var(--header); }
+
+	/* ---------- main content layers ---------- */
+	.main { position: absolute; top: 0; left: 255px; width: 720px; height: 872px; overflow: hidden; }
+	.main img { left: -255px; top: 0; width: 975px; }
+	.screen { position: absolute; inset: 0; opacity: 0; transition: opacity calc(320ms * var(--t)) ease, transform calc(420ms * var(--t)) var(--ease); }
+	.screen.on { opacity: 1; transform: none; }
+	.screen.dash { transform: translateY(10px); }
+	.screen.projects { transform: translateY(10px); }
+
+	/* project overview lives to the right of rail (56) + project sidebar (256) */
+	.ov { position: absolute; left: 56px; top: 0; width: 919px; height: 872px; pointer-events: none; }
+	.ov .ov-header { left: -56px; top: 0; width: 975px; clip-path: inset(0 0 806px 56px); opacity: 0; transition: opacity calc(250ms * var(--t)) ease; }
+	.ov .psb-clip {
+		position: absolute; left: 0; top: 66px; height: 806px; width: 0; overflow: hidden;
+		background: #fff; box-shadow: 1px 0 0 #e5e9e8;
+		transition: width calc(520ms * var(--t)) var(--ease);
+	}
+	.ov .psb-clip img { left: -56px; top: -66px; width: 975px; clip-path: inset(66px 663px 0 56px); transform: translateX(-28px); opacity: 0;
+		transition: transform calc(520ms * var(--t)) var(--ease), opacity calc(320ms * var(--t)) ease; }
+	.ov .ov-content { left: -56px; top: 0; width: 975px; clip-path: inset(66px 0 0 312px); opacity: 0; transform: translateX(24px);
+		transition: opacity calc(380ms * var(--t)) ease, transform calc(560ms * var(--t)) var(--ease); }
+
+	/* ---------- app sidebar: full (255) <-> rail (56) ---------- */
+	.appnav {
+		position: absolute; left: 0; top: 0; height: 872px; width: 255px; overflow: hidden; background: var(--sidebar);
+		transition: width calc(480ms * var(--t)) var(--ease); z-index: 3;
+	}
+	.appnav .full { left: 0; top: 0; width: 975px; transition: opacity calc(220ms * var(--t)) ease; }
+	.appnav .full.alt { opacity: 0; }
+	.appnav .rail { left: 0; top: 0; width: 975px; clip-path: inset(0 919px 0 0); opacity: 0; transition: opacity calc(260ms * var(--t)) ease; }
+
+	/* ---------- state: project (sidebar collapses, project sidebar expands) ---------- */
+	.stage.in-project .appnav { width: 56px; }
+	.stage.in-project .appnav .full { opacity: 0 !important; }
+	.stage.in-project .appnav .rail { opacity: 1; transition-delay: calc(140ms * var(--t)); }
+	.stage.in-project .main { left: 56px; transition: left calc(480ms * var(--t)) var(--ease); }
+	.stage.in-project .main .screen { opacity: 0; transform: translateX(-16px); transition-duration: calc(200ms * var(--t)); }
+	.stage.in-project .ov { pointer-events: auto; }
+	.stage.in-project .ov .ov-header { opacity: 1; }
+	.stage.in-project .ov .psb-clip { width: 256px; transition-delay: calc(120ms * var(--t)); }
+	.stage.in-project .ov .psb-clip img { transform: none; opacity: 1; transition-delay: calc(200ms * var(--t)); }
+	.stage.in-project .ov .ov-content { opacity: 1; transform: none; transition-delay: calc(220ms * var(--t)); }
+	.main { transition: left calc(480ms * var(--t)) var(--ease); }
+
+	/* active item highlight on the app sidebar: crossfade between the two exports */
+	.stage.on-projects .appnav .full.base { opacity: 0; }
+	.stage.on-projects .appnav .full.alt { opacity: 1; }
+
+	/* ---------- hotspots ---------- */
+	.hot { position: absolute; z-index: 5; cursor: pointer; border-radius: 8px; }
+	.hot:hover { background: rgba(255,255,255,.06); }
+	.hot[hidden] { display: none; }
+
+	/* ---------- fake cursor + click ripple ---------- */
+	.cursor { position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 10; pointer-events: none;
+		transform: translate(700px, 700px); transition: transform calc(700ms * var(--t)) cubic-bezier(.45,.05,.25,1), opacity .3s; }
+	.cursor svg { width: 22px; height: 22px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); transition: transform .12s; }
+	.cursor.press svg { transform: scale(.82); }
+	.ripple { position: absolute; z-index: 9; width: 36px; height: 36px; margin: -18px 0 0 -18px; border-radius: 50%;
+		background: rgba(30,127,120,.35); pointer-events: none; animation: ripple .5s ease-out forwards; }
+	@keyframes ripple { from { transform: scale(.2); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+
+	/* ---------- controls ---------- */
+	.controls { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; gap: 6px; align-items: center;
+		background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 999px; padding: 5px; z-index: 20; }
+	.controls button { font: inherit; color: #cfe3e1; background: none; border: 0; border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+	.controls button:hover { background: rgba(255,255,255,.08); }
+	.controls button.cur { background: #1e7f78; color: #fff; }
+	.controls .sep { width: 1px; height: 18px; background: rgba(255,255,255,.15); margin: 0 4px; }
+	.hide-ui .controls { display: none; }
+
+	/* ?embed: inside the case page. No controls, transparent ground, the stage fills the iframe
+	   inside a dark bezel (the device frame on the case Figma, node 1822:332147). */
+	.embed, .embed body { background: transparent; }
+	.embed .controls { display: none; }
+	.embed .wrap { display: block; }
+	.embed .stage { position: absolute; left: 0; top: 0; transform-origin: 0 0;
+		box-shadow: none; outline: 8px solid #0b1514; border-radius: 14px; }
+
+	@media (prefers-reduced-motion: reduce) { :root { --t: .01; } .cursor { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+	<div class="stage" id="stage">
+		<div class="topbar"></div>
+
+		<div class="main">
+			<div class="screen dash on"><img src="svg/dashboard.svg" alt="Dashboard" /></div>
+			<div class="screen projects"><img src="svg/projects.svg" alt="Projects" /></div>
+		</div>
+
+		<div class="ov">
+			<img class="ov-header" src="img/overview.jpg" alt="" />
+			<div class="psb-clip"><img src="img/overview.jpg" alt="Project sidebar" /></div>
+			<img class="ov-content" src="img/overview.jpg" alt="Project overview" />
+		</div>
+
+		<nav class="appnav">
+			<img class="rail" src="img/overview.jpg" alt="" />
+			<img class="full base" src="svg/dashboard.svg" alt="Straatos sidebar" />
+			<img class="full alt" src="svg/projects.svg" alt="" />
+		</nav>
+
+		<!-- hotspots, 1x frame coordinates -->
+		<div class="hot" id="hot-projects" style="left:0;top:392px;width:255px;height:40px" title="Projects"></div>
+		<div class="hot" id="hot-dashboard" style="left:0;top:120px;width:255px;height:40px" title="Dashboard"></div>
+		<div class="hot" id="hot-card" style="left:279px;top:248px;width:331px;height:442px" title="Projeto Raiz Amazônica" hidden></div>
+		<div class="hot" id="hot-home" style="left:6px;top:128px;width:44px;height:40px" title="Dashboard" hidden></div>
+
+		<div class="cursor" id="cursor"><svg viewBox="0 0 24 24"><path d="M5 3l13 7.5-6 1.6 3.6 6.4-2.6 1.5-3.6-6.4L5 18z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+	</div>
+</div>
+
+<div class="controls">
+	<button data-go="dashboard">1 · Dashboard</button>
+	<button data-go="projects">2 · Projects</button>
+	<button data-go="overview">3 · Project overview</button>
+	<span class="sep"></span>
+	<button id="play">Pause</button>
+</div>
+
+<script>
+const stage = document.getElementById('stage');
+const cursor = document.getElementById('cursor');
+const screens = { dashboard: stage.querySelector('.screen.dash'), projects: stage.querySelector('.screen.projects') };
+const hot = (id) => document.getElementById(id);
+const T = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--t')) || 1;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms * T()));
+
+let state = 'dashboard';
+
+const EMBED = new URLSearchParams(location.search).has('embed');
+if (EMBED) document.documentElement.classList.add('embed');
+
+function fit() {
+	const s = EMBED
+		? Math.min((innerWidth - 16) / 975, (innerHeight - 16) / 872)
+		: Math.min((innerWidth - 48) / 975, (innerHeight - 110) / 872, 1.4);
+	if (EMBED) {
+		// top-left origin, centred by hand: a 975px box in a narrower iframe would
+		// otherwise start at the left edge and overflow to the right before scaling
+		const x = (innerWidth - 975 * s) / 2, y = (innerHeight - 872 * s) / 2;
+		stage.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+		return;
+	}
+	stage.style.transform = `scale(${s})`;
+}
+
+function go(next) {
+	state = next;
+	const inProject = next === 'overview';
+	stage.classList.toggle('in-project', inProject);
+	stage.classList.toggle('on-projects', next === 'projects' || inProject);
+	// back to dashboard from the rail: return the highlight to Dashboard
+	if (next === 'dashboard') stage.classList.remove('on-projects');
+	screens.dashboard.classList.toggle('on', next === 'dashboard');
+	screens.projects.classList.toggle('on', next === 'projects' || inProject);
+	hot('hot-projects').hidden = inProject;
+	hot('hot-dashboard').hidden = inProject;
+	hot('hot-card').hidden = next !== 'projects';
+	hot('hot-home').hidden = !inProject;
+	document.querySelectorAll('[data-go]').forEach((b) => b.classList.toggle('cur', b.dataset.go === next));
+	if (!EMBED) history.replaceState(null, '', '#' + next);
+}
+
+/* ---------- fake cursor ---------- */
+function moveTo(x, y) { cursor.style.transform = `translate(${x - 5}px, ${y - 3}px)`; }
+async function click(x, y) {
+	moveTo(x, y);
+	await wait(760);
+	cursor.classList.add('press');
+	const r = document.createElement('div');
+	r.className = 'ripple'; r.style.left = x + 'px'; r.style.top = y + 'px';
+	stage.appendChild(r); setTimeout(() => r.remove(), 600);
+	await wait(120);
+	cursor.classList.remove('press');
+}
+
+const TARGETS = {
+	projects: [128, 412],   // "Projects" in the app sidebar
+	overview: [444, 434],   // first project card, Projeto Raiz Amazônica
+	dashboard: [28, 148],   // home icon on the collapsed rail
+};
+const NEXT = { dashboard: 'projects', projects: 'overview', overview: 'dashboard' };
+
+/* ---------- autoplay loop ---------- */
+let playing = true, runId = 0;
+async function loop(id) {
+	while (playing && id === runId) {
+		await wait(state === 'overview' ? 2600 : 1800);
+		if (!playing || id !== runId) return;
+		const next = NEXT[state];
+		await click(...TARGETS[next]);
+		if (!playing || id !== runId) return;
+		go(next);
+		moveTo(...(next === 'overview' ? [620, 640] : next === 'projects' ? [520, 560] : [600, 600]));
+	}
+}
+function setPlaying(p) {
+	playing = p; runId++;
+	document.getElementById('play').textContent = p ? 'Pause' : 'Play';
+	cursor.style.opacity = p ? 1 : 0;
+	if (p) loop(runId);
+}
+
+/* ---------- manual ---------- */
+hot('hot-projects').onclick = () => { setPlaying(false); go('projects'); };
+hot('hot-dashboard').onclick = () => { setPlaying(false); go('dashboard'); };
+hot('hot-card').onclick = () => { setPlaying(false); go('overview'); };
+hot('hot-home').onclick = () => { setPlaying(false); go('dashboard'); };
+document.querySelectorAll('[data-go]').forEach((b) => b.onclick = () => { setPlaying(false); go(b.dataset.go); });
+document.getElementById('play').onclick = () => setPlaying(!playing);
+addEventListener('keydown', (e) => {
+	if (e.key === ' ') { e.preventDefault(); setPlaying(!playing); }
+	if (e.key === 'ArrowRight') { setPlaying(false); go(NEXT[state]); }
+	if (e.key === 'ArrowLeft') { setPlaying(false); go({ dashboard: 'overview', projects: 'dashboard', overview: 'projects' }[state]); }
+	if (e.key === 'h' || e.key === 'H') document.body.classList.toggle('hide-ui');
+	if (e.key === 's' || e.key === 'S') { const r = document.documentElement.style; r.setProperty('--t', T() === 1 ? 3 : 1); }
+});
+addEventListener('resize', fit);
+
+fit();
+const start = location.hash.slice(1);
+go(['dashboard', 'projects', 'overview'].includes(start) ? start : 'dashboard');
+if (new URLSearchParams(location.search).has('still')) setPlaying(false); else setPlaying(true);
+</script>
+</body>
+</html>

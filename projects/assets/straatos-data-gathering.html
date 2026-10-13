@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Straatos data gathering</title>
+<style>
+  /* Data gathering composition from Pietra's layout (2026-10-12): laptop with
+     the New Project drawer bleeding off the left, the New Document card tilted
+     top right, Comments below it. Pieces from straatos-bento2/, hover as in
+     straatos-bento2.html. Stage 1080 x 720. */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; background: transparent; overflow: hidden; }
+  .stage { position: relative; width: 100%; aspect-ratio: 1080 / 720; }
+
+  .tile { position: absolute; transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1), filter .45s ease; will-change: transform, filter; }
+  .tile img { display: block; width: 100%; height: auto; }
+
+  .pc       { left: -1%;  top: 9%;   /* -1% eats the PNG's transparent left margin, so the laptop meets the sheet edge */  width: 57%; z-index: 1; }
+  .document { left: 60%; top: 0;   width: 27.5%; z-index: 2; transform: rotate(-8deg);
+              filter: drop-shadow(0 12px 32px rgba(15, 23, 42, .10)); }
+  .comments { left: 57%; top: 55%; width: 34%; z-index: 3;   /* bigger so the thread reads (Pietra) */
+              filter: drop-shadow(0 12px 28px rgba(15, 23, 42, .08)); }
+
+  .pc:hover       { transform: translateY(-8px) scale(1.015); filter: drop-shadow(0 24px 48px rgba(15, 23, 42, .16)); z-index: 5; }
+  .document:hover { transform: rotate(-6deg) translateY(-8px) scale(1.025); filter: drop-shadow(0 24px 48px rgba(15, 23, 42, .20)); z-index: 5; }
+  .comments:hover { transform: translateY(-8px) scale(1.02); filter: drop-shadow(0 24px 48px rgba(15, 23, 42, .16)); z-index: 5; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="tile pc">
+    <img src="straatos-bento2/pc.png" alt="Laptop with the New Project drawer: project cover dropzone with a mangrove photo, project type, country, activity type, stage and title">
+  </div>
+  <div class="tile document">
+    <img src="straatos-bento2/document.png" alt="New Document drawer titled SOS Mangrove Records, with file uploads: Validation Evidence Pack.zip, Satellite Boundary Maps.pdf, Field Survey Participants.csv">
+  </div>
+  <div class="tile comments">
+    <img src="straatos-bento2/comments.png" alt="Comments panel with messages from Mary Brown and John Fontaine and a reply">
+  </div>
+</div>
+</body>
+</html>

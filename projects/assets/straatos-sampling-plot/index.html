@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sampling plot form</title>
+<style>
+	/* Base = Pietra's SVG of the Sampling Plot SP0012 edit screen (1440 x 1236,
+	   ~/Desktop/straatos/04 · Sampling Plot · Identification ...svg). Its text is
+	   outlined and the fields come filled, so the form column (x 530-1210) is
+	   painted over and rebuilt in HTML at the SVG's coordinates and colours:
+	   boxes x 536 w 668 h 32 r 6, label #6C737F, value #384250, placeholder #D2D6DB,
+	   focus #028788, asterisk #FDA29B. The SVG leaves 140px under "Associated
+	   operational plots" for its open dropdown; the main column below it is shown
+	   140px higher (.lower). View mode and the sources switcher follow the Handover
+	   page "Handling data received from external sources" (node 2774:166439). */
+	:root {
+		--label: #6c737f;
+		--value: #384250;
+		--ph: #d2d6db;
+		--line: #e5e7eb;
+		--focus: #028788;
+		--teal: #016c6e;
+		--ring: rgba(2, 135, 136, .12);
+		--poly: #fd744e;
+		--ease: cubic-bezier(.22, .8, .24, 1);
+		--shadow: 0 6px 16px rgba(0,0,0,.08), 0 3px 6px -4px rgba(0,0,0,.12), 0 9px 28px 8px rgba(0,0,0,.05);
+	}
+	* { box-sizing: border-box; margin: 0; padding: 0; }
+	html, body { height: 100%; background: transparent; overflow: hidden; }
+	body { font: 400 14px/20px -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro", "Segoe UI", sans-serif; color: var(--value); -webkit-font-smoothing: antialiased; }
+	button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+
+	.stage { position: absolute; left: 0; top: 0; width: 1440px; height: 904px; transform-origin: 0 0; overflow: hidden; background: #fff; }
+	.stage.idle { cursor: pointer; }
+	.base { position: absolute; left: 0; top: 0; width: 1440px; height: 1236px; display: block; user-select: none; -webkit-user-drag: none;
+		clip-path: polygon(0 0, 1440px 0, 1440px 884px, 332px 884px, 332px 1236px, 0 1236px); /* main column stops above the stage edge */ }
+	.lower { position: absolute; left: 332px; top: 488px; width: 1108px; height: 416px; background: #fff url(base.svg) -332px -844px / 1440px 1236px no-repeat; }
+	.cover { position: absolute; left: 530px; width: 680px; background: #fff; }
+	.comment-veil { position: absolute; left: 1213px; top: 190px; width: 26px; height: 900px; background: rgba(255, 255, 255, .45); pointer-events: none; }
+
+	/* ---------- form rows ---------- */
+	.label { position: absolute; left: 537px; height: 20px; color: var(--label); font-weight: 500; white-space: nowrap; }
+	.label i { font-style: normal; color: #fda29b; margin-right: 4px; position: relative; top: 1px; }
+	.box {
+		position: absolute; left: 536px; width: 668px; height: 32px; border: 1px solid var(--line); border-radius: 6px; background: #fff;
+		display: flex; align-items: center; padding: 0 36px 0 12px; gap: 4px; transition: border-color .18s, box-shadow .18s, opacity .25s;
+	}
+	.box.date { width: 672px; }
+	.box .txt { color: var(--ph); font-weight: 500; white-space: nowrap; }
+	.box.filled .txt { color: var(--value); }
+	.box.focus { border-color: var(--focus); box-shadow: 0 0 0 2px var(--ring); }
+	.box svg.icon { position: absolute; right: 14px; top: 50%; width: 12px; height: 12px; margin-top: -6px; stroke: var(--ph); fill: none; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+	.box.date svg.icon { width: 14px; height: 14px; margin-top: -7px; right: 12px; }
+	.pop { animation: pop .28s var(--ease); }
+	@keyframes pop { from { opacity: 0; transform: translateY(3px); } }
+	.tag { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 6px 0 8px; border: 1px solid var(--line); border-radius: 4px; background: #f9fafb; color: var(--value); font-size: 12px; font-weight: 500; }
+	.tag b { font-weight: 400; color: #9da4ae; font-size: 13px; line-height: 1; }
+
+	/* view mode: the value reads as text where the box was */
+	.view-value { position: absolute; left: 537px; height: 20px; padding: 0 4px; margin-left: -4px; border-radius: 4px; color: #111927; white-space: nowrap; opacity: 0; transition: opacity .25s; }
+	.view .box { opacity: 0; pointer-events: none; }
+	.view .view-value { opacity: 1; }
+
+	/* leaving edit mode: a load bar under the header, skeleton lines where the values go,
+	   then the values rise in one by one, so the switch reads as a fresh page */
+	.loadbar { position: absolute; left: 332px; top: 175px; width: 1108px; height: 2px; background: var(--focus); transform: scaleX(0); transform-origin: left; opacity: 0; z-index: 5; pointer-events: none; }
+	.loadbar.run { animation: loadbar .62s var(--ease) forwards; }
+	@keyframes loadbar { 0% { opacity: 1; transform: scaleX(0); } 80% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(1); } }
+	.skel { position: absolute; left: 537px; height: 12px; border-radius: 6px; z-index: 4; pointer-events: none;
+		background: linear-gradient(90deg, #f3f4f6 0%, #e9eaec 40%, #f3f4f6 80%) 0 0 / 300% 100%; animation: shimmer .9s linear infinite, fadein .18s ease; }
+	@keyframes shimmer { to { background-position: -200% 0; } }
+	@keyframes fadein { from { opacity: 0; } }
+	.view.pending .view-value { opacity: 0; transition: none; }
+	.view-value.rise { animation: rise .42s var(--ease) backwards; }
+	@keyframes rise { from { opacity: 0; transform: translateY(6px); } }
+	.map.refresh { animation: maprefresh .7s ease; }
+	@keyframes maprefresh { 0% { filter: none; } 35% { filter: saturate(.4) brightness(1.15); opacity: .55; } 100% { filter: none; opacity: 1; } }
+	.view-value.changed { animation: changed 1.6s ease; }
+	@keyframes changed { 0% { opacity: 0; } 20% { opacity: 1; background: #ffe9e1; } 100% { background: transparent; } }
+
+	/* ---------- dropdown, as in the SVG: y +36, item h 32 ---------- */
+	.menu {
+		position: absolute; left: 536px; width: 668px; z-index: 6; padding: 4px 12px 4px 4px; background: #fff; border-radius: 6px; box-shadow: var(--shadow);
+		opacity: 0; transform: translateY(-4px) scaleY(.96); transform-origin: top; pointer-events: none; transition: opacity .16s, transform .2s var(--ease);
+	}
+	.menu.open { opacity: 1; transform: none; }
+	.menu .opt { position: relative; height: 32px; padding: 0 12px; display: flex; align-items: center; border-radius: 4px; color: var(--value); font-weight: 500; transition: background .12s; }
+	.menu .opt.hover { background: #f3f4f6; }
+	.menu .opt.sel { font-weight: 600; }
+	.menu .opt svg { position: absolute; right: 10px; width: 14px; height: 14px; stroke: var(--focus); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: 0; transform: scale(.6); transition: opacity .15s, transform .2s var(--ease); }
+	.menu .opt.sel svg { opacity: 1; transform: none; }
+	.menu::after { content: ""; position: absolute; right: 4px; top: 4px; bottom: 4px; width: 8px; border-radius: 4px; background: #f3f4f6; }
+
+	/* ---------- year picker (opens upwards) ---------- */
+	.picker {
+		position: absolute; left: 536px; width: 280px; z-index: 6; padding: 0 12px 12px; background: #fff; border-radius: 8px; box-shadow: var(--shadow);
+		opacity: 0; transform: translateY(4px) scaleY(.96); transform-origin: bottom; pointer-events: none; transition: opacity .16s, transform .2s var(--ease);
+	}
+	.picker.open { opacity: 1; transform: none; }
+	.picker header { height: 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f3f4f6; margin: 0 -12px 10px; padding: 0 14px; font-weight: 600; color: #111927; }
+	.picker header span { color: #9da4ae; font-weight: 400; letter-spacing: 2px; }
+	.picker .years { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px 0; padding: 4px 0; }
+	.picker .years span { height: 28px; margin: 0 12px; display: grid; place-items: center; border-radius: 4px; color: var(--value); transition: background .12s, color .12s; }
+	.picker .years span.dim { color: var(--ph); }
+	.picker .years span.hover { background: #f3f4f6; }
+	.picker .years span.sel { background: var(--focus); color: #fff; }
+
+	/* ---------- perimeter map: the SVG's own image, without its baked polygon ---------- */
+	.map { position: absolute; left: 536px; top: 512px; width: 672px; height: 300px; border-radius: 8px; overflow: hidden; }
+	.map img { position: absolute; left: 0; top: -10px; width: 672px; height: 320px; display: block; }
+	.map svg { position: absolute; inset: 0; width: 672px; height: 300px; overflow: visible; }
+	.map .edge { fill: none; stroke: var(--poly); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: stroke-dashoffset var(--draw, 500ms) var(--ease); }
+	.map .area { fill: var(--poly); fill-opacity: 0; stroke: none; transition: fill-opacity .35s; }
+	.map .area.on { fill-opacity: .18; }
+	.map .vx { fill: #fff; stroke: var(--poly); stroke-width: 2; transition: opacity .3s; }
+	.map.closed .vx { opacity: 0; }
+	.map .expand { position: absolute; left: 632px; top: 12px; width: 28px; height: 30px; background: url(base.svg) -1168px -880px / 1440px 1236px no-repeat; }
+
+	/* ---------- header: edit mode (from the SVG) ---------- */
+	.btn { position: absolute; top: 120px; width: 32px; height: 32px; border-radius: 6px; display: grid; place-items: center; transition: box-shadow .2s, background .2s, border-color .2s; }
+	.btn svg { width: 16px; height: 16px; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+	.save { left: 1346px; pointer-events: none; }
+	.save svg { stroke: #fff; opacity: 0; }
+	.save.press { box-shadow: 0 0 0 4px var(--ring); }
+	.save.disabled { background: #fff; border: 1px solid var(--line); box-shadow: 0 0 0 2px #fff; } /* the white halo hides the SVG's teal button edge underneath */
+	.save.disabled svg { stroke: var(--ph); opacity: 1; }
+	.close { left: 1384px; pointer-events: none; }
+	.saved .close { pointer-events: auto; }
+	.saved .close:hover { box-shadow: 0 0 0 4px rgba(17,25,39,.06); }
+	/* view mode drops "> Edit" from the breadcrumb */
+	.crumb-cover { position: absolute; left: 618px; top: 88px; width: 60px; height: 22px; background: #fff; opacity: 0; transition: opacity .2s; }
+
+	/* ---------- header: view mode ---------- */
+	.vhead { position: absolute; left: 1270px; top: 114px; width: 160px; height: 44px; background: #fff; opacity: 0; pointer-events: none; transition: opacity .25s; }
+	.view .vhead, .view .crumb-cover { opacity: 1; pointer-events: auto; }
+	.vhead .btn { top: 6px; }
+	.src { position: absolute; left: 8px; top: 6px; width: 60px; height: 32px; border: 1px solid var(--line); border-radius: 6px; background: #fff; display: flex; align-items: center; padding-left: 7px; gap: 8px; transition: box-shadow .2s, border-color .2s; }
+	/* neutral at rest; teal border + chevron only while the menu is open (active) */
+	.src:hover { border-color: #d2d6db; }
+	.src.open { border-color: var(--teal); box-shadow: 0 0 0 3px var(--ring); }
+	.src svg.chev { width: 16px; height: 16px; stroke: var(--label); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s var(--ease); }
+	.src.open svg.chev { transform: rotate(180deg); stroke: var(--teal); }
+	.share { left: 76px; background: var(--teal); }
+	.share svg { stroke: #fff; }
+	.edit { left: 116px; border: 1px solid var(--line); background: #fff; }
+	.edit svg { stroke: var(--value); }
+	.edit:hover { box-shadow: 0 0 0 4px rgba(17,25,39,.06); }
+
+	/* source badges, as in the Handover: OWN = the user's own data, magnifier = a monitor's data */
+	.badge { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+	.badge.own { background: var(--teal); color: #fff; font: 900 5px/1 -apple-system, BlinkMacSystemFont, "SF Pro", sans-serif; letter-spacing: .02em; }
+	.badge.mon { background: #f3f4f6; border: 1px solid var(--line); }
+	.badge.mon svg { width: 10px; height: 10px; stroke: #6c737f; fill: none; stroke-width: 1.6; stroke-linecap: round; }
+
+	.srcmenu {
+		position: absolute; left: 1118px; top: 157px; width: 260px; z-index: 8; padding: 4px; background: #fff; border: 1px solid var(--line); border-radius: 6px; box-shadow: var(--shadow);
+		opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .16s, transform .2s var(--ease);
+	}
+	.srcmenu.open { opacity: 1; transform: none; pointer-events: auto; }
+	.srcmenu button { width: 100%; height: 44px; padding: 0 12px; display: flex; align-items: center; gap: 8px; border-radius: 4px; text-align: left; font-weight: 500; color: #111927; }
+	.srcmenu button:hover { background: #f9fafb; }
+	.srcmenu .radio { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #d2d6db; flex: none; display: grid; place-items: center; margin-right: 4px; }
+	.srcmenu button.on .radio { border-color: var(--teal); }
+	.srcmenu button.on .radio::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--teal); }
+	.srcmenu small { display: block; font-size: 11px; line-height: 14px; color: var(--label); font-weight: 400; white-space: nowrap; }
+
+	/* view mode: the SVG's comment icons carry a "+" (add comment); reading a record they are plain */
+	.vicon { position: absolute; left: 1214px; width: 24px; height: 22px; background: #fff; display: grid; place-items: center; opacity: 0; transition: opacity .2s; z-index: 5; pointer-events: none; }
+	.vicon svg { width: 16px; height: 16px; stroke: #a6abb2; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+	.view .vicon { opacity: 1; }
+
+	/* ---------- partner comment: only on the partner's side, on the Technical partner row ---------- */
+	.cm-icon { position: absolute; left: 1214px; top: 517px; width: 24px; height: 22px; background: #fff; display: grid; place-items: center; opacity: 0; pointer-events: none; transition: opacity .2s; z-index: 6; }
+	.cm-icon svg { width: 16px; height: 16px; stroke: var(--teal); fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+	.cm-icon b { position: absolute; right: 1px; top: -2px; min-width: 13px; height: 13px; padding: 0 3px; border-radius: 7px; background: #f04438; color: #fff; font: 600 9px/13px -apple-system, BlinkMacSystemFont, sans-serif; text-align: center; }
+	.partner .cm-icon { opacity: 1; pointer-events: auto; cursor: pointer; }
+	.cm-pop {
+		position: absolute; left: 924px; top: 546px; width: 300px; z-index: 7; padding: 12px 14px; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow);
+		opacity: 0; transform: translateY(-4px); pointer-events: none; transition: opacity .2s .25s, transform .3s .25s var(--ease);
+	}
+	.cm-pop::before { content: ""; position: absolute; right: 13px; top: -6px; width: 10px; height: 10px; background: #fff; border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: rotate(45deg); }
+	.cm-pop.open { opacity: 1; transform: none; pointer-events: auto; }
+	.cm-pop header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+	.cm-pop header .badge { width: 22px; height: 22px; }
+	.cm-pop header b { font-weight: 600; color: #111927; font-size: 13px; }
+	.cm-pop header small { display: block; color: var(--label); font-size: 11px; line-height: 14px; }
+	.cm-pop p { font-size: 13px; line-height: 19px; color: var(--value); }
+
+	/* ---------- toast, as in the Handover ("Subject submitted successfully") ---------- */
+	.toast {
+		position: absolute; left: 720px; top: 80px; z-index: 8; transform: translate(-50%, -8px); opacity: 0;
+		display: flex; align-items: center; gap: 8px; padding: 9px 16px; background: #fff; border-radius: 8px; color: #111927; font-weight: 500;
+		box-shadow: var(--shadow); transition: opacity .25s, transform .3s var(--ease);
+	}
+	.toast.on { opacity: 1; transform: translate(-50%, 0); }
+	.toast svg { width: 16px; height: 16px; stroke: #17b26a; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+	/* ---------- fake cursor + click ripple (same as the navigation prototype) ---------- */
+	.cursor { position: absolute; left: 0; top: 0; width: 22px; height: 22px; z-index: 10; pointer-events: none; opacity: 0; transition: transform var(--move, 700ms) var(--ease), opacity .3s; }
+	.cursor svg { width: 22px; height: 22px; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); transition: transform .12s; }
+	.cursor.press svg { transform: scale(.82); }
+	.ripple { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 2px solid rgba(2,135,136,.5); z-index: 9; pointer-events: none; animation: ripple .5s ease-out forwards; }
+	@keyframes ripple { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
+
+	/* ---------- hint ---------- */
+	.hint {
+		position: absolute; left: 870px; top: 836px; transform: translateX(-50%); z-index: 7;
+		padding: 8px 16px 8px 13px; border-radius: 999px; background: #002627; color: #e6f2f2; font-size: 13px; font-weight: 500;
+		display: flex; align-items: center; gap: 8px; pointer-events: none; transition: opacity .3s; box-shadow: 0 6px 18px rgba(0,0,0,.25); white-space: nowrap;
+	}
+	.hint::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #57cacb; animation: pulse 1.6s ease-in-out infinite; }
+	@keyframes pulse { 50% { opacity: .35; } }
+	.hint.off, .hide-hint .hint { opacity: 0; }
+	html.embed, html.embed body { height: auto; overflow-x: hidden; overflow-y: auto; }
+	.hint.fixed { position: fixed; top: auto; bottom: 16px; left: 50%; }
+	html.embed .hint.off { opacity: 0; }
+</style>
+</head>
+<body>
+<div class="stage idle" id="stage" tabindex="0" aria-label="Sampling plot form. Click to fill it in.">
+	<img class="base" src="base.svg" alt="" />
+	<div class="lower"></div>
+	<div class="cover" style="top:190px;height:320px"></div>
+	<div class="cover" style="top:824px;height:80px"></div>
+
+	<div class="map" id="map">
+		<img src="map.jpg" alt="Satellite view of the sampling plot area" />
+		<svg viewBox="0 0 672 300"><path class="area" id="area" d="" /><g id="edges"></g><g id="vxs"></g></svg>
+		<div class="expand"></div>
+	</div>
+
+	<!-- the comment icons are baked into the SVG (#6C737F); a white veil over their column lightens them -->
+	<div class="comment-veil"></div>
+	<div id="form"></div>
+
+	<!-- header, edit mode -->
+	<div class="btn save" id="save"><svg viewBox="0 0 24 24"><path d="M7 3v3.4c0 .56 0 .84.11 1.05a1 1 0 0 0 .43.44C7.76 8 8.04 8 8.6 8h6.8c.56 0 .84 0 1.05-.11a1 1 0 0 0 .44-.44C17 7.24 17 6.96 17 6.4V4m0 17v-6.4c0-.56 0-.84-.11-1.05a1 1 0 0 0-.44-.44C16.24 13 15.96 13 15.4 13H8.6c-.56 0-.84 0-1.05.11a1 1 0 0 0-.44.44C7 13.76 7 14.04 7 14.6V21M21 9.33v6.87c0 1.68 0 2.52-.33 3.16a3 3 0 0 1-1.31 1.31C18.72 21 17.88 21 16.2 21H7.8c-1.68 0-2.52 0-3.16-.33a3 3 0 0 1-1.31-1.31C3 18.72 3 17.88 3 16.2V7.8c0-1.68 0-2.52.33-3.16a3 3 0 0 1 1.31-1.31C5.28 3 6.12 3 7.8 3h6.88c.49 0 .73 0 .96.06.2.05.4.13.58.24.2.12.37.3.72.64l3.13 3.13c.35.35.52.52.64.72.11.18.19.38.24.58.06.23.06.47.06.96Z"/></svg></div>
+	<button class="btn close" id="close" aria-label="Close the form"></button>
+	<div class="crumb-cover"></div>
+	<div class="loadbar" id="loadbar"></div>
+
+	<!-- header, view mode -->
+	<div class="vhead" id="vhead">
+		<button class="src" id="src" aria-label="Sources"><span class="badge own" id="srcBadge">OWN</span><svg class="chev" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4"/></svg></button>
+		<button class="btn share" aria-label="Submit"><svg viewBox="0 0 24 24"><path d="M12 15V3m0 0-4 4m4-4 4 4M3 13v3.2c0 1.68 0 2.52.33 3.16a3 3 0 0 0 1.31 1.31C5.28 21 6.12 21 7.8 21h8.4c1.68 0 2.52 0 3.16-.33a3 3 0 0 0 1.31-1.31C21 18.72 21 17.88 21 16.2V13"/></svg></button>
+		<button class="btn edit" id="edit" aria-label="Edit"><svg viewBox="0 0 24 24"><path d="M11 4H7.8c-1.68 0-2.52 0-3.16.33a3 3 0 0 0-1.31 1.31C3 6.28 3 7.12 3 8.8v7.4c0 1.68 0 2.52.33 3.16a3 3 0 0 0 1.31 1.31C5.28 21 6.12 21 7.8 21h7.4c1.68 0 2.52 0 3.16-.33a3 3 0 0 0 1.31-1.31C20 18.72 20 17.88 20 16.2V13M8 16h1.68c.49 0 .73 0 .96-.06.2-.05.4-.13.58-.24.2-.12.37-.3.72-.64L21.5 5.5a2.12 2.12 0 0 0-3-3l-9.56 9.56c-.35.35-.52.52-.64.72-.11.18-.19.38-.24.58-.06.23-.06.47-.06.96V16Z"/></svg></button>
+	</div>
+	<div class="srcmenu" id="srcmenu">
+		<button data-src="own" class="on"><span class="radio"></span><span class="badge own">OWN</span><span>Own Data<small>Saved by you · Straatos</small></span></button>
+		<button data-src="partner"><span class="radio"></span><span class="badge mon"><svg viewBox="0 0 10 10"><circle cx="4.3" cy="4.3" r="2.8"/><path d="m8.5 8.5-2.2-2.2"/></svg></span><span>Coastal Roots Initiative<small>Implementing partner · Kobo</small></span></button>
+	</div>
+
+	<div class="cm-icon" id="cmIcon" aria-label="1 comment"><svg viewBox="0 0 24 24"><path d="M3 7.8c0-1.68 0-2.52.33-3.16a3 3 0 0 1 1.31-1.31C5.28 3 6.12 3 7.8 3h8.4c1.68 0 2.52 0 3.16.33a3 3 0 0 1 1.31 1.31C21 5.28 21 6.12 21 7.8v5.4c0 1.68 0 2.52-.33 3.16a3 3 0 0 1-1.31 1.31C18.72 18 17.88 18 16.2 18H9.68c-.62 0-.94 0-1.24.06a3 3 0 0 0-.76.27c-.27.14-.51.33-1 .72l-2.39 1.91c-.42.33-.62.5-.8.5a.5.5 0 0 1-.39-.19C3 21.14 3 20.87 3 20.34V7.8Z"/></svg><b>1</b></div>
+	<div class="cm-pop" id="cmPop">
+		<header><span class="badge mon"><svg viewBox="0 0 10 10"><circle cx="4.3" cy="4.3" r="2.8"/><path d="m8.5 8.5-2.2-2.2"/></svg></span><span><b>Coastal Roots Initiative</b><small>Implementing partner · Kobo</small></span></header>
+		<p>Fixed the spelling of our name. "Initative" was a typo.</p>
+	</div>
+	<div class="toast" id="toast"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m7.5 12 3 3 6-6"/></svg>Subject updated successfully</div>
+	<div class="hint" id="hint">Click to fill the form</div>
+	<div class="cursor" id="cursor"><svg viewBox="0 0 24 24"><path d="M5 3l13 7.5-6 1.6 3.6 6.4-2.6 1.5-3.6-6.4L5 18z" fill="#fff" stroke="#111" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+</div>
+
+<script>
+/* Own values = the ones in Pietra's SVG (Senegal / Fatick / Foundiougne, Saloum,
+   Plot SL003 + Plot SL012, Saloum Cycle 03, FSC NGO, 2026, the perimeter drawn on
+   the map). The implementing partner's Kobo version, the other list options and
+   the toast copy are mock. */
+const ROWS = [
+	{ key: 'country',  label: 'Country',  required: true, top: 224, type: 'select', options: ['Senegal', 'The Gambia', 'Guinea-Bissau'], pick: ['Senegal'] },
+	{ key: 'province', label: 'Province', required: true, top: 296, type: 'select', options: ['Fatick', 'Foundiougne', 'Gossas'], pick: ['Foundiougne'] },
+	{ key: 'pregion',  label: 'Project region', top: 368, type: 'select', options: ['Saloum', 'Casamance', 'Sine'], pick: ['Saloum'] },
+	{ key: 'cycle',    label: 'Planting cycle / stratum', top: 440, type: 'select', options: ['Saloum Cycle 01', 'Saloum Cycle 02', 'Saloum Cycle 03'], pick: ['Saloum Cycle 03'] },
+	{ key: 'perimeter', label: 'Perimeter', top: 512, type: 'map' },
+	{ key: 'year',     label: 'Year', top: 852, type: 'year', pick: [2026] },
+];
+// perimeter corners in map coordinates (the SVG polygon 841,999.5 / 871.5,999.5 / 874,1042 / 826.5,1033.5, minus the map origin 536,868)
+const OWN_POLY = [[305, 131.5], [335.5, 131.5], [338, 174], [290.5, 165.5]];
+// The implementing partner's Kobo version matches the developer's except for the
+// spelling of the partner's own name, which it corrected and commented on.
+const PARTNER = {}; // was the corrected partner name + its comment; parked while Pietra changes the approach
+const PH = { select: 'Select', multi: 'Select', year: 'Select year' };
+const CHEV = '<svg class="icon" viewBox="0 0 12 12"><path d="M2.5 4.5 6 8l3.5-3.5"/></svg>';
+const CAL = '<svg class="icon" viewBox="0 0 14 14"><rect x="1.5" y="2.5" width="11" height="10" rx="1.5"/><path d="M1.5 5.5h11M4.5 1v3M9.5 1v3"/></svg>';
+const TICK = '<svg viewBox="0 0 14 14"><path d="M2.5 7.4 5.6 10.3 11.5 3.8"/></svg>';
+const MON = '<svg viewBox="0 0 10 10"><circle cx="4.3" cy="4.3" r="2.8"/><path d="m8.5 8.5-2.2-2.2"/></svg>';
+const MAP = { x: 536, y: 512 };
+
+const $ = (id) => document.getElementById(id);
+const stage = $('stage'), form = $('form'), cursor = $('cursor'), hint = $('hint');
+const FAST = matchMedia('(prefers-reduced-motion: reduce)').matches || location.search.includes('fast');
+const SPEED = 0.6; // pace of the fill: 1 = the first version, lower = faster (Pietra asked for faster)
+const wait = (ms) => new Promise((r) => setTimeout(r, FAST ? 1 : ms * SPEED));
+const say = (t) => { if (t) hint.textContent = t; hint.classList.toggle('off', !t); };
+
+/* ---------- build rows ---------- */
+for (const r of ROWS) {
+	const lab = document.createElement('div');
+	lab.className = 'label';
+	lab.style.top = (r.top - 24) + 'px';
+	lab.innerHTML = (r.required ? '<i>*</i>' : '') + r.label;
+	form.appendChild(lab);
+	const vi = document.createElement('div');
+	vi.className = 'vicon';
+	vi.style.top = (r.top + 5) + 'px';
+	vi.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 7.8c0-1.68 0-2.52.33-3.16a3 3 0 0 1 1.31-1.31C5.28 3 6.12 3 7.8 3h8.4c1.68 0 2.52 0 3.16.33a3 3 0 0 1 1.31 1.31C21 5.28 21 6.12 21 7.8v5.4c0 1.68 0 2.52-.33 3.16a3 3 0 0 1-1.31 1.31C18.72 18 17.88 18 16.2 18H9.68c-.62 0-.94 0-1.24.06a3 3 0 0 0-.76.27c-.27.14-.51.33-1 .72l-2.39 1.91c-.42.33-.62.5-.8.5a.5.5 0 0 1-.39-.19C3 21.14 3 20.87 3 20.34V7.8Z"/></svg>';
+	form.appendChild(vi);
+	if (r.type === 'map') continue;
+
+	const box = document.createElement('div');
+	box.style.top = r.top + 'px';
+	form.appendChild(box);
+	r.box = box;
+
+	const vv = document.createElement('div');
+	vv.className = 'view-value';
+	vv.style.top = (r.top + 4) + 'px';
+	form.appendChild(vv);
+	r.vv = vv;
+
+	if (r.type === 'select' || r.type === 'multi') {
+		const m = document.createElement('div');
+		m.className = 'menu';
+		m.style.top = (r.top + 36) + 'px';
+		m.innerHTML = r.options.map((o) => `<div class="opt">${o}${r.type === 'multi' ? TICK : ''}</div>`).join('');
+		form.appendChild(m);
+		r.menu = m;
+	} else {
+		const p = document.createElement('div');
+		p.className = 'picker';
+		p.style.bottom = (904 - r.top + 4) + 'px';
+		const ys = Array.from({ length: 12 }, (_, i) => 2019 + i);
+		p.innerHTML = `<header><span>«</span>2020-2029<span>»</span></header><div class="years">${ys.map((y) => `<span class="${y < 2020 || y > 2029 ? 'dim' : ''}" data-v="${y}">${y}</span>`).join('')}</div>`;
+		form.appendChild(p);
+		r.menu = p;
+	}
+}
+const FILL = ROWS.filter((r) => r.box);
+const STEPS = ROWS.filter((r) => r.type); // includes the perimeter
+
+function emptyBox(r) {
+	r.box.className = 'box' + (r.type === 'year' ? ' date' : '');
+	r.box.innerHTML = `<span class="txt">${PH[r.type]}</span>${r.type === 'year' ? CAL : CHEV}`;
+	r.menu.querySelectorAll('.sel, .hover').forEach((n) => n.classList.remove('sel', 'hover'));
+	r.value = '';
+}
+function setValue(r, values) {
+	r.box.classList.add('filled');
+	r.box.innerHTML = r.type === 'multi'
+		? values.map((v) => `<span class="tag pop">${v}<b>×</b></span>`).join('') + CHEV
+		: `<span class="txt pop">${values[0]}</span>${r.type === 'year' ? CAL : CHEV}`;
+	r.value = values.join(', ');
+}
+
+/* ---------- cursor ---------- */
+let cx = 1290, cy = 800;
+function moveTo(x, y, base = 700) {
+	const d = Math.hypot(x - cx, y - cy);
+	const t = FAST ? 1 : Math.round(Math.min(Math.max(base * (0.45 + d / 900), 240), 900) * SPEED);
+	cursor.style.setProperty('--move', t + 'ms');
+	cursor.style.transform = `translate(${x - 5}px, ${y - 3}px)`;
+	cx = x; cy = y;
+	follow(y);
+	return { t, done: new Promise((r) => setTimeout(r, FAST ? 1 : t + 40)) };
+}
+const go = (x, y, base) => moveTo(x, y, base).done;
+async function press(x, y) {
+	cursor.classList.add('press');
+	const rp = document.createElement('div');
+	rp.className = 'ripple'; rp.style.left = x + 'px'; rp.style.top = y + 'px';
+	stage.appendChild(rp); setTimeout(() => rp.remove(), 600);
+	await wait(110);
+	cursor.classList.remove('press');
+}
+function pos(el, fx = 0.5) {
+	let x = 0, y = 0;
+	for (let n = el; n && n !== stage; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; }
+	return [x + el.offsetWidth * fx, y + el.offsetHeight / 2];
+}
+
+/* ---------- a select or the year, the way a person fills it ---------- */
+async function fill(r) {
+	if (r.type === 'map') return drawPerimeter();
+	const bx = 536 + 140 + Math.random() * 180, by = r.top + 16;
+	await go(bx, by);
+	await wait(120);
+	await press(bx, by);
+	r.box.classList.add('focus');
+	r.menu.classList.add('open');
+	await wait(380);
+	const items = r.type === 'year' ? [...r.menu.querySelectorAll('[data-v]')] : [...r.menu.querySelectorAll('.opt')];
+	const label = (el) => (r.type === 'year' ? Number(el.dataset.v) : el.firstChild.textContent);
+	const picked = [];
+	for (const want of r.pick) {
+		const target = items.find((el) => label(el) === want);
+		const i = items.indexOf(target);
+		const path = r.type === 'year' ? [target] : items.slice(Math.max(0, i - (picked.length ? 1 : 3)), i + 1);
+		for (const it of path) {
+			const [x, y] = pos(it, r.type === 'year' ? 0.5 : 0.12);
+			await go(x, y, r.type === 'year' ? 700 : 240);
+			items.forEach((el) => el.classList.toggle('hover', el === it));
+			await wait(it === target ? 300 : 130);
+		}
+		const [tx, ty] = pos(target, r.type === 'year' ? 0.5 : 0.12);
+		await press(tx, ty);
+		target.classList.add('sel');
+		picked.push(want);
+		if (r.type === 'multi') { setValue(r, picked); await wait(260); }
+	}
+	items.forEach((el) => el.classList.remove('hover'));
+	await wait(r.type === 'multi' ? 380 : 140);
+	r.menu.classList.remove('open');
+	if (r.type !== 'multi') setValue(r, picked);
+	await wait(240);
+	r.box.classList.remove('focus');
+}
+
+/* ---------- perimeter: click the corners, close on the first one ---------- */
+const NS = 'http://www.w3.org/2000/svg';
+const polyD = (pts) => 'M' + pts.map((p) => p.join(' ')).join(' L') + ' Z';
+function clearPerimeter() {
+	$('edges').innerHTML = ''; $('vxs').innerHTML = '';
+	$('area').classList.remove('on'); $('area').setAttribute('d', '');
+	$('map').classList.remove('closed');
+}
+function setPerimeter(pts) {
+	$('edges').innerHTML = '';
+	const e = document.createElementNS(NS, 'path');
+	e.setAttribute('class', 'edge'); e.setAttribute('d', polyD(pts));
+	$('edges').appendChild(e);
+	$('area').setAttribute('d', polyD(pts));
+}
+async function drawPerimeter() {
+	const pts = OWN_POLY;
+	await go(MAP.x + pts[0][0], MAP.y + pts[0][1]);
+	await wait(200);
+	for (let i = 0; i <= pts.length; i++) {
+		const [x, y] = pts[i % pts.length];
+		if (i > 0) {
+			const [px, py] = pts[i - 1];
+			const len = Math.hypot(x - px, y - py);
+			const seg = document.createElementNS(NS, 'path');
+			seg.setAttribute('class', 'edge');
+			seg.setAttribute('d', `M${px} ${py} L${x} ${y}`);
+			seg.style.strokeDasharray = len; seg.style.strokeDashoffset = len;
+			$('edges').appendChild(seg);
+			const m = moveTo(MAP.x + x, MAP.y + y, 520);
+			seg.style.setProperty('--draw', m.t + 'ms');
+			seg.getBoundingClientRect(); // commit the start state before the transition
+			seg.style.strokeDashoffset = 0;
+			await m.done;
+		}
+		await press(MAP.x + x, MAP.y + y);
+		if (i < pts.length) {
+			const v = document.createElementNS(NS, 'circle');
+			v.setAttribute('class', 'vx'); v.setAttribute('cx', x); v.setAttribute('cy', y); v.setAttribute('r', 3.5);
+			$('vxs').appendChild(v);
+		}
+		await wait(160);
+	}
+	setPerimeter(pts);
+	$('area').classList.add('on');
+	$('map').classList.add('closed');
+	await wait(300);
+}
+
+/* ---------- flow: idle -> filling -> saved -> view (sources) -> edit = start over ---------- */
+let state = 'idle';
+async function run() {
+	if (state !== 'idle') return;
+	state = 'filling';
+	stage.classList.remove('idle');
+	say('');
+	cursor.style.opacity = 1;
+	for (const r of STEPS) await fill(r);
+	await go(1362, 136);
+	await wait(160);
+	await press(1362, 136);
+	$('save').classList.add('press'); setTimeout(() => $('save').classList.remove('press'), 300);
+	await wait(200);
+	$('save').classList.add('disabled');
+	$('toast').classList.add('on');
+	setTimeout(() => $('toast').classList.remove('on'), 2600);
+	await wait(900);
+	cursor.style.opacity = 0;
+	state = 'saved';
+	stage.classList.add('saved');
+	say('Close the form with ✕ to see the saved record');
+}
+
+async function toView() {
+	if (state !== 'saved') return;
+	state = 'view';
+	say('');
+	for (const r of FILL) r.vv.textContent = r.value;
+	stage.classList.add('view', 'pending');
+	stage.classList.remove('saved');
+	// load bar + skeletons
+	const bar = $('loadbar');
+	bar.classList.remove('run'); void bar.offsetWidth; bar.classList.add('run');
+	$('map').classList.remove('refresh'); void $('map').offsetWidth; $('map').classList.add('refresh');
+	const skels = FILL.map((r) => {
+		const k = document.createElement('div');
+		k.className = 'skel';
+		k.style.top = (r.top + 8) + 'px';
+		k.style.width = Math.max(90, Math.min(260, r.value.length * 8)) + 'px';
+		form.appendChild(k);
+		return k;
+	});
+	await wait(800);
+	skels.forEach((k) => k.remove());
+	stage.classList.remove('pending');
+	FILL.forEach((r, i) => {
+		r.vv.style.animationDelay = (i * 45) + 'ms';
+		r.vv.classList.remove('rise'); void r.vv.offsetWidth; r.vv.classList.add('rise');
+	});
+	await wait(700);
+	say('Open the sources next to the submit button');
+}
+let source = 'own';
+function setSource(s) {
+	closeSrc();
+	if (s === source) return;
+	source = s;
+	document.querySelectorAll('.srcmenu button').forEach((b) => b.classList.toggle('on', b.dataset.src === s));
+	$('srcBadge').className = 'badge ' + (s === 'own' ? 'own' : 'mon');
+	$('srcBadge').innerHTML = s === 'own' ? 'OWN' : MON;
+	for (const r of FILL) {
+		const v = s === 'own' ? r.value : (PARTNER[r.key] ?? r.value);
+		if (r.vv.textContent !== v) {
+			r.vv.textContent = v;
+			r.vv.style.animationDelay = ''; r.vv.classList.remove('changed', 'rise'); void r.vv.offsetWidth; r.vv.classList.add('changed');
+		}
+	}
+	say(s === 'own' ? 'Switch to Coastal Roots Initiative to see the Kobo version' : 'Back to Own Data, or edit to start again');
+}
+function closeSrc() { $('srcmenu').classList.remove('open'); $('src').classList.remove('open'); }
+
+function startOver() {
+	state = 'idle';
+	stage.className = 'stage idle';
+	FILL.forEach(emptyBox);
+	clearPerimeter();
+	$('save').classList.remove('disabled');
+	source = 'own';
+	document.querySelectorAll('.srcmenu button').forEach((b) => b.classList.toggle('on', b.dataset.src === 'own'));
+	$('srcBadge').className = 'badge own'; $('srcBadge').textContent = 'OWN';
+	closeSrc();
+	$('cmPop').classList.remove('open');
+	say('Click to fill the form');
+}
+
+/* ---------- events ---------- */
+stage.addEventListener('click', (e) => { if (state === 'idle') run(); else if (!e.target.closest('.srcmenu, .src')) closeSrc(); });
+stage.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && state === 'idle') { e.preventDefault(); run(); } });
+$('close').addEventListener('click', (e) => { e.stopPropagation(); toView(); });
+$('src').addEventListener('click', (e) => {
+	e.stopPropagation();
+	const open = $('srcmenu').classList.toggle('open');
+	$('src').classList.toggle('open', open);
+	if (open) say('');
+});
+document.querySelectorAll('.srcmenu button').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); setSource(b.dataset.src); }));
+$('edit').addEventListener('click', (e) => { e.stopPropagation(); startOver(); });
+$('cmIcon').addEventListener('click', (e) => { e.stopPropagation(); $('cmPop').classList.toggle('open'); });
+
+/* ---------- fit ----------
+   Standalone: the whole stage fits the window. ?embed (the case page, a 700px-tall
+   frame): the stage fills the width and the page scrolls; the view follows the cursor. */
+const EMBED = new URLSearchParams(location.search).has('embed');
+let scale = 1;
+function fit() {
+	if (EMBED) {
+		scale = innerWidth / 1440;
+		stage.style.transform = `scale(${scale})`;
+		document.body.style.height = Math.ceil(904 * scale) + 'px';
+		return;
+	}
+	scale = Math.min(innerWidth / 1440, innerHeight / 904);
+	stage.style.transform = `translate(${(innerWidth - 1440 * scale) / 2}px, ${(innerHeight - 904 * scale) / 2}px) scale(${scale})`;
+}
+function follow(y) {
+	if (!EMBED) return;
+	const py = y * scale, top = scrollY, h = innerHeight;
+	if (py < top + 90 || py > top + h - 140) scrollTo({ top: Math.max(0, py - h * 0.45), behavior: FAST ? 'auto' : 'smooth' });
+}
+if (EMBED) {
+	document.documentElement.classList.add('embed');
+	document.body.appendChild(hint); // pinned to the bottom of the frame, not of the stage
+	hint.classList.add('fixed');
+}
+addEventListener('resize', fit);
+fit();
+FILL.forEach(emptyBox);
+cursor.style.transform = `translate(${cx - 5}px, ${cy - 3}px)`; // parked, without scrolling the embed
+const q = new URLSearchParams(location.search);
+if (q.has('nohint')) stage.classList.add('hide-hint');
+if (q.has('autoplay')) run();
+</script>
+</body>
+</html>

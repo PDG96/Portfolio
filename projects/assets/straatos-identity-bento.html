@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Straatos identity components</title>
+<style>
+  /* Live version of the components block in the case Figma
+     (Projects, "Claude ler aqui", section 1822:331605). Stage is 1280 x 698,
+     the width of the palette above it, 20px gaps. */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%; background: transparent;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF UI Display', 'Segoe UI', sans-serif;
+  }
+  .stage { position: relative; width: 100%; aspect-ratio: 1280 / 698; }
+  .tile { position: absolute; border-radius: 12px; }
+
+  .salinity   { left: 0;      top: 0;      width: 43.9%;  height: 48.6%; }
+  .indicators { left: 45.47%; top: 0;      width: 24.84%; height: 48.6%; }
+  .newproject { left: 71.88%; top: 0;      width: 28.12%; height: 100%;  }
+  .events     { left: 0;      top: 51.4%;  width: 18.75%; height: 48.6%; }
+  .emissions  { left: 20.31%; top: 51.4%;  width: 50%;    height: 48.6%; }
+
+  .tile > chart-card, .tile .chart-mount { width: 100%; height: 100%; }
+
+  .tile.indicators { display: flex; }
+  .tile.indicators > [data-chart="indicator-stack"] {
+    width: 100%; height: 100%;
+    --is-gap: 5.9%;
+    --is-thumb-size: 56px;
+    --is-card-padding-y: 16px;
+    --is-card-padding-x: 18px;
+    --is-label-size: 13px;
+    --is-value-size: 22px;
+  }
+
+  /* ---------- Events Timeline: stacked activity blocks per month ---------- */
+  .ev-card {
+    width: 100%; height: 100%; display: flex; flex-direction: column;
+    background: #fff; border: 1px solid rgba(20,20,20,.10); border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04); padding: 24px;
+  }
+  .ev-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 0 -24px 0; padding: 0 24px 20px; border-bottom: 1px solid rgba(20,20,20,.10);
+  }
+  .ev-head h2 { font-weight: 500; font-size: .75rem; color: #141414; letter-spacing: -.005em; }
+  .ev-cal {
+    width: 24px; height: 24px; border: 1px solid rgba(20,20,20,.12); border-radius: 6px;
+    display: grid; place-items: center; color: #525252;
+  }
+  .ev-cal svg { width: 13px; height: 13px; }
+  .ev-plot { position: relative; flex: 1; min-height: 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; padding-top: 18px; }
+  .ev-col { position: relative; flex: 1; display: flex; flex-direction: column; align-items: stretch; gap: 3px; height: 100%; justify-content: flex-end; }
+  /* vertical guide behind each month's stack, as in the Figma */
+  .ev-col::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 28px; width: 1px; background: rgba(20, 20, 20, .08); }
+  .ev-stack { position: relative; }
+  .ev-stack { display: flex; flex-direction: column-reverse; gap: 3px; width: 60%; align-self: center; }
+  .ev-block {
+    height: 13px; border-radius: 2px; cursor: pointer;
+    transition: transform .2s cubic-bezier(.22,1,.36,1), filter .2s;
+  }
+  .ev-block:hover { transform: scaleX(1.12); filter: brightness(1.08); }
+  .ev-block.on { outline: 2px solid #fff; box-shadow: 0 0 0 3px #57CACB; }
+  /* same as the g2plot axis labels in /components (11px, rgba(20,20,20,.55)) */
+  .ev-col span { margin-top: 8px; font-size: 11px; color: rgba(20,20,20,.55); text-align: center; white-space: nowrap; }
+  /* Box only; the content comes from ChartTooltip.render and the box styles
+     from ChartTooltip.domStyles, so it matches the salinity and emissions tooltips. */
+  .ev-tip {
+    position: absolute; z-index: 3; white-space: nowrap;
+    pointer-events: none; transform: translate(-50%, -100%); transition: left .2s, top .2s, opacity .15s;
+  }
+
+  /* ---------- New Project card (PNG from Pietra) ----------
+     The PNG carries a transparent margin and the card's shadow around a
+     1446 x 2806 card body, which matches the tile's own ratio (360 x 698).
+     The image is scaled so the card body lands exactly on the tile edges. */
+  /* Same hover as the indicator cards (indicator-stack.js): lift 3px and a
+     soft shadow. The card is a PNG, so the shadow is a drop-shadow on it. */
+  .newproject { overflow: visible; transition: transform .3s cubic-bezier(0.22, 1, 0.36, 1); }
+  .newproject:hover { transform: translateY(-3px); }
+  .newproject:hover img { filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.08)); }
+  .newproject img {
+    position: absolute; display: block; height: auto;
+    width: 104.91%;       /* 1517 / 1446 */
+    left: -1.383%;        /* -20 / 1446 */
+    top: -0.57%;          /* -16 / 2806 */
+    pointer-events: none;
+    transition: filter .3s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="tile salinity">
+    <chart-card title="Salinity levels">
+      <div class="chart-mount" data-chart="smooth-line" data-src="/projects/assets/straatos-charts/salinity-levels.json"></div>
+    </chart-card>
+  </div>
+
+  <div class="tile indicators">
+    <div data-chart="indicator-stack" data-src="/projects/assets/straatos-charts/people-focused/people-focused.json"></div>
+  </div>
+
+  <div class="tile newproject">
+    <img src="straatos/new-project-card.webp" alt="New Project form: project cover with a mangrove photo being dropped in, project type, country Senegal, activity type, title SOS Mangrove and existing documentation uploads">
+  </div>
+
+  <div class="tile events">
+    <div class="ev-card">
+      <div class="ev-head">
+        <h2>Events Timeline</h2>
+        <span class="ev-cal" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></span>
+      </div>
+      <div class="ev-plot" id="evPlot"></div>
+    </div>
+  </div>
+
+  <div class="tile emissions">
+    <chart-card title="Emission reductions: design vs actual">
+      <div class="chart-mount" data-chart="area-comparison" data-src="/projects/assets/straatos-charts/simulation/emission-reductions.json"></div>
+    </chart-card>
+  </div>
+</div>
+
+<script>
+/* Events Timeline. Block counts per month and the March top tooltip follow the
+   Figma mock (Jan 6, Feb 3, Mar 10, Apr 7; "Safety Workshop, 02 May 25,
+   Training"). Activity types are mock data for the hover states. */
+document.addEventListener('DOMContentLoaded', () => {
+  const plot = document.getElementById('evPlot');
+  const TYPES = [
+    { name: 'Training',   color: '#A2E9E9' },
+    { name: 'Planting',   color: '#57CACB' },
+    { name: 'Monitoring', color: '#1B989B' },
+    { name: 'Community',  color: '#095D5E' },
+  ];
+  const MONTHS = [
+    { label: 'Jan 26', blocks: [3,3,3,2,1,0] },
+    { label: 'Feb 26', blocks: [3,2,1] },
+    { label: 'Mar 26', blocks: [3,3,3,2,2,1,1,0,0,0] },
+    { label: 'Apr 26', blocks: [3,3,2,1,0,0,0] },
+  ];
+  const tip = document.createElement('div');
+  tip.className = 'ev-tip';
+  tip.style.opacity = 0;
+  Object.assign(tip.style, ChartTooltip.domStyles['g2-tooltip']);
+  plot.appendChild(tip);
+
+  function show(block, title, date, type) {
+    tip.style.opacity = 1;
+    plot.querySelectorAll('.ev-block.on').forEach((b) => b.classList.remove('on'));
+    block.classList.add('on');
+    const t = TYPES[type];
+    tip.innerHTML = ChartTooltip.render({ title, subtitle: date, rows: [{ color: t.color, name: 'Activity Type', value: t.name }] });
+    const p = plot.getBoundingClientRect(), r = block.getBoundingClientRect();
+    const half = tip.offsetWidth / 2;
+    const x = Math.min(Math.max(r.left - p.left + r.width / 2, half), p.width - half);
+    tip.style.left = x + 'px';
+    tip.style.top = (r.top - p.top - 10) + 'px';
+  }
+
+  let first;
+  MONTHS.forEach((m, mi) => {
+    const col = document.createElement('div');
+    col.className = 'ev-col';
+    const stack = document.createElement('div');
+    stack.className = 'ev-stack';
+    m.blocks.forEach((type, bi) => {
+      const b = document.createElement('div');
+      b.className = 'ev-block';
+      b.style.background = TYPES[type].color;
+      const title = type === 0 ? 'Safety Workshop' : TYPES[type].name + ' activity';
+      const date = `${String(2 + bi * 3).padStart(2, '0')} ${m.label.split(' ')[0]} 26`;
+      b.addEventListener('mouseenter', () => show(b, title, date, type));
+      stack.appendChild(b);
+      if (mi === 2 && bi === m.blocks.length - 1) first = b;
+    });
+    const lab = document.createElement('span');
+    lab.textContent = m.label;
+    col.append(stack, lab);
+    plot.appendChild(col);
+  });
+  // tooltip only while hovering a block
+  plot.addEventListener('mouseleave', () => {
+    tip.style.opacity = 0;
+    plot.querySelectorAll('.ev-block.on').forEach((b) => b.classList.remove('on'));
+  });
+});
+</script>
+<script src="/components/chart-tooltip/chart-tooltip.js?v=4" defer></script>
+<script src="/components/chart-card/chart-card.js?v=4" defer></script>
+<script src="/components/smooth-line/smooth-line.js?v=4" defer></script>
+<script src="/components/indicator-stack/indicator-stack.js?v=6" defer></script>
+<script src="/components/area-comparison/area-comparison.js?v=4" defer></script>
+</body>
+</html>
