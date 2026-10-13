@@ -153,3 +153,4 @@ submission to Verra (copy is mine, written as future work). The submission scree
   1181-1494 at 1920 css): kota-lowfi.jpg ?v=8, kota-handover.jpg ?v=10. Previous low-fi image in scratchpad.
   bank-home links ?v=9. Not committed yet.
 - Kota: Challenge / Solution section hidden (style=display:none) for the 2026-10-13 demo only; restore afterwards.
+- Kota: The Product title now "Everything the bank needs to defend a decision, in one place." (PT: "Tudo o que o banco precisa para defender uma decisão, num só lugar."). Not committed yet.
