@@ -115,7 +115,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 /* ---- the counts ----
    Read as one sentence: your file is this complete, this many questions are
    open, you are in front of this many banks, and this is what they see. */
-.kpis{grid-column:1/3;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gutter)}
+.kpis{grid-column:1/3;grid-row:1;display:grid;grid-template-columns:repeat(4,1fr);gap:var(--gutter)}
 .kpi{background:var(--block);border-radius:var(--radius);padding:18px var(--pad)}
 .kpi .eyebrow{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .kpi .row{margin-top:10px;display:flex;align-items:baseline;gap:10px}
@@ -148,12 +148,12 @@ body{margin:0;background:var(--ground);color:var(--ink);
    screen about a file look like a screen about two complaints. They are now
    two rows in the aside; the file itself, the score and what has been
    declared carry the page. */
-.filecard{grid-column:1;grid-row:2}
+.filecard{grid-column:1;grid-row:4}
 /* The questions sit beside the file they belong to, and the score below: what
    a bank is waiting on is the live thing, the score is the consequence. */
-.asks{grid-column:2;grid-row:2}
-.vol-card{grid-column:1;grid-row:3}
-.score{grid-column:2;grid-row:3}
+.asks{grid-column:2;grid-row:4}
+.vol-card{grid-column:1;grid-row:2}
+.score{grid-column:2;grid-row:2}
 
 /* Each half of the file as one bar, because that is the first question the
    operator has: how far am I, and on which side. */
@@ -184,6 +184,27 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .worst .bar{margin-left:auto;width:96px;flex:none;height:6px;border-radius:3px;
   background:var(--track);overflow:hidden}
 .worst .bar i{display:block;height:100%;border-radius:3px;background:var(--accent-soft)}
+
+/* Progress over time, in place of the "where the work is" list (Pietra, 2026-10-13).
+   Same dark chart language as the declared volume: #232425 grid, muted 12px labels. */
+.prog-chart{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.prog-chart .ph{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.prog-chart .ph .w-lbl{padding:0}
+.prog-chart .plot{position:relative;height:170px}
+.prog-chart svg{display:block;width:100%;height:100%;overflow:visible}
+.prog-chart .gl{stroke:#232425;stroke-width:1}
+.prog-chart text{font:12px/1 inherit;fill:var(--muted)}
+.prog-chart .ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.prog-chart .guide{stroke:#4A4C50;stroke-width:1;stroke-dasharray:3 3;opacity:0;transition:opacity .12s}
+.prog-chart .plot:hover .guide{opacity:1}
+.prog-chart .pt{stroke:#1E1F20;stroke-width:2}
+.prog-tip{position:absolute;top:0;z-index:3;pointer-events:none;opacity:0;transform:translate(-50%,-6px);
+  padding:8px 10px;border-radius:8px;background:#2A2B2D;border:1px solid var(--line);box-shadow:0 8px 24px rgba(0,0,0,.35);
+  font-size:12px;color:var(--ink);white-space:nowrap;transition:opacity .12s}
+.prog-tip b{display:block;font-weight:600;margin-bottom:4px;color:var(--ink-2)}
+.prog-tip div{display:flex;align-items:center;gap:6px}
+.prog-tip i{width:8px;height:8px;border-radius:50%}
+.prog-chart .plot:hover .prog-tip{opacity:1}
 
 /* ---- declared volume ---- */
 .vol-card .head{align-items:flex-start}
@@ -227,7 +248,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .asks .empty{padding:22px;text-align:center;font-size:14px;color:#5E6062}
 
 /* ---- applications ---- */
-.apps{grid-column:1/3;grid-row:4}
+.apps{grid-column:1/3;grid-row:3} /* order per Pietra (2026-10-13): KPIs, volume, applications, file */
 .tbl{display:flex;flex-direction:column;overflow-x:auto}
 .thead,.tbody{min-width:0}
 /* Shares of the table, not of the text inside them: content-sized columns
@@ -288,7 +309,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 </style>
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=4">
-<link rel="stylesheet" href="assistant.css?v=3">
+<link rel="stylesheet" href="assistant.css?v=6">
 <script src="page-transition.js?v=3"></script>
 </head>
 <body>
@@ -354,23 +375,25 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
     <div class="canvas">
 
+
       <div class="kpis" id="kpis"></div>
 
-      <!-- ============ what is being asked of you ============ -->
-      <!-- ============ the file, section by section ============
-           The operator's own work, in the shape the form is actually in. This
-           is the card the screen is for: the asks are two rows of it, not the
-           subject of the page. -->
-      <section class="block filecard">
+      <!-- ============ what has been declared ============ -->
+      <section class="block vol-card">
         <div class="head">
           <div>
-            <h2>Your file</h2>
-            <div class="sub">Where each half stands</div>
+            <h2>Declared volume</h2>
+            <div class="sub">What the banks read as your output, last 12 months</div>
           </div>
-          <button class="btn btn--ghost" type="button" id="goForm2">Open the file</button>
+          <div class="keys"><span class="key"><i style="background:#B7B8B9"></i>Tonnes declared</span></div>
         </div>
-        <div class="halves" id="halves"></div>
-        <div class="worst" id="worst"></div>
+        <div class="vol" id="vol">
+          <span class="ylab">Volume (t)</span>
+          <div class="ticks" id="volTicks"></div>
+          <div class="field" id="volField"></div>
+          <div class="xaxis" id="volAxis"></div>
+          <div class="xname">Month</div>
+        </div>
       </section>
 
       <!-- ============ the score, from the other side ============ -->
@@ -399,35 +422,6 @@ body{margin:0;background:var(--ground);color:var(--ink);
           questions are answered and the missing certificate is attached.</p>
       </section>
 
-      <!-- ============ what a bank asked, in the aside column ============ -->
-      <section class="block asks">
-        <div class="head">
-          <div>
-            <h2>Open questions</h2>
-            <div class="sub">Each one points at the answer it is about</div>
-          </div>
-        </div>
-        <div class="asklist" id="asklist"></div>
-      </section>
-
-      <!-- ============ what has been declared ============ -->
-      <section class="block vol-card">
-        <div class="head">
-          <div>
-            <h2>Declared volume</h2>
-            <div class="sub">What the banks read as your output, last 12 months</div>
-          </div>
-          <div class="keys"><span class="key"><i style="background:#B7B8B9"></i>Tonnes declared</span></div>
-        </div>
-        <div class="vol" id="vol">
-          <span class="ylab">Volume (t)</span>
-          <div class="ticks" id="volTicks"></div>
-          <div class="field" id="volField"></div>
-          <div class="xaxis" id="volAxis"></div>
-          <div class="xname">Month</div>
-        </div>
-      </section>
-
       <!-- ============ your applications ============ -->
       <section class="block apps">
         <div class="head">
@@ -447,6 +441,37 @@ body{margin:0;background:var(--ground);color:var(--ink);
           <div class="tbody" id="apps"></div>
         </div>
       </section>
+
+      <!-- ============ what is being asked of you ============ -->
+      <!-- ============ the file, section by section ============
+           The operator's own work, in the shape the form is actually in. This
+           is the card the screen is for: the asks are two rows of it, not the
+           subject of the page. -->
+      <section class="block filecard">
+        <div class="head">
+          <div>
+            <h2>Assessment details</h2>
+            <div class="sub">Where each half stands</div>
+          </div>
+          <button class="btn btn--ghost" type="button" id="goForm2">Open the file</button>
+        </div>
+        <div class="halves" id="halves"></div>
+        <div class="worst" id="worst"></div>
+      </section>
+
+
+      <!-- ============ what a bank asked, in the aside column ============ -->
+      <section class="block asks">
+        <div class="head">
+          <div>
+            <h2>Open questions</h2>
+            <div class="sub">Each one points at the answer it is about</div>
+          </div>
+        </div>
+        <div class="asklist" id="asklist"></div>
+      </section>
+
+
 
     </div>
   </div>
@@ -470,7 +495,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
    ========================================================================== */
 (function(){
 
-  var FORM = 'operator-form.html', APPS = 'operator-applications.html';
+  var FORM = 'operator-form.html?v=7', APPS = 'operator-applications.html?v=2';
 
   /* ---- the counts ---- */
   var kpis = [
@@ -540,20 +565,56 @@ body{margin:0;background:var(--ground);color:var(--ink);
       '<div class="m">' + h.m + '</div></div>';
   }).join('');
 
-  var WORST = [
-    { n:'Grievance mechanism', done:1, total:3 },
-    { n:'Supplier engagement', done:1, total:4 },
-    { n:'Chain of custody',    done:2, total:4 }
+  /* ---- progress over time ----
+     Answers completed per half over the last eight weeks, ending on today's
+     counts above (15 of 17, 8 of 19). The weekly steps are mock. */
+  var WEEKS = ['24 Jun','1 Jul','8 Jul','15 Jul','22 Jul','29 Jul','5 Aug','12 Aug'];
+  var SERIES = [
+    { t:'KYC', c:'#F0F0F0', v:[3,6,8,10,12,13,14,15] },
+    { t:'Management systems', c:'#F08F65', v:[0,1,2,3,4,5,7,8] }
   ];
-  document.getElementById('worst').innerHTML =
-    '<div class="w-lbl">Where the work is</div>' +
-    WORST.map(function(w){
-      var pct = Math.round(w.done / w.total * 100);
-      return '<button class="w" type="button" data-form>' +
-        '<span class="n">' + w.n + '</span>' +
-        '<span class="bar"><i class="m-fill" style="width:' + pct + '%"></i></span>' +
-        '<span class="g">' + (w.total - w.done) + ' left</span></button>';
-    }).join('');
+  var prog = document.getElementById('worst');
+  prog.className = 'prog-chart';
+  prog.innerHTML =
+    '<div class="ph"><div class="w-lbl">Answers over the last 8 weeks</div><div class="keys">' +
+      SERIES.map(function(s){ return '<span class="key"><i style="background:' + s.c + '"></i>' + s.t + '</span>'; }).join('') +
+    '</div></div><div class="plot" id="progPlot"><div class="prog-tip" id="progTip"></div></div>';
+  function drawProg(){
+    var plot = document.getElementById('progPlot'), tip = document.getElementById('progTip');
+    var W = plot.clientWidth, H = plot.clientHeight, L = 28, R = 8, T = 6, B = 22, YMAX = 20;
+    if (!W) return;
+    var x = function(i){ return L + (W - L - R) * i / (WEEKS.length - 1); };
+    var y = function(v){ return T + (H - T - B) * (1 - v / YMAX); };
+    var svg = '<svg viewBox="0 0 ' + W + ' ' + H + '">';
+    [0,5,10,15,20].forEach(function(t){
+      svg += '<line class="gl" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t) + '" y2="' + y(t) + '"/>' +
+             '<text x="' + (L - 8) + '" y="' + (y(t) + 4) + '" text-anchor="end">' + t + '</text>';
+    });
+    WEEKS.forEach(function(w, i){
+      if (i % 2 === 1 && W < 520) return;
+      svg += '<text x="' + x(i) + '" y="' + (H - 4) + '" text-anchor="middle">' + w + '</text>';
+    });
+    svg += '<line class="guide" id="progGuide" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '"/>';
+    SERIES.forEach(function(s){
+      svg += '<path class="ln" stroke="' + s.c + '" d="' + s.v.map(function(v, i){ return (i ? 'L' : 'M') + x(i) + ' ' + y(v); }).join(' ') + '"/>';
+      var last = s.v.length - 1;
+      svg += '<circle class="pt" r="4" fill="' + s.c + '" cx="' + x(last) + '" cy="' + y(s.v[last]) + '"/>';
+    });
+    svg += '</svg>';
+    plot.querySelector('svg') && plot.querySelector('svg').remove();
+    plot.insertAdjacentHTML('afterbegin', svg);
+    plot.onmousemove = function(e){
+      var r = plot.getBoundingClientRect(), px = e.clientX - r.left;
+      var i = Math.max(0, Math.min(WEEKS.length - 1, Math.round((px - L) / ((W - L - R) / (WEEKS.length - 1)))));
+      var g = document.getElementById('progGuide');
+      g.setAttribute('x1', x(i)); g.setAttribute('x2', x(i));
+      tip.style.left = Math.max(70, Math.min(W - 70, x(i))) + 'px';
+      tip.innerHTML = '<b>Week of ' + WEEKS[i] + '</b>' + SERIES.map(function(s){
+        return '<div><i style="background:' + s.c + '"></i>' + s.t + ' · ' + s.v[i] + '</div>'; }).join('');
+    };
+  }
+  drawProg();
+  if ('ResizeObserver' in window) new ResizeObserver(drawProg).observe(document.getElementById('progPlot'));
 
   /* ---- declared volume ----
      The same twelve months the bank reads on the operator's file, from this
@@ -594,7 +655,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
       '<div class="prog"><span class="bar"><i style="width:' + a.pct + '%"></i></span>' +
         '<span class="pct">' + a.pct + '%</span></div>' +
       '<span class="cell' + (a.open ? '' : ' cell--off') + '">' + a.last + '</span>' +
-      '<button class="btn-sm' + (a.open ? ' btn-sm--now' : '') + '" type="button"' +
+      '<button class="btn-sm" type="button"' + // both rows use the default button (Pietra)
         (a.open ? '' : ' disabled') + '>Open</button></div>';
   }).join('');
 
@@ -632,8 +693,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
     b.addEventListener('click', function(){
       var seat = b.getAttribute('data-seat');
       try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-      KOTA.go(seat === 'bank' ? 'bank-home.html'
-                          : seat === 'start' ? 'start.html' : 'operator-home.html');
+      KOTA.go(seat === 'bank' ? 'bank-home.html?v=8'
+                          : seat === 'start' ? 'start.html' : 'operator-home.html?v=6');
     });
   });
   document.addEventListener('keydown', function(e){
@@ -665,7 +726,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 })();
 </script>
-<script src="assistant.js?v=3"></script>
+<script src="assistant.js?v=5"></script>
 <script src="assist-home.js?v=3"></script>
 <script src="motion.js?v=1"></script>
 </body>

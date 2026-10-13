@@ -871,6 +871,29 @@
  border: 1px solid var(--border);
  }
 
+ /* ====== PRESENTATION MODE ======
+    Only the case column on screen: nav, sidebar and the rounded sheet frame go,
+    the sheet fills the browser window. */
+ .present-btn {
+ display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem;
+ padding: 0.55rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: transparent;
+ font: 500 0.8125rem/1 var(--font); color: var(--text); cursor: pointer; transition: background .2s, border-color .2s;
+ }
+ .present-btn:hover { background: var(--accent-yellow); border-color: transparent; color: var(--gray-true-900); }
+ .present-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+ @media (max-width: 900px) { .present-btn { display: none; } }
+ body.presenting .nav, body.presenting .sidebar, body.presenting .mobile-menu, body.presenting .seg { display: none; }
+ body.presenting .shell { inset: 0; padding: 0; }
+ body.presenting .main-sheet { border: 0; border-radius: 0; }
+ .present-exit {
+ position: fixed; top: 14px; right: 18px; z-index: 50; display: none; align-items: center; gap: 0.5rem;
+ padding: 0.45rem 0.6rem 0.45rem 0.8rem; border: 1px solid var(--border); border-radius: 999px; background: var(--sheet);
+ font: 500 0.75rem/1 var(--font); color: var(--text-2); cursor: pointer; opacity: 0.35; transition: opacity .2s;
+ }
+ .present-exit:hover { opacity: 1; }
+ .present-exit kbd { font: 500 0.625rem/1 var(--mono); padding: 0.2rem 0.35rem; border: 1px solid var(--border); border-radius: 4px; }
+ body.presenting .present-exit { display: inline-flex; }
+
  /* ====== CASE SECTIONS (shared) ====== */
  .case-section {
  padding: var(--section-py) 0;
@@ -2242,6 +2265,10 @@
  </div>
  </div>
 
+ <button type="button" class="present-btn r" id="presentBtn">
+ <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg>
+ Presentation mode
+ </button>
  </div><!-- /.sidebar-intro -->
 
  <div class="sidebar-next">
@@ -2466,6 +2493,7 @@
 
  </div><!-- /.main-sheet -->
  </div><!-- /.shell -->
+ <button type="button" class="present-exit" id="presentExit">Exit presentation <kbd>Esc</kbd></button>
 
  <script>
  /* ------- i18n (EN / PT-BR) ------- */
@@ -2706,6 +2734,23 @@ setLang(lang);
 
    mob.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
 
+ })();
+
+ /* Presentation mode: toggles body.presenting, filling the browser window only
+    (no fullscreen, Pietra's screen is very wide). Esc brings the sidebar and nav back. */
+ (() => {
+ const btn = document.getElementById('presentBtn');
+ const exit = document.getElementById('presentExit');
+ if (!btn) return;
+ const on = () => {
+ document.body.classList.add('presenting');
+ };
+ const off = () => {
+ document.body.classList.remove('presenting');
+ };
+ btn.addEventListener('click', on);
+ exit.addEventListener('click', off);
+ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('presenting')) off(); });
  })();
 
  // Custom cursor

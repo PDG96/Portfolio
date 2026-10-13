@@ -230,7 +230,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
    height it was drawn at and the page grows to whatever the pane needs. */
 .canvas{display:grid;grid-template-columns:998fr 316fr;gap:var(--gutter);align-content:start}
 .canvas--insights{grid-template-rows:auto 581px 467px 487px}
-.canvas--detailed{grid-template-rows:auto 488px}
+.canvas--detailed{grid-template-rows:auto auto}   /* grows with the MS rows (was a fixed 488px) */
 
 .block{background:var(--block);border-radius:var(--radius);padding:var(--pad);
        display:flex;flex-direction:column;min-width:0;min-height:0}
@@ -487,6 +487,10 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .tag--ok{color:var(--good-2)}      .tag--ok .dot{background:var(--good)}
 .tag--warn{color:var(--warn-2)}    .tag--warn .dot{background:var(--warn)}
 .tag--bad{color:var(--bad-2)}      .tag--bad .dot{background:var(--bad)}
+.tgroup{padding:14px 12px 6px;font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted)}
+.tbody .tgroup + .tr{border-top:0}
+.tr--pending .f-name{color:var(--ink-2)}
+.cell--off{color:var(--muted)}
 .tag--none{color:var(--muted)}     .tag--none .dot{background:var(--muted)}
 /* The last column opens the form. Confirmed and Declined are settled, so
    they read "View"; anything still open reads "Review". Same control either
@@ -642,6 +646,13 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .tnode--self{height:56px;background:#303235;border-color:#4A4C4F;
   box-shadow:0 3px 9px rgba(0,0,0,.4)}
 .tnode.is-on{border-color:var(--accent);background:#26282A}
+/* a counterparty inside the conflict zone on the map (Pietra, 2026-10-13) */
+.tnode--alert{border-color:rgba(240,68,56,.7);background:#2A1E1D}
+.tnode--alert:hover{border-color:#F04438;background:#33211F}
+.tnode--alert .tico{color:#F97066}
+.talert{display:inline-flex;align-items:center;gap:4px;flex:none;padding:2px 7px;border-radius:9px;
+  background:rgba(240,68,56,.14);color:#F97066;font-size:11px;font-weight:600}
+.talert svg{width:12px;height:12px}
 
 /* Same device as the map: the dashes travel along the path in the direction
    the goods move, so the graph states upstream and downstream rather than
@@ -928,7 +939,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 </style>
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=4">
-<link rel="stylesheet" href="assistant.css?v=3">
+<link rel="stylesheet" href="assistant.css?v=6">
 <script src="page-transition.js?v=3"></script>
 </head>
 <body>
@@ -978,8 +989,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
          are", and when the page moves they hold the top as one bar. -->
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
-        <a href="evaluation.html">Evaluation</a><span class="sep"></span>
-        <a href="evaluation.html">Operators</a><span class="sep"></span>
+        <a href="evaluation.html?v=3">Evaluation</a><span class="sep"></span>
+        <a href="evaluation.html?v=3">Operators</a><span class="sep"></span>
         <span class="here">Tulivu Cooperative</span>
       </header>
 
@@ -1063,7 +1074,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
           </div>
           <div class="field">
             <div class="label">Declared sites</div>
-            <div class="value">5 · 1 in conflict area</div>
+            <div class="value">6 · 1 in conflict area</div>
           </div>
           <div class="field">
             <div class="label">Country of origin</div>
@@ -1166,12 +1177,12 @@ body{margin:0;background:var(--ground);color:var(--ink);
             </div>
           </div>
           <div class="keys">
-            <span class="key"><i style="background:#E8834F"></i>Rubaya concession</span>
+            <span class="key"><i style="background:#E8834F"></i>From Matoro · Rubaya</span>
             <span class="key"><i style="background:#DBE0E9"></i>Other sites</span>
           </div>
           <div class="plot">
             <div class="waffle" id="waffle" role="img"
-                 aria-label="Consignments declared per month, split by whether they came from the Rubaya concession"></div>
+                 aria-label="Consignments declared per month, split by whether they came from Matoro, in Rubaya"></div>
             <div class="xaxis" id="waffleX"></div>
           </div>
         </section>
@@ -1209,7 +1220,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
         <div class="head">
           <div>
             <h2>Review progress</h2>
-            <div class="sub">The four sections this desk received, counted</div>
+            <div class="sub">The sections this desk received, counted</div>
           </div>
           <div class="donut" id="progWheel"></div>
         </div>
@@ -1239,6 +1250,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
                  on their side and has not arrived here, which is why it is not
                  listed. The counts are the operator's own, read from this end. -->
             <div class="tbody">
+              <div class="tgroup">KYC</div>
               <div class="tr">
                 <div><div class="f-name">Identification</div><div class="f-doc">5 of 5 answered</div></div>
                 <div class="prog"><span class="bar"><i class="m-fill" style="width:100%"></i></span><span class="pct">100%</span></div>
@@ -1277,6 +1289,54 @@ body{margin:0;background:var(--ground);color:var(--ink);
                 <span><span class="tag tag--warn"><span class="dot"></span>Needs review</span></span>
                 <button class="btn-sm" data-open-form="Scrutiny" data-doc="2 of 2 answered"
                         data-status="Needs review" data-tone="warn">Review</button>
+              </div>
+
+              <!-- Management systems (Pietra, 2026-10-13): still being filled on the operator's side,
+                   so listed as not sent and kept out of the review ring. Counts match the operator form (8 of 19). -->
+              <div class="tgroup">Management systems</div>
+              <div class="tr tr--pending">
+                <div><div class="f-name">Supply chain policy</div><div class="f-doc">2 of 4 answered</div></div>
+                <div class="prog"><span class="bar"><i class="m-fill" style="width:50%"></i></span><span class="pct">50%</span></div>
+                <span class="cell cell--off">Not sent</span>
+                <span class="cell cell--off">Not assigned</span>
+                <span><span class="tag tag--none"><span class="dot"></span>Not sent</span></span>
+                <button class="btn-sm" type="button" disabled title="The operator has not sent this section yet">Review</button>
+              </div>
+
+              <div class="tr tr--pending">
+                <div><div class="f-name">Internal structure</div><div class="f-doc">2 of 4 answered</div></div>
+                <div class="prog"><span class="bar"><i class="m-fill" style="width:50%"></i></span><span class="pct">50%</span></div>
+                <span class="cell cell--off">Not sent</span>
+                <span class="cell cell--off">Not assigned</span>
+                <span><span class="tag tag--none"><span class="dot"></span>Not sent</span></span>
+                <button class="btn-sm" type="button" disabled title="The operator has not sent this section yet">Review</button>
+              </div>
+
+              <div class="tr tr--pending">
+                <div><div class="f-name">Chain of custody</div><div class="f-doc">2 of 4 answered</div></div>
+                <div class="prog"><span class="bar"><i class="m-fill" style="width:50%"></i></span><span class="pct">50%</span></div>
+                <span class="cell cell--off">Not sent</span>
+                <span class="cell cell--off">Not assigned</span>
+                <span><span class="tag tag--none"><span class="dot"></span>Not sent</span></span>
+                <button class="btn-sm" type="button" disabled title="The operator has not sent this section yet">Review</button>
+              </div>
+
+              <div class="tr tr--pending">
+                <div><div class="f-name">Supplier engagement</div><div class="f-doc">1 of 4 answered</div></div>
+                <div class="prog"><span class="bar"><i class="m-fill" style="width:25%"></i></span><span class="pct">25%</span></div>
+                <span class="cell cell--off">Not sent</span>
+                <span class="cell cell--off">Not assigned</span>
+                <span><span class="tag tag--none"><span class="dot"></span>Not sent</span></span>
+                <button class="btn-sm" type="button" disabled title="The operator has not sent this section yet">Review</button>
+              </div>
+
+              <div class="tr tr--pending">
+                <div><div class="f-name">Grievance mechanism</div><div class="f-doc">1 of 3 answered</div></div>
+                <div class="prog"><span class="bar"><i class="m-fill" style="width:33%"></i></span><span class="pct">33%</span></div>
+                <span class="cell cell--off">Not sent</span>
+                <span class="cell cell--off">Not assigned</span>
+                <span><span class="tag tag--none"><span class="dot"></span>Not sent</span></span>
+                <button class="btn-sm" type="button" disabled title="The operator has not sent this section yet">Review</button>
               </div>
             </div>
 
@@ -1523,9 +1583,9 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 <div class="notifpop" id="notifpop" role="menu" aria-label="Notifications">
   <div class="lbl">Notifications</div>
-  <button type="button" data-href="operator-detail.html" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative is ready for your decision</b><span class="m">Today · Evaluation</span></span></button>
-  <button type="button" data-href="operator-detail.html" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative uploaded 2 documents</b><span class="m">Yesterday · Registration</span></span></button>
-  <button type="button" data-href="evaluation.html" role="menuitem" class="old"><span class="dot"></span><span><b>Riverbend cooperative reached 72% of its registration</b><span class="m">3 days ago · Registration</span></span></button>
+  <button type="button" data-href="operator-detail.html?v=7" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative is ready for your decision</b><span class="m">Today · Evaluation</span></span></button>
+  <button type="button" data-href="operator-detail.html?v=7" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative uploaded 2 documents</b><span class="m">Yesterday · Registration</span></span></button>
+  <button type="button" data-href="evaluation.html?v=3" role="menuitem" class="old"><span class="dot"></span><span><b>Riverbend cooperative reached 72% of its registration</b><span class="m">3 days ago · Registration</span></span></button>
 </div>
 
 <div class="seatpop" id="seatpop" role="menu" aria-label="Change seat">
@@ -1552,11 +1612,14 @@ body{margin:0;background:var(--ground);color:var(--ink);
     mapboxgl.accessToken = "pk.eyJ1IjoicGlldHJhZ290dGFyZG8iLCJhIjoiY2x4YTh5a2hoMWQ0YjJxcjB6MGh0ZTVoYiJ9.cC6zYVd1cGSvF2_KpjLajw";
 
     var sites = [
-      { name:'Tulivu Cooperative (HQ)',   role:'Headquarters',      place:'Goma, Avenue du Lac',   center:[29.2286,-1.6784], icon:'hq' },
-      { name:'Rubaya concession',    role:'Concession',        place:'Masisi',                center:[28.9000,-1.5500], icon:'mine', zone:'Conflict-affected area' },
-      { name:'Masisi washing plant', role:'Washing plant',     place:'Route de Masisi',       center:[29.0200,-1.6000], icon:'wash' },
-      { name:'Goma export depot',    role:'Export depot',      place:'Grande Barrière, Goma', center:[29.2384,-1.6797], icon:'depot' },
-      { name:'Ntaro Transit',        role:'Transit',           place:'Gisenyi / Rubavu, RW',  center:[29.2564,-1.7000], icon:'transit' }
+      /* The same participants as Trade Relationships below (Pietra, 2026-10-13):
+         the three suppliers upstream, the operator, the two buyers downstream. */
+      { name:'Tulivu Cooperative (HQ)', role:'Headquarters',      place:'Goma, Avenue du Lac',   center:[29.2286,-1.6784], icon:'hq' },
+      { name:'Matoro',                  role:'Supplier · mine site', place:'Rubaya, Masisi',    center:[28.9000,-1.5500], icon:'mine', zone:'Conflict-affected area' },
+      { name:'Amani Bethem',            role:'Supplier · mine site', place:'Kirotshe, Masisi',  center:[28.9900,-1.7200], icon:'mine' },
+      { name:'Mweka',                   role:'Supplier · mine site', place:'Minova, South Kivu', center:[29.0300,-1.7000], icon:'mine' },
+      { name:'Maki Banga',              role:'Buyer',             place:'Grande Barrière, Goma', center:[29.2384,-1.6797], icon:'depot' },
+      { name:'Kandril Components',      role:'Buyer',             place:'Gisenyi / Rubavu, RW',  center:[29.2564,-1.7000], icon:'transit' }
     ];
 
     /* The chain of custody as the operator declared it, written origin-first
@@ -1565,9 +1628,11 @@ body{margin:0;background:var(--ground);color:var(--ink);
        dashes travel along that order, so the map states a direction rather
        than just a set of places that happen to be linked. */
     var flow = [
-      ['Rubaya concession',     'Masisi washing plant'],
-      ['Masisi washing plant', 'Goma export depot'],
-      ['Goma export depot',    'Ntaro Transit']
+      ['Matoro',                  'Tulivu Cooperative (HQ)'],
+      ['Amani Bethem',            'Tulivu Cooperative (HQ)'],
+      ['Mweka',                   'Tulivu Cooperative (HQ)'],
+      ['Tulivu Cooperative (HQ)', 'Maki Banga'],
+      ['Tulivu Cooperative (HQ)', 'Kandril Components']
     ];
 
     /* Masisi, drawn as an area rather than a pin because that is what it is:
@@ -1581,7 +1646,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
       rows:[
         ['Area',         'Masisi · Rubaya'],
         ['Designation',  'Armed-group presence'],
-        ['Sites inside', '1 of 5 · Rubaya']
+        ['Sites inside', '1 of 6 · Matoro']
       ],
       note:'Third-party conflict mapping, not operator-declared. A site inside it drives the geography score.'
     };
@@ -2004,7 +2069,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
      moves under it. */
   var home = document.getElementById('goHome');
   if (home) home.addEventListener('click', function(){
-    KOTA.go('bank-home.html');
+    KOTA.go('bank-home.html?v=8');
   });
 
   var head = document.getElementById('stickyhead');
@@ -2035,7 +2100,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
   var ev = document.getElementById('goEval');
   if (ev) ev.addEventListener('click', function(){
-    KOTA.go('evaluation.html');
+    KOTA.go('evaluation.html?v=3');
   });
 
 
@@ -2050,8 +2115,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'operator' ? 'operator-home.html'
-                            : seat === 'start' ? 'start.html' : 'bank-home.html');
+        KOTA.go(seat === 'operator' ? 'operator-home.html?v=6'
+                            : seat === 'start' ? 'start.html' : 'bank-home.html?v=8');
       });
     });
     document.addEventListener('keydown', function(e){
@@ -2150,7 +2215,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
         cell.style.setProperty('--i', i);
         cell.addEventListener('mouseenter', function(){
           showTip(this, '<b>' + d.m + '</b> · ' + d.total + ' consignments<br>' +
-                        '<span class="k">' + d.flagged + ' from Rubaya</span>');
+                        '<span class="k">' + d.flagged + ' from Matoro</span>');
         });
         cell.addEventListener('mouseleave', hideTip);
         col.appendChild(cell);                // column is bottom-aligned
@@ -2225,9 +2290,9 @@ body{margin:0;background:var(--ground);color:var(--ink);
      operator's own claim, which is why the panel says "declared" rather than
      stating a share as fact. */
   var upstream = [
-    { id:'amani',  name:'Amani Bethem', role:'Upstream site',   dir:'Supplies ore',        share:'34% of declared intake', last:'09 Aug 2025' },
-    { id:'matoro', name:'Matoro',       role:'Upstream site',   dir:'Supplies ore',        share:'41% of declared intake', last:'11 Aug 2025' },
-    { id:'mweka',  name:'Mweka',        role:'Upstream site',   dir:'Supplies ore',        share:'25% of declared intake', last:'02 Aug 2025' }
+    { id:'amani',  name:'Amani Bethem', role:'Upstream site',   dir:'Supplies ore',        share:'34% of declared intake', last:'09 Aug 2025', place:'Kirotshe, Masisi' },
+    { id:'matoro', name:'Matoro',       role:'Upstream site',   dir:'Supplies ore',        share:'41% of declared intake', last:'11 Aug 2025', place:'Rubaya, Masisi', zone:'Conflict-affected area' },
+    { id:'mweka',  name:'Mweka',        role:'Upstream site',   dir:'Supplies ore',        share:'25% of declared intake', last:'02 Aug 2025', place:'Minova, South Kivu' }
   ];
   /* The centre is the operator the page is about. Everything around it is a
      counterparty one step away, which is the only reading under which the
@@ -2236,19 +2301,23 @@ body{margin:0;background:var(--ground);color:var(--ink);
                dir:'Subject of this review', share:'3 suppliers, 2 buyers',
                last:'11 Aug 2025' };
   var downstream = [
-    { id:'maki',  name:'Maki Banga', role:'Downstream buyer', dir:'Buys concentrate', share:'62% of declared output', last:'10 Aug 2025' },
-    { id:'kemet', name:'Kandril Components',      role:'Downstream buyer', dir:'Buys concentrate', share:'38% of declared output', last:'05 Aug 2025' }
+    { id:'maki',  name:'Maki Banga', role:'Downstream buyer', dir:'Buys concentrate', share:'62% of declared output', last:'10 Aug 2025', place:'Grande Barrière, Goma' },
+    { id:'kemet', name:'Kandril Components',      role:'Downstream buyer', dir:'Buys concentrate', share:'38% of declared output', last:'05 Aug 2025', place:'Gisenyi / Rubavu, RW' }
   ];
 
   function node(d, kind){
     var b = document.createElement('button');
-    b.className = 'tnode' + (kind === 'self' ? ' tnode--self' : '');
+    b.className = 'tnode' + (kind === 'self' ? ' tnode--self' : '') + (d.zone ? ' tnode--alert' : '');
+    if (d.zone) b.setAttribute('title', d.name + ' is inside the conflict zone on the map');
     b.type = 'button';
     b.setAttribute('data-id', d.id);
     /* No trailing arrow: it promised a jump somewhere else, and what the node
        actually does is open its own panel right here. */
     b.innerHTML = (kind === 'site' ? SITE : ORG) +
-                  '<span class="tname">' + d.name + '</span>';
+                  '<span class="tname">' + d.name + '</span>' +
+                  (d.zone ? '<span class="talert" aria-label="Inside a conflict zone">' +
+                    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                    '<path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>Conflict zone</span>' : '');
     return b;
   }
 
@@ -2328,6 +2397,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
         '<div class="tt-div"></div>' +
         '<div class="tt-body">' +
           '<div class="tt-row"><span class="k">Role</span><span class="v">' + d.role + '</span></div>' +
+          (d.place ? '<div class="tt-row"><span class="k">Location</span><span class="v">' + d.place + '</span></div>' : '') +
+          (d.zone ? '<div class="tt-row"><span class="k">Area</span><span class="v" style="color:#F97066">' + d.zone + '</span></div>' : '') +
           '<div class="tt-row"><span class="k">Relationship</span><span class="v">' + d.dir + '</span></div>' +
           '<div class="tt-row"><span class="k">Declared</span><span class="v">' + d.share + '</span></div>' +
           '<div class="tt-row"><span class="k">Last declared</span><span class="v">' + d.last + '</span></div>' +
@@ -2498,7 +2569,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
   (function progress(){
     var wheel = document.getElementById('progWheel');
     if (!wheel) return;
-    var rows = [].slice.call(document.querySelectorAll('.tbody .tr'));
+    var rows = [].slice.call(document.querySelectorAll('.tbody .tr:not(.tr--pending)'));
     if (!rows.length) return;
 
     /* Three states of one pile of answers, counted off the table rather than
@@ -2833,7 +2904,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 })();
 </script>
-<script src="assistant.js?v=3"></script>
+<script src="assistant.js?v=5"></script>
 <script src="assist-review.js?v=4"></script>
 <script src="motion.js?v=1"></script>
 </body>

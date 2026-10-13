@@ -1,0 +1,145 @@
+/* ==========================================================================
+   KOTA — shell styles shared by the operator screens.
+
+   The rail, the two popovers, the tooltip and the header are the same object
+   on every operator page, so they are defined once. Page-specific layout
+   stays in each page's own <style>.
+   ========================================================================== */
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--ink);
+     font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+     font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;
+     font-variant-numeric:tabular-nums}
+
+:root{
+  --rail:54px; --pad:24px; --gutter:24px; --radius:8px; --topbar:52px;
+  --ground:#151617; --block:#1D1D1E; --line:#2B2C2D;
+  --ink:#F6F6F6; --ink-2:#D3D4D4; --muted:#898B8D; --track:#404244; --fill:#F0F0F0;
+  --accent:#E8723F;
+  /* The lighter step of the KOTA orange. Progress that is simply not
+     finished is not a warning, so it wears the brand colour one step
+     back from the primary rather than the amber of a problem. */
+  --accent-soft:#F08F65;
+  --good:#32D583; --good-2:#6CE9A6;
+  --warn:#FDB022; --warn-2:#FEDF89;
+  --bad:#F97066;  --bad-2:#F96666;
+  --info:#85A5FF; --info-2:#ADC6FF;
+}
+
+.app{display:flex;width:100%;min-height:100svh;position:relative;padding-left:var(--rail)}
+
+/* Hover lands at once; only the way out is eased. */
+.btn:hover,.btn-sm:hover,.nav:hover,.tbody .tr:hover{transition-duration:0s}
+
+/* ---- rail ---- */
+.rail{width:var(--rail);flex:none;background:var(--ground);display:flex;flex-direction:column;
+      align-items:center;gap:22px;padding:30px 0 22px;position:fixed;top:0;left:0;
+      height:100vh;height:100svh;z-index:10;border-right:1px solid #202122}
+.navgroup{display:flex;flex-direction:column;align-items:center;gap:6px}
+.nav{position:relative;width:36px;height:36px;border-radius:9px;border:0;padding:0;background:transparent;
+     color:#8C8E90;display:grid;place-items:center;cursor:pointer;
+     transition:background .15s ease,color .15s ease}
+.nav svg{width:20px;height:20px}
+.nav:hover{background:#2E3033;color:var(--ink)}
+.nav:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.nav:disabled{color:#252525;cursor:not-allowed}
+.nav:disabled:hover{background:#202122;color:#7A7D80}
+.nav.active{background:rgba(255,255,255,.08);color:var(--ink)}
+.nav.active::before{content:"";position:absolute;left:-9px;top:8px;width:2px;height:20px;
+  border-radius:0 2px 2px 0;background:var(--accent)}
+/* Unread is a dot on the bell, not a number: the count is in the panel. */
+.nav .badge{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 0 2px var(--ground)}
+.rail .spacer{margin-top:auto}
+.rail .me{width:32px;height:32px;display:block;border:0;padding:0;background:none;cursor:pointer}
+.rail .me svg{width:100%;height:100%;display:block}
+
+.main{flex:1;min-width:0;display:flex;flex-direction:column;padding:0 var(--pad) var(--pad)}
+
+/* ---- header ---- */
+.stickyhead{position:sticky;top:0;z-index:30;background:var(--ground);border-bottom:1px solid var(--line);
+  transition:margin .2s ease,padding .2s ease,box-shadow .2s ease}
+.stickyhead.is-stuck{margin:0 calc(var(--pad) * -1);padding:0 var(--pad);
+  box-shadow:0 10px 20px rgba(10,11,11,.55)}
+.topbar{height:var(--topbar);flex:none;display:flex;align-items:center;gap:8px;
+        font-size:10px;color:var(--muted)}
+.topbar a{color:inherit;text-decoration:none;border-radius:4px;padding:2px 4px;margin:0 -4px;
+  transition:color .15s ease,background .15s ease}
+.topbar a:hover{color:var(--ink);background:#202122;transition-duration:0s}
+.topbar .sep{width:5px;height:5px;border-right:1.5px solid var(--muted);
+             border-top:1.5px solid var(--muted);transform:rotate(45deg);opacity:.8}
+.topbar .here{color:var(--ink)}
+.ophead{display:flex;align-items:center;gap:16px;padding-bottom:16px}
+.ophead .logo{width:48px;height:48px;flex:none}
+.opname{display:flex;align-items:center;gap:10px;font-size:22px;line-height:28px;
+        font-weight:600;color:var(--ink)}
+.opaddr{margin-top:4px;font-size:14px;line-height:20px;color:var(--muted)}
+.headacts{margin-left:auto;flex:none;display:flex;align-items:center;gap:8px}
+
+/* ---- cards ---- */
+.canvas{padding-top:var(--gutter);display:grid;gap:var(--gutter);align-content:start}
+.block{background:var(--block);border-radius:var(--radius);padding:var(--pad);
+       display:flex;flex-direction:column;min-width:0}
+.block .head{margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.block h2{font-size:20px;line-height:28px;font-weight:500;margin:0;color:var(--ink)}
+.block .sub{margin-top:4px;font-size:15px;line-height:20px;color:var(--muted)}
+
+/* ---- buttons ---- */
+.btn{height:36px;padding:0 16px;border-radius:8px;border:1px solid transparent;font:inherit;
+     font-size:14px;font-weight:600;cursor:pointer;display:inline-grid;place-items:center;
+     transition:background .15s ease,border-color .15s ease}
+.btn--primary{background:var(--accent);color:#fff}
+.btn--primary:hover{background:#F2884F}
+.btn--ghost{background:#202122;border-color:var(--line);color:var(--ink)}
+.btn--ghost:hover{background:#34363A;border-color:#4A4C50}
+.btn:disabled{opacity:.4;cursor:not-allowed;pointer-events:none}
+.btn:focus-visible,.btn-sm:focus-visible{outline:2px solid var(--info);outline-offset:2px}
+.btn-sm{height:28px;padding:0 12px;border-radius:6px;border:1px solid var(--line);background:#202122;
+  color:var(--ink);font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;
+  transition:background .15s ease,border-color .15s ease}
+.btn-sm:hover{background:#34363A;border-color:#4A4C50}
+.btn-sm--now{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-sm--now:hover{background:#F2884F;border-color:#F2884F}
+
+/* ---- the two popovers at the foot of the rail ---- */
+.seatpop,.notifpop{position:fixed;left:62px;z-index:50;padding:8px;border-radius:10px;
+  background:var(--block);border:1px solid var(--line);box-shadow:0 16px 28px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(6px);pointer-events:none;
+  transition:opacity .16s ease,transform .16s ease}
+.seatpop{bottom:20px;width:244px}
+.notifpop{bottom:64px;width:296px}
+.seatpop.is-on,.notifpop.is-on{opacity:1;transform:none;pointer-events:auto}
+.seatpop .lbl,.notifpop .lbl{padding:8px 10px 6px;font-size:11px;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted)}
+.seatpop button,.notifpop button{width:100%;display:flex;align-items:flex-start;gap:10px;padding:9px 10px;
+  border:0;border-radius:8px;background:transparent;color:var(--ink);font:inherit;font-size:14px;
+  text-align:left;cursor:pointer}
+.seatpop button:hover,.notifpop button:hover{background:#26282A}
+.seatpop button .r{margin-left:auto;font-size:12px;color:var(--muted)}
+.seatpop .sep{height:1px;margin:6px 4px;background:var(--line)}
+.notifpop .dot{width:7px;height:7px;flex:none;margin-top:6px;border-radius:50%;background:var(--accent)}
+.notifpop .old .dot{background:var(--track)}
+.notifpop b{display:block;font-size:13px;line-height:18px;font-weight:500;color:var(--ink)}
+.notifpop .m{display:block;margin-top:3px;font-size:12px;color:var(--muted)}
+
+/* ---- tooltip ---- */
+.ctip{position:fixed;z-index:60;pointer-events:none;opacity:0;transform:translate(-50%,-100%);
+  padding:6px 9px;border-radius:6px;background:var(--block);border:1px solid var(--line);
+  box-shadow:0 6px 12px rgba(0,0,0,.35);font-size:12px;color:var(--ink);white-space:nowrap;
+  transition:opacity .12s ease}
+.ctip.is-on{opacity:1}
+.ctip--right{transform:translate(0,-50%)}
+.ctip .tip-off{margin-left:8px;padding:1px 6px;border-radius:9px;background:#2B2C2D;
+  color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.04em}
+
+/* ---- tags and meters, used by more than one operator screen ---- */
+.tag{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:11px;
+     background:var(--line);font-size:13px;font-weight:500;white-space:nowrap}
+.tag .dot{width:6px;height:6px;border-radius:50%}
+.tag--now{color:#FF9C6E}        .tag--now .dot{background:#FF9C6E}
+.tag--ok{color:var(--good-2)}   .tag--ok .dot{background:var(--good)}
+.tag--none{color:var(--muted)}  .tag--none .dot{background:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:11px;
+      background:var(--line);font-size:13px;font-weight:500;color:#FF9C6E}
+.pill .dot{width:6px;height:6px;border-radius:50%;background:#FF9C6E}

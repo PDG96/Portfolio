@@ -142,7 +142,7 @@
         var hint = document.createElement('div');
         hint.className = 'ka-hint';
         hint.innerHTML = A.icons.spark + '<span>This is on your ' + esc(d.n.split(' · ')[0].toLowerCase()) + '.</span>' +
-          '<button type="button">Let Kota read it</button>';
+          '<button type="button">Fill with AI assistant</button>';
         anchor.insertAdjacentElement('afterend', hint);
         hint.querySelector('button').addEventListener('click', function(){
           A.prefill('Fill my file from this document', [d]);

@@ -147,6 +147,12 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .atrow:hover{background:#232425;transition-duration:0s}
 .atrow:focus-visible{outline:2px solid var(--info);outline-offset:-2px}
 .atrow:last-child{border-bottom:0}
+/* The table is the whole page now ("What has happened" removed, Pietra 2026-10-13):
+   it runs to the bottom of the window, and the rows it does not have are drawn blank. */
+.canvas{flex:1;grid-template-rows:1fr}
+.tablecard{min-height:0}
+.atrow--blank{cursor:default;pointer-events:none;min-height:64px}
+.atrow--blank:last-child{border-bottom:0}
 
 .a-bank{display:flex;align-items:center;gap:11px;min-width:0}
 .a-bank .mk{width:30px;height:30px;flex:none;border-radius:8px;overflow:hidden}
@@ -235,7 +241,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=4">
 <script src="page-transition.js?v=3"></script>
-<link rel="stylesheet" href="assistant.css?v=3">
+<link rel="stylesheet" href="assistant.css?v=6">
 </head>
 <body>
 <div class="app">
@@ -245,7 +251,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
   <div class="main">
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
-        <a href="operator-home.html">Home</a><span class="sep"></span>
+        <a href="operator-home.html?v=6">Home</a><span class="sep"></span>
         <span class="here">Applications</span>
       </header>
       <div class="ophead">
@@ -277,15 +283,6 @@ body{margin:0;background:var(--ground);color:var(--ink);
         <div class="atbl" id="atbl"></div>
       </section>
 
-      <section class="block">
-        <div class="head">
-          <div>
-            <h2>What has happened</h2>
-            <div class="sub">Across both applications</div>
-          </div>
-        </div>
-        <div class="trail" id="trail"></div>
-      </section>
     </div>
   </div>
 </div>
@@ -299,7 +296,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 </div>
 <div class="ctip" id="ctip" role="status" aria-live="polite"></div>
 
-<script src="operator-shell.js"></script>
+<script src="operator-shell.js?v=2"></script>
 <script>
 (function(){
   buildOperatorRail('applications');
@@ -421,6 +418,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
         '<span>Clear the search or the filter to see all ' + applications.length + '.</span></div>';
 
     document.getElementById('atbl').innerHTML = head + body;
+    fillBlank();
 
     [].forEach.call(document.querySelectorAll('[data-sort]'), function(b){
       b.addEventListener('click', function(){
@@ -432,39 +430,38 @@ body{margin:0;background:var(--ground);color:var(--ink);
     [].forEach.call(document.querySelectorAll('[data-open]'), function(b){
       b.addEventListener('click', function(){
         KOTA.go(b.getAttribute('data-open') === 'Banque Orimu'
-          ? 'application-detail.html' : 'operator-form.html');
+          ? 'application-detail.html' : 'operator-form.html?v=7');
       });
     });
   }
+
+  /* Blank rows down to the bottom of the window, so the table reads as the page. */
+  function fillBlank(){
+    var tbl = document.getElementById('atbl');
+    [].forEach.call(tbl.querySelectorAll('.atrow--blank'), function(r){ r.remove(); });
+    var card = tbl.closest('.block'), pad = parseFloat(getComputedStyle(card).paddingBottom) || 24;
+    var gutter = 24, room = window.innerHeight - tbl.getBoundingClientRect().bottom - pad - gutter;
+    var n = Math.max(0, Math.floor(room / 64)), html = '';
+    for (var i = 0; i < n; i++) html += '<div class="atr atrow atrow--blank" aria-hidden="true">' +
+      '<span></span><span></span><span></span><span></span><span></span><span></span></div>';
+    tbl.insertAdjacentHTML('beforeend', html);
+  }
+  window.addEventListener('resize', fillBlank);
 
   document.getElementById('q').addEventListener('input', function(){
     query = this.value; draw();
   });
   draw();
 
-  /* The trail is the same events both sides can see, in one order. */
-  var trail = [
-    { when:'Today',       what:'Banque Orimu asked two questions about your registration',
-      who:'N. Okonkwo · Banque Orimu', now:true },
-    { when:'12 Aug 2025', what:'You uploaded 2 documents', who:'Tulivu Cooperative' },
-    { when:'10 Aug 2025', what:'Your file was sent to Banque Orimu', who:'Tulivu Cooperative' },
-    { when:'28 Jul 2025', what:'You started a draft for Banque Sefali', who:'Tulivu Cooperative' },
-    { when:'12 Jul 2025', what:'Banque Orimu invited you to apply', who:'N. Okonkwo · Banque Orimu' }
-  ];
-  document.getElementById('trail').innerHTML = trail.map(function(e){
-    return '<div class="ev' + (e.now ? ' ev--now' : '') + '"><span class="when">' + e.when + '</span>' +
-      '<span class="mark"></span><div><div class="what">' + e.what + '</div>' +
-      '<div class="who">' + e.who + '</div></div></div>';
-  }).join('');
 
   document.addEventListener('click', function(e){
     if (e.target.closest && e.target.closest('[data-open]')) KOTA.go('application-detail.html');
-    if (e.target.closest && e.target.closest('[data-form]')) KOTA.go('operator-form.html');
+    if (e.target.closest && e.target.closest('[data-form]')) KOTA.go('operator-form.html?v=7');
   });
 })();
 </script>
 <script src="motion.js?v=1"></script>
-<script src="assistant.js?v=3"></script>
+<script src="assistant.js?v=5"></script>
 <script src="assist-pages.js?v=1"></script>
 </body>
 </html>

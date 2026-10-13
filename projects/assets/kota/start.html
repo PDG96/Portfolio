@@ -97,7 +97,7 @@ body{margin:0;min-height:100svh;display:grid;place-items:center;padding:48px 24p
 
   <div class="seats">
 
-    <button class="seat" type="button" data-go="bank-home.html">
+    <button class="seat" type="button" data-go="bank-home.html?v=8">
       <div class="top">
         <svg class="avatar" viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <rect x="0.6" y="0.6" width="46.8" height="46.8" rx="13.4" fill="#1E1F21" stroke="#3A3C3E" stroke-width="1.2"/>
@@ -121,7 +121,7 @@ body{margin:0;min-height:100svh;display:grid;place-items:center;padding:48px 24p
       </span>
     </button>
 
-    <button class="seat" type="button" data-go="operator-home.html">
+    <button class="seat" type="button" data-go="operator-home.html?v=6">
       <div class="top">
         <svg class="avatar" viewBox="0 0 48 48" fill="none" aria-hidden="true">
           <defs>
@@ -181,7 +181,7 @@ body{margin:0;min-height:100svh;display:grid;place-items:center;padding:48px 24p
   [].forEach.call(document.querySelectorAll('[data-go]'), function(b){
     b.addEventListener('click', function(){
       var href = b.getAttribute('data-go');
-      try { localStorage.setItem('kota-seat', href === 'bank-home.html' ? 'bank' : 'operator'); }
+      try { localStorage.setItem('kota-seat', href === 'bank-home.html?v=8' ? 'bank' : 'operator'); }
       catch (e) {}
       if (embedded) {
         /* The case study owns the overlay, so the seat only says which one. */

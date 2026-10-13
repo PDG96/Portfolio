@@ -1,0 +1,76 @@
+/* ==========================================================================
+   KOTA — design tokens
+   ==========================================================================
+   One source of truth for both Kota surfaces: the operator looking at their
+   own KYC record, and the bank reviewing that operator. They were drifting
+   apart on two private vocabularies -- one calling it --ink and --card, the
+   other --text and --surface -- so the same idea had two names and two values.
+
+   The warm orange and the warm dark are deliberate: Straatos runs teal, WAZI
+   runs gold, and Kota needs to read as its own product at a glance.
+   ========================================================================== */
+
+:root{
+  --bg:#F9FAFB; --surface:#FFFFFF; --surface-2:#FCFCFD;
+  --border:#EAECF0; --border-soft:#F3F4F6;
+  --text:#101828; --text-2:#384250; --muted:#667085; --muted-2:#9DA4AE; --faint:#D2D6DB;
+  --accent:#E25E25; --accent-hover:#C94F1C; --accent-soft:#F08F65; --accent-tint:#FFF3EE; --accent-tint-2:#FFE2D6;
+  --good:#027A48; --good-bg:#ECFDF3; --good-bd:#ABEFC6;
+  --warn:#B54708; --warn-bg:#FFFAEB; --warn-bd:#FEDF89;
+  --bad:#B42318;  --bad-bg:#FEF3F2;  --bad-bd:#FECDCA;
+  --info:#175CD3; --info-bg:#EFF4FF; --info-bd:#B2CCFF;
+  --approve:#067647; --approve-hover:#055c37;
+  --reject:#D92D20;
+  --correct:#B54708;
+  --c-green:#6AD99E; --c-yellow:#FFC069; --c-orange:#FF9C6E; --c-red:#F97066;
+  --c-line-a:#E25E25; --c-line-b:#85A5FF;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.10);
+  --shadow-lg:0 8px 24px rgba(16,24,40,.12);
+  --radius:8px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+/* Light by default. Dark only when the host explicitly stamps data-theme="dark";
+   the case study pins these screens to light whatever the page theme. */
+:root[data-theme="dark"]{
+  --bg:#111214; --surface:#17181B; --surface-2:#1D1F23;
+  --border:#2C2E33; --border-soft:#242629;
+  --text:#F0F1F2; --text-2:#C9CBCF; --muted:#8E9196; --muted-2:#6B6E74; --faint:#46484D;
+  --accent:#F0743F; --accent-hover:#F5854F; --accent-soft:#F08F65; --accent-tint:#2A211B; --accent-tint-2:#3A2B1F;
+  --good:#75E0A7; --good-bg:#142620; --good-bd:#1F4632;
+  --warn:#FDB750; --warn-bg:#282213; --warn-bd:#5A481F;
+  --bad:#FDA29B;  --bad-bg:#2A1917;  --bad-bd:#5A2A26;
+  --info:#9DB0FF; --info-bg:#181D2B; --info-bd:#2C3859;
+  --approve:#12B76A; --approve-hover:#3BCB86;
+  --reject:#F04438;
+  --correct:#F79009;
+  --c-line-b:#9DB0FF;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.5);
+  --shadow-lg:0 10px 28px rgba(0,0,0,.55);
+}
+
+/* The app shell chrome. Not part of the review screen's own palette, but both
+   surfaces wear it, so it lives here rather than being hardcoded twice. */
+:root {
+  --sidebar: #384250;
+  --sidebar-2: #2E3742;
+  --sidebar-text: rgba(255, 255, 255, 0.78);
+  --sidebar-text-strong: rgba(255, 255, 255, 0.95);
+  --sidebar-hover: rgba(255, 255, 255, 0.06);
+}
+:root[data-theme="dark"], :root:not([data-theme="light"]) {
+  --sidebar: #121316;
+  --sidebar-2: #191A1E;
+}
+
+/* Type scale from the Figma bento (Text md/sm/xs). Titles are Gray/90, not
+   Gray/900: the bento keeps headings a step softer than body numerals. */
+:root{
+  --title:#384250;
+  --t-md:16px; --t-md-lh:24px;
+  --t-sm:14px; --t-sm-lh:20px;
+  --t-xs:12px; --t-xs-lh:18px;
+}
+
+/* Dark: o bloco de type-scale declarava --title so no light; sem override os
+   titulos de card somem no dark. */
+:root[data-theme="dark"]{ --title:#EFF0F2 }

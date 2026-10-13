@@ -212,7 +212,9 @@
 	.hint::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #57cacb; animation: pulse 1.6s ease-in-out infinite; }
 	@keyframes pulse { 50% { opacity: .35; } }
 	.hint.off, .hide-hint .hint { opacity: 0; }
-	html.embed, html.embed body { height: auto; overflow-x: hidden; overflow-y: auto; }
+	html.embed, html.embed body { overflow: hidden; }
+	#scroller { position: absolute; left: 332px; top: 176px; width: 1108px; overflow-x: hidden; overflow-y: auto; background: #fff; overscroll-behavior: contain; }
+	#scroller .scroll-inner { position: absolute; left: -332px; top: -176px; width: 1440px; height: 904px; overflow: hidden; } /* the SVG copy is 1236 tall; clip it so the scroll ends at the Year field */
 	.hint.fixed { position: fixed; top: auto; bottom: 16px; left: 50%; }
 	html.embed .hint.off { opacity: 0; }
 </style>
@@ -358,16 +360,16 @@ function moveTo(x, y, base = 700) {
 	const d = Math.hypot(x - cx, y - cy);
 	const t = FAST ? 1 : Math.round(Math.min(Math.max(base * (0.45 + d / 900), 240), 900) * SPEED);
 	cursor.style.setProperty('--move', t + 'ms');
-	cursor.style.transform = `translate(${x - 5}px, ${y - 3}px)`;
-	cx = x; cy = y;
 	follow(y);
+	cursor.style.transform = `translate(${x - 5}px, ${vis(y) - 3}px)`;
+	cx = x; cy = y;
 	return { t, done: new Promise((r) => setTimeout(r, FAST ? 1 : t + 40)) };
 }
 const go = (x, y, base) => moveTo(x, y, base).done;
 async function press(x, y) {
 	cursor.classList.add('press');
 	const rp = document.createElement('div');
-	rp.className = 'ripple'; rp.style.left = x + 'px'; rp.style.top = y + 'px';
+	rp.className = 'ripple'; rp.style.left = x + 'px'; rp.style.top = vis(y) + 'px';
 	stage.appendChild(rp); setTimeout(() => rp.remove(), 600);
 	await wait(110);
 	cursor.classList.remove('press');
@@ -466,9 +468,11 @@ async function drawPerimeter() {
 
 /* ---------- flow: idle -> filling -> saved -> view (sources) -> edit = start over ---------- */
 let state = 'idle';
+let running = false;
 async function run() {
 	if (state !== 'idle') return;
 	state = 'filling';
+	running = true;
 	stage.classList.remove('idle');
 	say('');
 	cursor.style.opacity = 1;
@@ -484,6 +488,7 @@ async function run() {
 	await wait(900);
 	cursor.style.opacity = 0;
 	state = 'saved';
+	running = false;
 	stage.classList.add('saved');
 	say('Close the form with ✕ to see the saved record');
 }
@@ -494,6 +499,7 @@ async function toView() {
 	say('');
 	for (const r of FILL) r.vv.textContent = r.value;
 	stage.classList.add('view', 'pending');
+	if (scroller) { target = 0; scroller.scrollTo({ top: 0, behavior: 'smooth' }); }
 	stage.classList.remove('saved');
 	// load bar + skeletons
 	const bar = $('loadbar');
@@ -539,6 +545,7 @@ function closeSrc() { $('srcmenu').classList.remove('open'); $('src').classList.
 function startOver() {
 	state = 'idle';
 	stage.className = 'stage idle';
+	if (scroller) { target = 0; scroller.scrollTo({ top: 0, behavior: 'smooth' }); }
 	FILL.forEach(emptyBox);
 	clearPerimeter();
 	$('save').classList.remove('disabled');
@@ -569,23 +576,49 @@ $('cmIcon').addEventListener('click', (e) => { e.stopPropagation(); $('cmPop').c
    frame): the stage fills the width and the page scrolls; the view follows the cursor. */
 const EMBED = new URLSearchParams(location.search).has('embed');
 let scale = 1;
+/* In the embed only the form column scrolls, the way the app does: header and
+   sidebars stay put. The column's layers move into #scroller (x 332+, y 176+),
+   inside a wrapper that keeps the stage's own coordinates. */
+const TOP = 176;
+let scroller = null, viewH = 904, target = 0;
+const vis = (y) => (scroller && y >= TOP ? y - target : y);
 function fit() {
 	if (EMBED) {
 		scale = innerWidth / 1440;
+		viewH = innerHeight / scale;
 		stage.style.transform = `scale(${scale})`;
-		document.body.style.height = Math.ceil(904 * scale) + 'px';
+		stage.style.height = viewH + 'px';
+		scroller.style.height = (viewH - TOP) + 'px';
 		return;
 	}
 	scale = Math.min(innerWidth / 1440, innerHeight / 904);
 	stage.style.transform = `translate(${(innerWidth - 1440 * scale) / 2}px, ${(innerHeight - 904 * scale) / 2}px) scale(${scale})`;
 }
 function follow(y) {
-	if (!EMBED) return;
-	const py = y * scale, top = scrollY, h = innerHeight;
-	if (py < top + 90 || py > top + h - 140) scrollTo({ top: Math.max(0, py - h * 0.45), behavior: FAST ? 'auto' : 'smooth' });
+	if (!scroller || y < TOP) return;
+	const max = 904 - viewH;
+	if (max <= 0) return;
+	const v = y - target;
+	if (v < TOP + 60 || v > viewH - 110) {
+		target = Math.min(max, Math.max(0, Math.round(y - (TOP + (viewH - TOP) * 0.45))));
+		scroller.scrollTo({ top: target, behavior: FAST ? 'auto' : 'smooth' });
+	}
 }
 if (EMBED) {
 	document.documentElement.classList.add('embed');
+	scroller = document.createElement('div');
+	scroller.id = 'scroller';
+	const inner = document.createElement('div');
+	inner.className = 'scroll-inner';
+	const spacer = document.createElement('div');
+	spacer.style.height = (904 - TOP) + 'px';
+	const baseCopy = stage.querySelector('.base').cloneNode();
+	inner.appendChild(baseCopy);
+	stage.querySelectorAll(':scope > .lower, :scope > .cover, :scope > .map, :scope > .comment-veil, :scope > #form, :scope > .cm-icon, :scope > .cm-pop')
+		.forEach((n) => inner.appendChild(n));
+	scroller.append(spacer, inner);
+	stage.querySelector('.base').after(scroller);
+	scroller.addEventListener('scroll', () => { if (!running) target = scroller.scrollTop; }, { passive: true });
 	document.body.appendChild(hint); // pinned to the bottom of the frame, not of the stage
 	hint.classList.add('fixed');
 }

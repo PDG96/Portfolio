@@ -68,7 +68,7 @@
               '<p>A short reminder that names the next step usually moves them.</p>');
           }).then(function(){
             A.chips([
-              { t:'Draft reminders on Home', run:function(){ go('bank-home.html?assist=remind'); } },
+              { t:'Draft reminders on Home', run:function(){ go('bank-home.html?v=8?assist=remind'); } },
               { t:'Who should I review first?', ask:'Who should I review first?' }
             ]);
           });
@@ -80,7 +80,7 @@
             '<p>Its review has two questions open on Registration, so you can read the rest while Tulivu answers.</p>');
         }).then(function(){
           A.chips([
-            { t:'Open Tulivu’s review', run:function(){ go('operator-detail.html'); } },
+            { t:'Open Tulivu’s review', run:function(){ go('operator-detail.html?v=7'); } },
             { t:'Who is stuck?', ask:'Who is stuck?' }
           ]);
         });

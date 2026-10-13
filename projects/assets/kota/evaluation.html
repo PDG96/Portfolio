@@ -47,7 +47,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 .app{display:flex;width:100%;min-width:1440px;min-height:100svh;
      position:relative;padding-left:var(--rail)}
-.btn-sm:hover,.nav:hover,/* The hover band is a panel, not a stripe: it carries its own padding and
+.btn-sm:hover,.nav:hover{transition-duration:0s}
+/* The hover band is a panel, not a stripe: it carries its own padding and
    stops short of the card wall. The table is pulled out by the same amount the
    rows are padded in, so the columns do not move. */
 .tbl{margin:0 -12px}
@@ -216,7 +217,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=4">
 <script src="page-transition.js?v=3"></script>
-<link rel="stylesheet" href="assistant.css?v=3">
+<link rel="stylesheet" href="assistant.css?v=6">
 </head>
 <body>
 <div class="app">
@@ -260,7 +261,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
-        <a href="bank-home.html">Home</a><span class="sep"></span>
+        <a href="bank-home.html?v=8">Home</a><span class="sep"></span>
         <span class="here">Evaluation</span>
       </header>
 
@@ -296,7 +297,6 @@ body{margin:0;background:var(--ground);color:var(--ink);
           <div class="tbody" id="rows"></div>
         </div>
 
-        <p class="foot" id="foot"></p>
       </section>
 
     </div>
@@ -305,9 +305,9 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 <div class="notifpop" id="notifpop" role="menu" aria-label="Notifications">
   <div class="lbl">Notifications</div>
-  <button type="button" data-href="operator-detail.html" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative is ready for your decision</b><span class="m">Today · Evaluation</span></span></button>
-  <button type="button" data-href="operator-detail.html" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative uploaded 2 documents</b><span class="m">Yesterday · Registration</span></span></button>
-  <button type="button" data-href="evaluation.html" role="menuitem" class="old"><span class="dot"></span><span><b>Riverbend cooperative reached 72% of its registration</b><span class="m">3 days ago · Registration</span></span></button>
+  <button type="button" data-href="operator-detail.html?v=7" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative is ready for your decision</b><span class="m">Today · Evaluation</span></span></button>
+  <button type="button" data-href="operator-detail.html?v=7" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative uploaded 2 documents</b><span class="m">Yesterday · Registration</span></span></button>
+  <button type="button" data-href="evaluation.html?v=3" role="menuitem" class="old"><span class="dot"></span><span><b>Riverbend cooperative reached 72% of its registration</b><span class="m">3 days ago · Registration</span></span></button>
 </div>
 
 <div class="seatpop" id="seatpop" role="menu" aria-label="Change seat">
@@ -328,7 +328,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
    ========================================================================== */
 (function(){
 
-  var DETAIL = 'operator-detail.html';
+  var DETAIL = 'operator-detail.html?v=7';
 
   var operators = [
     { name:'Tulivu Cooperative',             place:'Goma, North Kivu', initials:'TC',
@@ -385,13 +385,10 @@ body{margin:0;background:var(--ground);color:var(--ink);
     rows.appendChild(tr);
   });
 
-  document.getElementById('foot').textContent =
-    'Five of the six are still with their operators. They appear here so the desk can see the ' +
-    'whole pipeline, but a review only opens once a registration has been submitted.';
 
   /* ---- rail, header, tooltip: the same behaviour as the other screens ---- */
   document.getElementById('goHome').addEventListener('click', function(){
-    KOTA.go('bank-home.html');
+    KOTA.go('bank-home.html?v=8');
   });
 
 
@@ -406,8 +403,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'operator' ? 'operator-home.html'
-                            : seat === 'start' ? 'start.html' : 'bank-home.html');
+        KOTA.go(seat === 'operator' ? 'operator-home.html?v=6'
+                            : seat === 'start' ? 'start.html' : 'bank-home.html?v=8');
       });
     });
     document.addEventListener('keydown', function(e){
@@ -462,7 +459,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 })();
 </script>
 <script src="motion.js?v=1"></script>
-<script src="assistant.js?v=3"></script>
+<script src="assistant.js?v=5"></script>
 <script src="assist-pages.js?v=1"></script>
 </body>
 </html>

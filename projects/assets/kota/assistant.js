@@ -55,7 +55,17 @@
         '<div class="ka-head">' + orb() +
           '<div><div class="t">Kota Assistant</div>' +
           '<div class="c"><i></i><span>' + esc(cfg.context) + '</span></div></div>' +
+          /* Decision history (Pietra, 2026-10-13): a light entry point, not a full log. */
+          '<button class="ka-x ka-hist" type="button" aria-label="Decision history" aria-expanded="false" title="Decision history">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>' +
+            '<span class="ka-hist-n">3</span></button>' +
           '<button class="ka-x" type="button" aria-label="Close assistant">' + I.x + '</button>' +
+          '<div class="ka-histpop" role="dialog" aria-label="Decision history">' +
+            '<div class="h">Decision history<span>Every change Kota proposed, and what was decided</span></div>' +
+            '<div class="r"><b class="ok">Accepted</b><span>Tax identification number</span><i>From Tax certificate, p.1 · Today</i></div>' +
+            '<div class="r"><b class="no">Dismissed</b><span>VAT registration number</span><i>Reading did not match the certificate · Today</i></div>' +
+            '<div class="r"><b class="ok">Accepted</b><span>Registration date</span><i>From Registration certificate, p.1 · 12 Aug 2025</i></div>' +
+          '</div>' +
         '</div>' +
         '<div class="ka-log" role="log" aria-live="polite"></div>' +
         '<div class="ka-foot">' +
@@ -79,7 +89,16 @@
     menu = panel.querySelector('.ka-menu');
     orbHead = panel.querySelector('.ka-head .ka-orb');
 
-    panel.querySelector('.ka-x').addEventListener('click', function(){ A.close(); });
+    panel.querySelector('.ka-x:not(.ka-hist)').addEventListener('click', function(){ A.close(); });
+    var hb = panel.querySelector('.ka-hist'), hp = panel.querySelector('.ka-histpop');
+    hb.addEventListener('click', function(e){
+      e.stopPropagation();
+      var on = hp.classList.toggle('is-on');
+      hb.setAttribute('aria-expanded', on ? 'true' : 'false');
+    });
+    document.addEventListener('click', function(e){
+      if (!hp.contains(e.target)){ hp.classList.remove('is-on'); hb.setAttribute('aria-expanded', 'false'); }
+    });
     box.addEventListener('input', function(){ grow(); sync(); });
     box.addEventListener('keydown', function(e){
       if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); submit(); }
@@ -350,8 +369,24 @@
   /* The mark an assistant-written thing carries on the page. */
   A.mark = function(text, badge){
     return '<span class="ka-mark">' + I.spark + esc(text) +
-      (badge ? '<span class="ka-badge ka-badge--check">' + esc(badge) + '</span>' : '') + '</span>';
+      (badge ? '<span class="ka-badge ka-badge--check">' + esc(badge) + '</span>' : '') +
+      /* Every answer Kota wrote links back to the decision that let it in. */
+      '<a class="ka-histlink" href="#" data-ka-hist>View in history</a></span>';
   };
+  /* Opens the panel with the decision history showing. */
+  A.openHistory = function(){
+    A.open();
+    setTimeout(function(){
+      var hp = panel && panel.querySelector('.ka-histpop'), hb = panel && panel.querySelector('.ka-hist');
+      if (hp){ hp.classList.add('is-on'); hb.setAttribute('aria-expanded', 'true'); }
+    }, 60);
+  };
+  document.addEventListener('click', function(e){
+    var l = e.target.closest && e.target.closest('[data-ka-hist]');
+    if (!l) return;
+    e.preventDefault(); e.stopPropagation();
+    A.openHistory();
+  }, true);
 
   A.glow = function(node){
     if (!node) return;

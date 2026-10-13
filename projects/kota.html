@@ -861,6 +861,29 @@
  border: 1px solid var(--border);
  }
 
+ /* ====== PRESENTATION MODE ======
+    Only the case column on screen: nav, sidebar and the rounded sheet frame go,
+    the sheet fills the browser window. */
+ .present-btn {
+ display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem;
+ padding: 0.55rem 0.9rem; border: 1px solid var(--border); border-radius: 999px; background: transparent;
+ font: 500 0.8125rem/1 var(--font); color: var(--text); cursor: pointer; transition: background .2s, border-color .2s;
+ }
+ .present-btn:hover { background: var(--accent-yellow); border-color: transparent; color: var(--gray-true-900); }
+ .present-btn svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+ @media (max-width: 900px) { .present-btn { display: none; } }
+ body.presenting .nav, body.presenting .sidebar, body.presenting .mobile-menu, body.presenting .seg { display: none; }
+ body.presenting .shell { inset: 0; padding: 0; }
+ body.presenting .main-sheet { border: 0; border-radius: 0; }
+ .present-exit {
+ position: fixed; top: 14px; right: 18px; z-index: 50; display: none; align-items: center; gap: 0.5rem;
+ padding: 0.45rem 0.6rem 0.45rem 0.8rem; border: 1px solid var(--border); border-radius: 999px; background: var(--sheet);
+ font: 500 0.75rem/1 var(--font); color: var(--text-2); cursor: pointer; opacity: 0.35; transition: opacity .2s;
+ }
+ .present-exit:hover { opacity: 1; }
+ .present-exit kbd { font: 500 0.625rem/1 var(--mono); padding: 0.2rem 0.35rem; border: 1px solid var(--border); border-radius: 4px; }
+ body.presenting .present-exit { display: inline-flex; }
+
  /* ====== CASE SECTIONS (shared) ====== */
  .case-section {
  padding: var(--section-py) 0;
@@ -4181,6 +4204,10 @@
  </div>
  </div>
 
+ <button type="button" class="present-btn r" id="presentBtn">
+ <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zM8 20h8M12 16v4"/></svg>
+ Presentation mode
+ </button>
  </div><!-- /.sidebar-intro -->
 
  <div class="sidebar-next">
@@ -4256,15 +4283,15 @@
       so the beat needs no section header of its own. -->
  <section class="case-section">
  <div class="wrap">
- <p class="case-section-label r" data-i18n="who_label">Who It Is For</p>
- <h2 class="r" data-i18n="who_title">Two users, and what each one is blocked by.</h2>
- <p class="explore-intro r" data-i18n="who_intro">A cooperative needs an account and has no record that proves it exists. A reviewer needs to decide and has nothing solid to decide on. Everything below starts from those two positions.</p>
+ <p class="case-section-label r" data-i18n="who_label">The problem and the users</p>
+ <h2 class="r" data-i18n="who_title">Small producers needed a better way to apply for a bank account.</h2>
+ <p class="explore-intro r" data-i18n="who_intro">Applications arrived as handwritten forms that bank agents filled in on their behalf, so they were hard to verify. Two people meet in that process, the operator who applies and the bank reviewer who decides.</p>
 
    <!-- Problem statement board: the ask in one sentence, three sourced numbers under it. -->
    <figure class="app-shot app-shot--video r">
    <div class="video-frame">
    <video muted loop playsinline preload="metadata"
-   src="assets/kota-problem-statement.mp4?v=13"
+   src="assets/kota-problem-statement.mp4?v=14"
    aria-label="Problem statement board, animated: small producers in extractive industries need a better way to apply for banking. Applications arrived as handwritten forms completed by bank agents, making them difficult to verify and evaluate. Cards cycle through, including one where only 39% of adults in the DRC have a bank account. Sources: World Bank Global Findex 2025; EU Regulation 2017/821, in force since 1 January 2021."></video>
    </div>
    <figcaption class="cap"><span data-i18n="cap1_d">39% of adults with a bank account, 8.7% of firms with a loan, EU due-diligence rules since 2021, and where those numbers come from.</span></figcaption>
@@ -4279,17 +4306,6 @@
    <figcaption class="cap"><span data-i18n="cap2_d">What each side needs, and what holds it back.</span></figcaption>
    </figure>
 
-   <!-- The personas as text, so they read without playing the videos. -->
-   <div class="cs-grid who-personas r">
-   <div class="cs-block">
-   <span class="cs-block-label" data-i18n="persona_op_label">The operator</span>
-   <p data-i18n="persona_op_p">A cooperative that needs a bank account. Blocked by: no record that proves it exists.</p>
-   </div>
-   <div class="cs-block">
-   <span class="cs-block-label" data-i18n="persona_rev_label">The reviewer</span>
-   <p data-i18n="persona_rev_p">A compliance analyst at the bank. Blocked by: nothing solid to decide on.</p>
-   </div>
-   </div>
 
    <!-- Removed for now, per Pietra's request — kept commented out, not
         deleted, so it's a one-line revert.
@@ -4341,19 +4357,8 @@
  <section class="case-section">
  <div class="wrap">
  <p class="case-section-label r" data-i18n="prod_label">The Product</p>
- <h2 class="r" data-i18n="prod_title">One file, read in one pass.</h2>
- <p class="explore-intro r" data-i18n="prod_intro">One record, filled once by the operator and read by every bank they apply to. Below: the file a reviewer opens, and the same bank screen at wireframe stage and at handover.</p>
-
-   <!-- The dashboard bento. Screen capture at 2x; it scrolls down and back, and
-        the last frame matches the first, so it loops with no visible seam. -->
-   <figure class="app-shot app-shot--video r">
-   <div class="video-frame">
-   <video muted loop playsinline preload="metadata"
-   src="assets/kota-bento.mp4?v=5"
-   aria-label="Scrolling through the KOTA dashboard: declared settlement profile, declared volume by mineral, key risk indicators, score build-up, counterparties by grade, documentation status, overall risk score and trade relationships."></video>
-   </div>
-   <figcaption class="cap"><span data-i18n="cap3_d">Score, risk, documents and counterparties, in one read.</span></figcaption>
-   </figure>
+ <h2 class="r" data-i18n="prod_title">The operator fills in one file, and every bank reads the same one.</h2>
+ <p class="explore-intro r" data-i18n="prod_intro">The bank's screen at wireframe stage and at handover, then the dashboard a reviewer works from.</p>
 
    <!-- Lowfi/handover compare, before the interactive prototypes: same
         bank landing dashboard, wireframe stage vs. the shipped screen. -->
@@ -4371,6 +4376,20 @@
    </div>
    <figcaption class="cap"><span data-i18n="cap4_d">The same screen at both ends of the work. Drag to compare.</span></figcaption>
    </figure>
+
+   <!-- AI: slot reserved between the compare and the bento (Pietra, 2026-10-13), content to come. -->
+
+   <!-- The dashboard bento. Screen capture at 2x; it scrolls down and back, and
+        the last frame matches the first, so it loops with no visible seam. -->
+   <figure class="app-shot app-shot--video r">
+   <div class="video-frame">
+   <video muted loop playsinline preload="metadata"
+   src="assets/kota-bento.mp4?v=5"
+   aria-label="Scrolling through the KOTA dashboard: declared settlement profile, declared volume by mineral, key risk indicators, score build-up, counterparties by grade, documentation status, overall risk score and trade relationships."></video>
+   </div>
+   <figcaption class="cap"><span data-i18n="cap3_d">Score, risk, documents and counterparties, in one read.</span></figcaption>
+   </figure>
+
 
    <!-- DRAFT (A6), hidden until Pietra fills in the three changes. Add PT keys when it goes live.
    <ul class="reveal-notes r">
@@ -4398,6 +4417,45 @@
 
  <!-- ====== THE BRIEF (pull quote) ====== -->
 
+ <!-- ====== DATA COLLECTION (was Data compilation) ======
+      A copy of the live prototype (assets/kota-compilation/), separate so it can change on its own. -->
+ <section class="case-section case-section--proto">
+ <div class="wrap">
+ <p class="case-section-label" data-i18n="comp_label">Data collection</p>
+ <h2 data-i18n="comp_title">The file comes together from both sides.</h2>
+ <p class="explore-intro" data-i18n="comp_intro">The operator fills in the registration and answers the bank's questions. The bank reads the same record as it fills in.</p>
+
+ <figure class="app-shot app-shot--embed app-shot--front r">
+ <div class="proto-stack" data-base="assets/kota-compilation/">
+ <button class="embed-frame proto-open" type="button" 
+         aria-label="Open the prototype full size">
+  <iframe class="embed-iframe embed-iframe--app" src="assets/kota-compilation/operator-home-empty.html?v=23"
+ title="KOTA, the operator's seat the day the registration is done: an empty home with one next step, the assessment."
+ loading="lazy" tabindex="-1" scrolling="no"></iframe>
+  <span class="embed-hint" aria-hidden="true"><span class="hand">
+    <svg viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-8 8M3 21l8-8"/></svg>
+    <span data-i18n="hint_seat">Interactive · click to open</span>
+  </span></span>
+ </button>
+
+ <div class="seatswitch-row">
+   <span aria-hidden="true"></span>
+   <div class="seatswitch" role="tablist" aria-label="Choose a seat">
+     <span class="ss-thumb" aria-hidden="true"></span>
+     <button class="ss-opt" type="button" role="tab" aria-selected="false"
+             data-seat="bank" data-title="KOTA · Banque Orimu" data-src="assets/kota-compilation/operator-detail.html?v=7"
+             data-i18n="seat_bank">Be the bank</button>
+     <button class="ss-opt is-on" type="button" role="tab" aria-selected="true"
+             data-seat="operator" data-title="KOTA · Tulivu Cooperative" data-src="assets/kota-compilation/operator-home-empty.html?v=23"
+             data-i18n="seat_op">Be the operator</button>
+   </div>
+   <span aria-hidden="true"></span>
+ </div>
+ </div>
+  </figure>
+ </div>
+ </section>
+
  <!-- ====== THE PROTOTYPE, LIVE ======
       One prototype, and the choice it is about put where a reader can flip it
       without committing: a switch above the frame rather than a door in front
@@ -4407,7 +4465,7 @@
       it and the same file appears from the other end. -->
  <section class="case-section case-section--proto">
  <div class="wrap">
- <p class="case-section-label" data-i18n="proto_label">The Prototype, Live</p>
+ <p class="case-section-label" data-i18n="proto_label">Data visualisation</p>
  <h2 data-i18n="proto_title">Be the bank, or be the operator.</h2>
  <p class="explore-intro" data-i18n="proto_intro">One record, two seats. As the bank, you see your applicants on a map, the evaluation list, and a file to approve, question or decline. As the operator, you see the same file from the other side: your score, the reviewer's questions, and the form to answer them. Switch sides from the sidebar.</p>
 
@@ -4415,7 +4473,7 @@
  <div class="proto-stack">
  <button class="embed-frame proto-open" type="button" id="protoOpen"
          aria-label="Open the prototype full size">
-  <iframe class="embed-iframe embed-iframe--app" id="protoFrame" src="assets/kota/bank-home.html?v=3"
+  <iframe class="embed-iframe embed-iframe--app" id="protoFrame" src="assets/kota/bank-home.html?v=8"
  title="KOTA, the bank's seat: Banque Orimu's North Kivu desk, with its counts, its operators on a map, the latest movement and what has stalled."
  loading="lazy" tabindex="-1" scrolling="no"></iframe>
   <span class="embed-hint" aria-hidden="true"><span class="hand">
@@ -4430,10 +4488,10 @@
    <div class="seatswitch" role="tablist" aria-label="Choose a seat">
      <span class="ss-thumb" aria-hidden="true"></span>
      <button class="ss-opt is-on" type="button" role="tab" aria-selected="true"
-             data-seat="bank" data-src="assets/kota/bank-home.html"
+             data-seat="bank" data-title="KOTA · Banque Orimu" data-src="assets/kota/bank-home.html?v=8"
              data-i18n="seat_bank">Be the bank</button>
      <button class="ss-opt" type="button" role="tab" aria-selected="false"
-             data-seat="operator" data-src="assets/kota/operator-home.html"
+             data-seat="operator" data-title="KOTA · Tulivu Cooperative" data-src="assets/kota/operator-home.html?v=6"
              data-i18n="seat_op">Be the operator</button>
    </div>
    <span aria-hidden="true"></span>
@@ -4443,6 +4501,7 @@
  </figure>
  </div>
  </section>
+
 
 
  <!-- DRAFT (B5 Testing, version 1: use if there was any validation. Keep only one version). Hidden until it is ready; add PT keys when it goes live.
@@ -4495,6 +4554,7 @@
 
  </div><!-- /.main-sheet -->
  </div><!-- /.shell -->
+ <button type="button" class="present-exit" id="presentExit">Exit presentation <kbd>Esc</kbd></button>
 
  <script>
  /* ------- i18n (EN / PT-BR) ------- */
@@ -4623,17 +4683,20 @@
  brief_in2_v: "One-line briefings, like the one above.",
  brief_in3_k: "The voice",
  brief_in3_v: "Features that lived in the founder's head, told in conversation, never written down.",
- proto_label: "The Prototype, Live",
+ proto_label: "Data visualisation",
+ comp_label: "Data collection",
+ comp_title: "The file comes together from both sides.",
+ comp_intro: "The operator fills in the registration and answers the bank's questions. The bank reads the same record as it fills in.",
  proto_title: "Be the bank, or be the operator.",
  proto_intro: "One record, two seats. As the bank, you see your applicants on a map, the evaluation list, and a file to approve, question or decline. As the operator, you see the same file from the other side: your score, the reviewer's questions, and the form to answer them. Switch sides from the sidebar.",
  hint_seat: "Interactive · click to open",
  fig_front: "The same record, read from either seat.",
- who_label: "Who It Is For",
- who_title: "Two users, and what each one is blocked by.",
- who_intro: "A cooperative needs an account and has no record that proves it exists. A reviewer needs to decide and has nothing solid to decide on. Everything below starts from those two positions.",
+ who_label: "The problem and the users",
+ who_title: "Small producers needed a better way to apply for a bank account.",
+ who_intro: "Applications arrived as handwritten forms that bank agents filled in on their behalf, so they were hard to verify. Two people meet in that process, the operator who applies and the bank reviewer who decides.",
  prod_label: "The Product",
- prod_title: "One file, read in one pass.",
- prod_intro: "One record, filled once by the operator and read by every bank they apply to. Below: the file a reviewer opens, and the same bank screen at wireframe stage and at handover.",
+ prod_title: "The operator fills in one file, and every bank reads the same one.",
+ prod_intro: "The bank's screen at wireframe stage and at handover, then the dashboard a reviewer works from.",
  cap1_d: "39% of adults with a bank account, 8.7% of firms with a loan, EU due-diligence rules since 2021, and where those numbers come from.",
  cap2_d: "What each side needs, and what holds it back.",
  persona_op_label: "The operator",
@@ -4813,17 +4876,20 @@
  brief_in2_v: "Briefings de uma linha, como o de cima.",
  brief_in3_k: "A voz",
  brief_in3_v: "Funcionalidades que viviam na cabeça do fundador, contadas em conversa, nunca escritas.",
- proto_label: "O Protótipo, Ao Vivo",
+ proto_label: "Visualização de dados",
+ comp_label: "Coleta de dados",
+ comp_title: "O arquivo se forma pelos dois lados.",
+ comp_intro: "O operador preenche o registro e responde às perguntas do banco. O banco lê o mesmo registro enquanto ele é preenchido.",
  proto_title: "Seja o banco, ou seja o operador.",
  proto_intro: "Um registro, dois assentos. Como banco, você vê seus candidatos no mapa, a lista de avaliação e uma ficha para aprovar, questionar ou recusar. Como operador, você vê a mesma ficha pelo outro lado: sua nota, as perguntas do revisor e o formulário para respondê-las. Troque de lado pela barra lateral.",
  hint_seat: "Interativo · clique para abrir",
  fig_front: "O mesmo registro, lido pelos dois assentos.",
- who_label: "Para Quem É",
- who_title: "Dois usuários, e o que trava cada um.",
- who_intro: "Uma cooperativa precisa de conta e não tem registro que prove que existe. Um revisor precisa decidir e não tem base sólida para decidir. Tudo abaixo parte dessas duas posições.",
+ who_label: "O problema e os usuários",
+ who_title: "Pequenos produtores precisavam de um jeito melhor de pedir uma conta no banco.",
+ who_intro: "Os pedidos chegavam em formulários escritos à mão, preenchidos por agentes do banco no lugar deles, e eram difíceis de verificar. Duas pessoas se encontram nesse processo, o operador que pede e o revisor do banco que decide.",
  prod_label: "O Produto",
- prod_title: "Uma ficha, lida de uma vez.",
- prod_intro: "Um registro, preenchido uma vez pelo operador e lido por todo banco a que ele se candidata. Abaixo: a ficha que um revisor abre, e a mesma tela do banco no wireframe e no handover.",
+ prod_title: "O operador preenche uma ficha, e todo banco lê a mesma.",
+ prod_intro: "A tela do banco no wireframe e no handover, e depois o dashboard em que o revisor trabalha.",
  cap1_d: "39% dos adultos com conta em banco, 8,7% das empresas com crédito, regras de due diligence da UE desde 2021, e de onde vêm esses números.",
  cap2_d: "O que cada lado precisa, e o que trava cada um.",
  persona_op_label: "O operador",
@@ -5116,6 +5182,23 @@ setLang(lang);
 
  })();
 
+ /* Presentation mode: toggles body.presenting, filling the browser window only
+    (no fullscreen, Pietra's screen is very wide). Esc brings the sidebar and nav back. */
+ (() => {
+ const btn = document.getElementById('presentBtn');
+ const exit = document.getElementById('presentExit');
+ if (!btn) return;
+ const on = () => {
+ document.body.classList.add('presenting');
+ };
+ const off = () => {
+ document.body.classList.remove('presenting');
+ };
+ btn.addEventListener('click', on);
+ exit.addEventListener('click', off);
+ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('presenting')) off(); });
+ })();
+
  // Custom cursor
  (() => {
  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
@@ -5298,19 +5381,31 @@ setLang(lang);
  });
  })();
 
+ /* The Data collection demo keeps what is saved for the visit; a fresh load of
+    the case starts it empty again. */
+ try { sessionStorage.removeItem('kota-comp-kyc'); sessionStorage.removeItem('kota-comp-ms'); } catch (err) {}
+
  /* ---- the seat switch and the overlay ----
-    One controller for both: the inline frame and the overlay show the same
-    seat, so throwing the switch in either place moves both. The overlay is
-    built once, on first use, rather than sitting in the document unused. */
+    One controller for every prototype on the page (the live one and the Data
+    compilation copy). Each .proto-stack is its own instance: its own seat, its
+    own frame, its own pages (data-base). The overlay is shared and follows
+    whichever instance opened it. */
  (function () {
- var SEATS = {
- bank:     { src: 'assets/kota/bank-home.html',     t: 'KOTA · Banque Orimu' },
- operator: { src: 'assets/kota/operator-home.html', t: 'KOTA · Tulivu Cooperative' }
- };
- var seat = 'bank';
- var frame = document.getElementById('protoFrame');
- if (!frame) return;
- var lb = null, lbFrame = null;
+ var stacks = [].slice.call(document.querySelectorAll('.proto-stack'));
+ if (!stacks.length) return;
+ var INST = stacks.map(function (stack) {
+ var seats = {};
+ stack.querySelectorAll('.ss-opt').forEach(function (b) {
+ seats[b.getAttribute('data-seat')] = { src: b.getAttribute('data-src'), t: b.getAttribute('data-title') || 'KOTA' };
+ });
+ var on = stack.querySelector('.ss-opt.is-on');
+ var seat = on ? on.getAttribute('data-seat') : 'bank';   /* each stack opens on the seat its switch marks */
+ /* A stack without a switch shows one page (data-src / data-title on the stack). */
+ if (!Object.keys(seats).length) { seats.only = { src: stack.getAttribute('data-src'), t: stack.getAttribute('data-title') || 'KOTA' }; seat = 'only'; }
+ return { stack: stack, frame: stack.querySelector('.embed-iframe--app'), opener: stack.querySelector('.proto-open'),
+ base: stack.getAttribute('data-base') || 'assets/kota/', seats: seats, seat: seat, single: seat === 'only' };
+ });
+ var lb = null, lbFrame = null, active = INST[0];
 
  /* The thumb is measured, not hard-coded: the two labels are different
     lengths, and they change length again in Portuguese. */
@@ -5321,44 +5416,44 @@ setLang(lang);
  thumb.style.width = on.offsetWidth + 'px';
  thumb.style.transform = 'translateX(' + (on.offsetLeft - 3) + 'px)';
  }
-
- function paint() {
- document.querySelectorAll('.seatswitch').forEach(function (sw) {
+ function paintSwitch(sw, seat) {
  sw.querySelectorAll('.ss-opt').forEach(function (b) {
  var on = b.getAttribute('data-seat') === seat;
  b.classList.toggle('is-on', on);
  b.setAttribute('aria-selected', on ? 'true' : 'false');
  });
  fitThumb(sw);
+ }
+ function paint() {
+ INST.forEach(function (inst) {
+ inst.stack.querySelectorAll('.seatswitch').forEach(function (sw) { paintSwitch(sw, inst.seat); });
  });
+ if (lb) lb.querySelectorAll('.seatswitch').forEach(function (sw) { paintSwitch(sw, active.seat); });
  }
 
- function setSeat(next) {
- if (next === seat) return;
- seat = next;
+ function setSeat(inst, next) {
+ if (next === inst.seat) return;
+ inst.seat = next;
  paint();
- /* Both frames follow the switch, so the inline preview and the overlay can
-    never be showing two different sides of the same record. */
  /* The dip is the switch being felt: the frame drops out, the new seat
-    loads behind it, and it comes back. Without it the swap is silent and
-    the control looks like it did nothing on a slow load. */
+    loads behind it, and it comes back. */
+ var frame = inst.frame;
  frame.classList.add('is-swapping');
  frame.addEventListener('load', function once() {
  frame.removeEventListener('load', once);
  requestAnimationFrame(function () { frame.classList.remove('is-swapping'); });
  setTimeout(function () { frame.classList.remove('is-swapping'); }, 700);
  });
- frame.src = SEATS[seat].src + '?v=3';
- if (lbFrame && lbFrame.src.indexOf('about:blank') === -1) {
- lbFrame.src = SEATS[seat].src + '?v=3';
- }
- if (lb) lb.querySelector('.t').textContent = SEATS[seat].t;
+ frame.src = inst.seats[next].src;
+ if (inst === active && lbFrame && lbFrame.src.indexOf('about:blank') === -1) lbFrame.src = inst.seats[next].src;
+ if (lb && inst === active) lb.querySelector('.t').textContent = inst.seats[next].t;
  }
 
  document.addEventListener('click', function (e) {
  var b = e.target.closest && e.target.closest('.ss-opt');
  if (!b) return;
- setSeat(b.getAttribute('data-seat'));
+ var inst = (lb && lb.contains(b)) ? active : INST.filter(function (i) { return i.stack.contains(b); })[0];
+ if (inst) setSeat(inst, b.getAttribute('data-seat'));
  });
 
  /* ---- the overlay ---- */
@@ -5386,7 +5481,7 @@ setLang(lang);
  lbFrame = lb.querySelector('iframe');
  /* Once the pointer is inside the app, its document owns the keyboard, so
     Escape never reaches this page. Same origin, so the overlay listens from
-    in there too and the key works wherever the focus happens to be. */
+    in there too. */
  lbFrame.addEventListener('load', function () {
  try {
  lbFrame.contentDocument.addEventListener('keydown', function (ev) {
@@ -5399,12 +5494,15 @@ setLang(lang);
  });
  }
 
- var lastFocus = null;
- function open(url) {
+ var lastFocus = null, closeTimer = null;
+ function open(inst, url) {
  if (!lb) build();
+ clearTimeout(closeTimer);
+ active = inst;
+ lb.querySelector('.seatswitch-row').style.display = inst.single ? 'none' : '';
  lastFocus = document.activeElement;
- lb.querySelector('.t').textContent = SEATS[seat].t;
- lbFrame.src = (url || SEATS[seat].src) + '?v=3';
+ lb.querySelector('.t').textContent = inst.seats[inst.seat].t;
+ lbFrame.src = url || inst.seats[inst.seat].src;
  lb.classList.add('is-on');
  document.body.style.overflow = 'hidden';
  paint();
@@ -5416,7 +5514,7 @@ setLang(lang);
  if (!lb) return;
  lb.classList.remove('is-in');
  document.body.style.overflow = '';
- setTimeout(function () {
+ closeTimer = setTimeout(function () {
  lb.classList.remove('is-on');
  lbFrame.src = 'about:blank';
  }, 220);
@@ -5426,20 +5524,17 @@ setLang(lang);
  if (e.key === 'Escape' && lb && lb.classList.contains('is-on')) close();
  });
 
- var opener = document.getElementById('protoOpen');
- if (opener) opener.addEventListener('click', function () { open(); });
+ INST.forEach(function (inst) {
+ if (inst.opener) inst.opener.addEventListener('click', function () { open(inst); });
 
  /* The preview renders at the width the app is drawn to and is scaled to the
-    column, so the layout arrives whole instead of cropped. The height is the
-    frame's own height divided back out, so the iframe fills it exactly. */
+    column, so the layout arrives whole instead of cropped. */
  function fitPreview() {
- var box = frame.parentElement;
+ var frame = inst.frame, box = frame.parentElement;
  var w = box.clientWidth, h = box.clientHeight;
  if (!w || !h) return;
- /* Below 760 the column is narrower than the app's own mobile breakpoint, so
-    scaling a 1440 layout into it would be a quarter-size picture of the wrong
-    layout. There it renders at its real width and shows the phone design,
-    which is the honest preview at that size. */
+ /* Below 760 the column is narrower than the app's own mobile breakpoint:
+    render at real width and show the phone design. */
  if (w < 760) {
  frame.style.width = '100%';
  frame.style.height = h + 'px';
@@ -5451,26 +5546,21 @@ setLang(lang);
  frame.style.width = '1440px';
  frame.style.height = Math.ceil(h / k) + 'px';
  frame.style.setProperty('--k', k);
- /* The iframe rounds its own top corners rather than relying on the frame to
-    clip them: it is scaled, which puts it on its own compositing layer, and a
-    composited child does not reliably honour an ancestor's rounded clip. The
-    radius is divided by the scale so it lands at 13px on screen, not 13 times
-    k. */
  frame.style.borderRadius = (13 / k).toFixed(1) + 'px ' + (13 / k).toFixed(1) + 'px 0 0';
  }
  fitPreview();
  addEventListener('resize', fitPreview);
- if ('ResizeObserver' in window) {
- new ResizeObserver(fitPreview).observe(frame.parentElement);
- }
+ if ('ResizeObserver' in window) new ResizeObserver(fitPreview).observe(inst.frame.parentElement);
+ });
 
- /* A seat chosen inside the front door, when it is the page being shown,
-    asks for the prototype rather than navigating the frame it sits in. */
+ /* A seat chosen inside the front door asks for the prototype rather than
+    navigating the frame it sits in. Same-folder pages of the instance it came from. */
  addEventListener('message', function (e) {
  if (!e.data || e.data.kota !== 'open' || !e.data.url) return;
  var url = String(e.data.url);
- if (!/^[a-z0-9-]+\.html$/i.test(url)) return;      // same-folder pages only
- open('assets/kota/' + url);
+ if (!/^[a-z0-9-]+\.html(\?v=\d+)?$/i.test(url)) return;
+ var inst = INST.filter(function (i) { return i.frame.contentWindow === e.source; })[0] || active;
+ open(inst, inst.base + url);
  });
 
  paint();

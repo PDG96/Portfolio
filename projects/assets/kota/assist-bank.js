@@ -160,7 +160,7 @@
         '<p>Both registrations are waiting on the operator, so a reminder is the next step.</p>');
     }).then(function(){
       A.chips([
-        { t:'Open Tulivu’s review', run:function(){ go('operator-detail.html'); } },
+        { t:'Open Tulivu’s review', run:function(){ go('operator-detail.html?v=7'); } },
         { t:'Draft reminders for Mweka and Matoro', ask:'Draft reminders for Mweka and Matoro' }
       ]);
     });
@@ -269,7 +269,7 @@
     }
     if (/tulivu|review|decision|open/.test(t) && !/today|need|first/.test(t)){
       return A.bot('Tulivu’s file is ready for your decision. Taking you there.')
-        .then(function(){ return A.wait(700); }).then(function(){ go('operator-detail.html'); });
+        .then(function(){ return A.wait(700); }).then(function(){ go('operator-detail.html?v=7'); });
     }
     if (/need|today|first|priorit|attention|what now|hoje|o que/.test(t)) return today();
     return A.bot('On this dashboard I can rank what needs you, chart where each applicant stands, and draft reminders for the ones who stalled.')

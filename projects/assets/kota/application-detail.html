@@ -75,7 +75,7 @@
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=4">
 <script src="page-transition.js?v=3"></script>
-<link rel="stylesheet" href="assistant.css?v=3">
+<link rel="stylesheet" href="assistant.css?v=6">
 </head>
 <body>
 <div class="app">
@@ -85,8 +85,8 @@
   <div class="main">
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
-        <a href="operator-home.html">Home</a><span class="sep"></span>
-        <a href="operator-applications.html">Applications</a><span class="sep"></span>
+        <a href="operator-home.html?v=6">Home</a><span class="sep"></span>
+        <a href="operator-applications.html?v=2">Applications</a><span class="sep"></span>
         <span class="here">Banque Orimu</span>
       </header>
       <div class="ophead">
@@ -162,7 +162,7 @@
 </div>
 <div class="ctip" id="ctip" role="status" aria-live="polite"></div>
 
-<script src="operator-shell.js?v=1"></script>
+<script src="operator-shell.js?v=2"></script>
 <script>
 /* ==========================================================================
    The same four sections, the same answers and the same two questions the
@@ -242,12 +242,12 @@
   }).join('');
 
   document.addEventListener('click', function(e){
-    if (e.target.closest && e.target.closest('[data-form]')) KOTA.go('operator-form.html');
+    if (e.target.closest && e.target.closest('[data-form]')) KOTA.go('operator-form.html?v=7');
   });
 })();
 </script>
 <script src="motion.js?v=1"></script>
-<script src="assistant.js?v=3"></script>
+<script src="assistant.js?v=5"></script>
 <script src="assist-pages.js?v=1"></script>
 </body>
 </html>

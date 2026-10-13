@@ -302,7 +302,7 @@ select.finput{appearance:none;cursor:pointer;
 </style>
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=5">
-<link rel="stylesheet" href="assistant.css?v=3">
+<link rel="stylesheet" href="assistant.css?v=6">
 <script src="page-transition.js?v=3"></script>
 </head>
 <body>
@@ -313,7 +313,7 @@ select.finput{appearance:none;cursor:pointer;
   <div class="main">
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
-        <a href="operator-home.html">Home</a><span class="sep"></span>
+        <a href="operator-home.html?v=6">Home</a><span class="sep"></span>
         <span class="here">Your information</span>
       </header>
       <div class="ophead">
@@ -411,7 +411,7 @@ select.finput{appearance:none;cursor:pointer;
   <span id="toastText"></span>
 </div>
 
-<script src="operator-shell.js?v=1"></script>
+<script src="operator-shell.js?v=2"></script>
 <script>
 /* ==========================================================================
    The same four sections the bank reads in its read-only view, with the same
@@ -811,6 +811,12 @@ select.finput{appearance:none;cursor:pointer;
       if (f.ai && window.KotaAssistant) body += KotaAssistant.mark('From ' + f.ai.src, f.ai.check ? 'Check this' : '');
       var gap = showGaps && !isAnswered(f);
       var solved = f.ask && isAnswered(f);
+      /* The green "Answered" box is a moment, not a state: it shows for a few
+         seconds after the answer lands, then the question leaves the form.
+         The source line under the answer stays. */
+      if (solved && !f._solvedAt) f._solvedAt = Date.now();
+      if (!solved) delete f._solvedAt;
+      var flash = solved && (Date.now() - f._solvedAt < 3200);
       return '<div class="field' + (f.ask ? ' field--asked' : '') +
         (solved ? ' field--resolved' : '') + (gap ? ' field--missing' : '') +
         '" data-f="' + s.fields.indexOf(f) + '">' +
@@ -819,7 +825,7 @@ select.finput{appearance:none;cursor:pointer;
         /* Only where the bank has not already said it: two notices on one
            field is one notice too many. */
         (gap && !f.ask ? '<span class="miss">' + ALERT + 'Not answered yet</span>' : '') +
-        (f.ask ? '<div class="asked"><div class="who">' + CHAT + f.ask.who + '</div>' +
+        (f.ask && (!solved || flash) ? '<div class="asked"><div class="who">' + CHAT + f.ask.who + '</div>' +
                  '<div class="txt">' + f.ask.txt + '</div>' +
                  '<div class="when">' + f.ask.when + '</div>' +
                  '<div class="done">' + CHECK +
@@ -832,6 +838,18 @@ select.finput{appearance:none;cursor:pointer;
        rail, the group tallies and the bar all move as the form is filled. */
     [].forEach.call(document.querySelectorAll('#fields .field'), function(el){
       var f = s.fields[+el.getAttribute('data-f')];
+      if (f._solvedAt && f.ask && isAnswered(f)){
+        var box = el.querySelector('.asked');
+        if (box){
+          var left = Math.max(0, 3200 - (Date.now() - f._solvedAt));
+          setTimeout(function(){
+            box.style.transition = 'opacity .35s ease, max-height .35s ease, margin .35s ease';
+            box.style.overflow = 'hidden'; box.style.maxHeight = box.offsetHeight + 'px';
+            requestAnimationFrame(function(){ box.style.opacity = 0; box.style.maxHeight = 0; box.style.marginTop = 0; });
+            setTimeout(function(){ box.remove(); }, 380);
+          }, left);
+        }
+      }
 
       [].forEach.call(el.querySelectorAll('.choice .opt'), function(o, i){
         o.addEventListener('click', function(){
@@ -1051,8 +1069,8 @@ select.finput{appearance:none;cursor:pointer;
 
 })();
 </script>
-<script src="assistant.js?v=3"></script>
-<script src="assist-form.js?v=3"></script>
+<script src="assistant.js?v=5"></script>
+<script src="assist-form.js?v=4"></script>
 <script src="motion.js?v=1"></script>
 </body>
 </html>

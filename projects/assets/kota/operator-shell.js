@@ -43,9 +43,9 @@
   /* The two questions the reviewer left are the operator's notifications:
      there is no second feed, it is the same record read as an inbox. */
   var NOTES = [
-    { t:'Banque Orimu asked about your tax identification number', m:'Today · N. Okonkwo', href:'operator-form.html' },
-    { t:'Banque Orimu asked about your VAT registration number',   m:'Today · N. Okonkwo', href:'operator-form.html' },
-    { t:'Your file was sent to Banque Orimu',                      m:'10 Aug 2025', href:'operator-applications.html', old:true }
+    { t:'Banque Orimu asked about your tax identification number', m:'Today · N. Okonkwo', href:'operator-form.html?v=7' },
+    { t:'Banque Orimu asked about your VAT registration number',   m:'Today · N. Okonkwo', href:'operator-form.html?v=7' },
+    { t:'Your file was sent to Banque Orimu',                      m:'10 Aug 2025', href:'operator-applications.html?v=2', old:true }
   ];
 
   function svg(path){
@@ -69,9 +69,9 @@
 
     rail.innerHTML =
       '<div class="navgroup">' +
-        item({ icon:'overview', label:'Home',              href:'operator-home.html',         active:current === 'overview' }) +
-        item({ icon:'form',     label:'Your information',  href:'operator-form.html',         active:current === 'form' }) +
-        item({ icon:'apps',     label:'Applications',      href:'operator-applications.html', active:current === 'applications' }) +
+        item({ icon:'overview', label:'Home',              href:'operator-home.html?v=6',         active:current === 'overview' }) +
+        item({ icon:'form',     label:'Your information',  href:'operator-form.html?v=7',         active:current === 'form' }) +
+        item({ icon:'apps',     label:'Applications',      href:'operator-applications.html?v=2', active:current === 'applications' }) +
         item({ icon:'docs',     label:'Documents',         off:true }) +
         item({ icon:'sites',    label:'Sites',             off:true }) +
       '</div>' +
@@ -139,8 +139,8 @@
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'bank' ? 'bank-home.html'
-              : seat === 'start' ? 'start.html' : 'operator-home.html');
+        KOTA.go(seat === 'bank' ? 'bank-home.html?v=8'
+              : seat === 'start' ? 'start.html' : 'operator-home.html?v=6');
       });
     });
     document.addEventListener('keydown', function(e){

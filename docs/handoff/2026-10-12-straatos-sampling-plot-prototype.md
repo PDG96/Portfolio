@@ -49,3 +49,7 @@ rows below it. Previous version: scratchpad sp-index.bak.html.
   (PARTNER = {}, cm-icon/cm-pop no longer opened) until Pietra defines the new approach. Previous versions in
   scratchpad: sp-index.before-remove.html, sp-index.before-partner-removal.html.
 - Sources button: neutral at rest (grey border, grey chevron); teal border + chevron only while open.
+- Embed scroll (Pietra): only the form column scrolls now. In ?embed the main-column layers (SVG copy, window, covers,
+  map, form, veil, comment) move into #scroller (x 332+, y 176+); header and sidebars stay fixed. The cursor and the
+  ripples are drawn at y - scroll target, and the column auto-scrolls to follow the fill; view mode and start over
+  scroll it back to the top.

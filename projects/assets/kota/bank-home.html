@@ -158,10 +158,10 @@ body{margin:0;background:var(--ground);color:var(--ink);
 .pin--now:hover{transform:scale(1.1);transform-origin:bottom center}
 .tt-note{margin:0;padding:12px 14px 14px;font-size:12px;line-height:1.5;color:var(--muted)}
 /* The file the page is steering toward is the one that pulses. */
-.pin--now{width:38px;height:42px;z-index:3}
-.pin--now img{filter:drop-shadow(0 0 9px rgba(232,114,63,.85)) drop-shadow(0 2px 5px rgba(0,0,0,.5))}
-.pin--now::before{content:"";position:absolute;left:50%;bottom:2px;width:22px;height:22px;
-  margin-left:-11px;margin-bottom:-11px;border-radius:50%;
+.pin--now{width:30px;height:33px;z-index:3} /* was 38 x 42; smaller now that all six pins share it */
+.pin--now img{filter:drop-shadow(0 0 7px rgba(232,114,63,.85)) drop-shadow(0 2px 5px rgba(0,0,0,.5))}
+.pin--now::before{content:"";position:absolute;left:50%;bottom:2px;width:18px;height:18px;
+  margin-left:-9px;margin-bottom:-9px;border-radius:50%;
   background:radial-gradient(circle,rgba(232,114,63,.55) 0%,rgba(232,114,63,0) 70%);
   animation:pin-pulse 2.2s ease-out infinite;z-index:1}
 @keyframes pin-pulse{0%{transform:scale(1);opacity:.9}70%{transform:scale(3.2);opacity:0}100%{transform:scale(3.2);opacity:0}}
@@ -309,7 +309,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 <link rel="stylesheet" href="motion.css?v=3">
 <link rel="stylesheet" href="responsive.css?v=4">
 <script src="page-transition.js?v=3"></script>
-<link rel="stylesheet" href="assistant.css?v=3">
+<link rel="stylesheet" href="assistant.css?v=6">
 </head>
 <body>
 <div class="app">
@@ -409,8 +409,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
       <section class="block locs">
         <div class="head">
           <div>
-            <h2>On the ground</h2>
-            <div class="sub">Tulivu Cooperative, the file this desk is working, on the ground</div>
+            <h2>Operators location</h2>
+            <div class="sub">Where each operator in the pipeline is based</div>
           </div>
         </div>
         <div class="map">
@@ -482,9 +482,9 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 <div class="notifpop" id="notifpop" role="menu" aria-label="Notifications">
   <div class="lbl">Notifications</div>
-  <button type="button" data-href="operator-detail.html" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative is ready for your decision</b><span class="m">Today · Evaluation</span></span></button>
-  <button type="button" data-href="operator-detail.html" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative uploaded 2 documents</b><span class="m">Yesterday · Registration</span></span></button>
-  <button type="button" data-href="evaluation.html" role="menuitem" class="old"><span class="dot"></span><span><b>Riverbend cooperative reached 72% of its registration</b><span class="m">3 days ago · Registration</span></span></button>
+  <button type="button" data-href="operator-detail.html?v=7" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative is ready for your decision</b><span class="m">Today · Evaluation</span></span></button>
+  <button type="button" data-href="operator-detail.html?v=7" role="menuitem"><span class="dot"></span><span><b>Tulivu Cooperative uploaded 2 documents</b><span class="m">Yesterday · Registration</span></span></button>
+  <button type="button" data-href="evaluation.html?v=3" role="menuitem" class="old"><span class="dot"></span><span><b>Riverbend cooperative reached 72% of its registration</b><span class="m">3 days ago · Registration</span></span></button>
 </div>
 
 <div class="seatpop" id="seatpop" role="menu" aria-label="Change seat">
@@ -507,7 +507,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
    ========================================================================== */
 (function(){
 
-  var DETAIL = 'operator-detail.html';
+  var DETAIL = 'operator-detail.html?v=7';
 
   var operators = [
     { id:'riverbend', name:'Riverbend cooperative',     place:'North Kivu',       center:[29.35,-1.25],      stage:'Registration',         progress:'72%' },
@@ -549,7 +549,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
   /* ---- tooltip, same behaviour as the file page ---- */
   var ev = document.getElementById('goEval');
   if (ev) ev.addEventListener('click', function(){
-    KOTA.go('evaluation.html');
+    KOTA.go('evaluation.html?v=3');
   });
 
 
@@ -564,8 +564,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'operator' ? 'operator-home.html'
-                            : seat === 'start' ? 'start.html' : 'bank-home.html');
+        KOTA.go(seat === 'operator' ? 'operator-home.html?v=6'
+                            : seat === 'start' ? 'start.html' : 'bank-home.html?v=8');
       });
     });
     document.addEventListener('keydown', function(e){
@@ -626,7 +626,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
     /* No trailing arrow: the whole entry is the target, and the arrow only
        repeated that in a place too small to aim at. */
     el.innerHTML = '<span class="dot"></span><div><div class="t">' +
-                   (u.link ? '<a href="' + DETAIL + '">' + u.name + '</a>' : u.name) + u.t +
+                   u.name + u.t + // plain text, no orange link (Pietra); the entry itself still opens the file
                    '</div><div class="m">' + u.m + '</div></div>';
     if (u.link) el.addEventListener('click', openFile);
     else el.style.cursor = 'default';
@@ -642,7 +642,6 @@ body{margin:0;background:var(--ground);color:var(--ink);
       '<div><b>' + s.name + '</b><span class="m">' + s.m + '</span></div>' +
       '<div class="acts">' +
         (s.now ? '<button class="nudge nudge--now" type="button" data-open>Details</button>' : '') +
-        '<button class="nudge" type="button">Send reminder</button>' +
       '</div>';
     watch.appendChild(row);
   });
@@ -718,11 +717,13 @@ body{margin:0;background:var(--ground);color:var(--ink);
         '</svg>');
     }
 
-    operators.filter(function(o){ return o.now; }).forEach(function(o){
+    /* Every operator in the pipeline gets a pin (Pietra, 2026-10-13); only the one
+       with a submitted file is orange and opens a profile. */
+    operators.forEach(function(o){
       var wrapEl = document.createElement('div');
       var el = document.createElement('div');
-      el.className = 'pin' + (o.now ? ' pin--now' : '');
-      el.innerHTML = '<img src="' + pinSvg(o.now) + '" alt="">';
+      el.className = 'pin pin--now'; // every pin the same: orange with the glow (Pietra demos it and knows which to open)
+      el.innerHTML = '<img src="' + pinSvg(true) + '" alt="">';
       wrapEl.appendChild(el);
 
       var html = '<div class="tt-head"><p class="tt-title">' + o.name + '</p></div>' +
@@ -735,8 +736,12 @@ body{margin:0;background:var(--ground);color:var(--ink);
           '</div>' +
           '<button class="tt-go tt-go--now" type="button" data-open>Details</button>';
       } else {
-        html += '<p class="tt-note">This operator has been invited but hasn\u2019t completed ' +
-                'their registration yet, so there is no file to open.</p>';
+        html += '<div class="tt-body">' +
+            '<div class="tt-row"><span class="k">Stage</span><span class="v">' + o.stage + '</span></div>' +
+            '<div class="tt-row"><span class="k">Progress</span><span class="v">' + o.progress + '</span></div>' +
+            '<div class="tt-row"><span class="k">Location</span><span class="v">' + o.place + '</span></div>' +
+          '</div>' +
+          '<p class="tt-note">No file to open until the registration is submitted.</p>';
       }
 
       new mapboxgl.Marker({ element: wrapEl, anchor: 'bottom' })
@@ -904,7 +909,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 })();
 </script>
 <script src="motion.js?v=1"></script>
-<script src="assistant.js?v=3"></script>
+<script src="assistant.js?v=5"></script>
 <script src="assist-bank.js?v=3"></script>
 </body>
 </html>
