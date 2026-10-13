@@ -531,7 +531,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
   [].forEach.call(pop.querySelectorAll('[data-seat]'), function(b){
     b.addEventListener('click', function(){
       var seat = b.getAttribute('data-seat');
-      KOTA.go(seat === 'bank' ? 'bank-home.html?v=8' : seat === 'start' ? 'start.html' : 'operator-home-empty.html?v=23');
+      KOTA.go(seat === 'bank' ? 'bank-home.html?v=9' : seat === 'start' ? 'start.html' : 'operator-home-empty.html?v=23');
     });
   });
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape') pop.classList.remove('is-on'); });

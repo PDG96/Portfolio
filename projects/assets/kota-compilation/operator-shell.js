@@ -139,7 +139,7 @@
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'bank' ? 'bank-home.html?v=8'
+        KOTA.go(seat === 'bank' ? 'bank-home.html?v=9'
               : seat === 'start' ? 'start.html' : 'operator-home-empty.html?v=23');
       });
     });

@@ -69,7 +69,7 @@
 
     rail.innerHTML =
       '<div class="navgroup">' +
-        item({ icon:'overview', label:'Home',              href:'operator-home.html?v=6',         active:current === 'overview' }) +
+        item({ icon:'overview', label:'Home',              href:'operator-home.html?v=9',         active:current === 'overview' }) +
         item({ icon:'form',     label:'Your information',  href:'operator-form.html?v=7',         active:current === 'form' }) +
         item({ icon:'apps',     label:'Applications',      href:'operator-applications.html?v=2', active:current === 'applications' }) +
         item({ icon:'docs',     label:'Documents',         off:true }) +
@@ -139,8 +139,8 @@
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'bank' ? 'bank-home.html?v=8'
-              : seat === 'start' ? 'start.html' : 'operator-home.html?v=6');
+        KOTA.go(seat === 'bank' ? 'bank-home.html?v=9'
+              : seat === 'start' ? 'start.html' : 'operator-home.html?v=9');
       });
     });
     document.addEventListener('keydown', function(e){

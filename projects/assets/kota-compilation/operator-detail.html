@@ -2101,7 +2101,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
      moves under it. */
   var home = document.getElementById('goHome');
   if (home) home.addEventListener('click', function(){
-    KOTA.go('bank-home.html?v=8');
+    KOTA.go('bank-home.html?v=9');
   });
 
   var head = document.getElementById('stickyhead');
@@ -2148,8 +2148,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'operator' ? 'operator-home.html?v=6'
-                            : seat === 'start' ? 'start.html' : 'bank-home.html?v=8');
+        KOTA.go(seat === 'operator' ? 'operator-home.html?v=9'
+                            : seat === 'start' ? 'start.html' : 'bank-home.html?v=9');
       });
     });
     document.addEventListener('keydown', function(e){

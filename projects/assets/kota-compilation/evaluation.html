@@ -261,7 +261,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
     <div class="stickyhead" id="stickyhead">
       <header class="topbar">
-        <a href="bank-home.html?v=8">Home</a><span class="sep"></span>
+        <a href="bank-home.html?v=9">Home</a><span class="sep"></span>
         <span class="here">Evaluation</span>
       </header>
 
@@ -388,7 +388,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
   /* ---- rail, header, tooltip: the same behaviour as the other screens ---- */
   document.getElementById('goHome').addEventListener('click', function(){
-    KOTA.go('bank-home.html?v=8');
+    KOTA.go('bank-home.html?v=9');
   });
 
 
@@ -403,8 +403,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
       b.addEventListener('click', function(){
         var seat = b.getAttribute('data-seat');
         try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-        KOTA.go(seat === 'operator' ? 'operator-home.html?v=6'
-                            : seat === 'start' ? 'start.html' : 'bank-home.html?v=8');
+        KOTA.go(seat === 'operator' ? 'operator-home.html?v=9'
+                            : seat === 'start' ? 'start.html' : 'bank-home.html?v=9');
       });
     });
     document.addEventListener('keydown', function(e){

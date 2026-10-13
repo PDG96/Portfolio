@@ -144,3 +144,12 @@ submission to Verra (copy is mine, written as future work). The submission scree
   Conflict popup "1 of 6 · Matoro", Declared sites "6 · 1 in conflict area", shipments key "From Matoro · Rubaya".
   Supplier/buyer locations are mock. All operator-detail links ?v=5.
 - Kota operator detail (both copies), Detailed information: rows grouped under KYC and Management systems; the five MS sections added with the operator form's counts (2/4, 2/4, 2/4, 1/4, 1/3 = 8/19), 'Not sent' / 'Not assigned', Review disabled, kept out of the review ring (still 47%). Grid row no longer fixed at 488px. Subtitle 'The sections this desk received, counted'. Links ?v=7.
+- Committed 3449540 and pushed to main with 8267bd5 (2026-10-13); live site checked: kota and straatos serve the new pages.
+- Kota operator home (both copies), Assessment details: the KYC / MS bars are hidden; the line chart alone fills the card. operator-home ?v=9. (Not committed yet.)
+- Kota low-fi/handover slider: kota-handover.jpg re-captured from the current bank-home.html (headless Chrome, 1920 x 1596 @2x = 3840 x 3192, launcher hidden). Capture-only CSS reproduces the low-fi image grid (measured: canvas 88-1892, gap 28, KPIs 112, map 511, chart 343, watch 313, columns 1438/338) so the cards line up under the slider; the live bank-home is unchanged. Map tiles need a longer wait in headless Chrome (--virtual-time-budget=40000 --run-all-compositor-stages-before-draw); ?v=9. Not committed yet.
+- Kota bank home (both copies) and bank-home-lowfi.html: 4-column grid. KPIs span all four, the map spans three,
+  Latest updates spans one, so it is exactly as wide as Framework coverage. Slider images re-captured on one shared
+  grid (capture-only CSS, measured equal: KPIs 131-243, map 271-782, updates 1462-1892, chart 810-1153, watch
+  1181-1494 at 1920 css): kota-lowfi.jpg ?v=8, kota-handover.jpg ?v=10. Previous low-fi image in scratchpad.
+  bank-home links ?v=9. Not committed yet.
+- Kota: Challenge / Solution section hidden (style=display:none) for the 2026-10-13 demo only; restore afterwards.

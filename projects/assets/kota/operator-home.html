@@ -187,10 +187,10 @@ body{margin:0;background:var(--ground);color:var(--ink);
 
 /* Progress over time, in place of the "where the work is" list (Pietra, 2026-10-13).
    Same dark chart language as the declared volume: #232425 grid, muted 12px labels. */
-.prog-chart{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.prog-chart{margin-top:4px;flex:1;display:flex;flex-direction:column}
 .prog-chart .ph{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
 .prog-chart .ph .w-lbl{padding:0}
-.prog-chart .plot{position:relative;height:170px}
+.prog-chart .plot{position:relative;flex:1;min-height:170px}
 .prog-chart svg{display:block;width:100%;height:100%;overflow:visible}
 .prog-chart .gl{stroke:#232425;stroke-width:1}
 .prog-chart text{font:12px/1 inherit;fill:var(--muted)}
@@ -455,7 +455,7 @@ body{margin:0;background:var(--ground);color:var(--ink);
           </div>
           <button class="btn btn--ghost" type="button" id="goForm2">Open the file</button>
         </div>
-        <div class="halves" id="halves"></div>
+        <div class="halves" id="halves" style="display:none"></div>   <!-- bars removed; the line chart carries it (Pietra, 2026-10-13) -->
         <div class="worst" id="worst"></div>
       </section>
 
@@ -693,8 +693,8 @@ body{margin:0;background:var(--ground);color:var(--ink);
     b.addEventListener('click', function(){
       var seat = b.getAttribute('data-seat');
       try { if (seat !== 'start') localStorage.setItem('kota-seat', seat); } catch (err) {}
-      KOTA.go(seat === 'bank' ? 'bank-home.html?v=8'
-                          : seat === 'start' ? 'start.html' : 'operator-home.html?v=6');
+      KOTA.go(seat === 'bank' ? 'bank-home.html?v=9'
+                          : seat === 'start' ? 'start.html' : 'operator-home.html?v=9');
     });
   });
   document.addEventListener('keydown', function(e){
